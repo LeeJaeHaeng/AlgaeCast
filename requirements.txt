@@ -1,0 +1,36 @@
+# AlgaeCast-7 — Python 3.11. 정확한 설치 버전은 requirements.lock.txt (make lock) 참고.
+# --- 데이터 ---
+pandas>=2.2,<3.0
+numpy>=1.26,<3.0
+pyarrow>=15.0
+openpyxl>=3.1
+pyyaml>=6.0
+# --- ML / 통계 ---
+scikit-learn>=1.5
+lightgbm>=4.3
+catboost>=1.2.5
+optuna>=3.6
+shap>=0.45
+statsmodels>=0.14
+pymannkendall>=1.4
+# --- 검증 / 수집 ---
+pandera>=0.20
+requests>=2.31
+python-dotenv>=1.0
+tqdm>=4.66
+# --- DB ---
+supabase>=2.4
+# --- 시각화 / 노트북 ---
+matplotlib>=3.8
+seaborn>=0.13
+jupytext>=1.16
+ipykernel>=6.29
+nbconvert>=7.16
+# --- 개발 ---
+pytest>=8.0
+ruff>=0.5
+black>=24.4
+pre-commit>=3.7
+nbstripout>=0.7
+# --- 이 패키지 자체 (src 레이아웃, editable) ---
+-e .

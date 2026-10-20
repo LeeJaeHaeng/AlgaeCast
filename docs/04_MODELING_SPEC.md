@@ -1,0 +1,135 @@
+# 04. 통계분석·모델링·튜닝·평가 명세서
+
+## 1. 통계분석 (T2, `notebooks/02_stats.ipynb` → `reports/eda/`)
+
+| # | 분석 | 방법 | 산출물 | 보고서 용도 |
+|---|---|---|---|---|
+| S1 | 타깃 분포 | 원단위·log10(x+1) 히스토그램, 0값 비율, 분위수, Anderson-Darling | `fig_target_dist.png` | 변환 근거 |
+| S2 | 지점별 계절성 | 월별 상자그림, STL 분해(주기 52주) | `fig_seasonal_<site>.png` | 월 피처 근거 |
+| S3 | lag 상관 | 세포수(log) vs 각 변수의 0~30일 lag Spearman 히트맵 | `fig_lag_corr.png` | 창 길이(7/14/30) 선정 근거 |
+| S4 | 선행연구 재현 | 수온 0.630, 월 0.374, 유입량 0.188, 방류량 0.187(송찬영 외, 2023) 동일 지표 재계산 | `tbl_corr_vs_prior.md` | 데이터 타당성 |
+| S5 | 정상성 | ADF, KPSS (지점별) | `tbl_stationarity.md` | 차분 여부 |
+| S6 | 지점 이질성 | Kruskal-Wallis(세포수), 지점별 세포수-수온 LOESS 곡선 | `fig_site_response.png` | 지점 범주형 피처 근거 |
+| S7 | 조기화 추세 | 연도별 첫 경보일(관심/경계) Mann-Kendall + Sen's slope | `tbl_onset_trend.md` | 정책 브리프 핵심 그림 |
+| S8 | 결측 구조 | 변수×월 결측률 히트맵, 결측여부~유입량·강수 로지스틱 회귀(OR, p) | `fig_missing.png`, `tbl_mnar.md` | 결측 전략 근거 |
+| S9 | 급증 사례 | 5일 내 10배 이상 증가 사건 목록과 선행 7일 수온·방류 패턴 | `tbl_bloom_events.md` | 발표 사례 |
+| S10 | 다중공선성·중요도 | VIF, Mutual Information, Boruta | `tbl_feature_select.md` | 피처 선별 |
+
+## 2. 검증 설계
+
+```
+연도:   2015 … 2019 | 2020 | 2021 | 2022 | 2023 | 2024 || 2025 || 2026
+        ───── 학습(CV) ────────────────────────────── || 검증 || 평가
+Fold1  train ≤2019 → valid 2020
+Fold2  train ≤2020 → valid 2021
+Fold3  train ≤2021 → valid 2022
+Fold4  train ≤2022 → valid 2023
+Fold5  train ≤2023 → valid 2024
+Final  train ≤2024 → holdout 2025 (모든 지표 보고)
+Submit train ≤2025 → predict 2026 (sample_submission)
+```
+- 실제 데이터 시작 연도에 따라 폴드 수 조정(최소 3). 조류 시즌(4~11월) 샘플만 학습할지 전체 사용할지는 CV로 결정하고 보고.
+- 샘플 단위 = (site, base_date). 동일 base_date의 지점들은 같은 폴드.
+- 랜덤 분할 절대 금지.
+
+## 3. 베이스라인
+| 이름 | 정의 |
+|---|---|
+| B0 지속성 | pred = 기준일 최근 측정값 |
+| B1 계절 평균 | pred = 지점×월 학습기간 중앙값(log) |
+| B2 선형 추세 | 최근 3회 기울기 외삽 (상한·하한 클리핑) |
+| B3 NIER 공식 예측 | 물환경정보시스템 조류예측정보/AI 정밀예측 (가용 기간만) |
+| B4 ElasticNet | 전체 피처 선형 모델 |
+
+## 4. 모델
+
+### 4.1 주력: LightGBM (log 타깃, regression_l2 또는 huber)
+- `site_code`, `dominant_genus`, `basin`, `facility_type` → categorical
+- 샘플 가중치: 최근 연도 가중(연도 차이당 0.9 감쇠) 실험
+- 타깃: log10(y+1). 예측 후 10^ŷ − 1, 음수 0 클리핑
+
+### 4.2 분위 회귀: LightGBM objective=quantile, alpha ∈ {0.1, 0.5, 0.9}
+- 중앙값 모델 최적 파라미터 고정, alpha만 변경
+- 경계 초과 확률 p(y≥10,000): 분위 예측 3점으로 로그정규 근사 또는 분류기(binary LightGBM, 동일 피처) 병행 → 둘 비교 후 보고
+
+### 4.3 CatBoost (depth, lr, l2_leaf_reg, iterations early-stop)
+### 4.4 ElasticNet (StandardScaler, alpha, l1_ratio)
+### 4.5 앙상블
+- 검증 폴드 OOF 예측에 NNLS(합=1) 가중 → 최종. 단일 모델이 더 좋으면 단일 채택(보고에 명시).
+### 4.6 조건부: LSTM / Temporal Fusion Transformer
+- 학습 샘플 < 3,000이면 생략. 시도 시 `reports/experiments/EXP-LSTM.md`에 비교만 기록.
+
+## 5. 하이퍼파라미터 튜닝 (Optuna)
+
+### 5.1 공통
+- Sampler: TPESampler(seed=42, multivariate=True) / Pruner: MedianPruner(n_startup_trials=20)
+- 목적함수: CV 폴드 평균 log-RMSE (폴드 표준편차는 로그만)
+- 저장: `optuna.db` (sqlite) + `reports/experiments/tune_<model>.md` (상위 10 trial 표, 파라미터 중요도 그림)
+- 상위 5 trial을 시드 {0, 1, 2}로 재학습 → 평균·표준편차 → 분산 큰 조합 제외
+
+### 5.2 LightGBM 탐색 공간
+| 파라미터 | 공간 |
+|---|---|
+| num_leaves | int 8~64 |
+| max_depth | int 3~10 |
+| learning_rate | float log 0.01~0.1 |
+| n_estimators | 2000 + early_stopping(50) |
+| min_child_samples | int 10~100 |
+| feature_fraction | 0.5~1.0 |
+| bagging_fraction / bagging_freq | 0.5~1.0 / 1~5 |
+| lambda_l1, lambda_l2 | float log 1e-3~10 |
+| min_split_gain | 0~1 |
+| objective | {l2, huber(alpha 0.9~1.5)} |
+- trial 300, 시간 상한 2시간
+
+### 5.3 CatBoost
+depth 4~8, learning_rate log 0.01~0.1, l2_leaf_reg 1~10, bagging_temperature 0~1, random_strength 0~2 — trial 150
+
+### 5.4 ElasticNet
+alpha log 1e-4~10, l1_ratio 0~1 — trial 50
+
+## 6. 평가 프로토콜
+
+### 6.1 지표 (`src/algaecast/eval/metrics.py`)
+| 지표 | 공간 | 식/정의 |
+|---|---|---|
+| RMSE_log, MAE_log | log10 | 대회 1차 |
+| R2_raw | 원단위 | sklearn r2_score |
+| NSE_raw | 원단위 | 1 − Σ(o−p)²/Σ(o−ō)² (학습 평균이 아닌 검증 관측 평균) |
+| R2_log, KGE_log | log | 보완 |
+| F1, Precision, Recall @10k | 분류 | obs≥10,000 vs pred≥10,000 |
+| F1 @1k | 분류 | 관심 단계 |
+| PICP_80, MPIW_80 | 구간 | 0.1~0.9 분위 |
+| Brier | 확률 | 경계 초과 확률 |
+
+### 6.2 보고 표 (모두 `reports/eval/`)
+1. `tbl_baseline.md` — B0~B4
+2. `tbl_models_cv.md` — 모델별 CV 폴드 평균±표준편차
+3. `tbl_holdout_2025.md` — 모든 지표 + 부트스트랩 95% CI (1,000회, (site, base_date) 리샘플)
+4. `tbl_by_site.md`, `tbl_by_month.md` — 분해
+5. `tbl_missing_strategy.md` — S1/S2/S3 × 모델
+6. `tbl_ablation.md` — 피처 그룹(AR/수온수질/수문/기상/예보/시간) 제거 시 변화
+7. `tbl_stat_tests.md` — Diebold-Mariano(vs B0, B3), Wilcoxon(모델 간), p값
+8. `tbl_benchmark_nier.md` — 2026 가용 기간 NIER 공식 예측 vs 우리 모델 (동일 조합만)
+9. `fig_residuals.png` — 잔차 vs 예측, Q-Q, Ljung-Box 결과
+10. `fig_shap_global.png`, `fig_shap_cases.png` — 전역 + 경계 초과 사례 5건 waterfall
+11. `fig_pred_vs_obs_<site>.png` — 시계열 겹쳐 그리기(관측, 예측, 80% 밴드, 경보선)
+
+### 6.3 해석 규칙 (방법 설명서에 그대로)
+- 원단위 R²·NSE는 대발생 사건 몇 건에 민감 → log 지표와 병기, 대발생 제외 시 값도 각주
+- CI가 목표치를 걸치면 "목표 달성"이 아니라 "목표 수준과 통계적으로 구분되지 않음"으로 서술
+- 벤치마크 비교는 동일 (site, base_date, target_date)만, 표본 수 명시
+
+## 7. 설명가능성·의사결정 변환
+- SHAP TreeExplainer → 전역 중요도, 지점별 요약, 사례 waterfall
+- 담당자 문장 생성 규칙: 상위 3개 기여 피처를 그룹명으로 치환 ("수온 상승", "방류량 감소", "누적강우 부족") + 기여 비율(%)
+- 설비 배치 우선순위: score = p(경계 초과) × 취수 가중치(물금 1.0, 강정고령 0.8, 회남 0.7, 해평 0.5, 칠서 0.5; 취수능력 기반, `config/sites.yaml`) → 내림차순, 상위 N개 권고
+
+## 8. 실험 기록 양식 (`reports/experiments/EXP-###.md`)
+```
+# EXP-012 LightGBM huber + S2 결측
+- 날짜 / 커밋 / 데이터 버전(features_S2 sha)
+- 변경점
+- CV: RMSE_log 0.512±0.031 / R2_raw 0.58 / F1@10k 0.66
+- 결론 / 다음 실험
+```

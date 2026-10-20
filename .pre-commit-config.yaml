@@ -1,0 +1,33 @@
+# make setup 이 `pre-commit install` 로 등록. 수동 실행: .venv 의 pre-commit run --all-files
+# rev 는 requirements.lock.txt 의 ruff/black/nbstripout 버전과 맞춘다 (make lint 와 동일 결과 보장).
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=5000"]
+      - id: detect-private-key
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.1
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+  - repo: https://github.com/psf/black
+    rev: 26.10.1
+    hooks:
+      - id: black
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.9.1
+    hooks:
+      - id: nbstripout
+  - repo: local
+    hooks:
+      - id: no-api-secrets
+        name: block data.go.kr serviceKey / long base64 tokens
+        entry: '(serviceKey=[^&\s인]|[A-Za-z0-9+/%]{80,}={0,2})'
+        language: pygrep
+        types: [text]
+        exclude: '(^\.pre-commit-config\.yaml$|^requirements\.lock\.txt$|\.ipynb$|\.svg$)'

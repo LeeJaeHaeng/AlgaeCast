@@ -1,0 +1,16 @@
+# 줄바꿈을 저장소·체크아웃 모두 LF 로 고정 (Windows 개발 + ubuntu CI 혼용). 2026-10-20 T0-a
+* text=auto eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.zip binary
+*.parquet binary
+*.pkl binary
+*.db binary
+*.ipynb text eol=lf
