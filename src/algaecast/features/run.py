@@ -16,6 +16,7 @@ import json
 import logging
 from collections.abc import Callable
 from datetime import date
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -203,6 +204,28 @@ def group_of(col: str) -> str:
     return "etc"
 
 
+TEST_TARGETS_PATH = PROCESSED / "test_targets_DO_NOT_USE.parquet"
+TARGET_COLS = ["target_cells", "target_log"]
+
+
+def quarantine_test_targets(feats: pd.DataFrame, path: Path = TEST_TARGETS_PATH) -> pd.DataFrame:
+    """test split 의 타깃을 별도 파일로 분리 저장하고 피처 프레임의 test 타깃은 NaN 으로 비운다.
+
+    분리 파일은 사후 검증 전용(eval/live).
+    """
+    d = feats.copy()
+    is_test = d["split"] == "test"
+    tt = d.loc[is_test, ["station_id", "site_code", "base_date", "target_date", *TARGET_COLS]].copy()
+    if path.exists():
+        prev = pd.read_parquet(path)
+        prev["base_date"] = pd.to_datetime(prev["base_date"]).dt.date
+        tt = pd.concat([prev, tt]).drop_duplicates(["station_id", "base_date"], keep="last")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tt.to_parquet(path, index=False)
+    d.loc[is_test, TARGET_COLS] = np.nan
+    return d
+
+
 def _md(t: pd.DataFrame) -> str:
     hdr = "| " + " | ".join(map(str, t.columns)) + " |\n|" + "---|" * len(t.columns)
     return (
@@ -246,6 +269,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         feats = pd.concat(frames, ignore_index=True)
         feats = assign_split(feats, cfg, submission)
+        feats = quarantine_test_targets(feats)
         feature_cols = [c for c in feats.columns if c not in META_COLS] + ["horizon_days"]
         feature_cols = list(dict.fromkeys(feature_cols))
         for c in CAT_COLS:

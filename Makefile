@@ -18,7 +18,7 @@ endif
 START ?= 2012-01-01
 END   ?= today
 
-.PHONY: help venv setup lock test lint format collect align features eda tune train evaluate predict upload submission reproduce clean
+.PHONY: help venv setup lock test lint format collect align features select baselines eda tune train evaluate predict upload submission reproduce clean
 
 help:
 	@echo AlgaeCast-7 make targets
@@ -67,6 +67,12 @@ align:
 features:
 	$(PY) -m algaecast.features.run --strategy S1,S2,S3
 	$(PY) scripts/leakage_audit.py --strategy S1 --sample 300
+
+select:
+	$(PY) -m algaecast.features.select --strategy S1 --boruta-iter 100
+
+baselines:
+	$(PY) -m algaecast.models.baselines --strategy S1
 
 eda:
 	$(PY) -m jupytext --to notebook --execute notebooks/02_stats.py
