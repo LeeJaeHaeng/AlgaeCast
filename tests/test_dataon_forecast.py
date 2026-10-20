@@ -157,3 +157,35 @@ def test_run_format_table_and_date_arg():
     assert [s.name for s in runmod.STEPS][0] == "nier_algae" and runmod.STEPS[-1].name.startswith(
         "nier_forecast"
     )
+
+
+def test_offset_and_continuous_series():
+    days = [date(2024, 12, 29), date(2024, 12, 30), date(2024, 12, 31)]
+    dataon = pd.DataFrame(
+        {
+            "station_code": "3008680",
+            "station_name": "대전시(대청조정지댐)",
+            "dam_name": "대청댐",
+            "obs_date": days,
+            "wl": [10.0, 10.1, 10.2],
+            "source": "dataon_v5:x.xlsx",
+        }
+    )
+    wamis = pd.DataFrame(
+        {
+            "station_code": "3008680",
+            "obs_date": days + [date(2025, 1, 1)],
+            "wl": [10.26, 10.36, 10.46, 10.5],
+            "source": "wamis_wl_dtdata",
+        }
+    )
+    off = dl.offset_table(dataon, wamis)
+    assert off.loc[0, "오프셋 m(중앙값)"] == pytest.approx(-0.26) and off.loc[0, "기준면 차이"] == "Y"
+    assert off.loc[0, "일치율 %"] == 0.0 and off.loc[0, "보정 후 일치율 %"] == 100.0
+    cont = dl.continuous_series(dataon, wamis, off, date(2025, 1, 1))
+    assert len(cont) == 4 and cont.iloc[-1]["source"] == "wamis_wl_dtdata"
+    assert cont.iloc[-1]["wl_adj"] == pytest.approx(10.24) and cont.iloc[0]["wl_adj"] == 10.0
+    assert dl.site_station_codes({"sites": [{"dataon_stations": [{"code": "1"}, "2", {"code": "1"}]}]}) == [
+        "1",
+        "2",
+    ]

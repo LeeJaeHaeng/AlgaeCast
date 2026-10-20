@@ -95,7 +95,15 @@ sites:
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 143 }
     kma_mid_reg_id_ta: "11H10602" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
     kma_mid_reg_id_land: "11H10000" # 중기육상예보(getMidLandFcst) 광역코드
-    dataon_stations: ['2001685', '2001680', '2001690', '2002677', '2002675', '2002680', '2002609', '2008603'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 안동댐·방수로·조정지, 임하댐·방수로·조정지, 성덕댐, 군위댐 (영주댐 관측소 없음)
+    dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
+      - { code: "2001685", name: 안동시(안동댐), use: true }
+      - { code: "2001680", name: 안동시(안동댐방수로), use: true }
+      - { code: "2001690", name: 안동시(안동조정지댐), use: true }
+      - { code: "2002677", name: 안동시(임하댐), use: true }
+      - { code: "2002675", name: 안동시(임하댐방수로), use: true }
+      - { code: "2002680", name: 안동시(임하조정지댐), use: true }
+      - { code: "2002609", name: 청송군(성덕댐), use: true }
+      - { code: "2008603", name: 군위군(군위댐), use: true }
     asos_stn_id: 279
     asos_alt_stn_id: null
     service_start: 2016 # 시범 2013.2~2015.12, 정식 2016
@@ -133,7 +141,16 @@ sites:
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 143 }
     kma_mid_reg_id_ta: "11H10701" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
     kma_mid_reg_id_land: "11H10000" # 중기육상예보(getMidLandFcst) 광역코드
-    dataon_stations: ['2001685', '2001680', '2001690', '2002677', '2002675', '2002680', '2002609', '2008603', '2010625'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): HP 와 동일 + 김천부항댐
+    dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
+      - { code: "2001685", name: 안동시(안동댐), use: true }
+      - { code: "2001680", name: 안동시(안동댐방수로), use: true }
+      - { code: "2001690", name: 안동시(안동조정지댐), use: true }
+      - { code: "2002677", name: 안동시(임하댐), use: true }
+      - { code: "2002675", name: 안동시(임하댐방수로), use: true }
+      - { code: "2002680", name: 안동시(임하조정지댐), use: true }
+      - { code: "2002609", name: 청송군(성덕댐), use: true }
+      - { code: "2008603", name: 군위군(군위댐), use: true }
+      - { code: "2010625", name: 김천시(김천부항댐), use: true }
     asos_stn_id: 143
     asos_alt_stn_id: null
     service_start: 2016
@@ -171,7 +188,15 @@ sites:
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 155 }
     kma_mid_reg_id_ta: "11H20601" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
     kma_mid_reg_id_land: "11H20000" # 중기육상예보(getMidLandFcst) 광역코드
-    dataon_stations: ['2015680', '2016630', '2016635', '2016640', '2018698', '2012615', '2012607', '2021620'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 합천댐·방수로·조정지·조정지방수로, 남강댐방수로, 영천댐, 보현산댐, 운문댐(금호강)
+    dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
+      - { code: "2015680", name: 합천군(합천댐), use: true }
+      - { code: "2016630", name: 합천군(합천댐방수로), use: true }
+      - { code: "2016635", name: 합천군(합천조정지댐), use: true }
+      - { code: "2016640", name: 합천군(합천조정지방수로), use: true }
+      - { code: "2018698", name: 진주시(남강댐방수로), use: true }
+      - { code: "2012615", name: 영천시(영천댐), use: true }
+      - { code: "2012607", name: 영천시(보현산댐), use: true, wamis_ok: false } # WAMIS wl_dtdata 가 다른 계열(차 226.9 m) → 2025~ 결측
+      - { code: "2021620", name: 청도군(운문댐), use: true }
     asos_stn_id: 263
     asos_alt_stn_id: 155 # 창원 (의령군 263 결측 시 대체)
     service_start: 2016
@@ -208,7 +233,14 @@ sites:
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 257 }
     kma_mid_reg_id_ta: "11H20102" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
     kma_mid_reg_id_land: "11H20000" # 중기육상예보(getMidLandFcst) 광역코드
-    dataon_stations: ['2022696', '2022697', '2021660', '2021650', '2015680', '2016635', '2018698'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 낙동강하구언(내·외) = WAMIS 2022696/2022697 과 동일 코드, 밀양댐·대리(밀양강), 합천댐·조정지, 남강댐방수로
+    dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
+      - { code: "2022696", name: 부산시(낙동강하구언(내)), use: true }
+      - { code: "2022697", name: 부산시(낙동강하구언(외)), use: false } # 조석 영향 → 피처 제외
+      - { code: "2021660", name: 밀양시(밀양댐), use: true }
+      - { code: "2021650", name: 양산시(대리), use: true }
+      - { code: "2015680", name: 합천군(합천댐), use: true }
+      - { code: "2016635", name: 합천군(합천조정지댐), use: true }
+      - { code: "2018698", name: 진주시(남강댐방수로), use: true }
     asos_stn_id: 159
     asos_alt_stn_id: null
     service_start: 2020 # '20년 조류경보제 편입
@@ -246,7 +278,10 @@ sites:
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 133 }
     kma_mid_reg_id_ta: "11C10301" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
     kma_mid_reg_id_land: "11C10000" # 중기육상예보(getMidLandFcst) 광역코드
-    dataon_stations: ['3008690', '3008685', '3008680'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 대청댐·대청댐방수로·대청조정지댐 (용담댐 관측소는 파일에 없음)
+    dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
+      - { code: "3008690", name: 청주시(대청댐), use: true }
+      - { code: "3008685", name: 청주시(대청댐방수로), use: true }
+      - { code: "3008680", name: 대전시(대청조정지댐), use: true }
     asos_stn_id: 133
     asos_alt_stn_id: null
     service_start: 1998

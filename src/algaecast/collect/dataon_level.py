@@ -17,7 +17,7 @@ from __future__ import annotations
 import argparse
 import logging
 import re
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -31,6 +31,8 @@ log = logging.getLogger(__name__)
 
 DATAON_DIR = RAW_DIR / "dataon"
 OUT_PATH = DATAON_DIR / "dataon_level_daily_long.parquet"
+CONT_PATH = DATAON_DIR / "level_continuous_long.parquet"
+CUTOVER = date(2025, 1, 1)  # 이 날부터 WAMIS
 LONG_COLS = ["station_code", "station_name", "dam_name", "obs_date", "wl", "source"]
 SCHEMA = pa.DataFrameSchema(
     {
@@ -173,8 +175,9 @@ def coverage_table(long: pd.DataFrame, sites_cfg: dict) -> pd.DataFrame:
     """지점별 dataon_stations 의 기간·행수·결측률."""
     rows = []
     for s in sites_cfg["sites"]:
-        for code in s.get("dataon_stations", []):
-            g = long[long["station_code"] == str(code)]
+        for ent in s.get("dataon_stations", []):
+            code = str(ent["code"]) if isinstance(ent, dict) else str(ent)
+            g = long[long["station_code"] == code]
             if g.empty:
                 rows.append({"station_id": s["station_id"], "code": code, "name": "(파일에 없음)"})
                 continue
@@ -230,6 +233,85 @@ def compare_with_wamis(long: pd.DataFrame, tol: float = 0.05) -> pd.DataFrame | 
     return pd.DataFrame(rows)
 
 
+def site_station_codes(sites_cfg: dict) -> list[str]:
+    codes: list[str] = []
+    for s in sites_cfg["sites"]:
+        for ent in s.get("dataon_stations", []):
+            c = str(ent["code"]) if isinstance(ent, dict) else str(ent)
+            if c not in codes:
+                codes.append(c)
+    return codes
+
+
+def fetch_wamis_levels(codes: list[str], start: date, end: date) -> pd.DataFrame:
+    """WAMIS wl_dtdata 로 같은 수위관측소를 수집 (연도 실패는 건너뜀)."""
+    from algaecast.collect.wamis import WamisLevelCollector
+
+    col = WamisLevelCollector()
+    frames = []
+    for c in codes:
+        try:
+            df = col.fetch(c, start, end)
+        except CollectError as exc:
+            log.warning("WAMIS %s 실패: %s", c, exc)
+            continue
+        if not df.empty:
+            frames.append(df.rename(columns={"obscd": "station_code"})[["station_code", "obs_date", "wl"]])
+    if not frames:
+        return pd.DataFrame(columns=["station_code", "obs_date", "wl"])
+    out = pd.concat(frames, ignore_index=True)
+    out["station_code"] = out["station_code"].astype(str)
+    out["source"] = "wamis_wl_dtdata"
+    log.info("WAMIS 수위: 요청 %d회, 캐시 %d회", col.n_requests, col.n_cache_hits)
+    return out
+
+
+def offset_table(dataon: pd.DataFrame, wamis: pd.DataFrame, tol: float = 0.05) -> pd.DataFrame:
+    """겹치는 구간(2020~2024) 관측소별 일치율·기준면 오프셋(중앙값 차, DataON − WAMIS)."""
+    m = dataon.merge(wamis, on=["station_code", "obs_date"], suffixes=("_d", "_w"))
+    rows = []
+    for code, g in m.groupby("station_code"):
+        diff = g["wl_d"] - g["wl_w"]
+        med = float(diff.median())
+        rows.append(
+            {
+                "code": code,
+                "name": g["station_name"].iloc[0],
+                "공통일": len(g),
+                "일치율 %": round(100 * (diff.abs() <= tol).mean(), 1),
+                "오프셋 m(중앙값)": round(med, 3),
+                "MAD m": round(float((diff - med).abs().median()), 3),
+                "보정 후 일치율 %": round(100 * ((diff - med).abs() <= tol).mean(), 1),
+                "기준면 차이": "Y" if abs(med) > tol else "N",
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def continuous_series(
+    dataon: pd.DataFrame, wamis: pd.DataFrame, offsets: pd.DataFrame, cutover: date
+) -> pd.DataFrame:
+    """DataON(≤cutover 전날) + WAMIS(≥cutover) 연속 시계열.
+
+    wl_adj = WAMIS 값에 오프셋을 더해 DataON 기준면으로 정렬.
+    """
+    off = offsets.set_index("code")["오프셋 m(중앙값)"] if not offsets.empty else pd.Series(dtype=float)
+    names = dataon.drop_duplicates("station_code").set_index("station_code")[["station_name", "dam_name"]]
+    keep = ["station_code", "station_name", "dam_name", "obs_date", "wl", "source"]
+    d = dataon[dataon["obs_date"] < cutover][keep].copy()
+    d["offset_m"] = 0.0
+    d["wl_adj"] = d["wl"]
+    w = wamis[wamis["obs_date"] >= cutover].copy()
+    w = w[w["station_code"].isin(names.index)]
+    w["station_name"] = w["station_code"].map(names["station_name"])
+    w["dam_name"] = w["station_code"].map(names["dam_name"])
+    w["offset_m"] = w["station_code"].map(off).fillna(0.0)
+    w["wl_adj"] = w["wl"] + w["offset_m"]
+    cols = ["station_code", "station_name", "dam_name", "obs_date", "wl", "wl_adj", "offset_m", "source"]
+    out = pd.concat([d[cols], w[cols]], ignore_index=True)
+    return out.sort_values(["station_code", "obs_date"]).reset_index(drop=True)
+
+
 def _md(t: pd.DataFrame) -> str:
     if t is None or t.empty:
         return "(없음)"
@@ -254,6 +336,25 @@ def main(argv: list[str] | None = None) -> int:
     sites_cfg = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))
     cov = coverage_table(long, sites_cfg)
     cmp_t = compare_with_wamis(long)
+    codes = site_station_codes(sites_cfg)
+    wamis = fetch_wamis_levels(codes, date(2020, 1, 1), date.today())
+    offsets = offset_table(long[long["station_code"].isin(codes)], wamis)
+    bad = {
+        str(e["code"])
+        for s_ in sites_cfg["sites"]
+        for e in s_.get("dataon_stations", [])
+        if isinstance(e, dict) and e.get("wamis_ok") is False
+    }
+    cont = continuous_series(
+        long[long["station_code"].isin(codes)], wamis[~wamis["station_code"].isin(bad)], offsets, CUTOVER
+    )
+    cont.to_parquet(CONT_PATH, index=False)
+    n_w = int((cont["source"] == "wamis_wl_dtdata").sum())
+    print(
+        f"연속 시계열 {len(cont):,}행 (WAMIS {CUTOVER}~ {n_w:,}행, 최근 {cont['obs_date'].max()}) "
+        f"→ {CONT_PATH.name}"
+    )
+    print(offsets.to_string(index=False))
     print(
         f"{len(long):,}행, 관측소 {long['station_code'].nunique()}개, "
         f"{long['obs_date'].min()}~{long['obs_date'].max()} → {OUT_PATH.name}"
@@ -266,9 +367,12 @@ def main(argv: list[str] | None = None) -> int:
         f"- 전체 {len(long):,}행, 관측소 {long['station_code'].nunique()}개, "
         f"{long['obs_date'].min()}~{long['obs_date'].max()}\n\n## 지점별 dataon_stations\n"
         + _md(cov)
-        + "\n\n## WAMIS wl_dtdata 와 일치율 (동일 코드, |차| ≤ 0.05 m)\n"
+        + "\n\n## (T1-b hydro long) 하굿둑 WAMIS 와 일치율 (|차| ≤ 0.05 m)\n"
         + _md(cmp_t)
-        + "\n",
+        + "\n\n## DataON vs WAMIS wl_dtdata 겹침 구간(2020~2024) 일치율·기준면 오프셋 (DataON − WAMIS)\n"
+        + _md(offsets)
+        + f"\n\n- 연속 시계열: DataON ≤{CUTOVER - timedelta(days=1)}, WAMIS ≥{CUTOVER} (`{CONT_PATH.name}`, "
+        + "`wl_adj` = WAMIS + 오프셋). 하굿둑 외측(2022697)은 조석 영향으로 `use: false`.\n",
         encoding="utf-8",
         newline="\n",
     )
