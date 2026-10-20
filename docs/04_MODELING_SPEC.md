@@ -102,7 +102,8 @@ alpha log 1e-4~10, l1_ratio 0~1 — trial 50
 | 지표 | 공간 | 식/정의 |
 |---|---|---|
 | RMSE_log, MAE_log | log10 | 대회 1차 |
-| R2_raw | 원단위 | sklearn r2_score |
+| R2_raw | 원단위 | sklearn r2_score = 1 − Σ(o−p)²/Σ(o−ō)² (NSE 와 수식 동일; 편향·척도 오차 벌점) |
+| R2_pearson_raw | 원단위 | Pearson 상관계수 제곱 (편향·척도 무시한 설명력) |
 | NSE_raw | 원단위 | 1 − Σ(o−p)²/Σ(o−ō)² (학습 평균이 아닌 검증 관측 평균) |
 | R2_log, KGE_log | log | 보완 |
 | F1, Precision, Recall @10k | 분류 | obs≥10,000 vs pred≥10,000 |
@@ -111,6 +112,8 @@ alpha log 1e-4~10, l1_ratio 0~1 — trial 50
 | Brier | 확률 | 경계 초과 확률 |
 
 **구현 메모 (T0-c, `src/algaecast/eval/metrics.py`)**: 분류 임계값은 '이상'(≥, 경보 기준과 동일; README 의 '초과' 표기와 다르나 정확히 10,000 인 값은 데이터에 없음). PICP/MPIW 는 교차 구간(q90<q10)을 정렬해 계산하고 `n_crossed_q` 로 건수를 보고(T4-c 분위 모델은 저장 전 정렬 권장). MPIW 기본 공간은 log10(x+1). KGE 는 log 공간·ddof=0. 관측 분산 0 이면 R²·NSE·KGE 는 NaN. 부트스트랩은 백분위법(percentile), 시드 42, (site, base_date) 행 단위가 기본이며 `groups` 로 군집 재표본 가능.
+
+**R² 정의 (T4-b, 2026-10-21)**: 대회 요강은 R² 의 정의(결정계수 vs 상관계수 제곱)를 명시하지 않으므로 **r2_raw(sklearn 결정계수)·r2_pearson_raw(상관계수 제곱)·nse_raw 세 가지를 모든 표에 병기**한다. 원단위 결정계수는 극단값 1~2건에 지배되므로 log 역변환 편향 보정(단순/Duan smearing/isotonic)과 함께 보고하고, 방법 설명서에는 '어느 정의로도' 목표 달성 여부를 기술한다.
 
 ### 6.2 보고 표 (모두 `reports/eval/`)
 1. `tbl_baseline.md` — B0~B4

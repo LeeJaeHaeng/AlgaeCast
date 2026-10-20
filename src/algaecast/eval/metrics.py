@@ -100,6 +100,17 @@ def r2_raw(obs: ArrayLike, pred: ArrayLike) -> float:
     return _r2(o, p)
 
 
+def r2_pearson_raw(obs: ArrayLike, pred: ArrayLike) -> float:
+    """Pearson 상관계수 제곱 (원단위). 편향·척도 오차를 벌점하지 않는 '설명력' 정의.
+
+    관측 또는 예측이 상수이면 NaN.
+    """
+    o, p = _pair(obs, pred)
+    if _is_constant(o) or _is_constant(p):
+        return float("nan")
+    return float(np.corrcoef(o, p)[0, 1] ** 2)
+
+
 def nse_raw(obs: ArrayLike, pred: ArrayLike) -> float:
     """Nash–Sutcliffe Efficiency = 1 − Σ(o−p)² / Σ(o−ō)², ō 는 검증 관측 평균. 관측이 상수이면 NaN."""
     o, p = _pair(obs, pred)
@@ -189,7 +200,8 @@ def compute_all(
 ) -> dict[str, float]:
     """04 문서 6.1절 지표를 한 번에 계산한다. 구간·확률 지표는 입력이 있을 때만 포함.
 
-    키: n, rmse_log, mae_log, r2_raw, nse_raw, r2_log, kge_log, f1_10k/precision_10k/recall_10k/n_pos_obs_10k,
+    키: n, rmse_log, mae_log, r2_raw, r2_pearson_raw, nse_raw, r2_log, kge_log,
+    f1_10k/precision_10k/recall_10k/n_pos_obs_10k,
     같은 4개의 _1k, (q10·q90 시) picp80, mpiw80_log, mpiw80_raw, n_crossed_q, (p10k 시) brier_10k.
     """
     o, p = _pair(obs, pred)
@@ -198,6 +210,7 @@ def compute_all(
         "rmse_log": rmse_log(o, p),
         "mae_log": mae_log(o, p),
         "r2_raw": r2_raw(o, p),
+        "r2_pearson_raw": r2_pearson_raw(o, p),
         "nse_raw": nse_raw(o, p),
         "r2_log": r2_log(o, p),
         "kge_log": kge(o, p, log=True),

@@ -16,7 +16,7 @@ from algaecast.eval.metrics import compute_all
 
 FOLD_YEARS = (2020, 2021, 2022, 2023, 2024)
 FINAL_VALID_YEAR = 2025
-REPORT_METRICS = ["rmse_log", "mae_log", "r2_raw", "nse_raw", "r2_log", "f1_10k", "f1_1k"]
+REPORT_METRICS = ["rmse_log", "mae_log", "r2_log", "r2_raw", "r2_pearson_raw", "nse_raw", "f1_10k", "f1_1k"]
 SMALL_SAMPLE_SITES = {"MGMR": "표본 부족(2020-05~)"}
 
 
