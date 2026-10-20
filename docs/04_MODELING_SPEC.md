@@ -61,7 +61,10 @@ Submit train ≤2025 → predict 2026 (sample_submission, 5~10월 124조합)
 ### 4.4 ElasticNet (StandardScaler, alpha, l1_ratio)
 ### 4.5 앙상블
 - 검증 폴드 OOF 예측에 NNLS(합=1) 가중 → 최종. 단일 모델이 더 좋으면 단일 채택(보고에 명시).
-### 4.6 조건부: LSTM / Temporal Fusion Transformer
+### 4.6 hurdle 변형 (T2 반영, 2026-10-21; T4 후보)
+- 타깃 0값이 25.3%(T2 S1)이므로 **출현 여부 분류기(세포수>0, LightGBM binary) × 양수 조건부 회귀(log 타깃, 양수 표본만)** 의 hurdle 구조를 후보에 추가. 점추정 = P(>0)·E[y|y>0] 또는 P(>0)≥0.5 일 때 조건부 예측. 분위 예측은 혼합분포로 산출. 단일 log 회귀와 log-RMSE·F1@1,000 비교 후 채택.
+
+### 4.7 조건부: LSTM / Temporal Fusion Transformer
 - 학습 샘플 < 3,000이면 생략. 시도 시 `reports/experiments/EXP-LSTM.md`에 비교만 기록.
 
 ## 5. 하이퍼파라미터 튜닝 (Optuna)

@@ -62,10 +62,11 @@ collect:
 	$(PY) -m algaecast.collect.run --start $(START) --end $(END)
 
 align:
-	@echo TODO [T3-a] $(PY) -m algaecast.align.run --strategy S1,S2,S3
+	$(PY) -m algaecast.align.run --strategy S1,S2,S3
 
 features:
-	@echo TODO [T3-b] $(PY) -m algaecast.features.run
+	$(PY) -m algaecast.features.run --strategy S1,S2,S3
+	$(PY) scripts/leakage_audit.py --strategy S1 --sample 300
 
 eda:
 	$(PY) -m jupytext --to notebook --execute notebooks/02_stats.py

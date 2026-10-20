@@ -1,0 +1,45 @@
+# 피처 생성 설정 (T3-b). docs/03 4절 + T2 반영.
+calendar:
+  start: "2012-01-01" # 지점별 일 단위 달력 시작 (수집 자료 시작)
+target:
+  horizon_days: 7
+  match_tolerance_days: 3 # base+7 에 가장 가까운 측정일, |차| ≤ 3, 동률은 이른 날 (대회 규칙 재현)
+  transform: log10p1
+splits:
+  train_max_year: 2024
+  valid_year: 2025
+  test: sample_submission # (station_id, base_date, target_date) 조합 그대로
+
+windows:
+  ar_days: 28
+  water_ma: [7, 14, 30]
+  rain_sum: [7, 14, 30]
+  flow_sum: [7, 14, 30]
+
+# T2 S6: 지점별 LOESS 가 관심(1,000 cells/mL) 에 도달하는 수온(℃) → wtemp_over_site_thresh_days
+site_caution_wtemp:
+  HP: 25.5
+  GJGR: 23.7
+  CS: 22.9
+  MGMR: 22.2
+  DCHN: 20.0
+
+degree_day_base_c: 20 # 적산온도 기준 (수온·기온 공통)
+wtemp_hot_c: 25 # wtemp_days_over25
+dry_day_rain_mm: 5 # dry_days: 마지막 5 mm 이상 강우 이후 경과일
+
+forecast:
+  available_from: "2026-10-21" # 이전 base_date 는 결측 + fc_available=0 (docs/03 4.5)
+  cutoff_hour_kst: 6 # issued_at ≤ base_date 06:00
+  pop_rain_day: 60 # fc_rain_days: 강수확률 ≥ 60 %
+
+hydro:
+  primary:
+    weir_sites: [HP, GJGR, CS, MGMR] # 보 자체(facility_kwater_code) 운영자료가 1차, 상류 본댐 합산은 보조 (T2 반영)
+    dam_sites: [DCHN] # 대청댐 본댐(facility_dam_code) 그대로
+  release_event_m3s: 300 # dam_release_event_7d: 보/댐 일 방류량이 이 값을 넘는 날 수 (수문 방류 이벤트 대리)
+
+imputation:
+  hydro_weather_ffill_limit_days: 3 # S1~S3 공통: ≤3일 전진채움, 그 이상은 같은 달 과거 중앙값
+  s3_min_train_rows: 100
+  s3_features: [wtemp, chla, cells_log, ph, do, turb, ta_ma7, month_sin, month_cos]

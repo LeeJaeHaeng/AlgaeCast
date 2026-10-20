@@ -86,6 +86,12 @@ def make_<group>_features(df_daily: pd.DataFrame, as_of: date, site_code: str) -
 | weir_level_t0, weir_level_diff7 | 보 상류 수위, 7일 변화 (WAMIS) |
 | dam_release_event_7d | 최근 7일 수문 방류 이벤트 횟수 |
 | upstream_dam_release_sum7 | 상류 다목적댐 방류 합 (sites.yaml 매핑) |
+| weir_inflow_t0 / weir_outflow_t0 | **보 자체** 유입·방류량(delist/WAMIS mn_dtdata, sites.yaml facility_kwater_code) |
+| weir_outflow_sum7 / 14, weir_flow_ma7 | 보 방류 누적, 보 유입 7일 평균 |
+| weir_level_t0 / weir_level_diff7 | 보 자체 수위(rwl)·7일 변화 (강정고령보는 상류 관측소 폐쇄로 rwl 사용) |
+| weir_residence_proxy | 보 저수량(sites.yaml storage_mcm, 10^6 m³) / 보 방류 7일 평균(m³/s·86,400) [일]; 저수량 없으면 1/유량 대리 |
+| level_cont_* | DataON+WAMIS 연속 수위(dataon_stations, use:true) 7일 변화 |
+- **T2 반영(2026-10-21)**: 낙동강 4지점(해평·강정고령·칠서·물금매리)은 **보 자체 유량·방류·수위(delist, WAMIS)를 1차 수문 피처**로 하고, 상류 본댐 합산(inflow_*/outflow_*/upstream_dam_release_sum7)은 **보조 피처로 격하**한다(T2 S4 에서 본댐 합산 유입·방류의 원단위 상관이 ≈0). 회남은 대청댐 본댐 운영자료(facility_dam_code 3008110)를 그대로 1차로 쓴다.
 
 ### 4.4 기상 (관측)
 | 피처명 | 정의 |
@@ -137,3 +143,4 @@ def make_<group>_features(df_daily: pd.DataFrame, as_of: date, site_code: str) -
 - `data/processed/splits.json` (train/valid/test의 (site, base_date) 목록)
 - `reports/features/feature_catalog.md` (피처명, 정의, 결측률, 타깃 Spearman)
 - `tests/test_no_leakage.py` 통과 로그
+- **T3 구현 메모 (2026-10-21)**: `align/run.py` 가 지점별 일 달력(2012-01-01~)에 `fac_*`(보 자체/대청댐)·`dam_*`(상류 본댐 합)·`level_cont_*`·기상(asos_by_var)·`fc_*`(발표일 행)·수질(측정일, `*_obs` 원값 보존)을 조인하고 `<var>_missing` 플래그를 유지한다. S1/S2/S3 는 수질 채움 방식만 다르고 수문·기상은 공통(≤3일 ffill, 이후 같은 달 과거 중앙값). S2 는 base_date 가 측정일일 때만 무누수이므로 샘플은 측정일 전부를 base_date 로 쓴다. `features/run.py` 샘플 2,979 = 대회 eval_pairs 와 train 2,310/valid 256/test 124 가 정확히 일치. 누수 감사: `scripts/leakage_audit.py` → `reports/eval/leakage_audit.md`. 총인·총질소·유역강수·토양수분 피처는 자료 미보유로 보류.
