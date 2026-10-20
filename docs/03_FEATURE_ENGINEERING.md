@@ -71,6 +71,7 @@ def make_<group>_features(df_daily: pd.DataFrame, as_of: date, site_code: str) -
 | ph_t0, do_t0, turb_t0, transp_t0 | pH, DO, 탁도, 투명도 |
 | tp_t0, tn_t0, np_ratio | 총인, 총질소, TN/TP |
 | tp_ma30 | 총인 30일 평균 |
+- (T1-c 메모, 2026-10-20) **회남(호소)은 기온–수온 Spearman 이 0.79 로 하천 4지점(0.98)보다 뚜렷이 낮다**(reports/eda/asos_station_choice.md). 호소는 열 관성이 커서 당일 기온보다 누적 열량이 수온을 설명하므로, 회남은 `wtemp_ma14/ma30` 과 적산온도 `wtemp_degree_days20`(기온 기반 대체 `ta_degree_days` 포함)를 우선 검토하고 당일 기온 피처 비중은 낮춘다.
 
 ### 4.3 수문
 | 피처명 | 정의 |
@@ -96,6 +97,7 @@ def make_<group>_features(df_daily: pd.DataFrame, as_of: date, site_code: str) -
 | ss_sum7, si_sum7 | 일조·일사 7일 합 |
 | ws_mean7, ws_max7 | 풍속 7일 평균·최대 (혼합) |
 | hm_mean7 | 습도 |
+- 변수별 관측소는 `sites.yaml asos_by_var`(ta·rn·ws·hm·ss = asos_primary, si = 일사 결측률 <5% 후보 중 최근접; 칠서는 해당 후보가 없어 창원 155 + 일조시간 대체)를 따른다. 2관측소 평균 피처는 `asos_secondary` 로 실험.
 | soil_moisture_t0, et_sum7 | 토양수분, 증발산 (MT-02) |
 
 ### 4.5 예보 (base_date 발표분, 창의성)
@@ -107,6 +109,8 @@ def make_<group>_features(df_daily: pd.DataFrame, as_of: date, site_code: str) -
 | fc_rain_days | 강수확률 ≥60% 일수 |
 | maple_rn_6h | MAPLE 기준일 초단기 누적강수 (AI-03) |
 - 과거 발표분이 없는 기간은 결측 처리 + 플래그. 학습 시 해당 피처 기여도를 ablation으로 보고.
+- **가용 기간 (T1-e, 2026-10-20)**: 기상청 API 는 과거 발표분을 제공하지 않으므로 `collect/kma_forecast.py` 가 매일 KST 06:00 에 05시 단기예보(+중기예보, 서비스 승인 후) 발표분을 `data/raw/kma_forecast/YYYY-MM-DD.csv` 에 누적한다. **예보 피처는 2026-10-21 이후 base_date 에만 가용**하며, 그 이전(학습·검증 전 구간, 2026 평가 대부분)은 결측 + `fc_available=0` 플래그로 처리한다. 따라서 예보 피처는 본 모델이 아닌 운영 대시보드·확장 실험용으로 두고, 제출 모델 성능 주장에 포함하지 않는다. 누수 규칙: `forecasts_as_of(base_date)` = issued_at ≤ base_date 06:00 KST.
+
 
 ### 4.6 시간·지점
 | 피처명 | 정의 |

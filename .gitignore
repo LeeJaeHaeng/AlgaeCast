@@ -25,6 +25,8 @@ data/raw/cache/*
 # 물모아 예측 스냅샷 CSV 는 공개 벤치마크 원자료(소량) → 커밋 허용, 원문 JSON(raw/)은 제외
 !data/raw/mulmoa/
 data/raw/mulmoa/raw/
+# 기상 예보 발표분 CSV(T1-e, 일 1회 소량, 공공데이터) → 커밋 허용
+!data/raw/kma_forecast/
 data/interim/*
 !data/interim/.gitkeep
 data/processed/*

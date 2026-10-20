@@ -67,8 +67,8 @@
 | MT-02 | 수문기상정보 | 기상청 수문기상팀 | data.go.kr #15133499 CSV → `data/raw/kma/수문기상정보/*.csv`, `collect/kma_basin.py` 가 `sites.yaml basin_mid_code`(중권역 = 조사지점코드 앞 4자리: 2011 낙동왜관, 2020 낙동밀양, 2022 낙동강하구언, 3008 대청댐) 로 결합, 미수령 시 건너뜀 | 유역단위 면적강수량, 토양수분, 증발산량 (표준유역·중권역) | 일 | 유역 전체 강수 |
 | MT-03 | 유역단위 기후 면적강수량 | 기상청 기후예측과 | data.go.kr #15152903 CSV → `data/raw/kma/유역단위_면적강수량/*.csv` (동일 파서) (odcloud API #15068582 는 2020-08-01 단일 일자 스냅샷이라 사용 불가, 2026-10-20 확인) | 표준유역·중권역·대권역 면적강수량 (일·월) | 일 | MT-02 보완 |
 | MT-04 | 기상청 API허브 | 기상청 | apihub.kma.go.kr (계정 발급) | 일사량·일조시간 상세, ASOS 시간자료 | 시간 | 광합성 피처 |
-| MT-05 | 단기예보 조회서비스 | 기상청 | data.go.kr `VilageFcstInfoService_2.0/getVilageFcst` (nx,ny 격자; 승인 2026-01-03~2028-01-03, 2026-10-20 응답 확인) | 발표시각 기준 +3일 기온·강수 | 일 8회 | **예보 피처(창의성)**. 과거 발표분은 API허브 "예보 과거자료" |
-| MT-06 | 중기예보 조회서비스 | 기상청 | data.go.kr "중기예보 조회서비스" | +3~+10일 기온·강수확률 | 일 2회 | 7일 창 커버 |
+| MT-05 | 단기예보 조회서비스 | 기상청 | data.go.kr `VilageFcstInfoService_2.0/getVilageFcst` (nx,ny 격자 = `kma_forecast.latlon_to_grid(lat,lon)`; 승인 2026-01-03~2028-01-03) | 05시 발표분 +3~4일 TMP/TMX/TMN/POP/PCP/REH/WSD/SKY → 일 집계 | 일 1회 수집(06 KST) | **예보 피처(창의성)**. T1-e: 2026-10-20 부터 `data/raw/kma_forecast/` 누적(과거 발표분 API 미제공, docs/03 4.5) |
+| MT-06 | 중기예보 조회서비스 | 기상청 | data.go.kr `MidFcstInfoService/getMidTa`(regId 지점)·`getMidLandFcst`(regId 광역), tmFc=0600 (`sites.yaml kma_mid_reg_id_*`) | +3~+10일 최저·최고기온, 강수확률 | 일 1회 수집 | 7일 창 커버. **2026-10-20 현재 서비스 미승인(코드 30)** → 활용신청 필요, 수집기는 승인 즉시 동작 |
 
 ## 6. AIDA (aida.kisti.re.kr) 데이터 — 대회 취지 부합
 

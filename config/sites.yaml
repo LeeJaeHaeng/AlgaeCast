@@ -89,6 +89,13 @@ sites:
     asos_primary: 279 # T1-c reports/eda/asos_station_choice.md: 구미 7일평균 ρ=0.977 최대·7.4km. 구미 일사는 2016~2024 결측 → 일사 피처는 2순위 대구(143) 또는 일조시간 대체
     asos_secondary: 143
     basin_mid_code: "2011" # 수자원단위지도 중권역 낙동왜관 (근거: 조사지점코드 HP 앞 4자리 = 중권역 코드)
+    lat: 36.1695 # 근사 좌표(T1-c 거리·T1-e 격자 변환용). 정밀 좌표는 조류경보제 지점 정보 확인 후 갱신
+    lon: 128.3873
+    asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(대구 0.1%·안동 0.2%) 중 최근접 대구 40.3 km
+      { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 143 }
+    kma_mid_reg_id_ta: "11H10602" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_land: "11H10000" # 중기육상예보(getMidLandFcst) 광역코드
+    dataon_stations: ['2001685', '2001680', '2001690', '2002677', '2002675', '2002680', '2002609', '2008603'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 안동댐·방수로·조정지, 임하댐·방수로·조정지, 성덕댐, 군위댐 (영주댐 관측소 없음)
     asos_stn_id: 279
     asos_alt_stn_id: null
     service_start: 2016 # 시범 2013.2~2015.12, 정식 2016
@@ -120,6 +127,13 @@ sites:
     asos_primary: 279 # T1-c reports/eda/asos_station_choice.md: 구미 ρ=0.979 최대(대구 0.978 과 차이 0.001). 2순위 대구 18.4km·일사 보유 → T3 2관측소 평균 후보
     asos_secondary: 143
     basin_mid_code: "2011" # 수자원단위지도 중권역 낙동왜관 (근거: 조사지점코드 GJGR 앞 4자리 = 중권역 코드)
+    lat: 35.843 # 근사 좌표(T1-c 거리·T1-e 격자 변환용). 정밀 좌표는 조류경보제 지점 정보 확인 후 갱신
+    lon: 128.453
+    asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(대구·안동) 중 최근접 대구 18.4 km
+      { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 143 }
+    kma_mid_reg_id_ta: "11H10701" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_land: "11H10000" # 중기육상예보(getMidLandFcst) 광역코드
+    dataon_stations: ['2001685', '2001680', '2001690', '2002677', '2002675', '2002680', '2002609', '2008603', '2010625'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): HP 와 동일 + 김천부항댐
     asos_stn_id: 143
     asos_alt_stn_id: null
     service_start: 2016
@@ -151,6 +165,13 @@ sites:
     asos_primary: 288 # T1-c reports/eda/asos_station_choice.md: 밀양 ρ=0.981 최대. 밀양 일사 결측 89% → 일사는 2순위 창원(155, 보유 74%) 또는 일조시간
     asos_secondary: 155
     basin_mid_code: "2020" # 수자원단위지도 중권역 낙동밀양 (근거: 조사지점코드 CS 앞 4자리 = 중권역 코드)
+    lat: 35.37 # 근사 좌표(T1-c 거리·T1-e 격자 변환용). 정밀 좌표는 조류경보제 지점 정보 확인 후 갱신
+    lon: 128.48
+    asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보 없음(밀양 89·창원 25·합천 100%) → 최소인 창원 사용, 결측 구간은 일조시간 대체(T3)
+      { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 155 }
+    kma_mid_reg_id_ta: "11H20601" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_land: "11H20000" # 중기육상예보(getMidLandFcst) 광역코드
+    dataon_stations: ['2015680', '2016630', '2016635', '2016640', '2018698', '2012615', '2012607', '2021620'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 합천댐·방수로·조정지·조정지방수로, 남강댐방수로, 영천댐, 보현산댐, 운문댐(금호강)
     asos_stn_id: 263
     asos_alt_stn_id: 155 # 창원 (의령군 263 결측 시 대체)
     service_start: 2016
@@ -181,6 +202,13 @@ sites:
     asos_primary: 257 # T1-c reports/eda/asos_station_choice.md: 양산시 ρ=0.982 최대·2.7km. 2순위 부산(159)=번들 관측소, 일사 98%
     asos_secondary: 159
     basin_mid_code: "2022" # 수자원단위지도 중권역 낙동강하구언 (근거: 조사지점코드 MGMR 앞 4자리 = 중권역 코드)
+    lat: 35.31 # 근사 좌표(T1-c 거리·T1-e 격자 변환용). 정밀 좌표는 조류경보제 지점 정보 확인 후 갱신
+    lon: 128.99
+    asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(양산시 0.4%·부산 1.9%) 중 최근접 양산시 2.7 km
+      { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 257 }
+    kma_mid_reg_id_ta: "11H20102" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_land: "11H20000" # 중기육상예보(getMidLandFcst) 광역코드
+    dataon_stations: ['2022696', '2022697', '2021660', '2021650', '2015680', '2016635', '2018698'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 낙동강하구언(내·외) = WAMIS 2022696/2022697 과 동일 코드, 밀양댐·대리(밀양강), 합천댐·조정지, 남강댐방수로
     asos_stn_id: 159
     asos_alt_stn_id: null
     service_start: 2020 # '20년 조류경보제 편입
@@ -212,6 +240,13 @@ sites:
     asos_primary: 131 # T1-c reports/eda/asos_station_choice.md: 청주 ρ=0.788 최대(대전 0.785, 차 0.003 — 사실상 동률). 2순위 대전(133)=번들 관측소·호소 수온이라 기온 상관 전반적으로 낮음
     asos_secondary: 133
     basin_mid_code: "3008" # 수자원단위지도 중권역 대청댐 (근거: 조사지점코드 DCHN 앞 4자리 = 중권역 코드)
+    lat: 36.4 # 근사 좌표(T1-c 거리·T1-e 격자 변환용). 정밀 좌표는 조류경보제 지점 정보 확인 후 갱신
+    lon: 127.6
+    asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(청주 0.1%·대전 0.4%) 중 최근접 대전 20.6 km
+      { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 133 }
+    kma_mid_reg_id_ta: "11C10301" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_land: "11C10000" # 중기육상예보(getMidLandFcst) 광역코드
+    dataon_stations: ['3008690', '3008685', '3008680'] # HY-05 DataON 댐유역 일평균수위 관측소(WAMIS 수위코드와 동일): 대청댐·대청댐방수로·대청조정지댐 (용담댐 관측소는 파일에 없음)
     asos_stn_id: 133
     asos_alt_stn_id: null
     service_start: 1998

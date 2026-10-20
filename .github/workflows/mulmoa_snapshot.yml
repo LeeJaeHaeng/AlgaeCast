@@ -1,4 +1,4 @@
-# 물모아 'AI 녹조 정밀 예측 정보' 스냅샷 — WQ-04 벤치마크 원자료 (T8 daily.yml 과 별도 유지)
+# 물모아 'AI 녹조 정밀 예측 정보' 스냅샷 — WQ-04 벤치마크 원자료 (T8 daily.yml 과 별도 유지) + 기상 예보 발표분(MT-05/06) 누적
 # 매일 KST 06:00 / 09:00 / 18:00 (UTC 21,0,9시). 같은 날 동일 내용이면 커밋 없음. 어떤 단계가 실패해도 워크플로는 성공으로 끝난다.
 name: mulmoa-snapshot
 
@@ -31,7 +31,7 @@ jobs:
       - name: Install minimal deps
         continue-on-error: true
         run: |
-          pip install requests urllib3 pyyaml python-dotenv numpy pandas
+          pip install requests urllib3 pyyaml python-dotenv numpy pandas pandera pyarrow
           pip install -e . --no-deps
 
       - name: Snapshot
@@ -40,6 +40,14 @@ jobs:
         run: |
           mkdir -p logs
           python scripts/snapshot_mulmoa_forecast.py 2>&1 | tee -a logs/mulmoa_snapshot.log
+
+      - name: KMA forecast snapshot (단기예보 05시 발표분 + 중기예보 06시, T1-e)
+        continue-on-error: true
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          API_KMA_VILAGE_FCST: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+          API_KMA_MID_FCST: https://apis.data.go.kr/1360000/MidFcstInfoService
+        run: python -m algaecast.collect.kma_forecast 2>&1 | tee -a logs/mulmoa_snapshot.log
 
       - name: Live benchmark (Mulmoa forecast vs NIER observations)
         continue-on-error: true
@@ -54,7 +62,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f data/raw/mulmoa/*.csv reports/eval/live_benchmark.csv 2>/dev/null || true
+          git add -f data/raw/mulmoa/*.csv data/raw/kma_forecast/*.csv reports/eval/live_benchmark.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "no new snapshot to commit"; exit 0
           fi

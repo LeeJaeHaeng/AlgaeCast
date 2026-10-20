@@ -15,7 +15,7 @@ else
   PY       := $(VENV_BIN)/python
 endif
 
-START ?= 2015-01-01
+START ?= 2012-01-01
 END   ?= today
 
 .PHONY: help venv setup lock test lint format collect align features eda tune train evaluate predict upload submission reproduce clean
@@ -59,7 +59,7 @@ format:
 	$(PY) -m ruff check --fix src tests scripts
 
 collect:
-	@echo TODO [T1-g] $(PY) -m algaecast.collect.run --start $(START) --end $(END)
+	$(PY) -m algaecast.collect.run --start $(START) --end $(END)
 
 align:
 	@echo TODO [T3-a] $(PY) -m algaecast.align.run --strategy S1,S2,S3
