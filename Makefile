@@ -68,7 +68,7 @@ features:
 	@echo TODO [T3-b] $(PY) -m algaecast.features.run
 
 eda:
-	@echo TODO [T2] $(PY) -m jupyter nbconvert --execute notebooks/*.ipynb
+	$(PY) -m jupytext --to notebook --execute notebooks/02_stats.py
 
 tune:
 	@echo TODO [T4-b] $(PY) -m algaecast.models.tune --model lgbm --trials 300
