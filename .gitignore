@@ -22,6 +22,9 @@ data/raw/*
 !data/raw/cache/
 data/raw/cache/*
 !data/raw/cache/.gitkeep
+# 물모아 예측 스냅샷 CSV 는 공개 벤치마크 원자료(소량) → 커밋 허용, 원문 JSON(raw/)은 제외
+!data/raw/mulmoa/
+data/raw/mulmoa/raw/
 data/interim/*
 !data/interim/.gitkeep
 data/processed/*

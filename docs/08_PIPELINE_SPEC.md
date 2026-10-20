@@ -25,6 +25,8 @@ make collect  →  make align  →  make features  →  make train  →  make ev
 | reproduce | `make features train submission && diff submission/submission.csv submission/submission_final.csv` | | diff 0 확인 |
 
 ## 3. 일일 자동화 (`.github/workflows/daily.yml`)
+> **별도 워크플로**: `.github/workflows/mulmoa_snapshot.yml` (물모아 AI 녹조 예측 스냅샷, KST 06/09/18시, 봇 커밋, 실패해도 성공 처리)는 T8 의 `daily.yml` 과 분리해 유지한다 — 수집 주기·실패 정책이 다르고 벤치마크 원자료는 모델 파이프라인과 독립적으로 쌓여야 하기 때문. (2026-10-20)
+
 ```yaml
 name: daily-forecast
 on:

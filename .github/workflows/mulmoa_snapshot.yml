@@ -1,0 +1,65 @@
+# 물모아 'AI 녹조 정밀 예측 정보' 스냅샷 — WQ-04 벤치마크 원자료 (T8 daily.yml 과 별도 유지)
+# 매일 KST 06:00 / 09:00 / 18:00 (UTC 21,0,9시). 같은 날 동일 내용이면 커밋 없음. 어떤 단계가 실패해도 워크플로는 성공으로 끝난다.
+name: mulmoa-snapshot
+
+on:
+  schedule:
+    - cron: "0 21,0,9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mulmoa-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install minimal deps
+        continue-on-error: true
+        run: pip install requests urllib3 pyyaml python-dotenv numpy
+
+      - name: Snapshot
+        id: snap
+        continue-on-error: true
+        run: |
+          mkdir -p logs
+          python scripts/snapshot_mulmoa_forecast.py 2>&1 | tee -a logs/mulmoa_snapshot.log
+
+      - name: Commit & push (only if a new CSV appeared)
+        continue-on-error: true
+        env:
+          TZ: Asia/Seoul
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/raw/mulmoa/*.csv 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "no new snapshot to commit"; exit 0
+          fi
+          git commit -m "data(mulmoa): snapshot $(date +'%Y-%m-%d %H:%M KST') [skip ci]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin HEAD:"${GITHUB_REF_NAME}"
+
+      - name: Upload log
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: mulmoa-snapshot-log-${{ github.run_id }}
+          path: logs/mulmoa_snapshot.log
+          if-no-files-found: ignore
+          retention-days: 14
