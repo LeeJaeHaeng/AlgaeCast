@@ -12,6 +12,7 @@ catboost>=1.2.5
 optuna>=3.6
 shap>=0.45
 statsmodels>=0.14
+scipy>=1.11,<2
 pymannkendall>=1.4
 # --- 검증 / 수집 ---
 pandera>=0.20

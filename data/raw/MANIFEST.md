@@ -16,6 +16,7 @@
 | HY-02 | K-water 수문 운영 정보 delist — 본댐 11 + 낙동강 보·하굿둑 9, 일자료 (`data/raw/kwater_sluice/kwater_sluice_daily.parquet`) | 한국수자원공사 | apis.data.go.kr/B500001/dam/sluicePresentCondition/delist (damcode, 연 단위 300요청) | 2012-01-01~2026-10-20 | 2026-10-20 17:49 KST | 107,775 | 이용허락범위 제한 없음 | 2ff4791949c05993 |
 | HY-06 | WAMIS mn_dtdata 보 9개 전기간 + 댐 15개 2026-09-12~ / wl_dtdata 보 상·하류 수위 18개소 (`data/raw/wamis_dam/`, long 에 포함) | 환경부 한강홍수통제소 | www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dtdata, wkw/wl_dtdata (키 불필요) | 2012-01-01~2026-10-20 | 2026-10-20 18:30 KST | 44,894 (+수위 79,324) | 공공누리 | 5ddb7077aae2556c |
 | HY-01 보조 | 다목적댐 운영 정보 API 최근 60일 (`data/raw/kwater_damapi/kwater_damapi_recent.parquet`) | 한국수자원공사 | apis.data.go.kr/B500001/dam/multipurPoseDam/multipurPoseDamlist (일 100건, 날짜별 영구 캐시) | 2026-08-21~2026-10-19 | 2026-10-20 18:15 KST | 1,260 | 이용허락범위 제한 없음 | f7c5db40a4d229b2 |
+| MT-01 | 기상청 ASOS 일자료 — 지점별 후보 관측소 11개(구미 279·대구 143·안동 136·밀양 288·창원 155·합천 285·부산 159·양산시 257·대전 133·보은 226·청주 131), 15개 변수 (`data/raw/kma_asos/kma_asos_daily_2012_2026.parquet`) | 기상청 국가기후데이터센터 | apis.data.go.kr/1360000/AsosDalyInfoService/getWthrDataList (dataCd=ASOS, dateCd=DAY, 연 단위 numOfRows 999, 전날까지 제공) | 2012-01-01~2026-10-19 | 2026-10-20 19:42 KST | 59,466 | 공공누리 1유형(출처표시) | cf3eb91bd9d19b70 |
 | HY 통합 | hydro_daily_long.parquet (번들 WAMIS + 위 3개 소스 long 포맷, facility_code/변수/소스별) | - | collect/kwater_dam.py | 2012~2026-10-20 | 2026-10-20 | 1,724,876 | - | (파생) |
 
 ## API 인증키 점검 (2026-10-20, 개발계정, 활용기간 2026-10-20 ~ 2028-10-20)

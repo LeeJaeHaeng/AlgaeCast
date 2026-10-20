@@ -48,7 +48,7 @@ weirs:
   "2009601": { name: 낙단보, basin: 낙동강, wamis_bo_code: "2009801", wl_up: "2009618", wl_down: null }
   "2009602": { name: 구미보, basin: 낙동강, wamis_bo_code: "2009802", wl_up: "2009680", wl_down: "2009682", mwl: 32.5, storage_mcm: 52.7, length_m: 374.3, completed: "2012-06", note: 안동댐 하류 114 km }
   "2011601": { name: 칠곡보, basin: 낙동강, site: HP, wamis_bo_code: "2011801", wl_up: "2011648", wl_down: "2011649", mwl: 25.5, storage_mcm: 88.8, catchment_km2: 11040, length_m: 348, completed: "2012-06", note: 안동댐 하류 141 km }
-  "2011602": { name: 강정고령보, basin: 낙동강, site: GJGR, wamis_bo_code: "2011802", wl_up: null, wl_down: "2011696", mwl: 19.5, mwl_lowered_since_2017_06_04: 18.25, storage_mcm: 92.3, catchment_km2: 11667, length_m: 953.5, completed: "2013-06", note: 칠곡보 하류 25 km; 상류 관측소 강정보(임) 2011697 은 폐쇄 }
+  "2011602": { name: 강정고령보, basin: 낙동강, site: GJGR, wamis_bo_code: "2011802", wl_up: null, wl_down: "2011696", mwl: 19.5, mwl_lowered_since_2017_06_04: 18.25, storage_mcm: 92.3, catchment_km2: 11667, length_m: 953.5, completed: "2013-06", note: 칠곡보 하류 25 km; 상류 관측소 강정보(임) 2011697 폐쇄 → 보 상류 수위는 delist/mn_dtdata 의 보 자체 수위(rwl)로, 하류는 2011696 으로 대체 (T1-b 승인 2026-10-20) }
   "2014601": { name: 달성보, basin: 낙동강, wamis_bo_code: "2014801", wl_up: "2014650", wl_down: "2014651" }
   "2014602": { name: 합천창녕보, basin: 낙동강, wamis_bo_code: "2014802", wl_up: "2014697", wl_down: "2014699", mwl: 10.5, storage_mcm: 70.0, catchment_km2: 15074, length_m: 328, completed: "2013-01" }
   "2017601": { name: 창녕함안보, basin: 낙동강, site: CS, wamis_bo_code: "2017801", wl_up: "2020647", wl_down: "2020646", mwl: 5.0, storage_mcm: 100.9, catchment_km2: 20697, length_m: 549.3, completed: "2012-10", note: 합천창녕보 하류 43 km, 하굿둑 상류 75 km }
@@ -82,6 +82,13 @@ sites:
     upstream_facility_kwater_code: "2009602"
     upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110"] # 안동·임하(+조정지)·성덕·영주·군위(위천)
     upstream_dams_uncertain: ["2010101"] # 김천부항(감천): 감천 합류점이 측정지점 상·하류 중 어디인지 확인 필요 (TODO)
+    asos_candidates: # T1-c: 기온 vs 수온 Spearman 으로 1순위(asos_primary) 선정, 2순위는 평균 피처 후보. 거리는 지점 좌표(근사) 기준 haversine
+      - { stn_id: 279, name: 구미, distance_km: 7.4 }
+      - { stn_id: 143, name: 대구, distance_km: 40.3 }
+      - { stn_id: 136, name: 안동, distance_km: 53.2 }
+    asos_primary: 279 # T1-c reports/eda/asos_station_choice.md: 구미 7일평균 ρ=0.977 최대·7.4km. 구미 일사는 2016~2024 결측 → 일사 피처는 2순위 대구(143) 또는 일조시간 대체
+    asos_secondary: 143
+    basin_mid_code: "2011" # 수자원단위지도 중권역 낙동왜관 (근거: 조사지점코드 HP 앞 4자리 = 중권역 코드)
     asos_stn_id: 279
     asos_alt_stn_id: null
     service_start: 2016 # 시범 2013.2~2015.12, 정식 2016
@@ -106,6 +113,13 @@ sites:
     upstream_facility_kwater_code: "2011601"
     upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110", "2010101"]
     # 금호강 합류점(파호동·죽곡리 = 강정고령보 지점)은 측정지점(보 상류 7 km, detail_adres) 하류 → 금호강은 CS·MGMR 상류 지류로 분류
+    asos_candidates: # T1-c: 기온 vs 수온 Spearman 으로 1순위(asos_primary) 선정, 2순위는 평균 피처 후보. 거리는 지점 좌표(근사) 기준 haversine
+      - { stn_id: 279, name: 구미, distance_km: 34.1 }
+      - { stn_id: 143, name: 대구, distance_km: 18.4 }
+      - { stn_id: 136, name: 안동, distance_km: 84.3 }
+    asos_primary: 279 # T1-c reports/eda/asos_station_choice.md: 구미 ρ=0.979 최대(대구 0.978 과 차이 0.001). 2순위 대구 18.4km·일사 보유 → T3 2관측소 평균 후보
+    asos_secondary: 143
+    basin_mid_code: "2011" # 수자원단위지도 중권역 낙동왜관 (근거: 조사지점코드 GJGR 앞 4자리 = 중권역 코드)
     asos_stn_id: 143
     asos_alt_stn_id: null
     service_start: 2016
@@ -130,6 +144,13 @@ sites:
     upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110", "2010101", "2015110", "2018611"] # + 합천(황강)·합천조정지
     upstream_dams_uncertain: ["2018110"] # 남강: 남강 합류점(남지)과 측정지점의 상대 위치 확인 필요 (TODO)
     tributaries_without_dam: [금호강, 회천] # 금호강(대구 도심, 보현산댐 유역 포함)은 강정고령보 지점에서 합류 → 칠서 상류
+    asos_candidates: # T1-c: 기온 vs 수온 Spearman 으로 1순위(asos_primary) 선정, 2순위는 평균 피처 후보. 거리는 지점 좌표(근사) 기준 haversine
+      - { stn_id: 288, name: 밀양, distance_km: 27.5 }
+      - { stn_id: 155, name: 창원, distance_km: 23.8 }
+      - { stn_id: 285, name: 합천, distance_km: 35.5 }
+    asos_primary: 288 # T1-c reports/eda/asos_station_choice.md: 밀양 ρ=0.981 최대. 밀양 일사 결측 89% → 일사는 2순위 창원(155, 보유 74%) 또는 일조시간
+    asos_secondary: 155
+    basin_mid_code: "2020" # 수자원단위지도 중권역 낙동밀양 (근거: 조사지점코드 CS 앞 4자리 = 중권역 코드)
     asos_stn_id: 263
     asos_alt_stn_id: 155 # 창원 (의령군 263 결측 시 대체)
     service_start: 2016
@@ -153,6 +174,13 @@ sites:
     upstream_facility_kwater_code: "2017601"
     upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110", "2010101", "2015110", "2018611", "2018110", "2021110"] # + 남강·밀양
     tributaries_without_dam: [금호강, 회천, 양산천]
+    asos_candidates: # T1-c: 기온 vs 수온 Spearman 으로 1순위(asos_primary) 선정, 2순위는 평균 피처 후보. 거리는 지점 좌표(근사) 기준 haversine
+      - { stn_id: 159, name: 부산, distance_km: 23.1 }
+      - { stn_id: 257, name: 양산시, distance_km: 2.7 }
+      - { stn_id: 288, name: 밀양, distance_km: 30.1 }
+    asos_primary: 257 # T1-c reports/eda/asos_station_choice.md: 양산시 ρ=0.982 최대·2.7km. 2순위 부산(159)=번들 관측소, 일사 98%
+    asos_secondary: 159
+    basin_mid_code: "2022" # 수자원단위지도 중권역 낙동강하구언 (근거: 조사지점코드 MGMR 앞 4자리 = 중권역 코드)
     asos_stn_id: 159
     asos_alt_stn_id: null
     service_start: 2020 # '20년 조류경보제 편입
@@ -177,6 +205,13 @@ sites:
     facility_dam_code: "3008110" # 측정지점이 저수지 내부 → 대청댐 자체 운영자료가 1차 수문 입력
     downstream_dams: ["3008611"]
     upstream_dams: ["3001110"] # 용담
+    asos_candidates: # T1-c: 기온 vs 수온 Spearman 으로 1순위(asos_primary) 선정, 2순위는 평균 피처 후보. 거리는 지점 좌표(근사) 기준 haversine
+      - { stn_id: 133, name: 대전, distance_km: 20.6 }
+      - { stn_id: 226, name: 보은, distance_km: 15.5 }
+      - { stn_id: 131, name: 청주, distance_km: 30.2 }
+    asos_primary: 131 # T1-c reports/eda/asos_station_choice.md: 청주 ρ=0.788 최대(대전 0.785, 차 0.003 — 사실상 동률). 2순위 대전(133)=번들 관측소·호소 수온이라 기온 상관 전반적으로 낮음
+    asos_secondary: 133
+    basin_mid_code: "3008" # 수자원단위지도 중권역 대청댐 (근거: 조사지점코드 DCHN 앞 4자리 = 중권역 코드)
     asos_stn_id: 133
     asos_alt_stn_id: null
     service_start: 1998

@@ -50,7 +50,7 @@ docs/02_DATA_SPEC.md와 docs/08_PIPELINE_SPEC.md 4절을 읽고, collect/base.py
 |---|---|---|
 | T1-a | `nier_algae.py` (WQ-01 API) | 5지점 가용 전 기간 수집(회남 2012-04~, 낙동강 4지점 2016-01~, 물금·매리 2020-05~), 대회 데이터와 겹치는 기간 세포수 일치율 ≥95% 검증 로그 |
 | T1-b | `kwater_dam.py` (HY-01/02/03) | 매핑 댐 전체 일별, 결측률 보고 |
-| T1-c | `kma_asos.py` (MT-01) + `kma_basin.py` (MT-02/03 CSV 파서) | 지점별 ASOS 2015~현재 |
+| T1-c | `kma_asos.py` (MT-01) + `kma_basin.py` (MT-02/03 CSV 파서) | 지점별 후보 관측소 2~3개 ASOS 2012~현재(가용 전 기간), 번들 일치율, 기온–수온 상관 기반 관측소 선정표, 결측률 표(관측소×변수×연도) |
 | T1-d | `wamis.py` (HY-06) + `dataon_level.py` (HY-05 파서) | 낙동강 4보 수위·방류 |
 | T1-e | `kma_forecast.py` (MT-05/06) + `nier_forecast.py` (WQ-03/04) | 발표일 기준 예보 테이블(issued_at, target_date, 값), 벤치마크 테이블 |
 | T1-f (Should) | `aida_grid.py` (AI-01~03) | 지점 bbox 평균 시계열 |
