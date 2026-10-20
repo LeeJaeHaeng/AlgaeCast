@@ -1,0 +1,120 @@
+selected:
+  study: log_w_composite_perc75_S1
+  variant: log_w
+  objective: composite
+  bias: smearing
+  feature_set: perc75
+  strategy: S1
+  params: &id001
+    n_estimators: 700
+    learning_rate: 0.010042211754693912
+    num_leaves: 33
+    max_depth: 12
+    min_child_samples: 34
+    feature_fraction: 0.7269637197946567
+    bagging_fraction: 0.8573467636129732
+    lambda_l1: 0.09640472142724615
+    lambda_l2: 0.08326771540462878
+    min_split_gain: 0.07959792056450789
+    alpha: 0.05899553344307833
+  cv:
+    rmse_log: 0.8191
+    mae_log: 0.5902
+    r2_log: 0.6662
+    r2_raw: 0.229
+    r2_pearson_raw: 0.3072
+    nse_raw: 0.229
+    f1_10k: 0.4956
+  final_2025:
+    rmse_log: 0.7129
+    mae_log: 0.519
+    r2_log: 0.777
+    r2_raw: 0.1087
+    r2_pearson_raw: 0.1913
+    nse_raw: 0.1087
+    f1_10k: 0.6818
+  decided_on: '2026-10-21'
+studies:
+  ens_rmse_log_perc75_S1:
+    best_value: 0.8018629373327611
+    n_complete: 143
+    best_params:
+      n_estimators: 1100
+      learning_rate: 0.014025680203200967
+      num_leaves: 127
+      max_depth: 12
+      min_child_samples: 5
+      feature_fraction: 0.4823786691334526
+      bagging_fraction: 0.7997940109139725
+      lambda_l1: 0.020789534032198475
+      lambda_l2: 0.09342461072568184
+      min_split_gain: 0.48212916734654565
+      alpha: 0.24349754304434157
+      variance_power: 1.7581287126679095
+      w_c1: 0.5298388358850028
+  hurdle_rmse_log_perc75_S1:
+    best_value: 0.8141578190232062
+    n_complete: 119
+    best_params:
+      n_estimators: 200
+      learning_rate: 0.021052425104918077
+      num_leaves: 23
+      max_depth: 9
+      min_child_samples: 15
+      feature_fraction: 0.4540614425720832
+      bagging_fraction: 0.6563577880177509
+      lambda_l1: 0.012680101982275767
+      lambda_l2: 0.009160096008174533
+      min_split_gain: 0.3511323708389702
+      cls_n_estimators: 700
+  log_w_composite_perc75_S1:
+    best_value: 0.8788925536841863
+    n_complete: 187
+    best_params: *id001
+  log_w_rmse_log_perc75_S1:
+    best_value: 0.8110887189882611
+    n_complete: 169
+    best_params:
+      n_estimators: 1200
+      learning_rate: 0.02300991682366322
+      num_leaves: 35
+      max_depth: 11
+      min_child_samples: 5
+      feature_fraction: 0.66262085846494
+      bagging_fraction: 0.9882337213620658
+      lambda_l1: 0.014409326996295066
+      lambda_l2: 0.002832786078081524
+      min_split_gain: 0.18065105306118348
+      alpha: 0.39199146752649977
+  tweedie_composite_perc75_S1:
+    best_value: 0.9130310316434814
+    n_complete: 116
+    best_params:
+      n_estimators: 800
+      learning_rate: 0.08759845433286662
+      num_leaves: 24
+      max_depth: 12
+      min_child_samples: 31
+      feature_fraction: 0.5819962812825519
+      bagging_fraction: 0.8187565556878325
+      lambda_l1: 0.25788423720212295
+      lambda_l2: 0.0028303098796075956
+      min_split_gain: 0.3892136872388312
+      objective_raw: tweedie
+      variance_power: 1.3000651733667983
+  tweedie_rmse_log_perc75_S1:
+    best_value: 0.8096190973075549
+    n_complete: 264
+    best_params:
+      n_estimators: 1400
+      learning_rate: 0.012601297825346218
+      num_leaves: 70
+      max_depth: 12
+      min_child_samples: 5
+      feature_fraction: 0.8831961791114029
+      bagging_fraction: 0.8355394819893969
+      lambda_l1: 3.307824224914294
+      lambda_l2: 1.2357663052054415
+      min_split_gain: 0.476483878726096
+      objective_raw: tweedie
+      variance_power: 1.4311078505035189
