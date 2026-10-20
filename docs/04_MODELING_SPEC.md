@@ -102,6 +102,8 @@ alpha log 1e-4~10, l1_ratio 0~1 — trial 50
 | PICP_80, MPIW_80 | 구간 | 0.1~0.9 분위 |
 | Brier | 확률 | 경계 초과 확률 |
 
+**구현 메모 (T0-c, `src/algaecast/eval/metrics.py`)**: 분류 임계값은 '이상'(≥, 경보 기준과 동일; README 의 '초과' 표기와 다르나 정확히 10,000 인 값은 데이터에 없음). PICP/MPIW 는 교차 구간(q90<q10)을 정렬해 계산하고 `n_crossed_q` 로 건수를 보고(T4-c 분위 모델은 저장 전 정렬 권장). MPIW 기본 공간은 log10(x+1). KGE 는 log 공간·ddof=0. 관측 분산 0 이면 R²·NSE·KGE 는 NaN. 부트스트랩은 백분위법(percentile), 시드 42, (site, base_date) 행 단위가 기본이며 `groups` 로 군집 재표본 가능.
+
 ### 6.2 보고 표 (모두 `reports/eval/`)
 1. `tbl_baseline.md` — B0~B4
 2. `tbl_models_cv.md` — 모델별 CV 폴드 평균±표준편차
