@@ -45,7 +45,21 @@ def _call(url: str, params: dict[str, str]) -> tuple[str, str, int, list[str]]:
     r.raise_for_status()
     text = r.text.strip()
     if text.startswith("{"):
-        body = r.json()["response"]
+        payload = r.json()
+        if "data" in payload and "totalCount" in payload:  # odcloud 파일데이터 API
+            first = payload["data"][0] if payload["data"] else {}
+            return "00", "odcloud", int(payload["totalCount"]), list(first.keys())
+        if "result" in payload and "list" in payload:  # WAMIS 개방 API
+            res = payload["result"]
+            code = "00" if res.get("code") == "success" else str(res.get("code"))
+            first = payload["list"][0] if payload["list"] else {}
+            return (
+                code,
+                res.get("msg", ""),
+                int(payload.get("count", len(payload["list"]))),
+                list(first.keys()),
+            )
+        body = payload["response"]
         header, items = body["header"], body["body"]
         item = items.get("items") or {}
         raw = item.get("item") if isinstance(item, dict) else None
@@ -69,6 +83,7 @@ def _call(url: str, params: dict[str, str]) -> tuple[str, str, int, list[str]]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", type=date.fromisoformat, default=date.today() - timedelta(days=1))
+    ap.add_argument("--all", action="store_true", help="일 100건 제한 서비스(댐코드 조회)까지 호출")
     args = ap.parse_args(argv)
     d: date = args.date
     ymd = d.strftime("%Y%m%d")
@@ -118,7 +133,43 @@ def main(argv: list[str] | None = None) -> int:
             get_env("API_NIER_ALGAE", required=True),
             {"pageNo": "1", "numOfRows": "3"},
         ),
+        "K-water 수문 운영 정보 delist (강정고령보)": (
+            get_env("API_KWATER_SLUICE", required=True) + "/delist",
+            {
+                "pageNo": "1",
+                "numOfRows": "3",
+                "_type": "json",
+                "damcode": "2011602",
+                "stdt": (d - timedelta(days=2)).isoformat(),
+                "eddt": d.isoformat(),
+            },
+        ),
+        "KMA 단기예보 getVilageFcst (대구 89,90)": (
+            get_env("API_KMA_VILAGE_FCST", required=True) + "/getVilageFcst",
+            {
+                "pageNo": "1",
+                "numOfRows": "3",
+                "dataType": "JSON",
+                "base_date": ymd,
+                "base_time": "0500",
+                "nx": "89",
+                "ny": "90",
+            },
+        ),
+        "KMA 유역별 강수량 (odcloud, 단일 일자 스냅샷)": (
+            get_env("API_KMA_BASIN_RAIN_ODCLOUD", required=True),
+            {"page": "1", "perPage": "3"},
+        ),
+        "WAMIS 댐 일자료 mn_dtdata (대청 3008110, 키 불필요)": (
+            get_env("API_WAMIS_BASE", required=True) + "/wkd/mn_dtdata",
+            {"damcd": "3008110", "startdt": ymd, "enddt": ymd, "output": "json"},
+        ),
     }
+    if args.all:  # 일 100건 제한 서비스는 명시적으로만 호출
+        checks["K-water 댐코드 조회 (일 100건)"] = (
+            get_env("API_KWATER_DAMCODE", required=True),
+            {"pageNo": "1", "numOfRows": "100", "_type": "json"},
+        )
     ok = True
     print(f"기준일 {d.isoformat()}")
     for name, (url, params) in checks.items():

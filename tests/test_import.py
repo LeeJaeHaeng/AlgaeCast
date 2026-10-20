@@ -43,6 +43,6 @@ def test_env_example_has_no_secret_values() -> None:
         key, _, value = line.partition("=")
         key, value = key.strip(), value.strip()
         if key.startswith("API_") or key in PUBLIC_URL_VARS:
-            assert value == "" or value.startswith("https://"), f"{key}: 공개 URL 만 허용"
+            assert value == "" or value.startswith(("https://", "http://")), f"{key}: 공개 URL 만 허용"
         else:
             assert value == "", f"{key} 에 값이 들어있음 — 예시 파일에는 비워둘 것"

@@ -1,0 +1,2409 @@
+{
+ "_about": "config/sites.yaml 근거 자료. 2026-10-20 웹 조사 → 출처 재확인(verify) 통과 항목. 생성: research-sites-facts 워크플로.",
+ "verified": [
+  {
+   "entity": "물금취수장",
+   "attribute": "intake_capacity",
+   "value": "840",
+   "unit": "천톤/일",
+   "source_url": "https://www.busan.go.kr/water/status",
+   "source_quote": "취수장(생활용수) 2개소: 매리 1,725 천톤/일, 물금 840 천톤/일, 계 2,565 천톤/일",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "매리취수장",
+   "attribute": "intake_capacity",
+   "value": "1,725",
+   "unit": "천톤/일",
+   "source_url": "https://www.busan.go.kr/water/status",
+   "source_quote": "매리 1,725 천톤/일",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "부산 상수도(물금+매리)",
+   "attribute": "total_intake_capacity",
+   "value": "2,565",
+   "unit": "천톤/일",
+   "source_url": "https://www.busan.go.kr/water/status",
+   "source_quote": "계 2,565 천톤/일; 수원: 낙동강 1,701천톤/일(90%), 수원지 198천톤/일(10%)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "부산 정수장",
+   "attribute": "treatment_capacity",
+   "value": "덕산(생활) 805 / 덕산(공업) 352 / 화명 544 / 명장 190 / 범어사 8 / 계 1,899",
+   "unit": "천톤/일",
+   "source_url": "https://www.busan.go.kr/water/status",
+   "source_quote": "정수장 생산능력(천톤/일): 덕산(생활) 805, 덕산(공업) 352, 화명 544, 명장 190, 범어사 8, 계 1,899",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "물금취수장",
+   "attribute": "share_of_busan_drinking_water",
+   "value": "약 33% (하루 취수 능력 84만 톤)",
+   "unit": "%",
+   "source_url": "https://www.busan.com/view/busan/view.php?code=2026081018354465170",
+   "source_quote": "[부산일보 2026-08-10 르포] 물금취수장 하루 취수 능력 84만 톤 … 부산 전체 먹는 물 공급량의 약 33% (fetch tool paraphrased: 'Daily intake capacity: 840,000 tons; approximately 33% of Busan's total drinking water supply')",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "물금 통합취수탑(부산·양산)",
+   "attribute": "planned_intake_capacity",
+   "value": "96.5만 톤 (부산 84만, 양산 12.5만); 총사업비 290억원",
+   "unit": "톤/일",
+   "source_url": "https://www.yangsanilbo.com/news/articleView.html?idxno=112267",
+   "source_quote": "수심별 선택 취수가 가능한 시설용량 96.5만 톤의 물금 통합취수탑을 신설해 이 중 84만 톤을 부산으로, 12.5만 톤은 양산으로 보내는 것 … (수심 10m 취수 시) 남조류 유입 90% 이상이 차단되는 점을 이용",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "물금·매리 (2022G05)",
+   "attribute": "alert_history_2025",
+   "value": "2025-05-29 관심 발령 → 2025-12-01 해제, 총 194일 (관심 166일 + 경계 28일); 2022년 196일에 이어 두 번째로 긴 기록",
+   "unit": "days",
+   "source_url": "https://www.busan.com/view/busan/view.php?code=2025120210051894310",
+   "source_quote": "올해 5월 29일 올해 첫 조류경보 '관심' 단계 발령 … 194일 … 2022년(196일)에 이어 두 번째 … 11월 24일 888개/㎖, 12월 1일 533개/㎖ (경계 28일/관심 166일 내역은 부산일보 2026-08-10 기사: 'Last year saw 194 total alert days … 166 Attention-level, 28 Caution-level days')",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "물금·매리 (2022G05)",
+   "attribute": "alert_history_2026",
+   "value": "06-08 18시 관심(6/1 2,418 → 6/8 8,458) → 06-22 18시 경계(6/15 21,868; 6/22 13,288) → 07-23 관심 하향 → 08-10 18시 경계 재상향(7/23 1,498; 7/27 4,946; 8/3 56,949; 8/10 30,865) → 10-19 기준 경계 유지(10/12 98,750 세포/mL, 조류독소 10.45 μg/L)",
+   "unit": "세포/mL",
+   "source_url": "https://www.gnnews24.kr/news/articleView.html?idxno=33690",
+   "source_quote": "낙동강유역환경청 … 8월 10일 오후 6시를 기해 물금매리 지점 조류경보 '경계' … 지난 6월 '경계' 발령 후 7월 23일 '관심' 하향 … 7월 23일 1498세포/㎖, 7월 27일 4946, 8월 3일 5만6949, 8월 10일 3만865 (6월 수치: 경남일보 idxno=639674; 10월 수치: 경남신문 idxno=1553127; 6/8 수치: nate 20260608n32538)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠서정수장/칠서취수장 (창원시)",
+   "attribute": "intake_capacity",
+   "value": "440,000",
+   "unit": "㎥/일",
+   "source_url": "https://www.changwon.go.kr/water/sub05/sub_05_03_01.do",
+   "source_quote": "취수용량 440,000㎥/일, 취수장 부지면적 15,224㎡; 정수용량 400,000㎥/일; 오존처리시설(400,000㎥/일), 입상활성탄여과시설(400,000㎥/일); 공급구역 창원시, 함안군; 급수인구 830,000명",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠서정수장 (창원시)",
+   "attribute": "treatment_capacity",
+   "value": "400,000",
+   "unit": "㎥/일",
+   "source_url": "https://www.changwon.go.kr/water/sub05/sub_05_03_01.do",
+   "source_quote": "정수용량 400,000㎥/일 … 급수인구 830,000명",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창원공업용수도 (K-water)",
+   "attribute": "facility_capacity",
+   "value": "285",
+   "unit": "천㎥/일",
+   "source_url": "https://www.kwater.or.kr/water/sub02/sub06/supplyPage.do?s_mid=54",
+   "source_quote": "창원 공업: 시설용량 285천㎥/일, 수원 285(하천), 급수지역 반송 등",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠서취수장 개선사업",
+   "attribute": "planned_new_intake_capacity",
+   "value": "하루 28만t 규모 신설, 총사업비 약 490억 원; 창원시 수돗물의 약 63%가 칠서 취·정수장 의존",
+   "unit": "톤/일",
+   "source_url": "https://www.gnnews.co.kr/news/articleView.html?idxno=640094",
+   "source_quote": "노후화된 칠서취수장 … 하루 28만t 규모 … 총사업비 약 490억 원 (경남일보 2026-06-30; '창원시 수돗물 약 63%' is fetch-tool paraphrase)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠서 (2020G33)",
+   "attribute": "alert_history_2025",
+   "value": "2025-06-05 15시 관심 발령(5/26 2,124; 6/2 2,762 세포/mL); 2025-08-28 경계 상향(8/14 관심 상태에서); 해제일 미확인(부산일보 2025-12-02: 낙동강청 관할 지점 모두 해제 상태)",
+   "unit": "세포/mL",
+   "source_url": "https://news.knn.co.kr/news/article/173536",
+   "source_quote": "낙동강유역환경청 … 6월 5일 오후 3시 칠서지점 조류경보 '관심' … 5월 26일 2,124 cells/mL, 6월 2일 2,762 cells/mL (경계 8/28: YTN 2025-09-05 key=202509051105098848)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠서 (2020G33)",
+   "attribute": "alert_history_2026",
+   "value": "06-08 18시 관심(6/1 4,877; 6/8 7,280) → 06-22 18시 경계(6/15 18,956; 6/22 18,836) → 07-27 관심 하향(4,618) → 08-20 18시 경계(8/3 7,113; 8/10 183,037; 8/20 12,280) → 10-19 기준 경계 유지(34,763 세포/mL, 조류독소 3.6 μg/L)",
+   "unit": "세포/mL",
+   "source_url": "https://www.newspim.com/news/view/20260820001260",
+   "source_quote": "낙동강유역환경청 … 8월 20일 오후 6시 칠서 지점 '경계' … 7월 27일 '관심' 하향 … 6월 22일 경계 … 7/27 4,618, 8/3 7,113, 8/10 183,037, 8/20 12,280 cells/mL; '2회 연속 1만 세포/㎖ 이상' (6월 수치: nate 20260608n35150, 경남일보 639674; 10월: 경남신문 1553127)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "매곡정수사업소/매곡취수장 (대구)",
+   "attribute": "intake_capacity",
+   "value": "77만",
+   "unit": "㎥/일",
+   "source_url": "https://www.grandculture.net/daegu/suseonggu/toc/GC40081074",
+   "source_quote": "일 77만㎥ 규모의 취수 시설과 일 70만㎥ 규모의 정수 시설 … 2014년 일 58만㎥의 고도 정수 처리[전 오존] 시설을 완공",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "매곡정수장 (대구)",
+   "attribute": "treatment_capacity",
+   "value": "70만",
+   "unit": "㎥/일",
+   "source_url": "https://www.grandculture.net/daegu/suseonggu/toc/GC40081074",
+   "source_quote": "일 70만㎥ 규모의 정수 시설 … 중구, 서구, 남구, 달성군 전역, 북구·달성군 일부 급수",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대구 취수원 다변화 (강정·고령 구간)",
+   "attribute": "policy_plan",
+   "value": "해평취수장 추가 취수 30만톤 + 문산·매곡 초고도정수 28.8만톤; 대구 57만톤·경북 1.8만톤 배분; '21~'28년, 7,199억원",
+   "unit": "톤/일",
+   "source_url": "https://www.daegu.go.kr/daeguPolicy/6/index.html",
+   "source_quote": "해평취수장 추가 취수(30만톤) … 문산ㆍ매곡정수장 초고도정수시설(28.8만톤) 도입 … 대구 57만톤, 경북 1.8만톤 배분 … '21~'28년(8년) … 7,199억원 정도 … 문산·매곡취수장이 구미산단 31㎞ 하류에 위치",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대구 (문산·매곡취수장)",
+   "attribute": "current_daily_intake",
+   "value": "하루 약 60만t (이 중 약 30만t을 해평취수장에서 공동 활용하는 협정, 2022-04-04 체결 예정이었음)",
+   "unit": "톤/일",
+   "source_url": "https://www.kbmaeil.com/925116",
+   "source_quote": "대구시 취수량(하루 약 60만t) 일부(하루 약 30만t)를 구미 해평취수장에서 공동 활용 … 낙동강수계기금 매년 100억원 지원, 구미하수처리장 시설 개선 … KTX구미역 신설 (경북매일 2022-03-28)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대구 맑은물 하이웨이 (안동댐 취수)",
+   "attribute": "policy_plan",
+   "value": "안동댐 직하류~문산·매곡정수장 약 110km 관로; 하루 46만톤(대구 40만9000, 신공항 3만3000, 성주·고령 1만8000); 약 1조5000억원; 해평 공동이용은 2022년 구미시장 반대로 무산",
+   "unit": "톤/일",
+   "source_url": "https://www.kbmaeil.com/article/20250527500451",
+   "source_quote": "안동댐 직 하류에서 문산, 매곡정수장까지 약 110㎞의 관로를 신설하는 사업 … 하루 46만 톤 … 그해 지방선거에서 새롭게 당선된 구미시장의 반대의사 표명으로 무산 … 낙동강유역물관리위원회의 심의만 남겨두고 있음 (2025-05-27)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정·고령 (2011G56)",
+   "attribute": "alert_history_2025",
+   "value": "2025-07-10 올해 첫 관심 발령(7/7 106,505 세포/mL, 전주 2,364; 수온 31.7℃) → 2025-08-14 15시 경계 상향(8월 2주 16,780 세포/mL, 2주 연속 1만 초과); 해제일 미확인",
+   "unit": "세포/mL",
+   "source_url": "https://news.bbsi.co.kr/news/articleView.html?idxno=4043008",
+   "source_quote": "[불교방송 2025-08-14] 강정고령 '관심'→'경계' 오늘(14일) 15시 … 16,780 cells/mL, 2주 연속 1만 초과; 영천호 1,802, 안계호 1,281 '관심' (첫 관심 7/10: 대경일보 idxno=504857 '강정고령보 상류 7㎞ … 2,364→106,505 cells/㎖')",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "해평취수장 (K-water 구미권광역상수도)",
+   "attribute": "intake_capacity",
+   "value": "464",
+   "unit": "천㎥/일",
+   "source_url": "https://www.kwater.or.kr/water/sub01/sub05/20060674/works.do?s_mid=1367&s_officecode=10730017&s_flag=1&brdId=KO27",
+   "source_quote": "구미권광역상수도 시설용량 464천㎥/일; 취수시설 3개소: 해평취수장(464), 보조취수시설(450), 구미광역취수장(400); 정수시설 2개소: 구미정수장(464), 해평정수장(15); 급수지역 구미시, 칠곡군, 김천시, 구미국가산단(2,3,4단지), 김천공단, 김천혁신도시; 급수인구 약 40만 명; 송수관로 135km",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미권 광역상수도 (K-water 전국표)",
+   "attribute": "facility_capacity",
+   "value": "구미 1단계 200 / 구미 2단계 200 / 구미공업 64",
+   "unit": "천㎥/일",
+   "source_url": "https://www.kwater.or.kr/water/sub02/sub06/supplyPage.do?s_mid=54",
+   "source_quote": "구미 1단계: 시설용량 200천㎥/일, 수원 200(하천); 구미 2단계: 200천㎥/일; 구미 공업: 64천㎥/일",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "해평 (2011G26)",
+   "attribute": "alert_history_2026",
+   "value": "06-08 18시 관심 → 08-10 경계(약 4만3천 세포/mL; 수온 30℃) → 09-04 해제(89일) → 09-14 18시 관심 재발령(9/3 659; 9/7 3,201; 9/14 1,940) → 09-28 375 세포/mL(관심 기준 미만)",
+   "unit": "세포/mL",
+   "source_url": "https://www.kyongbuk.co.kr/news/articleView.html?idxno=4084295",
+   "source_quote": "[경북일보 2026-09-16] 지난 14일 오후 6시를 기해 … 이달 4일 경보가 해제됐다 … 9/3 659, 9/7 3,201, 9/14 1,940 cells/mL (6/8 18시 관심: nate 20260608n35128; 8/10 경계: supple.kr cmsnoi8i60057et5il68h4vib; 89일 해제: nate 20260904n23236; 9/28 375: 경북도민일보 722972)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "total_storage_mcm",
+   "value": "1,490",
+   "unit": "백만㎥",
+   "source_url": "https://www.kwater.or.kr/water/sub01/sub05/20060557/works.do?s_mid=1357&s_officecode=10750012&s_flag=1&brdId=KO27",
+   "source_quote": "총저수량 1,490백만㎥; 유역면적 3,204㎢; 높이 72m, 길이 495m; 홍수조절 250백만㎥",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "annual_water_supply",
+   "value": "1,649",
+   "unit": "백만㎥/년",
+   "source_url": "https://www.kwater.or.kr/water/sub01/sub05/20060557/works.do?s_mid=1357&s_officecode=10750012&s_flag=1&brdId=KO27",
+   "source_quote": "연간 용수공급량 1,649백만㎥/년 (생활·공업용수 및 농업용수 공급)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청광역정수장 (청주)",
+   "attribute": "treatment_capacity",
+   "value": "297,000",
+   "unit": "㎥/일",
+   "source_url": "https://www.cheongju.go.kr/sangsudo/contents.do?key=1918",
+   "source_quote": "대청광역정수장: 청주시 서원구 성화동 286, 시설용량 297,000㎥/일, 수원 대청댐호소수 및 금강하천수(대청댐하류)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "지북정수장 / 국전취수장 (청주)",
+   "attribute": "treatment_capacity",
+   "value": "지북정수장 125,000㎥/일 (수원 대청댐호소수); 국전취수장 취수량 114,000㎥/일 (수자원공사 위탁 2000.6.29); 청주 정수시설 총 423,600㎥/일",
+   "unit": "㎥/일",
+   "source_url": "https://www.cheongju.go.kr/sangsudo/contents.do?key=1918",
+   "source_quote": "지북정수장 시설용량 125,000 ㎥/일, 수원 대청댐호소수; 국전취수장 취수량 114,000 ㎥/일, 수자원공사 위탁(2000.6.29); 정수시설 총용량 423,600㎥/일",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청 광역상수도 1·2·3단계 (K-water)",
+   "attribute": "facility_capacity",
+   "value": "대청1 250 / 대청2 760 / 대청3 474",
+   "unit": "천㎥/일",
+   "source_url": "https://www.kwater.or.kr/water/sub02/sub06/supplyPage.do?s_mid=54",
+   "source_quote": "대청1: 250천㎥/일, 수원 250(댐), 급수지역 청주 및 전동·목천; 대청2: 760천㎥/일, 청주·천안 등; 대청3: 474천㎥/일, 천안·아산 등",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대전 상수도 (대청호 취수탑)",
+   "attribute": "treatment_capacity",
+   "value": "일일 최대시설용량 135만 톤 = 송촌 30만 + 월평 60만 + 회덕 15만 + 신탄진 30만; 취수탑(추동·삼정), 취수장(중리·삼정)",
+   "unit": "톤/일",
+   "source_url": "https://www.daejeon.go.kr/its/ItsdjNormalboardView.do?menuSeq=&boardSeq=3570&boardGubun=itsdj01&pageIndex=1",
+   "source_quote": "대청댐→취수탑(추동·삼정/대청호의 물을 가져오는 곳) … 취수장(중리·삼정/물을 각 정수장으로 공급하는 시설) … 일일 최대시설용량 135만 톤의 수돗물을 송촌정수사업소(30만 톤), 월평정수사업소(60만 톤), 회덕정수장(15만 톤), 신탄진정수사업소(30만 톤)에서 (월간 대전이즈유 2025년 11월호)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대전 제2취수탑 및 도수터널 (대청호)",
+   "attribute": "planned_intake_capacity",
+   "value": "일일 취수량 105만 톤, 총연장 4.7km, 2028년 준공 목표",
+   "unit": "톤/일",
+   "source_url": "https://www.daejeon.go.kr/its/ItsdjNormalboardView.do?menuSeq=&boardSeq=3570&boardGubun=itsdj01&pageIndex=1",
+   "source_quote": "일일 취수량 105만 톤, 총연장 4.7㎞의 '제2취수탑 및 도수터널 건설계획' 방침을 수립하고 오는 2028년 준공을 목표로",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청호 회남 (3008G30)",
+   "attribute": "alert_history_2025",
+   "value": "관심 발령일 UNKNOWN; 2025-08-14 15시 문의·회남 경계 상향(회남 8/4 23,323 → 8/11 38,665; 문의 17,585 → 11,129; 추동 896 → 4,228); 2025-08-21 15시 추동 관심(8/18: 문의 11,661, 추동 9,604, 회남 194,194)",
+   "unit": "세포/mL",
+   "source_url": "https://mcee.go.kr/gg/web/board/read.do?boardCategoryId=&boardId=1759060&boardMasterId=237&condition.hideCate=1&decorator=&maxIndexPages=10&maxPageItems=10&menuId=2290&orgCd=&pagerOffset=0&searchKey=&searchValue=",
+   "source_quote": "[금강유역환경청 2025-08-14] 8월 14일(목) 15시를 기해 … '관심'→'경계' … 경계 기준 10,000세포/mL 2주 연속 초과 … 회남 23,323/38,665, 문의 17,585/11,129, 추동 896/4,228 … 대청호 원수를 사용하는 정수장에서 심층 취수 및 고도정수처리 … 조류독소 불검출 (8/21 추동 관심: boardId=1759930 '대청호 취수원 인근 3개 지점(문의, 추동, 회남)')",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청호 회남 (3008G30)",
+   "attribute": "alert_history_2026",
+   "value": "07-20 18시 회남 경계(7/20 13,889 세포/mL; 문의 704/478, 추동 479/288 on 7/13·7/20) → 08-03 18시 문의·추동 관심(회남 경계 유지) → 09-21 18시 추동 경계 → 10-12 18시 문의 경계(10/6 17,576; 10/12 41,395)",
+   "unit": "세포/mL",
+   "source_url": "https://www.joongdo.co.kr/web/view.php?key=20260721010006095",
+   "source_quote": "[중도일보 2026-07-21] 2026년 7월 20일 오후 6시 … 대청호 회남수역 '경계' … 심층취수를 실시하고 고도정수처리를 강화 (13,889: K-Life TV 37910; 8/3 문의·추동 관심 '현재 경계 단계가 유지 중인 회남 수역': TJB 101959 2026-08-04; 9/21 추동 경계: 미래세종일보 83981; 10/12 문의 경계: 대전일보 2306449)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 매뉴얼(2025.8) 상수원 구간",
+   "attribute": "alert_thresholds",
+   "value": "관심 1,000 이상 10,000 미만 / 경계 10,000 이상 1,000,000 미만 / 대발생 1,000,000 이상 / 해제 1,000 미만 (모두 2회 연속 채취)",
+   "unit": "세포/mL",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "표 6 단계별 조류경보 발령기준 — 상수원 구간: 관심 2회 연속 채취 시 남조류 세포수가 1,000 세포/mL 이상 10,000 세포/mL 미만인 경우; 경계 2회 연속 채취 시 10,000 세포/mL 이상 1,000,000 세포/mL 미만인 경우; 조류대발생 2회 연속 채취 시 1,000,000 세포/mL 이상인 경우; 해제 2회 연속 채취 시 1,000 세포/mL 미만인 경우 (p.30, 1.3.2)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 매뉴얼(2025.8) 친수활동 구간",
+   "attribute": "alert_thresholds",
+   "value": "관심 20,000 이상 100,000 미만 / 경계 100,000 이상 / 해제 20,000 미만 (2회 연속)",
+   "unit": "세포/mL",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "친수활동 구간: 관심 2회 연속 채취 시 남조류 세포수가 20,000 세포/mL 이상 100,000 세포/mL 미만인 경우; 경계 100,000 세포/mL 이상; 해제 20,000 세포/mL 미만 … 비고: 발령주체는 … 강우 예보 등 기상상황을 고려하여 조류경보를 발령ㆍ해제하지 않을 수 있다",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 매뉴얼(2025.8)",
+   "attribute": "cyanobacteria_definition",
+   "value": "Microcystis, Anabaena, Aphanizomenon, Oscillatoria 속 세포수의 합",
+   "unit": "definition",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "1.3.1 기준항목: 남조류 세포수 ※ 남조류 세포수는 마이크로시스티스(Microcystis), 아나베나(Anabaena), 아파니조메논(Aphanizomenon), 오실라토리아(Oscillatoria) 속(屬) 세포수의 합을 말한다",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 (MyWater 요약)",
+   "attribute": "toxin_criterion",
+   "value": "상수원 경계: 남조류 10,000 세포/mL 이상 또는 조류독소 10 μg/L 이상 (2회 연속); 친수 경계: 100,000 또는 조류독소 20 μg/L",
+   "unit": "μg/L",
+   "source_url": "https://www.water.or.kr/kor/menu/sub.do?menuId=16_177_281",
+   "source_quote": "상수원 구간 경계: 남조류 10,000 세포/mL 이상 또는 조류독소 10 μg/L 이상 (2회 연속); 운영 지점 전국 29개 하천·호소; 모니터링 주기 주 1회 이상(경계·대발생 시 주 2회 이상)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "녹조 신속 분석 체계 (해평·강정·고령·칠서·물금·매리)",
+   "attribute": "operation_since",
+   "value": "2025.08부터 채수 당일 발령; 채수지점 취수구 인근으로 이동",
+   "unit": "policy",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "20) 2025.08 : 녹조 신속 분석 체계(해평, 강정·고령, 칠서, 물금·매리) 운영 - 채수지점 이동(취수구 2~4km 상류→취수구 인근), 발령일자(채수 3일차 오후→채수 당일) 등 … 2025년 8월부터는 낙동강 하천 4개 지점 … 녹조 신속 분석 체계를 통해 채수당일 발령 … 유해남조류 세포수 및 발령현황은 채수당일 물환경정보시스템을 통해 공개",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 낙동강 4지점 ↔ 취수장 매핑",
+   "attribute": "linked_intake",
+   "value": "해평→해평취수구; 강정·고령→매곡취수구(구 고령취수구 상류 2km); 칠서→칠서취수구; 물금·매리→매리취수구 (모두 취수구 인근 50m 채수)",
+   "unit": "mapping",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "※낙동강하천지점시료채취위치변경 ①해평 해평취수구상류2km→취수구인근50m, ②강정·고령 고령취수구상류 2km→매곡취수구인근50m, ③칠서 칠서취수구상류4km→취수구인근50m, ④물금·매리 매리취수구상류3km→취수구인근50m (p.24)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 조사지점 코드/위치 (낙동강 4지점)",
+   "attribute": "site_code_and_location",
+   "value": "해평 2011G26 구미시 해평면 문량리 128°23'14.3\"/36°10'10.3\" 대구청; 강정·고령 2011G56 달성군 다사읍 매곡리 128°27'6.1\"/35°50'50.7\" 대구청; 칠서 2020G33 함안군 칠서면 계내리 128°28'55.9\"/35°22'55.4\" 낙동강청; 물금·매리 2022G05 김해시 상동면 매리 128°57'8.6\"/35°20'6.9\" 낙동강청",
+   "unit": "code",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "낙동강(해평) 경상북도구미시해평면문량리 128°23'14.3\"/36°10'10.3\" 취수구50m 대구청 낙동강물환경센터 2011G26; (강정·고령) 대구광역시달성군다사읍매곡리 128°27'6.1\"/35°50'50.7\" 취수구50m 2011G56; (칠서) 경상남도함안군칠서면계내리 128°28'55.9\"/35°22'55.4\" 취수구50m 낙동강청 2020G33; (물금·매리) 경상남도김해시상동면매리 128°57'8.6\"/35°20'6.9\" 취수구50m 2022G05",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청호 조사지점 코드 (추동/문의/회남)",
+   "attribute": "site_code_and_location",
+   "value": "추동 3008G40 대전 동구 용계동 155, 취수구 1km; 문의 3008G50 청주시 상당구 문의면 문산리 129, 취수구 1km; 회남 3008G30 보은군 회남면 사음리 127, 취수구 14km; 관리 금강청, 조사 금강물환경센터",
+   "unit": "code",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "대청호 (추동) 대전동구용계동155 127°29'32.45\"/36°22'29.52\" 취수구1km 금강청 금강물환경센터 3008G40; (문의) 충북청주시상당구문의면문산리129 127°30'07.11\"/36°30'28.83\" 취수구1km 3008G50; (회남) 충북보은군회남면사음리127 127°33'08.76\"/36°25'54.54\" 취수구14km 3008G30",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 운영지점 연혁",
+   "attribute": "site_history",
+   "value": "대청호(3: 추동·문의·회남) '98 시행; 낙동강 해평(구 칠곡)·강정·고령·칠서(구 창녕·함안) 시범 '13.2~'15.12, 정식 '16; 물금·매리 '20 신규('20.5~'21.4 시범); 전국 29개 발령지점",
+   "unit": "history",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "표 4 조류경보제 운영지점: 2 대청호(3) 추동, 문의, 회남 금강청 ('98) … 24 '16 낙동강(3)(시범 '13∼'15) 해평(구 칠곡) 대구청 / 25 강정·고령 대구청 / 26 칠서(구 창녕·함안) 낙동강청 … 29 '20 낙동강(1) 물금·매리 낙동강청 … ※지점명변경: ②낙동강(칠곡)→낙동강(해평), ③낙동강(창녕·함안)→낙동강(칠서) ※낙동강(물금·매리)지점은 신규추가('20.5~'21.4 시범운영)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "조류경보제 매뉴얼 표1 지점별 발령내역",
+   "attribute": "historical_alert_days_table",
+   "value": "1998~2024 연도별 지점별 발령일수·기간표 존재 (예: 칠서 '15 관심 161일·경계 10일; 강정·고령 '18 관심 84일·경계 13일; 대청호 '16 관심 91일 회남 8.3~10.5 64일)",
+   "unit": "days",
+   "source_url": "https://www.water.or.kr/upload/board/2026/04/20260416110044_1.pdf",
+   "source_quote": "낙동강 칠서 관심 <161일> 6.2∼7.6 (35일) 7.28∼11.9 (105일) 11.24∼12.14 (21일) … 경계 <10일> 7.7∼7.16 … 강정·고령 관심 <84일> 6.27~8.21 (56일) 9.4~10.1 (28일) 경계 <13일> 8.22~9.3 … 대청호 관심 <91일> 회남 8.3~10.5 (64일) 추동 8.3~10.25 (84일) 문의 8.3~11.1 (91일) (* 발령일자에 해제일은 포함하지 않음)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "물환경정보시스템 조류경보 발생현황지도",
+   "attribute": "official_status_page",
+   "value": "https://water.nier.go.kr/web/algaeStat?pMENU_NO=195 — 지점별 현재 발령상태 링크 목록(2026-10-20 조회 시 '해평_미발령_', '강정·고령_미발령_' 표기), 상세표는 '상세자료 바로가기'",
+   "unit": "url",
+   "source_url": "https://water.nier.go.kr/web/algaeStat?pMENU_NO=195",
+   "source_quote": "individual monitoring points by region (한강, 금강, 낙동강, 영산강) with their current alert status, such as '해평_미발령_' and '강정·고령_미발령_' … '상세자료 바로가기'",
+   "confidence": "low",
+   "corrected_value": ""
+  },
+  {
+   "entity": "WAMIS mn_dammain endpoint",
+   "attribute": "endpoint_status",
+   "value": "works; returns 49 dams with fields damcd, damnm, bbsncd, sbsncd, bbsnnm, mggvnm only (no area/storage/level fields)",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"result\":{\"code\":\"success\",\"msg\":\"완료되었습니다!\"},\"count\":49,\"list\":[{\"damcd\":\"1001210\",\"damnm\":\"광동\",\"bbsncd\":\"10\",\"sbsncd\":\"100109\",\"bbsnnm\":\"한강\",\"mggvnm\":\"한국수자원공사\"},...",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "wamis_code",
+   "value": "2001110",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2001110\", \"damnm\": \"안동\", \"bbsncd\": \"20\", \"sbsncd\": \"200118\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동조정지댐",
+   "attribute": "wamis_code",
+   "value": "2001611",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2001611\", \"damnm\": \"안동조정지\", \"bbsncd\": \"20\", \"sbsncd\": \"200118\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "wamis_code",
+   "value": "2002110",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2002110\", \"damnm\": \"임하\", \"bbsncd\": \"20\", \"sbsncd\": \"200212\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하조정지댐",
+   "attribute": "wamis_code",
+   "value": "2002610",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2002610\", \"damnm\": \"임하조정지\", \"bbsncd\": \"20\", \"sbsncd\": \"200213\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "wamis_code",
+   "value": "2002111 (NOT listed in mn_dammain; but mn_dtdata returns daily data for damcd=2002111 with water levels ~354 EL.m consistent with 성덕댐 저수위 333/상시만수위 364)",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dtdata?damcd=2002111&startdt=20240701&enddt=20240703&output=json",
+   "source_quote": "{\"result\":{\"code\":\"success\",\"msg\":\"완료되었습니다!\"},\"count\":3,\"list\":[{\"obsymd\":\"20240701\",\"rwl\":\"354.1\",\"iqty\":\"1.426\",\"tdqty\":\".4\",...",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "wamis_code",
+   "value": "2004101",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2004101\", \"damnm\": \"영주\", \"bbsncd\": \"20\", \"sbsncd\": \"200402\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "wamis_code",
+   "value": "2008110 (NOT listed in mn_dammain; mn_dtdata returns daily data for damcd=2008110 with water levels ~192 EL.m consistent with 군위댐 저수위 181/상시만수위 204; code 2008101 returns no data in WAMIS)",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dtdata?damcd=2008110&startdt=20240701&enddt=20240703&output=json",
+   "source_quote": "{\"result\":{\"code\":\"success\",\"msg\":\"완료되었습니다!\"},\"count\":3,\"list\":[{\"obsymd\":\"20240701\",\"rwl\":\"192.038\",\"iqty\":\"1.571\",\"tdqty\":\".925\",...  (damcd=2008101 -> {\"result\":{\"code\":\"success\",\"msg\":\"해당 데이터가 없습니다.\"},\"count\":0,\"list\":[]})",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "kma_hydro_areacode",
+   "value": "2008101 (KMA 수문기상 가뭄정보시스템 uses 2008101 for 군위댐; areacode=2008110 returns an empty page there)",
+   "unit": "-",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2008101",
+   "source_quote": "군위댐 현황 ... 댐|군위|C.F.R.D|45.0|390.0|208.4|877.0 ... 유역면적(km²) ... 87.50",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "wamis_code",
+   "value": "2010101",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2010101\", \"damnm\": \"김천부항\", \"bbsncd\": \"20\", \"sbsncd\": \"201001\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "wamis_code",
+   "value": "2015110",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2015110\", \"damnm\": \"합천\", \"bbsncd\": \"20\", \"sbsncd\": \"201809\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "wamis_code",
+   "value": "2018110",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2018110\", \"damnm\": \"남강\", \"bbsncd\": \"20\", \"sbsncd\": \"202101\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천조정지댐",
+   "attribute": "wamis_code",
+   "value": "2018611",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2018611\", \"damnm\": \"합천조정지\", \"bbsncd\": \"20\", \"sbsncd\": \"201810\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "wamis_code",
+   "value": "2021110",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"2021110\", \"damnm\": \"밀양\", \"bbsncd\": \"20\", \"sbsncd\": \"202315\", \"bbsnnm\": \"낙동강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "wamis_code",
+   "value": "3001110",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"3001110\", \"damnm\": \"용담\", \"bbsncd\": \"30\", \"sbsncd\": \"300108\", \"bbsnnm\": \"금강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "wamis_code",
+   "value": "3008110",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"3008110\", \"damnm\": \"대청\", \"bbsncd\": \"30\", \"sbsncd\": \"300809\", \"bbsnnm\": \"금강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청조정지댐",
+   "attribute": "wamis_code",
+   "value": "3008611",
+   "unit": "-",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\": \"3008611\", \"damnm\": \"대청조정지\", \"bbsncd\": \"30\", \"sbsncd\": \"300809\", \"bbsnnm\": \"금강\", \"mggvnm\": \"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "river_basin",
+   "value": "낙동강 본류 / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "안동댐 낙동강 본류 최북단에 위치한 안동댐은 ... 1971년 4월 댐 건설에 착공, 1976년 10월 준공했다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "catchment_area_km2",
+   "value": "1584",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2001110",
+   "source_quote": "안동댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|1,584.00|926.00  (K-water CSV: 안동,다목적댐,E.C.R.D,1977-05-31,K-water,612,83,1584,166,161.7,160,1248,130; K-water: 안동댐의 유역면적은 낙동강유역 전체 면적의 6.6%인 1584㎢다.)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "total_storage_mcm",
+   "value": "1248.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2001110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|1,248.0|1,000.0|110.0  (K-water: 총 저수용량은 12억 4800만㎥, 홍수 조절용량은 1억 1000만㎥)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "effective_storage_mcm",
+   "value": "1000.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2001110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|1,248.0|1,000.0|110.0",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "160.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2001110",
+   "source_quote": "저수면적(km²)|계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|51.5|161.70|160.00|160.00|151.00|130.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "design_flood_level_elm",
+   "value": "161.70",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2001110",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|...|저수위(EL.m)|저수지|51.5|161.70|160.00|160.00|151.00|130.00  (K-water: 계획홍수위는 EL. 161.7m, 홍수기 제한수위는 EL. 160m다.)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "low_water_level_elm",
+   "value": "130.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2001110",
+   "source_quote": "...|저수위(EL.m)|저수지|51.5|161.70|160.00|160.00|151.00|130.00  (K-water CSV 저수위 column: 130)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동댐",
+   "attribute": "completion_year",
+   "value": "1976 (준공 1976년 10월; K-water CSV 준공일/사업기간 종료 1977-05-31)",
+   "unit": "year",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "1971년 4월 댐 건설에 착공, 1976년 10월 준공했다.  (KMA: 사업기간 : 1971/04/01 ~ 1977/05/31; CSV: 안동,다목적댐,E.C.R.D,1977-05-31,...)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "안동조정지댐",
+   "attribute": "spec_height_length_effective_storage",
+   "value": "콘크리트 중력식, 높이 20 m, 길이 218 m, 유효저수량 3 백만m3; 본댐 하류 3 km",
+   "unit": "m / 백만m3",
+   "source_url": "http://www.kncold.or.kr/content.php?contentCd=dam_of_kor_03",
+   "source_quote": "조정지댐 형식 콘크리트 중력식 높이 20m 길이 218m 유효저수량 3백만㎥ 시설용량 1.2만kW  (K-water: 본댐과 함께 댐 하류 3km 지점에 역조정지댐을 건설했다.)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "river_basin",
+   "value": "반변천 (낙동강 제1지류) / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "임하댐은 낙동강유역의 4번째 다목적댐으로 경상북도 안동시 임하면 낙동강 지류인 반변천에 건설되었다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "catchment_area_km2",
+   "value": "1361",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002110",
+   "source_quote": "임하댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|1,361.00|591.60  (CSV: 임하,다목적댐,E.C.R.D,1993-12-31,K-water,515,73,1361,168,164.7,163,595,137; K-water: 유역면적은 1361㎢)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "total_storage_mcm",
+   "value": "595.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|595.0|424.0|80.0  (K-water: 임하댐의 저수용량은 5억 9500만㎥, 홍수조절능력은 8000만㎥)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "effective_storage_mcm",
+   "value": "424.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|595.0|424.0|80.0  (K-water: 유효저수량은 4억 2400만㎥다.)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "163.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002110",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|26.4|164.70|163.00|161.70|151.40|137.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "design_flood_level_elm",
+   "value": "164.70",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002110",
+   "source_quote": "저수지|26.4|164.70|163.00|161.70|151.40|137.00  (CSV 계획홍수위 164.7)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "low_water_level_elm",
+   "value": "137.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002110",
+   "source_quote": "저수지|26.4|164.70|163.00|161.70|151.40|137.00  (CSV 저수위 137)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하댐",
+   "attribute": "completion_year",
+   "value": "1992 (준공 1992년 5월; K-water CSV 준공일/사업기간 종료 1993-12-31)",
+   "unit": "year",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "임하댐은 1984년 12월 진입도로 공사를 시작으로 1985년 12월부터 본댐 공사에 착공하여 1992년 5월 준공했다.  (KMA: 사업기간 : 1984/12/01 ~ 1993/12/31)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "임하조정지댐",
+   "attribute": "spec_height_length_effective_storage",
+   "value": "콘크리트 및 석괴혼합식, 높이 17 m, 길이 320 m, 유효저수량 1.7 백만m3 (한국대댐회); 한국민족문화대백과는 높이 10m, 길이 315m, 유효저수량 약 150만㎥ — sources conflict",
+   "unit": "m / 백만m3",
+   "source_url": "http://www.kncold.or.kr/content.php?contentCd=dam_of_kor_04",
+   "source_quote": "조정지댐 형식 콘크리트 및 석괴혼합식 높이 17m 길이 320m 유효저수량 1.7백만㎥ 시설용량 1.2만kW  (encykorea E0047724: 높이 10m, 길이 315m로서 유효저수량은 약 150만㎥)",
+   "confidence": "low",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "river_basin",
+   "value": "보현천 (낙동강-길안천-보현천) / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "또한 지방2급 보현천(낙동강-길안천-보현천) 유역에 건설하여 경산시, 영천시, 청송군 등에 연간 15.4백만㎥의 생공용수를 공급하고, 4.2백만㎥(홍수기)의 홍수조절용량을 갖추게 되어",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "catchment_area_km2",
+   "value": "41.3",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002111",
+   "source_quote": "성덕댐 현황 ... 댐|성덕|C.G.D|58.5|274.0|368.5|227.0 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|41.3|20.3  (CSV: 성덕,다목적댐,C.G.D,2015-12-31,K-water,274,58.5,41.3,368.5,364.9,364,27.9,333; K-water: 성덕댐의 유역면적은 41.3㎢로서 보현천 유역면적의 약 62.3%에 해당하며)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "total_storage_mcm",
+   "value": "27.9",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002111",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|27.9|24.8|4.2  (CSV 총저수용량 27.9)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "effective_storage_mcm",
+   "value": "24.8",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002111",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|27.9|24.8|4.2",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "364.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002111",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|1.5|364.90|364.00|362.00|360.00|333.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "design_flood_level_elm",
+   "value": "364.90",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002111",
+   "source_quote": "저수지|1.5|364.90|364.00|362.00|360.00|333.00  (CSV 계획홍수위 364.9)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "low_water_level_elm",
+   "value": "333.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002111",
+   "source_quote": "저수지|1.5|364.90|364.00|362.00|360.00|333.00  (CSV 저수위 333)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "성덕댐",
+   "attribute": "completion_year",
+   "value": "2015 (K-water CSV 준공일 2015-12-31)",
+   "unit": "year",
+   "source_url": "https://www.data.go.kr/data/15049846/fileData.do",
+   "source_quote": "성덕,다목적댐,C.G.D,2015-12-31,K-water,274,58.5,41.3,368.5,364.9,364,27.9,333  (KMA: 사업기간 : 2002/08/01 ~ 2015/12/31)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "river_basin",
+   "value": "내성천 / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "영주댐은 내성천과 낙동강이 모이는 합류점으로부터 약 55.6㎞ 상류에 위치하며 유역면적 500㎢, 길이 400m, 높이 55.5m, 연평균유입량 316.6백만㎥, 유효저수용량 160.4백만㎥, 총저수용량 181.1백만㎥ 인 댐이다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "catchment_area_km2",
+   "value": "500",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2004101",
+   "source_quote": "영주댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|500.00|203.30  (CSV: 영주,다목적댐,C.F.R.D,2018-12-31,K-water,400,55.5,500,168,164,161,181.1,135)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "total_storage_mcm",
+   "value": "181.1",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2004101",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|181.1|138.0|75.0  (CSV 총저수용량 181.1; K-water: 총저수용량 181.1백만㎥)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "effective_storage_mcm",
+   "value": "138.0 (KMA/current); K-water narrative (design-era) says 160.4 — sources differ",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2004101",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|181.1|138.0|75.0  (K-water 1511: 유효저수용량 160.4백만㎥, 총저수용량 181.1백만㎥)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "161.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2004101",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|10.4|164.00|161.00|156.70|153.00|135.00  (CSV 상시만수위 161)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "design_flood_level_elm",
+   "value": "164.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2004101",
+   "source_quote": "저수지|10.4|164.00|161.00|156.70|153.00|135.00  (CSV 계획홍수위 164)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "low_water_level_elm",
+   "value": "135.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2004101",
+   "source_quote": "저수지|10.4|164.00|161.00|156.70|153.00|135.00  (CSV 저수위 135)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "영주댐",
+   "attribute": "completion_year",
+   "value": "2016 (본댐 주요공사 준공 2016년 12월); K-water CSV 준공일/사업기간 종료 2018-12-31",
+   "unit": "year",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "영주댐은 2016년 12월 본댐 등 주요공사는 준공하였으며, 기타 잔여 부대공사를 마무리하고 있다.  (CSV: 영주,다목적댐,C.F.R.D,2018-12-31,...; KMA: 사업기간 : 2009/12/01 ~ 2018/12/31)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "river_basin",
+   "value": "위천 (낙동강 제1지류) / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "군위댐 낙동강 제1지류인 위천의 상류에 위치한 군위댐은 경북 중부지역의 홍수 및 가뭄 피해를 예방하고, 전력생산 및 군위, 의성, 칠곡으로의 안정적인 생공용수 공급을 목적으로 건설된 다목적댐이다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "catchment_area_km2",
+   "value": "87.5",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2008101",
+   "source_quote": "군위댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|87.50|38.3  (CSV: 군위,다목적댐,C.F.R.D,2012-12-31,K-water,390,45,87.5,208.4,205.1,204,48.7,181)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "total_storage_mcm",
+   "value": "48.7",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2008101",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|48.7|40.1|3.1  (CSV 총저수용량 48.7)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "effective_storage_mcm",
+   "value": "40.1",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2008101",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|48.7|40.1|3.1  (한국대댐회: 총저수용량 48.70百萬㎥ 유효저수용량 40.10百萬㎥)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "204.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2008101",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|2.7|205.10|204.00|204.00|197.20|181.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "design_flood_level_elm",
+   "value": "205.10",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2008101",
+   "source_quote": "저수지|2.7|205.10|204.00|204.00|197.20|181.00  (CSV 계획홍수위 205.1)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "low_water_level_elm",
+   "value": "181.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2008101",
+   "source_quote": "저수지|2.7|205.10|204.00|204.00|197.20|181.00  (CSV 저수위 181)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "군위댐",
+   "attribute": "completion_year",
+   "value": "2012 (K-water CSV 준공일 2012-12-31; 한국대댐회 사업기간 2000 ~ 2011)",
+   "unit": "year",
+   "source_url": "https://www.data.go.kr/data/15049846/fileData.do",
+   "source_quote": "군위,다목적댐,C.F.R.D,2012-12-31,K-water,390,45,87.5,208.4,205.1,204,48.7,181  (KMA: 사업기간 : 2000/01/01 ~ 2012/12/31; kncold_15: 사업기간 2000 ~ 2011)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "river_basin",
+   "value": "부항천 (감천 제1지류, 낙동강 제2지류) / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "댐이 들어설 부항천은 감천의 제1지류로서 유역면적 85.44㎢, 유로연장 22.0km인 지방2급 하천이다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "catchment_area_km2",
+   "value": "82.0 (KMA & K-water CSV); K-water narrative gives 부항천 유역면적 85.44㎢",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2010101",
+   "source_quote": "김천부항댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|82.00|36.30  (CSV: 김천부항,다목적댐,C.F.R.D,2014-12-31,K-water,472,64,82,201.4,198.6,195,54.3,165)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "total_storage_mcm",
+   "value": "54.3",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2010101",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|54.3|42.6|12.3  (K-water: 부항댐은 높이 64m, 길이 472m, 체적 216만 2000㎥, 마루표고 EL. 201.4m의 표면차수벽형 석괴댐으로 총 저수용량은 54.3백만㎥다.)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "effective_storage_mcm",
+   "value": "42.6",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2010101",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|54.3|42.6|12.3",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "195.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2010101",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|2.5|198.60|195.00|193.50|190.50|165.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "design_flood_level_elm",
+   "value": "198.60",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2010101",
+   "source_quote": "저수지|2.5|198.60|195.00|193.50|190.50|165.00  (CSV 계획홍수위 198.6)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "low_water_level_elm",
+   "value": "165.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2010101",
+   "source_quote": "저수지|2.5|198.60|195.00|193.50|190.50|165.00  (CSV 저수위 165)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "김천부항댐",
+   "attribute": "completion_year",
+   "value": "2014 (K-water CSV 준공일 2014-12-31)",
+   "unit": "year",
+   "source_url": "https://www.data.go.kr/data/15049846/fileData.do",
+   "source_quote": "김천부항,다목적댐,C.F.R.D,2014-12-31,K-water,472,64,82,201.4,198.6,195,54.3,165  (KMA: 사업기간 : 2002/08/01 ~ 2014/12/31)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "river_basin",
+   "value": "황강 (낙동강 제1지류) / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "댐이 위치한 황강은 낙동강 제1지류로서 유역면적은 낙동강 유역면적의 4%인 1326㎢, 유로연장은 63km였다. 댐의 유역면적은 925㎢이며 본댐 하류 6.5km 지점에 역조정지댐을 설치했다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "catchment_area_km2",
+   "value": "925",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2015110",
+   "source_quote": "합천댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|925.00|599.00  (CSV: 합천,다목적댐,C.G.D,1989-12-31,K-water,472,96,925,181,179,176,790,140)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "total_storage_mcm",
+   "value": "790.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2015110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|790.0|560.0|80.0  (K-water: 댐은 중력식 콘크리트댐으로 높이 96m, 길이 472m, 체적 89만 9800㎥에 총 저수용량 7억 9000만㎥를 갖추고 있다.)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "effective_storage_mcm",
+   "value": "560.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2015110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|790.0|560.0|80.0  (한국대댐회: 총저수용량 790百萬㎥ 유효저수용량 560百萬㎥)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "176.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2015110",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|25.0|179.00|176.00|176.00|166.00|140.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "design_flood_level_elm",
+   "value": "179.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2015110",
+   "source_quote": "저수지|25.0|179.00|176.00|176.00|166.00|140.00  (CSV 계획홍수위 179)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "low_water_level_elm",
+   "value": "140.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2015110",
+   "source_quote": "저수지|25.0|179.00|176.00|176.00|166.00|140.00  (CSV 저수위 140)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천댐",
+   "attribute": "completion_year",
+   "value": "1989 (준공 1989년 5월; K-water CSV 준공일 1989-12-31)",
+   "unit": "year",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "합천댐 정부는 낙동강유역 개발사업의 일환으로 1973년 10월부터 12월까지 합천다목적댐 기본계획을 수립하여 1983년 12월 건설에 착수, 1989년 5월 준공했다.  (KMA: 사업기간 : 1982/04/01 ~ 1989/12/31)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천조정지댐",
+   "attribute": "spec_height_length_effective_storage",
+   "value": "콘크리트 및 석괴혼합식, 높이 29 m, 길이 275.5 m, 유효저수량 17 백만m3; 본댐 하류 6.5 km",
+   "unit": "m / 백만m3",
+   "source_url": "http://www.kncold.or.kr/content.php?contentCd=dam_of_kor_05",
+   "source_quote": "조정지댐 형식 콘크리트 및 석괴혼합식 높이 29m 길이 275.5m 유효저수량 17백만㎥ 시설용량 0.12만kW  (also: 본댐 하류 6.5㎞ 지점에 높이 29m의 콘크리트 및 석괴혼합식의 조정지댐을 건설하여)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "river_basin",
+   "value": "남강 (낙동강 제1지류) / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "남강댐 남강은 낙동강의 제1지류로서 유역면적은 낙동강 유역면적의 14.5%인 3466㎢, 유로연장은 108㎞다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "catchment_area_km2",
+   "value": "2285",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2018110",
+   "source_quote": "남강댐 현황 ... 댐|남강|C.F.R.D|34.0|1,126.0|51.0|1,280.0 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|2,285.00|573.30  (CSV: 남강,다목적댐,C.F.R.D,2003-12-31,K-water,1126,34,2285,51,46,41,309.2,32)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "total_storage_mcm",
+   "value": "309.2",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2018110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|309.2|299.7|269.8  (CSV 총저수용량 309.2)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "effective_storage_mcm",
+   "value": "299.7",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2018110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|309.2|299.7|269.8",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "41.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2018110",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|28.2|46.00|41.00|41.00|29.00|32.00  (CSV 상시만수위 41)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "design_flood_level_elm",
+   "value": "46.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2018110",
+   "source_quote": "저수지|28.2|46.00|41.00|41.00|29.00|32.00  (CSV 계획홍수위 46)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "low_water_level_elm",
+   "value": "32.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2018110",
+   "source_quote": "저수지|28.2|46.00|41.00|41.00|29.00|32.00  (CSV 저수위 32)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "남강댐",
+   "attribute": "completion_year",
+   "value": "2003 (K-water CSV 준공일 2003-12-31; 보강댐 사업기간 1987~2001; 기존 남강댐 1969 준공)",
+   "unit": "year",
+   "source_url": "https://www.data.go.kr/data/15049846/fileData.do",
+   "source_quote": "남강,다목적댐,C.F.R.D,2003-12-31,K-water,1126,34,2285,51,46,41,309.2,32  (K-water 1511: 기존 남강댐은 1969년에 준공되었으며 ... 보강댐은 ... 사업기간은 1987년부터 2001년까지; KMA: 사업기간 : 1987/11/01 ~ 2003/12/31)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "river_basin",
+   "value": "단장천 (밀양강 지류) / 낙동강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "밀양댐은 밀양시 단장면에 있는 단장천이 밀양강과 합류하는 지점으로부터 상류 21.6km 지점인 단장천 중류에 위치한다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "catchment_area_km2",
+   "value": "95.4",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2021110",
+   "source_quote": "밀양댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|95.40|73.00  (CSV: 밀양,다목적댐,C.F.R.D,2015-11-18,K-water,535,89,95.4,212.5,210.2,207.2,73.6,150)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "total_storage_mcm",
+   "value": "73.6",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2021110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|73.6|69.8|6.0  (CSV 총저수용량 73.6)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "effective_storage_mcm",
+   "value": "69.8",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2021110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|73.6|69.8|6.0  (한국대댐회: 총저수용량 73,600,000㎥ 유효저수용량 69,800,000㎥)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "207.20",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2021110",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|2.2|210.20|207.20|207.20|199.50|150.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "design_flood_level_elm",
+   "value": "210.20",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2021110",
+   "source_quote": "저수지|2.2|210.20|207.20|207.20|199.50|150.00  (CSV 계획홍수위 210.2)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "low_water_level_elm",
+   "value": "150.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2021110",
+   "source_quote": "저수지|2.2|210.20|207.20|207.20|199.50|150.00  (CSV 저수위 150)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "밀양댐",
+   "attribute": "completion_year",
+   "value": "2001 (준공 2001년 11월). Note: K-water CSV 준공일 shows 2015-11-18 and KMA 사업기간 2001/12/01 ~ 2015/11/18, apparently an administrative date shared by several dams",
+   "unit": "year",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "우리공사는 1991년 7월 실시설계를 완료하여 1996년 11월 공사에 착수한 뒤 2001년 11월 준공했다.  (CSV: 밀양,다목적댐,C.F.R.D,2015-11-18,...; 한국대댐회: 건설기간 1991 ∼ 2001)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "river_basin",
+   "value": "금강 본류 / 금강 수계",
+   "unit": "-",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent02Page.do?s_mid=1510",
+   "source_quote": "용담댐유역은 금강의 본류로서 전라북도 무주군·진안군·장수군 등 3군에 걸쳐 있으며, 유역면적은 930㎢, 연평균 강수량은 1,285.0㎜, 연평균 유입량은 7억 6950만㎥다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "catchment_area_km2",
+   "value": "930",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3001110",
+   "source_quote": "용담댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|930.0|650.50  (CSV: 용담,다목적댐,C.F.R.D,2006-12-31,K-water,498,70,930,268.5,265.5,263.5,815,228.5)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "total_storage_mcm",
+   "value": "815.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3001110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|815.0|672.5|137.0  (CSV 총저수용량 815)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "effective_storage_mcm",
+   "value": "672.5",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3001110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|815.0|672.5|137.0  (K-water: 용담댐은 전라북도 진안군 용담면에 위치하고 있으며 유효저수용량은 6억 7200만㎥, 홍수조절용량은 1억 3700만㎥다.)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "263.50",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3001110",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|36.2|265.50|263.50|261.50|252.80|228.50",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "design_flood_level_elm",
+   "value": "265.50",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3001110",
+   "source_quote": "저수지|36.2|265.50|263.50|261.50|252.80|228.50  (CSV 계획홍수위 265.5)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "low_water_level_elm",
+   "value": "228.50",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3001110",
+   "source_quote": "저수지|36.2|265.50|263.50|261.50|252.80|228.50  (CSV 저수위 228.5)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "용담댐",
+   "attribute": "completion_year",
+   "value": "2006 per K-water CSV 준공일 2006-12-31 (사업 종료); 한국대댐회 건설기간 1992 ∼ 2001",
+   "unit": "year",
+   "source_url": "https://www.data.go.kr/data/15049846/fileData.do",
+   "source_quote": "용담,다목적댐,C.F.R.D,2006-12-31,K-water,498,70,930,268.5,265.5,263.5,815,228.5  (KMA: 사업기간 : 1990/10/01 ~ 2006/12/31; kncold_14: 하천명 금강 목적 다목적 유역면적 930.0㎢ 형식 CF 건설기간 1992 ∼ 2001)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "river_basin",
+   "value": "금강 본류 / 금강 수계",
+   "unit": "-",
+   "source_url": "http://www.kncold.or.kr/content.php?contentCd=dam_of_kor_07",
+   "source_quote": "일반 하천명 금강 본류 위치 댐지점 좌안 대전시 대덕구 미호동 우안 충북 청원군 문의면 덕유리 유역면적 4,134㎢ ... 사업기간 1975. 3 ∼ 1981. 6",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "catchment_area_km2",
+   "value": "3204 (KMA & K-water CSV; 용담댐 유역 제외). K-water narrative: 4134㎢ (용담댐 930㎢ 포함)",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3008110",
+   "source_quote": "대청댐 현황 ... 유역면적(km²)|연간용수공급량(백만m³)|유역|3,204.00|1,649.00  (CSV: 대청,다목적댐,C.G_E.C.R.D,1981-06-30,K-water,495,72,3204,83,80,76.5,1490,60; K-water: 대청댐은 유역면적 4134㎢(용담댐 930㎢ 포함))",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "total_storage_mcm",
+   "value": "1490.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3008110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|1,490.0|790.0|250.0  (CSV 총저수용량 1490; 한국대댐회: 총저수용량 1,490百萬㎥)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "effective_storage_mcm",
+   "value": "790.0",
+   "unit": "백만m3",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3008110",
+   "source_quote": "총 저수용량(백만m³)|유효저수용량(백만m³)|홍수조절용량(백만m³)|1,490.0|790.0|250.0  (K-water: 대청댐의 저수면적은 72.8㎢, 유효저수량은 7억 9000만㎥, 홍수조절용량은 2억 5000만㎥, 계획홍수위는 EL. 80m다.)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "normal_high_water_level_elm",
+   "value": "76.50",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3008110",
+   "source_quote": "계획홍수위(EL.m)|상시만수위(EL.m)|홍수기제한수위(EL.m)|월류정표고(EL.m)|저수위(EL.m)|저수지|72.8|80.00|76.50|76.50|64.50|60.00",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "design_flood_level_elm",
+   "value": "80.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3008110",
+   "source_quote": "저수지|72.8|80.00|76.50|76.50|64.50|60.00  (CSV 계획홍수위 80)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "low_water_level_elm",
+   "value": "60.00",
+   "unit": "EL.m",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3008110",
+   "source_quote": "저수지|72.8|80.00|76.50|76.50|64.50|60.00  (CSV 저수위 60; 한국대댐회: 저수지 EL60.00m)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청댐",
+   "attribute": "completion_year",
+   "value": "1981 (사업준공 1981-06-30; 준공식 1980-12-02)",
+   "unit": "year",
+   "source_url": "http://www.kncold.or.kr/content.php?contentCd=dam_of_kor_07",
+   "source_quote": "1980. 6. 30 담수 개시 ... 1980. 12. 2 준공식 1981. 6. 30 사업준공  (CSV: 대청,다목적댐,C.G_E.C.R.D,1981-06-30,...; KMA: 사업기간 : 1975/03/01 ~ 1981/06/30)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대청조정지댐",
+   "attribute": "spec_height_length_effective_storage",
+   "value": "콘크리트 중력식 및 석괴댐의 복합형, 높이 16.7 m, 길이 234 m, 유효저수량 3.8 백만m3",
+   "unit": "m / 백만m3",
+   "source_url": "http://www.kncold.or.kr/content.php?contentCd=dam_of_kor_07",
+   "source_quote": "조정지댐 형식 콘크리트 중력식 및 석괴댐의 복합형 댐 높이 16.7m 길이 234m 유효저수량 3.8百萬㎥",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "WAMIS 용어정의",
+   "attribute": "definitions",
+   "value": "상시만수위: 평시에 저수지로 유입하는 수량을 저장할 수 있는 최대 범위를 나타내는 한계수위(EL.m); 계획홍수위: 다목적댐의 경우 홍수기중 유지할 수 있는 상한수위 (EL.m); 저수위: 댐의 정상적인 조작에서 쓰이는 저수공간의 범위중 가장 낮은 취수 수위(EL.m); 유효저수량: 저수위(LWL)와 상시만수위 사이의 저수용량",
+   "unit": "-",
+   "source_url": "https://www.wamis.go.kr/main/help_dam.do",
+   "source_quote": "상시만수위: 평시에 저수지로 유입하는 수량을 저장할 수 있는 최대 범위를 나타내는 한계수위(EL.m) / 계획홍수위: 다목적댐의 경우 홍수기중 유지할 수 있는 상한수위 (EL.m) / 저수위: 댐의 정상적인 조작에서 쓰이는 저수공간의 범위중 가장 낮은 취수 수위(EL.m)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "K-water 댐별 제원 CSV",
+   "attribute": "dataset_metadata",
+   "value": "한국수자원공사_댐별 제원정보_20241231; file 댐별(다목적댐_용수댐)_제원.csv; 34 rows; columns 시설명,종류,형식,준공일,관할기관,길이,높이,유역면적,정상표고,계획홍수위,상시만수위,총저수용량,저수위 (no 유효저수용량 column)",
+   "unit": "-",
+   "source_url": "https://www.data.go.kr/cmm/cmm/fileDownload.do?atchFileId=FILE_000000003513263&fileDetailSn=1&insertDataPrcus=N",
+   "source_quote": "Content-Disposition: attachment; filename=\"댐별(다목적댐_용수댐)_제원.csv\" ... header: 시설명,종류,형식,준공일,관할기관,길이,높이,유역면적,정상표고,계획홍수위,상시만수위,총저수용량,저수위",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "wamis_bo_code",
+   "value": "2011801",
+   "unit": "boobscd",
+   "source_url": "https://www.wamis.go.kr/wks/wks_boobs_lst_list.do",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obsnm\":\"칠곡보\",\"boobscd\":\"2011801\",\"sbsncd\":\"201103\",\"agcnm\":\"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "wamis_bo_code",
+   "value": "2011802",
+   "unit": "boobscd",
+   "source_url": "https://www.wamis.go.kr/wks/wks_boobs_lst_list.do",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obsnm\":\"강정고령보\",\"boobscd\":\"2011802\",\"sbsncd\":\"201108\",\"agcnm\":\"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "wamis_bo_code",
+   "value": "2017801",
+   "unit": "boobscd",
+   "source_url": "https://www.wamis.go.kr/wks/wks_boobs_lst_list.do",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obsnm\":\"창녕·함안보\",\"boobscd\":\"2017801\",\"sbsncd\":\"201705\",\"agcnm\":\"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "wamis_bo_code",
+   "value": "2022510",
+   "unit": "boobscd",
+   "source_url": "https://www.wamis.go.kr/wks/wks_boobs_lst_list.do",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obsnm\":\"낙동강하굿둑\",\"boobscd\":\"2022510\",\"sbsncd\":\"202208\",\"agcnm\":\"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "wamis_bo_code",
+   "value": "2009802",
+   "unit": "boobscd",
+   "source_url": "https://www.wamis.go.kr/wks/wks_boobs_lst_list.do",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obsnm\":\"구미보\",\"boobscd\":\"2009802\",\"sbsncd\":\"200902\",\"agcnm\":\"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "wamis_bo_code",
+   "value": "2014802",
+   "unit": "boobscd",
+   "source_url": "https://www.wamis.go.kr/wks/wks_boobs_lst_list.do",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obsnm\":\"합천·창녕보\",\"boobscd\":\"2014802\",\"sbsncd\":\"201407\",\"agcnm\":\"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강 기타 보",
+   "attribute": "wamis_bo_code",
+   "value": "상주보 2007801; 낙단보 2009801; 달성보 2014801",
+   "unit": "boobscd",
+   "source_url": "https://www.wamis.go.kr/wks/wks_boobs_lst_list.do",
+   "source_quote": "\"obsnm\":\"상주보\",\"boobscd\":\"2007801\" ... \"obsnm\":\"낙단보\",\"boobscd\":\"2009801\" ... \"obsnm\":\"달성보\",\"boobscd\":\"2014801\"",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "wamis_wl_station_upstream",
+   "value": "2011648",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2011648\",\"obsnm\":\"칠곡군(칠곡보상)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"201103\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "wamis_wl_station_downstream",
+   "value": "2011649",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2011649\",\"obsnm\":\"칠곡군(칠곡보하)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"201104\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "wamis_wl_daily_endpoint_check",
+   "value": "wl_dtdata?obscd=2011648 returns daily wl (2024-08-01: 25.5475 EL.m)",
+   "unit": "EL.m",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dtdata?obscd=2011648&startdt=20240801&enddt=20240803&output=json",
+   "source_quote": "{\"result\":{\"code\":\"success\",\"msg\":\"완료되었습니다!\"},\"count\":3,\"list\":[{\"ymd\":\"20240801\",\"wl\":\"25.5475\"},{\"ymd\":\"20240802\",\"wl\":\"25.5275\"},{\"ymd\":\"20240803\",\"wl\":\"25.52\"}]}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "wamis_wl_station_downstream",
+   "value": "2011696",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2011696\",\"obsnm\":\"대구시(강정고령보하)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"201402\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "wamis_wl_station_closed",
+   "value": "2011697 (강정보(임), 폐쇄, 한국수자원공사)",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2011697\",\"obsnm\":\"강정보(임)\",\"clsyn\":\"폐쇄\",\"obsknd\":\"T/M\",\"sbsncd\":\"201402\",\"mngorg\":\"한국수자원공사\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "wamis_wl_station_upstream",
+   "value": "2020647",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2020647\",\"obsnm\":\"창녕군(창녕함안보상)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"202004\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "wamis_wl_station_downstream",
+   "value": "2020646",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2020646\",\"obsnm\":\"함안군(창녕함안보하)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"202004\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "wamis_wl_station_upstream",
+   "value": "2009680",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2009680\",\"obsnm\":\"구미시(구미보상)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"200902\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "wamis_wl_station_downstream",
+   "value": "2009682",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2009682\",\"obsnm\":\"구미시(구미보하)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"201101\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "wamis_wl_station_upstream",
+   "value": "2014697",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2014697\",\"obsnm\":\"합천군(합천창녕보상)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"201604\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "wamis_wl_station_downstream",
+   "value": "2014699",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"bbsnnm\":\"낙동강\",\"obscd\":\"2014699\",\"obsnm\":\"합천군(합천창녕보하)\",\"clsyn\":\"운영\",\"obsknd\":\"T/M\",\"sbsncd\":\"201604\",\"mngorg\":\"기후에너지환경부\"}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강 기타 보",
+   "attribute": "wamis_wl_station_up_down",
+   "value": "상주보 2007680/2007682; 낙단보상 2009618; 달성보 2014650/2014651",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "\"obscd\":\"2007680\",\"obsnm\":\"상주시(상주보상)\" ... \"obscd\":\"2007682\",\"obsnm\":\"상주시(상주보하)\" ... \"obscd\":\"2009618\",\"obsnm\":\"의성군(낙단보상)\" ... \"obscd\":\"2014650\",\"obsnm\":\"대구시(달성보상)\" ... \"obscd\":\"2014651\",\"obsnm\":\"고령군(달성보하)\"",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "kwater_mywater_dam_code",
+   "value": "2011601",
+   "unit": "damCd",
+   "source_url": "https://www.water.or.kr/kor/realtime/sumun/index.do?mode=sumun&menuId=13_91_93_94",
+   "source_quote": "'2011601' : {'damGb' : '3', 'damNm' : '칠곡보',} ... // 2011601 칠곡보 text: ['수위<br>(EL.m)', '방수로수위<br>(EL.m)'",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "kwater_mywater_dam_code",
+   "value": "2011602",
+   "unit": "damCd",
+   "source_url": "https://www.water.or.kr/kor/realtime/sumun/index.do?mode=sumun&menuId=13_91_93_94",
+   "source_quote": "'2011602' : {'damGb' : '3', 'damNm' : '강정고령보',} ... // 2011602 강정고령보 text: ['수위<br>(EL.m)', '방수로수위<br>(EL.m)'",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "kwater_mywater_dam_code",
+   "value": "2017601",
+   "unit": "damCd",
+   "source_url": "https://www.water.or.kr/kor/realtime/sumun/index.do?mode=sumun&menuId=13_91_93_94",
+   "source_quote": "'2017601' : {'damGb' : '3', 'damNm' : '창녕함안보',}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "kwater_mywater_dam_code",
+   "value": "2022510",
+   "unit": "damCd",
+   "source_url": "https://www.water.or.kr/kor/realtime/sumun/index.do?mode=sumun&menuId=13_91_93_94",
+   "source_quote": "'2022510' : {'damGb' : '6', 'damNm' : '낙동강하굿둑',} ... // 2022510 낙동강하굿둑 text: ['내수위<BR>(EL.m)', '외수위<BR>(EL.m)'",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "kwater_mywater_dam_code",
+   "value": "2009602",
+   "unit": "damCd",
+   "source_url": "https://www.water.or.kr/kor/realtime/sumun/index.do?mode=sumun&menuId=13_91_93_94",
+   "source_quote": "'2009602' : {'damGb' : '3', 'damNm' : '구미보',}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "kwater_mywater_dam_code",
+   "value": "2014602",
+   "unit": "damCd",
+   "source_url": "https://www.water.or.kr/kor/realtime/sumun/index.do?mode=sumun&menuId=13_91_93_94",
+   "source_quote": "'2014602' : {'damGb' : '3', 'damNm' : '합천창녕보',}",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강 기타 보",
+   "attribute": "kwater_mywater_dam_code",
+   "value": "상주보 2007601; 낙단보 2009601; 달성보 2014601",
+   "unit": "damCd",
+   "source_url": "https://www.water.or.kr/kor/realtime/sumun/index.do?mode=sumun&menuId=13_91_93_94",
+   "source_quote": "<option value=\"2007601\">상주보</option> <option value=\"2009601\">낙단보</option> <option value=\"2014601\">달성보</option>",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "K-water 수문 운영 정보 API",
+   "attribute": "damcode_param_example",
+   "value": "2022510 (7-char facility code; same as MyWater 낙동강하굿둑 code)",
+   "unit": "damcode",
+   "source_url": "https://www.data.go.kr/data/15099110/openapi.do?recommendDataYn=Y",
+   "source_quote": "damcode: Seven-character facility code (e.g. 2022510) ... obsrdt, lowlevel (댐수위 EL.m), rf, inflowqy, totdcwtrqy, rsvwtqy, rsvwtrt",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "management_water_level",
+   "value": "25.50",
+   "unit": "EL.m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "안동댐에서 하류 141㎞에 위치하고 있으며, 상류 관리수위는 EL. 25.50m로서 보 건설로 88.8백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "secured_storage_mcm",
+   "value": "88.8",
+   "unit": "백만㎥",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "상류 관리수위는 EL. 25.50m로서 보 건설로 88.8백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "catchment_area_km2",
+   "value": "11,040",
+   "unit": "km2",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "유역면적: 11,040㎢에 해당 (K-water page lists the same 11,040㎢ for 구미보 and 칠곡보)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "weir_length_m",
+   "value": "348 (승강식 가동보 120 + 복합형 가동보 80 + 고정보 148)",
+   "unit": "m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보연장은 총 348m로 승강식 가동보 120m, 복합형 가동보 80m, 고정보 구간 148m로 구성",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "completion",
+   "value": "2012-06 (착공 2009-10)",
+   "unit": "date",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "칠곡보는 2009년 10월에 착공하여 2012년 6월 준공하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보",
+   "attribute": "location",
+   "value": "경북 칠곡군 석적면(좌안)~약목면(우안), 안동댐 하류 141 km",
+   "unit": "km",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1515",
+   "source_quote": "경상북도 칠곡군 석적면(좌안) ~ 칠곡군 약목면(우안)에 건설되었으며, 안동댐에서 하류 141㎞",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "management_water_level",
+   "value": "19.50",
+   "unit": "EL.m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "칠곡보에서 하류 25㎞에 위치하고 있으며, 상류 관리수위는 EL. 19.50m이며, 보 건설로 92.3백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "lowered_operation_level_since_2017",
+   "value": "18.25 (양수제약수위, 2017-06-04 이후)",
+   "unit": "EL.m",
+   "source_url": "https://koreascience.kr/article/JAKO201919163087499.pdf",
+   "source_quote": "강정고령보의 경우, 2017년 6월 이후 당초 보 관리수위인 EL. 19.50 m보다 1.25 m 낮은 양수제약 수위(EL. 18.25 m)로 운영되고 있다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "secured_storage_mcm",
+   "value": "92.3 (K-water) / 총 저수용량 92 (논문)",
+   "unit": "백만㎥",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보 건설로 92.3백만㎥의 수량을 확보하였다. / 논문: 유역면적은 11,667 km2, 총 저수용량은 92백만 m3이다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "catchment_area_km2",
+   "value": "11,667",
+   "unit": "km2",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "유역면적은 11,667㎢로 낙동강 유역면적의 약 49%에 해당하며",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "weir_length_m",
+   "value": "953.5 (고정보 833.5; 가동보 90.0 per K-water, 120 per 논문/대구역사문화대전); 높이 11.5",
+   "unit": "m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보연장은 총 953.5m로 가동보 90.0m, 고정보 833.5m로 구성 / 논문: 보의 높이는 11.5 m, 길이는 953.5 m(고정보 833.5 m, 가동보 120 m)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "completion",
+   "value": "2013-06 (K-water; 착공 2009-10). 대구역사문화대전/ko.wikipedia: 2011-10",
+   "unit": "date",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "강정고령보는 2009년 10월에 착공하여 2013년 6월 준공하였다.",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "location",
+   "value": "대구 달성군 다사읍 죽곡리 ~ 경북 고령군 다산면 곽촌리; 칠곡보 하류 25 km",
+   "unit": "km",
+   "source_url": "https://www.grandculture.net/daegu/toc/GC40081109",
+   "source_quote": "대구광역시 달성군 다사읍 죽곡리와 경상북도 고령군 다산면 곽촌리에 있는 낙동강의 보 / K-water: 칠곡보에서 하류 25㎞에 위치",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "management_water_level",
+   "value": "5.0 (상류) / 0.76 (하류)",
+   "unit": "EL.m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "상류 관리수위는 EL.5.0m, 하류 관리수위는 EL.0.76m이며, 보 건설로 100.9백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "secured_storage_mcm",
+   "value": "100.9",
+   "unit": "백만㎥",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보 건설로 100.9백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "catchment_area_km2",
+   "value": "20,697",
+   "unit": "km2",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "전체 유역면적은 20,697km",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "weir_length_m",
+   "value": "549.3 (라이징섹터 가동보 144 + 고정보 405.3)",
+   "unit": "m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보의 길이는 총 549.3m이며 라이징섹터형식의 가동보(144m)와 고정보(405.3m)로 구성",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "completion",
+   "value": "2012-10 (착공 2009-10)",
+   "unit": "date",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "창녕함안보는 2009년 10월에 착공하여 2012년 10월에 준공되었고",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보",
+   "attribute": "location",
+   "value": "합천창녕보 하류 43 km; 낙동강하구둑 상류 75 km",
+   "unit": "km",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "합천창녕보로부터 43km하류, 낙동강하구둑으로부터 75km 상류에 위치",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "management_water_level",
+   "value": "32.5",
+   "unit": "EL.m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "안동댐에서 하류 114㎞에 위치하고, 상류 관리수위는 EL. 32.5m이며, 보 건설로 52.7백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "secured_storage_mcm",
+   "value": "52.7",
+   "unit": "백만㎥",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보 건설로 52.7백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "weir_length_m",
+   "value": "374.3 (가동보 103.5 + 고정보 270.8)",
+   "unit": "m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보 연장은 총 374.3m로 가동보 103.5m, 고정보 구간 270.8m로 구성",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "completion",
+   "value": "2012-06 (착공 2009-10)",
+   "unit": "date",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "구미보는 2009년 10월에 착공하여 2012년 6월 준공하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "구미보",
+   "attribute": "location",
+   "value": "경북 구미시 선산읍·해평면, 안동댐 하류 114 km",
+   "unit": "km",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1515",
+   "source_quote": "경상북도 구미시 선산읍 및 해평면 일원에 건설되었으며, 안동댐에서 하류 114㎞",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "management_water_level",
+   "value": "10.5 (상류) / 5.0 (하류)",
+   "unit": "EL.m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "상류 관리수위는 EL.10.5m, 하류 관리수위는 EL.5.0m이며, 보 건설로 70.0백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "secured_storage_mcm",
+   "value": "70.0",
+   "unit": "백만㎥",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보 건설로 70.0백만㎥의 수량을 확보하였다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "catchment_area_km2",
+   "value": "15,074",
+   "unit": "km2",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "전체 유역면적은 15,074km",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "weir_length_m",
+   "value": "328 (리프트게이트 가동보 218 + 고정보 110)",
+   "unit": "m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "보의 길이는 총 328m이며 리프트게이트 형식의 가동보(218m)와 고정보(110m)로 구성",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "합천창녕보",
+   "attribute": "completion",
+   "value": "2013-01 (착공 2009-10)",
+   "unit": "date",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "합천창녕보는 2009년 10월에 착공하여 2013년 1월에 준공되었고, 달성보로부터 38km하류, 창녕함안보부터 43km 상류에 위치해있다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "total_length_m",
+   "value": "2,230 (K-water) / 2,400 (한국민족문화대백과)",
+   "unit": "m",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "총연장은 2230m, 체적은 220만 6000㎥로 우안은 부산광역시 강서구 명지동에, 좌안은 부산광역시 사하구 하단동에 닿아 있다. / encykorea: 길이는 2,400m, 높이는 18.7m",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "gates",
+   "value": "주수문 6연, 조절수문 4연, 갑문 1연, 우안 배수문 3연; Radial Gate 10문 순경간 47.5 m; 제방 21.9 km",
+   "unit": "count",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "제방시설 21.9km, 주수문 6연, 조절수문 4연, 갑문 1연, 우안 배수문 3연 ... 순경간 47.5m, 중량 약 245톤의 Radial Gate 10문을 부착",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "design_flood_cms",
+   "value": "18,300",
+   "unit": "㎥/s",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "설계홍수량은 초당 1만 8300㎥의 소통",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "completion",
+   "value": "본체 준공 1987-11 (착공 1983-09); K-water 사업 준공 1990-06",
+   "unit": "date",
+   "source_url": "https://encykorea.aks.ac.kr/Article/E0011568",
+   "source_quote": "1983년 9월에 착공 ... 1987년 11월에 준공 / K-water: 1983년 9월 하구둑 건설에 착수하여 1990년 6월 준공했다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "catchment_area_km2",
+   "value": "23,560",
+   "unit": "km2",
+   "source_url": "https://encykorea.aks.ac.kr/Article/E0011568",
+   "source_quote": "유역면적은 2만 3560㎢",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "total_storage",
+   "value": "500만톤 (총저수량); 용수공급량 6억4800만톤/년 (encykorea) / 연평균 7억5000만㎥ (K-water)",
+   "unit": "㎥/yr",
+   "source_url": "https://encykorea.aks.ac.kr/Article/E0011568",
+   "source_quote": "총 저수량은 500만톤, 용수공급량은 6억 4800만톤 / K-water: 조성된 담수호는 부산 및 경남 일원에 연평균 7억 5000만㎥의 용수를 공급한다.",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "brackish_zone_operation",
+   "value": "기수역 하굿둑 상류 12 km 내외로 조절 계획; 3차 개방 시 상류 8 km까지 기수역 형성",
+   "unit": "km",
+   "source_url": "https://www.korea.kr/news/policyNewsView.do?newsId=148894435",
+   "source_quote": "목표지점(9km)에 근접한 하굿둑 상류 8km 부근까지 기수역을 형성했다 ... 하굿둑 상류 12km 내외로 기수역 범위를 조절할 계획 (2021.10.18)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "wikipedia_ko_specs",
+   "value": "총연장 2,230 m (토언제 1,720 m, 수문부 510 m); 착공 1983, 준공 1987; 관리 한국수자원공사",
+   "unit": "m",
+   "source_url": "https://ko.wikipedia.org/wiki/%EB%82%99%EB%8F%99%EA%B0%95%ED%95%98%EA%B5%AC%EB%91%91",
+   "source_quote": "총연장 2,230m / 토언제 구간 1,720m / 수문부 구간 510m / 관리기관 한국수자원공사",
+   "confidence": "low",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보→매곡취수장",
+   "attribute": "intake_linkage",
+   "value": "매곡 취·정수장 draws water impounded by 강정고령보 (관리수위 EL.19.5 m) for 대구 식수",
+   "unit": "-",
+   "source_url": "https://www.koreascience.or.kr/article/JAKO201823954942676.pdf",
+   "source_quote": "현재는 EL.19.5 m로 관리수위가 유지되는 강정고령보가 건설되어 있다(Fig. 2). ... 저류된 물은 매곡 취·정수장에서 정수하여 대구광역시에 식수로 이용되고 있다.",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "매곡취수장(매곡정수사업소)",
+   "attribute": "intake_capacity_m3d",
+   "value": "770,000 (취수) / 700,000 (정수)",
+   "unit": "㎥/일",
+   "source_url": "https://www.grandculture.net/daegu/suseonggu/toc/GC40081074",
+   "source_quote": "대구광역시 달성군 다사읍 달구벌대로 717[매곡리 1008] ... 일 77만㎥ 규모의 취수 시설과 일 70만㎥ 규모의 정수 시설",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "강정고령보→문산·매곡취수장",
+   "attribute": "intake_linkage",
+   "value": "문산·매곡취수장: 낙동강 중류(달성군 다사읍) 취수, 대구시민 70% 급수; 구미산단 31 km 하류. 문산취수장-강정고령보 직접 명시 출처는 미확보",
+   "unit": "-",
+   "source_url": "https://www.khan.co.kr/article/202601151547001",
+   "source_quote": "현재 낙동강 중류의 물을 취수 및 정수하는 대구 문산·매곡취수장 (2026-01-15) / newspim 2021-09-14: 대구시민 70%가 마시는 매곡과 문산취수장의 원수 / daegu.go.kr: 대구취수원(매곡·문산)은 구미산단 31㎞ 하류지점에 위치",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "대구 용수 수요",
+   "attribute": "daily_demand_t",
+   "value": "약 580,000",
+   "unit": "t/일",
+   "source_url": "https://www.khan.co.kr/article/202601151547001",
+   "source_quote": "대구지역에서 하루 평균 필요한 물의 양은 약 58만t이다",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "칠곡보→해평취수장",
+   "attribute": "intake_linkage",
+   "value": "해평취수장 (구미 광역취수장) sits 23 km upstream of 칠곡보; natural intake depends on 칠곡보 impoundment; supplies 구미·김천·칠곡 (30만t/일 need)",
+   "unit": "km",
+   "source_url": "https://www.hankookilbo.com/news/article/201105111799166758",
+   "source_quote": "23㎞하류에 설치되는 낙동강 24공구 칠곡보에 물을 채워야만 자연취수가 가능한 상태로 유지될 전망 ... 구미와 김천, 칠곡 지역에 필요한 하루 30만톤의 물 (2011-05-11)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "해평취수장(구미광역상수도, K-water 구미권지사)",
+   "attribute": "intake_capacity_m3d",
+   "value": "464,000 (해평취수장 464천㎥/일; 보조취수시설 450; 구미광역취수장 400)",
+   "unit": "㎥/일",
+   "source_url": "https://www.kwater.or.kr/water/sub01/sub05/20060674/works.do?s_mid=1367&s_officecode=10730017&s_flag=1&brdId=KO27",
+   "source_quote": "급수지역 : 구미, 김천, 칠곡 / 급수인구 : 40만명 / 시설용량 : 464천㎥/일 / 해평취수장(464), 보조취수시설(450), 구미광역취수장(400)",
+   "confidence": "high",
+   "corrected_value": ""
+  },
+  {
+   "entity": "창녕함안보→칠서취수장",
+   "attribute": "intake_linkage",
+   "value": "칠서취수장 located upstream of 창녕함안보; supplies 창원 등 (칠서 취·정수장 = 창원 수돗물 약 63%); 신설 규모 28만t/일 (총사업비 약 490억)",
+   "unit": "-",
+   "source_url": "https://www.idomin.com/news/articleView.html?idxno=941382",
+   "source_quote": "낙동강 하류 창녕함안보 상류에 위치해 ... 창원 등 지역에 공급하는 시설 (2025-07-09) / gnnews 2026-06-30: 노후화된 칠서취수장을 하루 28만t 규모로 신설 ... 창원시 전체 수돗물 공급량 가운데 칠서 취·정수장이 담당하는 비중이 약 63%",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "낙동강하굿둑→물금·매리취수장",
+   "attribute": "intake_linkage",
+   "value": "물금취수장 26 km, 매리취수장 28 km upstream of 하굿둑 (in 창녕함안보–하굿둑 reach, 75 km)",
+   "unit": "km",
+   "source_url": "https://www.busan.com/view/busan/view.php?code=20201110000054",
+   "source_quote": "물금(26㎞) ... 매리취수장(28㎞) ... 30㎞ 이내 시설물은 염분 피해가 불가피 (2020-11-10)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "물금취수장",
+   "attribute": "share_of_busan_supply",
+   "value": "약 23%",
+   "unit": "%",
+   "source_url": "https://www.ecojournal.co.kr/m/view.php?idx=140556",
+   "source_quote": "부산시 전체 수돗물 생산 중 23% 가량을 담당하고 있는 물금취수장 (양산시 물금읍)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "물금·매리 조류경보 채수지점",
+   "attribute": "sampling_point_change",
+   "value": "2025-08부터 매리 채수지점을 매리취수장 상류 3 km → 취수장 전면 50 m로 조정",
+   "unit": "m",
+   "source_url": "https://www.newspim.com/news/view/20260608000986",
+   "source_quote": "물금 지점의 조류 개체수는 밀리리터(㎖)당 2418개, 매리 지점은 8458개 ... 취수장 전면 50ｍ 지점 (2026-06-08)",
+   "confidence": "medium",
+   "corrected_value": ""
+  },
+  {
+   "entity": "WAMIS 댐 목록(mn_dammain)",
+   "attribute": "dam_codes_crosscheck",
+   "value": "49 dams; 보/하굿둑 미포함. 낙동강: 2001110 안동, 2001611 안동조정지, 2002110 임하, 2002610 임하조정지, 2004101 영주, 2010101 김천부항, 2012210 영천, 2015110 합천, 2018110 남강, 2018611 합천조정지, 2021110 밀양, 2021210 운문",
+   "unit": "damcd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dammain?output=json",
+   "source_quote": "{\"damcd\":\"2015110\",\"damnm\":\"합천\",\"bbsncd\":\"20\",\"sbsncd\":\"201809\",\"bbsnnm\":\"낙동강\",\"mggvnm\":\"한국수자원공사\"} ... {\"damcd\":\"2018611\",\"damnm\":\"합천조정지\"...}",
+   "confidence": "high",
+   "corrected_value": ""
+  }
+ ],
+ "unverified": [
+  {
+   "entity": "강정·고령 (2011G56)",
+   "attribute": "alert_history_2026",
+   "value": "05-18 관심 → 06-15 경계(11,231 → 17,014) → 07-27 관심 하향 → 08-10 경계 재상향(약 2만9천) → 09-15 해제(120일) → 09-29 관심 재발령",
+   "unit": "세포/mL",
+   "source_url": "https://biz.heraldcorp.com/article/10773447",
+   "source_quote": "강정·고령 지점은 지난달 18일 조류경보 '관심' 단계 발령 이후 … 15일부터 '경계'로 상향 … 1만1231세포/㎖ … 1만7014세포/㎖ … 해평, 칠서, 물금·매리 3개 지점 모두 '관심' 발령 상태 (2026-06-17; 8/10: supple.kr; 9/15 해제·120일: 대경일보 554383; 9/29 재발령: 경북도민일보 722972)",
+   "confidence": "medium",
+   "why": "All stages confirmed except the lift date: 대구신문 559693 and 대경일보 554383 (article dated 9/15) state the alert was lifted 9월 14일 오후 6시, 120 days after 5/18 관심 (해평 재발령 same day per 경북일보 '지난 14일 오후 6시'). Herald 10773447 (2026-06-17) confirms 5/18 관심, 6/15 경계, 1만1231→1만7014. supple.kr cmsnoi8i60057et5il68h4vib (2026-08-10) confirms 8/10 18:05 경계, 2만9천여셀/㎖, 7/27 관심 하향. 경북도민일보 722972 (9/29) confirms 관심 재발령 with 1895/3305."
+  },
+  {
+   "entity": "구미보",
+   "attribute": "catchment_area_km2",
+   "value": "11,040",
+   "unit": "km2",
+   "source_url": "https://www.kwater.or.kr/busi/sub02/facilitiespresent03Page.do?s_mid=1511",
+   "source_quote": "유역면적은 11,040㎢",
+   "confidence": "high",
+   "why": "The full 구미보 paragraph on the K-water page (착공/준공, 위치, 관리수위, 수량, 보연장, 공도교, 소수력, 형상, 명소) contains no 유역면적 figure at all. '11,040㎢' appears only in the 칠곡보 paragraph. The quoted sentence '유역면적은 11,040㎢' is not stated for 구미보; and since 구미보 is upstream of 칠곡보 an identical catchment is implausible. No other authoritative source checked."
+  }
+ ],
+ "unknown": [
+  {
+   "entity": "문산취수장 (대구)",
+   "attribute": "intake_capacity",
+   "value": "UNKNOWN",
+   "unit": "㎥/일",
+   "source_url": "https://www.daegu.go.kr/daeguPolicy/6/index.html",
+   "source_quote": "개별 문산취수장 용량은 어느 공식 페이지에서도 확인 못함. 대구시 취수원 다변화 페이지는 '문산ㆍ매곡정수장 초고도정수시설(28.8만톤) 도입'만 기재. data.go.kr 15094840(대구 정수장별 시설용량 xlsx)에 들어있을 가능성 있음(미리보기 없음)",
+   "confidence": "none"
+  },
+  {
+   "entity": "해평 (2011G26)",
+   "attribute": "alert_history_2025",
+   "value": "UNKNOWN",
+   "unit": "date",
+   "source_url": "https://www.kyongbuk.co.kr/news/articleView.html?idxno=4084295",
+   "source_quote": "검색엔진 요약이 '2025 해평 6/8 관심(1,812 cells), 10/14 재발령'을 제시했으나 실제 기사(경북일보 2026-09-16, 경북매일 20260609500158)는 모두 2026년 기사임. 2025년 해평 발령일을 확인한 1차 자료 없음",
+   "confidence": "none"
+  },
+  {
+   "entity": "안동조정지댐",
+   "attribute": "catchment_area_km2",
+   "value": "UNKNOWN",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2001611",
+   "source_quote": "KMA page for areacode=2001611 returns an empty table (all '-'); not in K-water CSV; WAMIS mn_dammain has no area field",
+   "confidence": "none"
+  },
+  {
+   "entity": "임하조정지댐",
+   "attribute": "catchment_area_km2",
+   "value": "UNKNOWN",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2002610",
+   "source_quote": "KMA page for areacode=2002610 returns an empty table (all '-'); not in K-water CSV",
+   "confidence": "none"
+  },
+  {
+   "entity": "합천조정지댐",
+   "attribute": "catchment_area_km2",
+   "value": "UNKNOWN",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=2018611",
+   "source_quote": "KMA page for areacode=2018611 returns an empty table (all '-'); not in K-water CSV",
+   "confidence": "none"
+  },
+  {
+   "entity": "대청조정지댐",
+   "attribute": "catchment_area_km2",
+   "value": "UNKNOWN",
+   "unit": "km2",
+   "source_url": "https://hydro.kma.go.kr/obs/damInfo.do?areacode=3008611",
+   "source_quote": "KMA page for areacode=3008611 returns an empty table (all '-'); not in K-water CSV",
+   "confidence": "none"
+  },
+  {
+   "entity": "조정지댐 (안동·임하·합천·대청)",
+   "attribute": "water_levels_elm (상시만수위/계획홍수위/저수위)",
+   "value": "UNKNOWN",
+   "unit": "EL.m",
+   "source_url": "https://www.data.go.kr/data/15049846/fileData.do",
+   "source_quote": "K-water 댐별(다목적댐_용수댐)_제원.csv has 34 rows (20 다목적댐 + 14 용수댐) and contains no 조정지 rows; KMA damInfo pages for the 조정지 codes are empty",
+   "confidence": "none"
+  },
+  {
+   "entity": "강정고령보",
+   "attribute": "wamis_wl_station_upstream",
+   "value": "UNKNOWN",
+   "unit": "obscd",
+   "source_url": "https://www.wamis.go.kr/wkw/wl_dubwlobs_list.do",
+   "source_quote": "name=강정 검색 결과 2건만 존재: 2011696 대구시(강정고령보하) 운영 / 2011697 강정보(임) 폐쇄 — '강정고령보상' 관측소 없음",
+   "confidence": "none"
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "wamis_wl_station",
+   "value": "UNKNOWN (no 하굿둑/물금/매리 station in WAMIS 낙동강 list; nearest listed: 2022610 밀양시(삼랑진교), 2022680 부산시(구포대교))",
+   "unit": "obscd",
+   "source_url": "http://www.wamis.go.kr:8080/wamis/openapi/wkw/wl_dubwlobs?basin=2&output=json",
+   "source_quote": "{\"obscd\":\"2022610\",\"obsnm\":\"밀양시(삼랑진교)\"...} {\"obscd\":\"2022680\",\"obsnm\":\"부산시(구포대교)\"...}; name=하굿둑/하구둑/물금/매리 → {\"rows\":[]}",
+   "confidence": "none"
+  },
+  {
+   "entity": "낙동강하굿둑",
+   "attribute": "management_water_level",
+   "value": "UNKNOWN",
+   "unit": "EL.m",
+   "source_url": "https://www.haguopen.kr/hagu/open.asp",
+   "source_quote": "'하굿둑 관리수위는 유지' (수치 미기재). K-water/encykorea/wikipedia 어디에도 하굿둑 자체 관리수위 수치 없음. 참고: K-water는 창녕함안보 '하류 관리수위 EL.0.76m'를 기재 (하굿둑 담수호 구간 수위로 해석 가능하나 출처가 하굿둑 관리수위로 명시한 것은 아님)",
+   "confidence": "none"
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+﻿,표,원본 파일,행,열(표준화 후),키,기간(min),기간(max),자료형
+0,stations,stations.csv,5,14,site_code,(정적),(정적),"object×9, Int64×2, int64×1"
+1,algae,algae_measure.csv,2939,32,"(site_code, obs_date)",2012-04-02,2026-09-10,"float64×14, object×8, bool×7, Int64×1"
+2,dam_daily,dam_daily.csv,79964,14,"(dam_code, obs_date)",2012-01-01,2026-09-11,"float64×8, object×4"
+3,asos,asos_daily.csv,32208,22,"(stn_id, obs_date)",2012-01-01,2026-09-11,"float64×15, object×2, bool×2, int64×1"
+4,dam_operation_api,dam_operation_api.csv,1128,21,"(dam_name, obs_date)",2026-06-10,2026-09-11,"float64×16, object×3"
+5,eval_pairs,eval_pairs.csv,2754,8,"(station_id, base_date)",2012-04-02,2026-09-03,"object×5, int64×1"
+6,sample_submission,sample_submission.csv,124,4,"(station_id, base_date)",2026-05-04,2026-09-03,"object×3, Int64×1"

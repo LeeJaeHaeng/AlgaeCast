@@ -1,0 +1,185 @@
+# AlgaeCast-7 대상 지점·연계 시설 정의 (T0-b, 2026-10-20)
+# 출처: 대회 stations.csv / 03_collect_dataset.py (2026-09-12), K-water 댐코드 조회 API(2026-10-20 실응답),
+#       WAMIS 개방 API(mn_dammain, wl_dubwlobs, 보 목록), KMA 수문기상 댐정보, K-water·부산시·창원시·대구시·청주시 공식 페이지.
+#       항목별 출처 URL·인용문은 docs/reference/sites_facts_verified.json (검증 통과 229건).
+# TODO 로 표시된 값은 1차 출처 확인 전이다. 추정값을 넣지 않는다.
+version: "2026-10-20"
+
+alert_thresholds_cells_per_ml: # 상수원 구간, 2회 연속 측정 기준 (조류경보제 운영 매뉴얼 2025.8 / 물환경보전법 시행령 별표3)
+  caution: 1000 # 관심
+  warning: 10000 # 경계 (또는 조류독소 10 μg/L 이상)
+  outbreak: 1000000 # 조류대발생
+  release_below: 1000 # 해제
+harmful_genera: [Microcystis, Anabaena, Aphanizomenon, Oscillatoria] # 유해남조류 4속 (세포수 합)
+
+# ---------------------------------------------------------------------------
+# 다목적댐 (대회 dam_daily.csv 15개소, WAMIS 댐코드). role: main=본댐, regulating=조정지.
+# 제원 출처: KMA 수문기상 댐정보(hydro.kma.go.kr/obs/damInfo.do?areacode=<code>) + K-water 댐별 제원 CSV(2024-12-31).
+# catchment_km2 유역면적, total_mcm 총저수용량(백만㎥), effective_mcm 유효저수용량, nhwl 상시만수위, fwl 계획홍수위, lwl 저수위(EL.m)
+dams:
+  "2001110": { name: 안동, basin: 낙동강, river: 낙동강 본류, role: main, catchment_km2: 1584, total_mcm: 1248.0, effective_mcm: 1000.0, nhwl: 160.0, fwl: 161.7, lwl: 130.0, completed: 1976 }
+  "2001611": { name: 안동조정지, basin: 낙동강, river: 낙동강 본류, role: regulating, parent: "2001110", effective_mcm: 3.0, note: 본댐 하류 3 km }
+  "2002110": { name: 임하, basin: 낙동강, river: 반변천, role: main, catchment_km2: 1361, total_mcm: 595.0, effective_mcm: 424.0, nhwl: 163.0, fwl: 164.7, lwl: 137.0, completed: 1992 }
+  "2002610": { name: 임하조정지, basin: 낙동강, river: 반변천, role: regulating, parent: "2002110", effective_mcm: 1.7 }
+  "2002111": { name: 성덕, basin: 낙동강, river: 보현천(길안천 지류), role: main, catchment_km2: 41.3, total_mcm: 27.9, effective_mcm: 24.8, nhwl: 364.0, fwl: 364.9, lwl: 333.0, completed: 2015 }
+  "2004101": { name: 영주, basin: 낙동강, river: 내성천, role: main, catchment_km2: 500, total_mcm: 181.1, effective_mcm: 138.0, nhwl: 161.0, fwl: 164.0, lwl: 135.0, completed: 2016, note: 유효저수량은 KMA 138.0 / K-water 설계치 160.4 로 상이 }
+  "2008110": { name: 군위, basin: 낙동강, river: 위천, role: main, kwater_code: "2008101", catchment_km2: 87.5, total_mcm: 48.7, effective_mcm: 40.1, nhwl: 204.0, fwl: 205.1, lwl: 181.0, completed: 2012, note: WAMIS 2008110 / K-water·KMA 2008101 }
+  "2010101": { name: 김천부항, basin: 낙동강, river: 부항천(감천 지류), role: main, catchment_km2: 82.0, total_mcm: 54.3, effective_mcm: 42.6, nhwl: 195.0, fwl: 198.6, lwl: 165.0, completed: 2014 }
+  "2015110": { name: 합천, basin: 낙동강, river: 황강, role: main, catchment_km2: 925, total_mcm: 790.0, effective_mcm: 560.0, nhwl: 176.0, fwl: 179.0, lwl: 140.0, completed: 1989 }
+  "2018611": { name: 합천조정지, basin: 낙동강, river: 황강, role: regulating, parent: "2015110", effective_mcm: 17.0, note: 본댐 하류 6.5 km }
+  "2018110": { name: 남강, basin: 낙동강, river: 남강, role: main, catchment_km2: 2285, total_mcm: 309.2, effective_mcm: 299.7, nhwl: 41.0, fwl: 46.0, lwl: 32.0, completed: 2003 }
+  "2021110": { name: 밀양, basin: 낙동강, river: 단장천(밀양강 지류), role: main, catchment_km2: 95.4, total_mcm: 73.6, effective_mcm: 69.8, nhwl: 207.2, fwl: 210.2, lwl: 150.0, completed: 2001 }
+  "3001110": { name: 용담, basin: 금강, river: 금강 본류, role: main, catchment_km2: 930, total_mcm: 815.0, effective_mcm: 672.5, nhwl: 263.5, fwl: 265.5, lwl: 228.5, completed: 2006 }
+  "3008110": { name: 대청, basin: 금강, river: 금강 본류, role: main, catchment_km2: 3204, total_mcm: 1490.0, effective_mcm: 790.0, nhwl: 76.5, fwl: 80.0, lwl: 60.0, completed: 1981, note: 유역면적은 용담댐 유역 제외값(포함 시 4134) }
+  "3008611": { name: 대청조정지, basin: 금강, river: 금강 본류, role: regulating, parent: "3008110", effective_mcm: 3.8 }
+# dam_operation_api.csv(2026-06-10~09-11) 에만 있는 댐: 보현산 — dam_daily 에 없어 장기 피처에는 쓰지 않는다
+dams_api_only:
+  보현산: { basin: 낙동강, river: 고현천(금호강 지류), role: main, kwater_code: "2012101", note: 금호강 경유 → CS·MGMR 상류이며 GJGR 상류 아님 }
+
+# ---------------------------------------------------------------------------
+# 낙동강 보·하굿둑 (상류→하류). 코드 3종:
+#   kwater_code  — K-water 댐코드(/damCode/damCodelist). 수문 운영 정보 API(sluicePresentCondition/{delist,hourlist,mntlist}) 의 damcode. 일자료 2016~ 보유 확인.
+#   wamis_bo_code — WAMIS 보 코드(boobscd, wamis.go.kr/wks 보 목록)
+#   wl_up / wl_down — WAMIS 수위관측소 코드(obscd, 보 상류/하류). wkw/wl_dtdata?obscd=<code> 로 일수위 조회 가능(키 불필요, 2024-08 응답 확인)
+# mwl 관리수위(EL.m), storage_mcm 저수용량(백만㎥), catchment_km2 유역면적, length_m 보 연장
+weirs:
+  "2007601": { name: 상주보, basin: 낙동강, wamis_bo_code: "2007801", wl_up: "2007680", wl_down: "2007682" }
+  "2009601": { name: 낙단보, basin: 낙동강, wamis_bo_code: "2009801", wl_up: "2009618", wl_down: null }
+  "2009602": { name: 구미보, basin: 낙동강, wamis_bo_code: "2009802", wl_up: "2009680", wl_down: "2009682", mwl: 32.5, storage_mcm: 52.7, length_m: 374.3, completed: "2012-06", note: 안동댐 하류 114 km }
+  "2011601": { name: 칠곡보, basin: 낙동강, site: HP, wamis_bo_code: "2011801", wl_up: "2011648", wl_down: "2011649", mwl: 25.5, storage_mcm: 88.8, catchment_km2: 11040, length_m: 348, completed: "2012-06", note: 안동댐 하류 141 km }
+  "2011602": { name: 강정고령보, basin: 낙동강, site: GJGR, wamis_bo_code: "2011802", wl_up: null, wl_down: "2011696", mwl: 19.5, mwl_lowered_since_2017_06_04: 18.25, storage_mcm: 92.3, catchment_km2: 11667, length_m: 953.5, completed: "2013-06", note: 칠곡보 하류 25 km; 상류 관측소 강정보(임) 2011697 은 폐쇄 }
+  "2014601": { name: 달성보, basin: 낙동강, wamis_bo_code: "2014801", wl_up: "2014650", wl_down: "2014651" }
+  "2014602": { name: 합천창녕보, basin: 낙동강, wamis_bo_code: "2014802", wl_up: "2014697", wl_down: "2014699", mwl: 10.5, storage_mcm: 70.0, catchment_km2: 15074, length_m: 328, completed: "2013-01" }
+  "2017601": { name: 창녕함안보, basin: 낙동강, site: CS, wamis_bo_code: "2017801", wl_up: "2020647", wl_down: "2020646", mwl: 5.0, storage_mcm: 100.9, catchment_km2: 20697, length_m: 549.3, completed: "2012-10", note: 합천창녕보 하류 43 km, 하굿둑 상류 75 km }
+  "2022510": { name: 낙동강하굿둑, basin: 낙동강, site: MGMR, wamis_bo_code: "2022510", wl_up: null, wl_down: null, catchment_km2: 23560, length_m: 2230, completed: "1987-11", note: 주수문 6연·조절수문 4연; 기수역 개방 운영(상류 ~12 km) }
+
+# ASOS 관측소 (대회 asos_daily.csv 6개소)
+asos_stations:
+  133: 대전
+  143: 대구
+  155: 창원
+  159: 부산
+  263: 의령군
+  279: 구미
+
+# ---------------------------------------------------------------------------
+# 대상 지점 5개소. intake_weight 는 docs/04 7절 정책 가중치. intake_capacity_tpd 는 톤/일(㎥/일), 출처는 json 참조.
+sites:
+  - site_code: "2011G26"
+    station_id: HP
+    name: 해평
+    aliases: [칠곡] # 구 지점명
+    basin: 낙동강
+    water_body: 낙동강
+    river_lake: 하천
+    section: 상수원
+    location: 구미시 해평면 문량리 (해평취수구 인근 50 m 채수, 2025-08~)
+    facility_type: 보
+    facility: 칠곡보 # 측정지점은 구미보 하류·칠곡보 상류 구간 (해평취수장은 칠곡보 상류 23 km)
+    facility_kwater_code: "2011601"
+    upstream_facility: 구미보
+    upstream_facility_kwater_code: "2009602"
+    upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110"] # 안동·임하(+조정지)·성덕·영주·군위(위천)
+    upstream_dams_uncertain: ["2010101"] # 김천부항(감천): 감천 합류점이 측정지점 상·하류 중 어디인지 확인 필요 (TODO)
+    asos_stn_id: 279
+    asos_alt_stn_id: null
+    service_start: 2016 # 시범 2013.2~2015.12, 정식 2016
+    data_start: "2016-01-04"
+    intake_weight: 0.5 # docs/04 7절
+    intake_capacity_tpd: 464000 # 해평취수장 (K-water 구미권 광역상수도) 464 천㎥/일
+    intakes: [해평취수장]
+    note: 대구 취수원 다변화(해평 공동이용 30만 톤/일 계획, 안동댐 직취수 '맑은물 하이웨이')
+  - site_code: "2011G56"
+    station_id: GJGR
+    name: 강정·고령
+    aliases: [강정고령]
+    basin: 낙동강
+    water_body: 낙동강
+    river_lake: 하천
+    section: 상수원
+    location: 대구 달성군 다사읍 매곡리 (매곡취수구 인근, 구 고령취수구 상류 2 km)
+    facility_type: 보
+    facility: 강정고령보
+    facility_kwater_code: "2011602"
+    upstream_facility: 칠곡보
+    upstream_facility_kwater_code: "2011601"
+    upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110", "2010101"]
+    # 금호강 합류점(파호동·죽곡리 = 강정고령보 지점)은 측정지점(보 상류 7 km, detail_adres) 하류 → 금호강은 CS·MGMR 상류 지류로 분류
+    asos_stn_id: 143
+    asos_alt_stn_id: null
+    service_start: 2016
+    data_start: "2016-01-04"
+    intake_weight: 0.8
+    intake_capacity_tpd: 770000 # 매곡취수장 770 천㎥/일 (정수 700). 문산취수장 용량 TODO; 문산+매곡 실제 취수 약 60만 톤/일, 대구 급수 70%
+    intakes: [매곡취수장, 문산취수장]
+  - site_code: "2020G33"
+    station_id: CS
+    name: 칠서
+    aliases: [창녕·함안, 창녕함안]
+    basin: 낙동강
+    water_body: 낙동강
+    river_lake: 하천
+    section: 상수원
+    location: 창녕함안보 상류 12 km (칠서취수구 인근 50 m 채수)
+    facility_type: 보
+    facility: 창녕함안보
+    facility_kwater_code: "2017601"
+    upstream_facility: 합천창녕보
+    upstream_facility_kwater_code: "2014602"
+    upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110", "2010101", "2015110", "2018611"] # + 합천(황강)·합천조정지
+    upstream_dams_uncertain: ["2018110"] # 남강: 남강 합류점(남지)과 측정지점의 상대 위치 확인 필요 (TODO)
+    tributaries_without_dam: [금호강, 회천] # 금호강(대구 도심, 보현산댐 유역 포함)은 강정고령보 지점에서 합류 → 칠서 상류
+    asos_stn_id: 263
+    asos_alt_stn_id: 155 # 창원 (의령군 263 결측 시 대체)
+    service_start: 2016
+    data_start: "2016-01-04"
+    intake_weight: 0.5
+    intake_capacity_tpd: 440000 # 칠서취수장(창원시) 440,000 ㎥/일, 정수 400,000. 창원 수돗물 약 63% 의존
+    intakes: [칠서취수장]
+  - site_code: "2022G05"
+    station_id: MGMR
+    name: 물금·매리
+    aliases: [물금매리, 물금]
+    basin: 낙동강
+    water_body: 낙동강
+    river_lake: 하천
+    section: 상수원
+    location: 매리취수장 전면 50 m (2025-08 채수지점 조정); 하굿둑 상류 26~28 km
+    facility_type: 하굿둑 상류
+    facility: 낙동강하굿둑
+    facility_kwater_code: "2022510"
+    upstream_facility: 창녕함안보
+    upstream_facility_kwater_code: "2017601"
+    upstream_dams: ["2001110", "2001611", "2002110", "2002610", "2002111", "2004101", "2008110", "2010101", "2015110", "2018611", "2018110", "2021110"] # + 남강·밀양
+    tributaries_without_dam: [금호강, 회천, 양산천]
+    asos_stn_id: 159
+    asos_alt_stn_id: null
+    service_start: 2020 # '20년 조류경보제 편입
+    data_start: "2020-05-11"
+    intake_weight: 1.0
+    intake_capacity_tpd: 840000 # 물금취수장 840 천톤/일 (부산 먹는물 약 33%, 문제 설명서). 매리취수장 1,725 천톤/일 별도
+    intake_capacity_tpd_total: 2565000 # 물금 + 매리 (부산시 상수도 현황)
+    intakes: [물금취수장, 매리취수장]
+    note: 2025년 경보 194일(관심 166·경계 28), 2022년 196일에 이어 2위
+  - site_code: "3008G30"
+    station_id: DCHN
+    name: 회남
+    aliases: [대청호 회남, 대청(회남)]
+    basin: 금강
+    water_body: 대청호
+    river_lake: 호소
+    section: 상수원
+    location: 충북 보은군 회남면 (대청호 상류부; 취수탑은 추동 3008G40·문의 3008G50 인근)
+    facility_type: 댐
+    facility: 대청댐
+    facility_dam_code: "3008110" # 측정지점이 저수지 내부 → 대청댐 자체 운영자료가 1차 수문 입력
+    downstream_dams: ["3008611"]
+    upstream_dams: ["3001110"] # 용담
+    asos_stn_id: 133
+    asos_alt_stn_id: null
+    service_start: 1998
+    data_start: "2012-04-02"
+    intake_weight: 0.7
+    intake_capacity_tpd: 1350000 # 대전 상수도 일 최대 시설용량 135만 톤(대청호 취수탑 추동·삼정 기준). 대청광역 1·2·3단계 1,484 천㎥/일, 청주 대청광역정수장 297,000 ㎥/일 별도
+    intakes: [대청댐취수탑(추동·삼정), 대청광역정수장]
+    note: 회남은 대청호 3지점(추동·문의·회남) 중 최상류, 2026-07-20 경계 발령
