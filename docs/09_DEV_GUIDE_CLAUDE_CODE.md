@@ -48,7 +48,7 @@ docs/02_DATA_SPEC.md와 docs/08_PIPELINE_SPEC.md 4절을 읽고, collect/base.py
 ```
 | 태스크 | 모듈 | DoD |
 |---|---|---|
-| T1-a | `nier_algae.py` (WQ-01 API) | 5지점 2015~현재 수집, 대회 데이터와 겹치는 기간 세포수 일치율 ≥95% 검증 로그 |
+| T1-a | `nier_algae.py` (WQ-01 API) | 5지점 가용 전 기간 수집(회남 2012-04~, 낙동강 4지점 2016-01~, 물금·매리 2020-05~), 대회 데이터와 겹치는 기간 세포수 일치율 ≥95% 검증 로그 |
 | T1-b | `kwater_dam.py` (HY-01/02/03) | 매핑 댐 전체 일별, 결측률 보고 |
 | T1-c | `kma_asos.py` (MT-01) + `kma_basin.py` (MT-02/03 CSV 파서) | 지점별 ASOS 2015~현재 |
 | T1-d | `wamis.py` (HY-06) + `dataon_level.py` (HY-05 파서) | 낙동강 4보 수위·방류 |

@@ -83,6 +83,19 @@ def cache_key(url: str, params: dict[str, Any]) -> str:
     return hashlib.sha1(payload.encode("utf-8")).hexdigest()
 
 
+def closed_year_ttl(year: int, now: datetime | None = None, closed_month: int = 2) -> timedelta:
+    """연도별 캐시 허용 기간. 마감(다음 해 ``closed_month`` 월 1일) 뒤 받은 캐시만 영구, 진행 중이면 12시간.
+
+    ``get()`` 은 ``now - fetched <= ttl`` 이면 캐시를 쓰므로, 마감 후에는 ttl = now − closed_at 로 두어
+    closed_at 이후에 받은 응답만 통과시킨다.
+    """
+    now = now or datetime.now(KST)
+    closed_at = datetime(year + 1, closed_month, 1, tzinfo=KST)
+    if now <= closed_at:
+        return timedelta(hours=12)
+    return max(now - closed_at, timedelta(hours=12))
+
+
 def portal_error(text: str) -> PortalError | None:
     """포털 레벨 오류 XML(OpenAPI_ServiceResponse)이면 PortalError, 아니면 None."""
     head = text.lstrip()[:200]

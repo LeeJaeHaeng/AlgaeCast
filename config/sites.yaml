@@ -39,7 +39,8 @@ dams_api_only:
 # ---------------------------------------------------------------------------
 # 낙동강 보·하굿둑 (상류→하류). 코드 3종:
 #   kwater_code  — K-water 댐코드(/damCode/damCodelist). 수문 운영 정보 API(sluicePresentCondition/{delist,hourlist,mntlist}) 의 damcode. 일자료 2016~ 보유 확인.
-#   wamis_bo_code — WAMIS 보 코드(boobscd, wamis.go.kr/wks 보 목록)
+#   wamis_bo_code — WAMIS 보 코드(boobscd). WAMIS 개방 API wkd/mn_dtdata?damcd=<이 코드> 로 보 일자료(수위·유입·방류·강우)
+#                   조회 가능 확인(2026-10-20; K-water delist 와 동일 값)
 #   wl_up / wl_down — WAMIS 수위관측소 코드(obscd, 보 상류/하류). wkw/wl_dtdata?obscd=<code> 로 일수위 조회 가능(키 불필요, 2024-08 응답 확인)
 # mwl 관리수위(EL.m), storage_mcm 저수용량(백만㎥), catchment_km2 유역면적, length_m 보 연장
 weirs:
@@ -51,7 +52,7 @@ weirs:
   "2014601": { name: 달성보, basin: 낙동강, wamis_bo_code: "2014801", wl_up: "2014650", wl_down: "2014651" }
   "2014602": { name: 합천창녕보, basin: 낙동강, wamis_bo_code: "2014802", wl_up: "2014697", wl_down: "2014699", mwl: 10.5, storage_mcm: 70.0, catchment_km2: 15074, length_m: 328, completed: "2013-01" }
   "2017601": { name: 창녕함안보, basin: 낙동강, site: CS, wamis_bo_code: "2017801", wl_up: "2020647", wl_down: "2020646", mwl: 5.0, storage_mcm: 100.9, catchment_km2: 20697, length_m: 549.3, completed: "2012-10", note: 합천창녕보 하류 43 km, 하굿둑 상류 75 km }
-  "2022510": { name: 낙동강하굿둑, basin: 낙동강, site: MGMR, wamis_bo_code: "2022510", wl_up: null, wl_down: null, catchment_km2: 23560, length_m: 2230, completed: "1987-11", note: 주수문 6연·조절수문 4연; 기수역 개방 운영(상류 ~12 km) }
+  "2022510": { name: 낙동강하굿둑, basin: 낙동강, site: MGMR, wamis_bo_code: "2022510", wl_up: "2022696", wl_down: "2022697", catchment_km2: 23560, length_m: 2230, completed: "1987-11", note: 주수문 6연·조절수문 4연; 기수역 개방 운영(상류 ~12 km). wl_up=낙동강하구언(내), wl_down=하구언(외) (K-water 운영, WAMIS wl_dubwlobs 2026-10-20) }
 
 # ASOS 관측소 (대회 asos_daily.csv 6개소)
 asos_stations:
@@ -160,6 +161,7 @@ sites:
     intake_capacity_tpd: 840000 # 물금취수장 840 천톤/일 (부산 먹는물 약 33%, 문제 설명서). 매리취수장 1,725 천톤/일 별도
     intake_capacity_tpd_total: 2565000 # 물금 + 매리 (부산시 상수도 현황)
     intakes: [물금취수장, 매리취수장]
+    river_level_stations: { 삼랑진교: "2022610", 대동낙동강교: "2022678", 구포대교: "2022680" } # WAMIS 수위관측소(물금·매리 상·하류 하천 수위)
     note: 2025년 경보 194일(관심 166·경계 28), 2022년 196일에 이어 2위
   - site_code: "3008G30"
     station_id: DCHN

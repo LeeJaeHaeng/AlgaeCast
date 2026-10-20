@@ -13,6 +13,11 @@
 
 | WQ-01 | 조류경보제 조회서비스 — 5지점 전기간 수집 (`data/raw/nier_algae/nier_algae_2012_2026.parquet/.csv`, 대회 번들 겹침 구간 세포수 일치율 100%, 4속 합≠총합 1건; 경보단계 2회 연속 규칙은 매뉴얼 표1 '16~'24 발령 이력 재현 확인) | 기후에너지환경부 국립환경과학원 | apis.data.go.kr/1480523/nieragainstalgae/algaePreMeasure (ptNoList=5지점, wmyrList 연 단위, numOfRows=10000, 15요청) | 2012-04-02~2026-10-15 | 2026-10-20 17:11 KST | 2,979 | 공공누리 1유형(출처표시) | 270482b6535f8216 |
 
+| HY-02 | K-water 수문 운영 정보 delist — 본댐 11 + 낙동강 보·하굿둑 9, 일자료 (`data/raw/kwater_sluice/kwater_sluice_daily.parquet`) | 한국수자원공사 | apis.data.go.kr/B500001/dam/sluicePresentCondition/delist (damcode, 연 단위 300요청) | 2012-01-01~2026-10-20 | 2026-10-20 17:49 KST | 107,775 | 이용허락범위 제한 없음 | 2ff4791949c05993 |
+| HY-06 | WAMIS mn_dtdata 보 9개 전기간 + 댐 15개 2026-09-12~ / wl_dtdata 보 상·하류 수위 18개소 (`data/raw/wamis_dam/`, long 에 포함) | 환경부 한강홍수통제소 | www.wamis.go.kr:8080/wamis/openapi/wkd/mn_dtdata, wkw/wl_dtdata (키 불필요) | 2012-01-01~2026-10-20 | 2026-10-20 18:30 KST | 44,894 (+수위 79,324) | 공공누리 | 5ddb7077aae2556c |
+| HY-01 보조 | 다목적댐 운영 정보 API 최근 60일 (`data/raw/kwater_damapi/kwater_damapi_recent.parquet`) | 한국수자원공사 | apis.data.go.kr/B500001/dam/multipurPoseDam/multipurPoseDamlist (일 100건, 날짜별 영구 캐시) | 2026-08-21~2026-10-19 | 2026-10-20 18:15 KST | 1,260 | 이용허락범위 제한 없음 | f7c5db40a4d229b2 |
+| HY 통합 | hydro_daily_long.parquet (번들 WAMIS + 위 3개 소스 long 포맷, facility_code/변수/소스별) | - | collect/kwater_dam.py | 2012~2026-10-20 | 2026-10-20 | 1,724,876 | - | (파생) |
+
 ## API 인증키 점검 (2026-10-20, 개발계정, 활용기간 2026-10-20 ~ 2028-10-20)
 키는 `.env` 의 `DATA_GO_KR_KEY` 에만 보관한다. 재점검: `python scripts/check_api_keys.py`
 
