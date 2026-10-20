@@ -18,7 +18,7 @@ endif
 START ?= 2012-01-01
 END   ?= today
 
-.PHONY: help venv setup lock test lint format collect align features select baselines eda tune train evaluate predict upload submission reproduce clean
+.PHONY: help venv setup lock test lint format collect align features select baselines alert eda tune train evaluate predict upload submission reproduce clean
 
 help:
 	@echo AlgaeCast-7 make targets
@@ -78,10 +78,13 @@ eda:
 	$(PY) -m jupytext --to notebook --execute notebooks/02_stats.py
 
 tune:
-	@echo TODO [T4-b] $(PY) -m algaecast.models.tune --model lgbm --trials 300
+	$(PY) -m algaecast.models.tune --variant log_w --objective composite --trials 300
 
 train:
-	@echo TODO [T4-b] $(PY) -m algaecast.models.train --config config/model.yaml
+	$(PY) -m algaecast.models.experiments
+
+alert:
+	$(PY) -m algaecast.models.alert --trials 150
 
 evaluate:
 	@echo TODO [T5] $(PY) -m algaecast.eval.report

@@ -1,0 +1,50 @@
+{
+ "name": "classifier",
+ "version": "20261021_083408",
+ "created": "2026-10-21T08:34:08",
+ "features": [
+  "cell_log_t0",
+  "cell_max_4w",
+  "cell_log_lag1w",
+  "wtemp_minus_site_thresh",
+  "ta_degree_days20",
+  "wtemp_ma14",
+  "rn_sum30",
+  "consecutive_over_1k",
+  "season_day",
+  "inflow_t0",
+  "cell_slope_3",
+  "weir_outflow_t0",
+  "outflow_change7",
+  "level_cont_diff7",
+  "level_cont_t0",
+  "wtemp_diff7",
+  "weir_storage_rate_t0",
+  "hm_mean7",
+  "weir_outflow_ma7",
+  "chla_lag1w",
+  "cell_log_lag3w",
+  "ph_t0",
+  "storage_rate_t0",
+  "outflow_t0",
+  "weir_residence_proxy",
+  "ws_mean7",
+  "horizon_days",
+  "dominant_genus",
+  "facility_type",
+  "basin"
+ ],
+ "features_hash": "5bdc74f7c30d",
+ "metrics_holdout": {
+  "pr_auc": 0.8034,
+  "brier": 0.0828,
+  "f1": 0.6947,
+  "thr": 0.83
+ },
+ "meta": {
+  "train_through": 2025,
+  "target": "over_window(+4~+10일 창 ≥10k)",
+  "purpose": "dashboard probability"
+ },
+ "path": "models/classifier/20261021_083408/model.pkl"
+}

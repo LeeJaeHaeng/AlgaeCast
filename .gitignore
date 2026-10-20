@@ -52,3 +52,6 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# ---- 모델 레지스트리: 메타(json)만 커밋, pickle 은 make train 으로 재생성 ----
+models/**/*.pkl
