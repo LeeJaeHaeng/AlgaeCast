@@ -10,6 +10,20 @@
 - 비교는 동일 (site_code, base_date, target_date) 조합에서만: 발표일 ≤ base_date 인 가장 최근 발표분의
   ``forecast_date == target_date`` 행을 쓴다. 없으면 그 조합은 벤치마크 표본에서 제외하고 n 을 명시한다.
 - 물모아는 세포수가 아니라 단계(0~4)만 주므로 비교 지표는 단계 일치율·관측 단계 대비 혼동행렬이다.
+
+**단계 코드 (물모아 조류예측정보 '단계별 범례', 2026-10-20 페이지 원문 확인)** — 유해남조류 세포수(cells/mL)
+= Anabaena + Aphanizomenon + Microcystis + Oscillatoria 속 세포수 합. 우리 5지점은 모두 **상수원(혼합)** 구간.
+
+| 코드 | 상수원(혼합)·관찰지점 | 친수(표층) | 경보 대응(상수원) |
+|---|---|---|---|
+| 0단계 | 1,000 미만 | 20,000 미만 | 해제/미발령 |
+| 1단계 | 1,000 이상 ~ 10,000 미만 | 20,000 이상 ~ 100,000 미만 | 관심 |
+| 2단계 | 10,000 이상 ~ 100,000 미만 | 100,000 이상 | 경계 (하) |
+| 3단계 | 100,000 이상 ~ 1,000,000 미만 | (없음) | 경계 (상) |
+| 4단계 | **1,000,000 이상** | (없음) | 조류대발생 |
+
+범례 배경색: 0 #FFFFFF, 1 #ffff00, 2 #fda155, 3 #d8bee4, 4 #e10000 (Water.js applyCellStyle). '-' 는 미발표.
+``LEVEL_BOUNDS`` 가 이 상수원 경계를 그대로 담는다. 친수 구간 지점은 ``level_from_cells`` 를 쓰면 안 된다.
 """
 
 from __future__ import annotations
@@ -23,7 +37,7 @@ from algaecast.config import RAW_DIR
 
 MULMOA_DIR: Path = RAW_DIR / "mulmoa"
 SOURCE = "mulmoa_web_snapshot"
-LEVEL_BOUNDS = [0, 1_000, 10_000, 100_000, 1_000_000]  # 상수원 구간 단계 경계 (0~4단계)
+LEVEL_BOUNDS = [0, 1_000, 10_000, 100_000, 1_000_000]  # 상수원(혼합) 0~4단계 하한 (물모아 범례)
 
 
 def level_from_cells(cells: pd.Series) -> pd.Series:

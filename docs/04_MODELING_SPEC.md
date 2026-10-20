@@ -112,7 +112,7 @@ alpha log 1e-4~10, l1_ratio 0~1 — trial 50
 5. `tbl_missing_strategy.md` — S1/S2/S3 × 모델
 6. `tbl_ablation.md` — 피처 그룹(AR/수온수질/수문/기상/예보/시간) 제거 시 변화
 7. `tbl_stat_tests.md` — Diebold-Mariano(vs B0, B3), Wilcoxon(모델 간), p값
-8. `tbl_benchmark_nier.md` — 2026 가용 기간 NIER 공식 예측 vs 우리 모델 (동일 조합만)
+8. `tbl_benchmark_nier.md` — **경보 단계 분류 비교** (6.4절): 물모아 AI 녹조 예측(단계) vs 우리 모델(단계로 변환) vs 실측 단계, 동일 (지점, base_date, target_date) 조합만
 9. `fig_residuals.png` — 잔차 vs 예측, Q-Q, Ljung-Box 결과
 10. `fig_shap_global.png`, `fig_shap_cases.png` — 전역 + 경계 초과 사례 5건 waterfall
 11. `fig_pred_vs_obs_<site>.png` — 시계열 겹쳐 그리기(관측, 예측, 80% 밴드, 경보선)
@@ -120,7 +120,29 @@ alpha log 1e-4~10, l1_ratio 0~1 — trial 50
 ### 6.3 해석 규칙 (방법 설명서에 그대로)
 - 원단위 R²·NSE는 대발생 사건 몇 건에 민감 → log 지표와 병기, 대발생 제외 시 값도 각주
 - CI가 목표치를 걸치면 "목표 달성"이 아니라 "목표 수준과 통계적으로 구분되지 않음"으로 서술
-- 벤치마크 비교는 동일 (site, base_date, target_date)만, 표본 수 명시
+- 벤치마크 비교는 동일 (site, base_date, target_date)만, 표본 수 명시. 물모아 발표는 `issued_date ≤ base_date` 인 가장 최근 발표분만 사용(발표 이후 정보 금지)
+- 벤치마크는 회귀 지표가 아니라 **단계 분류 지표**로 비교한다(6.4절). 물모아가 단계만 제공하기 때문이며, 세포수·확률·예측구간은 우리 모델만 제공하는 추가 정보로 별도 기술한다
+
+### 6.4 NIER/물모아 벤치마크 비교 설계 — 경보 단계 분류 (2026-10-20 변경)
+
+**변경 이유**: 대회가 명시한 벤치마크(국립환경과학원 'AI 녹조 정밀 예측 정보')는 물모아 플랫폼에서 **D+1~D+7 단계(0~4)** 만 공개하고
+세포수 수치 예측을 제공하지 않는다(`docs/reference/mulmoa_api_notes.md`). 따라서 원래 계획(동일 조합에서 log-RMSE 등 회귀 비교)은
+성립하지 않으므로, 비교 단위를 유지한 채 지표를 단계 분류로 바꾼다. 또한 서버가 지점당 최근 3회 발표분만 보관해 2026-10-20 이전
+발표는 확보할 수 없으므로, 비교 표본은 2026-10 스냅샷 이후 (+ `reports/eval/live_benchmark.csv` 누적분)으로 한정하고 n 을 명시한다.
+
+| 항목 | 정의 |
+|---|---|
+| 비교 단위 | (지점, base_date, target_date). 물모아 측은 `issued_date ≤ base_date` 인 최신 발표의 `forecast_date == target_date` 단계 (`collect/nier_forecast.benchmark_table`) |
+| 단계 코드 | 물모아 범례(상수원): 0단계 <1,000 / 1단계 1,000~10,000 / 2단계 10,000~100,000 / 3단계 100,000~1,000,000 / 4단계 ≥1,000,000 cells/mL (`nier_forecast.LEVEL_BOUNDS`) |
+| 실측 단계 | target_date 실측 세포수를 같은 범례로 변환 (`level_from_cells`) |
+| 우리 모델 단계 (a) 단순 임계 | 예측 세포수(점추정 또는 q50)를 같은 범례로 변환 → `pred_level_simple`. 경보 명칭은 상수원 기준(관심 ≥1,000 / 경계 ≥10,000 / 대발생 ≥1,000,000)으로 병기 |
+| 우리 모델 단계 (b) 2회 연속 규칙 | 조류경보제 운영 규칙(발령·해제 모두 2회 연속 측정)을 적용한 `pred_level_2consec`: base_date 까지의 실측 시퀀스로 현재 발령 상태를 계산한 뒤, target_date 예측 단계가 현재 상태보다 높으면 (base_date 실측, target 예측) 2회 연속 충족 시에만 상향, 낮으면 2회 연속 미만 시에만 하향, 그 외 현재 상태 유지. 물모아 발표 단계에는 적용하지 않는다(발표값 그대로) |
+| 지표 1 | 단계 정확도 = mean(pred_level == obs_level) — 물모아 / 우리(a) / 우리(b) 각각, horizon(lag_days)별 분해 |
+| 지표 2 | 경계 이상(단계 ≥2, 즉 ≥10,000 cells/mL) 이진 Precision / Recall / F1 — 세 비교군 동일 정의 (`eval/metrics.f1_at` 와 일치) |
+| 지표 3 | 5×5 혼동행렬(실측 단계 × 예측 단계) — 비교군별 `fig_benchmark_confusion.png` |
+| 추가 정보 | 우리 모델만 제공: 세포수 점추정(log-RMSE 등 6.1 지표), 경계 초과 확률 `p_over_10k`(Brier, 신뢰도 곡선), 80% 예측구간(PICP/MPIW). 표 하단에 "물모아 단계 비교에서는 평가 불가한 정보" 로 기술 |
+| 표본 | 비교군 공통 조합만(교집합), n·기간·발표일 범위를 표 제목에 명시. 물모아 결측(발표 없음) 조합은 제외하고 건수 보고 |
+| 라이브 검증 | `scripts/update_live_benchmark.py` 가 매일 물모아 발표와 조류경보제 실측을 (site_code, issued_date, target_date) 로 매칭해 `reports/eval/live_benchmark.csv` 누적 (컬럼 site_code, issued_date, target_date, mulmoa_level, obs_cells, obs_level, hit). T5 이후 같은 키로 `pred_level`, `p_over_10k` 를 붙인다 |
 
 ## 7. 설명가능성·의사결정 변환
 - SHAP TreeExplainer → 전역 중요도, 지점별 요약, 사례 waterfall

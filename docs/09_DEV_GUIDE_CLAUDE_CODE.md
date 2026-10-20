@@ -117,7 +117,7 @@ docs/04_MODELING_SPEC.md 4.2~4.5절을 구현해줘. 분위 회귀 3개(중앙�
 
 ## T5. 평가·검정·SHAP (10/31~11/2)
 출력: `eval/report.py`, `eval/stats_tests.py`, `reports/eval/*` (04 문서 6.2절 1~11 전부)
-DoD: 2025 holdout 표에 95% CI, DM 검정 p값, 지점·월 분해, ablation, NIER 벤치마크, 잔차 진단, SHAP 그림
+DoD: 2025 holdout 표에 95% CI, DM 검정 p값, 지점·월 분해, ablation, NIER 벤치마크(04 문서 6.4절 단계 분류: 정확도·≥2단계 F1·혼동행렬, live_benchmark.csv 에 pred_level·p_over_10k 결합), 잔차 진단, SHAP 그림
 ```
 docs/04_MODELING_SPEC.md 6절 표·그림 11개를 전부 생성하는 eval/report.py를 만들어 실행해줘. 부트스트랩 1000회 (site,base_date) 리샘플, Diebold-Mariano(vs B0, B3), Wilcoxon(모델 간), Ljung-Box 잔차. SHAP TreeExplainer 전역+사례 5건. 7절 규칙으로 담당자 문장(drivers)과 설비 배치 우선순위를 계산하는 eval/decision.py도 구현.
 ```
