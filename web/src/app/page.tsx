@@ -4,13 +4,13 @@ import { SiteMap } from "@/components/SiteMap";
 import { Sparkline } from "@/components/Charts";
 import { TierBadge } from "@/components/TierBadge";
 import { TIER_ACTION, fmtCells, fmtDate, fmtDateFull, fmtPct, tierOf } from "@/lib/format";
-import { getBloomEvents, getLatestRun, getObservations, getPredictions, getSiteStatus, getSites, leadSummary } from "@/lib/queries";
+import { getBloomEvents, getLatestRun, getLatestRunAny, getObservations, getPredictions, getSiteStatus, getSites, leadSummary } from "@/lib/queries";
 import { frozenCommit } from "@/lib/reports";
 
 export const revalidate = 1800;
 
 export default async function Home() {
-  const [status, sites, run, events] = await Promise.all([getSiteStatus(), getSites(), getLatestRun(), getBloomEvents()]);
+  const [status, sites, run, events, anyRun] = await Promise.all([getSiteStatus(), getSites(), getLatestRun(), getBloomEvents(), getLatestRunAny()]);
   const lead = leadSummary(events);
   const order = { alert: 0, watch: 1, normal: 2 } as const;
   const ranked = [...status].sort((a, b) => order[tierOf(a.tier)] - order[tierOf(b.tier)] || (b.p_alert ?? 0) - (a.p_alert ?? 0));
@@ -31,11 +31,20 @@ export default async function Home() {
   );
   return (
     <div className="space-y-6">
+      {anyRun?.status === "failed" && (
+        <div role="alert" className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-800">
+          최근 일일 파이프라인 실행이 실패했습니다 ({new Date(anyRun.run_at).toLocaleString("ko-KR")}). 아래 예측은 마지막 성공 run 기준입니다. {anyRun.notes ?? ""}
+        </div>
+      )}
       <section className="card border-sky-200 bg-sky-50">
-        <h1 className="text-xl font-bold">공식 경계 발령 20건 중 18건(90%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 감시 단계로 포착</h1>
+        <h1 className="text-xl font-bold">
+          동결 모델이 처음 보는 2026년 경계 사건 {lead.posthoc.n}건 중 {lead.posthoc.detected}건을 중앙 {lead.posthoc.median ?? "–"}일 앞서 감시 단계로 포착(지속성 2건)
+        </h1>
         <p className="mt-1 text-sm text-slate-600">
-          2020~2025 검증 기준(지속성 베이스라인 1건, 5%). 2026 사후 검증(모델 동결 후, 선택·튜닝 미사용): 경계 사건 {lead.posthoc.n}건 중 감시 {lead.posthoc.detected}건 사전 포착, 중앙 리드 {lead.posthoc.median ?? "–"}일. 발령일 기준 리드는 각각 21일·31일.
+          2020~2026 합계 {lead.prior.n + lead.posthoc.n}건 중 {lead.prior.detected + lead.posthoc.detected}건(
+          {Math.round((100 * (lead.prior.detected + lead.posthoc.detected)) / (lead.prior.n + lead.posthoc.n))}%), 지속성 3건. 2026은 모델 동결 후 사후 검증(선택·튜닝 미사용).
         </p>
+        <p className="mt-1 text-xs text-slate-500">리드타임은 첫 경계 초과 측정일 기준. 공식 발령일 기준으로는 2020~25 중앙 21일, 2026 중앙 31일.</p>
         <p className="mt-1 text-xs text-slate-500">
           최근 갱신 {run ? new Date(run.run_at).toLocaleString("ko-KR") : "–"} · 모델 {run?.model_name} {hp?.registry?.regression ?? ""} · 동결 커밋 {frozen || "–"} · 최신 base_date {latestBase ? fmtDateFull(latestBase) : "–"}
         </p>
@@ -44,7 +53,7 @@ export default async function Home() {
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <KpiTile label="경보 지점" value={`${nAlert}`} sub="녹조제거설비 선제 배치 권고" tone={nAlert ? "alert" : "default"} />
         <KpiTile label="감시 지점" value={`${nWatch}`} sub="모니터링 강화·설비 준비 점검" tone={nWatch ? "watch" : "default"} />
-        <KpiTile label="리드타임 실적 (2020~25)" value={`${lead.prior.detected}/${lead.prior.n}`} sub={`중앙 ${lead.prior.median ?? "–"}일 (감시 단계)`} tone="good" />
+        <KpiTile label="리드타임 실적 (2020~26 합계)" value={`${lead.prior.detected + lead.posthoc.detected}/${lead.prior.n + lead.posthoc.n}`} sub={`2020~25 중앙 ${lead.prior.median ?? "–"}일 · 지속성 3건`} tone="good" />
         <KpiTile label="2026 사후 검증" value={`${lead.posthoc.detected}/${lead.posthoc.n}`} sub={`중앙 ${lead.posthoc.median ?? "–"}일 · 동결 모델`} />
       </section>
 

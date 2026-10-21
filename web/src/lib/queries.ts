@@ -178,3 +178,9 @@ export function leadSummary(events: BloomEvent[]) {
   };
   return { prior: summ(by((e) => e.first_exceed_date < "2026-01-01")), posthoc: summ(by((e) => e.first_exceed_date >= "2026-01-01")) };
 }
+
+/** 상태 무관 최신 run (실패 배너용) */
+export async function getLatestRunAny(): Promise<{ run_at: string; status: string; notes: string | null } | null> {
+  const { data } = await supabase().from("model_runs").select("run_at,status,notes").order("run_at", { ascending: false }).limit(1);
+  return (data?.[0] as { run_at: string; status: string; notes: string | null }) ?? null;
+}

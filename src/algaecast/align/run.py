@@ -158,10 +158,21 @@ def forecast_daily(fc: pd.DataFrame, site_code: str, cfg: dict) -> pd.DataFrame:
 
 # ---------------------------------------------------------------- 지점 달력 조립
 def build_site_daily(
-    site: dict, src: dict[str, pd.DataFrame], sites_cfg: dict, feat_cfg: dict, end: date
+    site: dict,
+    src: dict[str, pd.DataFrame],
+    sites_cfg: dict,
+    feat_cfg: dict,
+    end: date,
+    *,
+    start: date | None = None,
+    level_means: dict[str, float] | None = None,
 ) -> pd.DataFrame:
+    """지점 일 달력 조립.
+
+    ``start``(기본 calendar.start)·``level_means``(관측소별 wl_adj 전기간 평균, 증분 모드) 선택.
+    """
     sid = site["station_id"]
-    days = pd.date_range(feat_cfg["calendar"]["start"], pd.Timestamp(end))
+    days = pd.date_range(start or feat_cfg["calendar"]["start"], pd.Timestamp(end))
     df = pd.DataFrame(index=days)
     df.index.name = "obs_date"
     # 수질 (측정일만)
@@ -213,7 +224,12 @@ def build_site_daily(
         c = src["level_cont"][src["level_cont"]["station_code"].isin(codes)]
         if len(c):
             w = c.pivot_table(index="obs_date", columns="station_code", values="wl_adj")
-            df["level_cont_anom"] = (w - w.mean()).mean(axis=1).reindex(days)
+            means = (
+                pd.Series({k: level_means.get(str(k), w[k].mean()) for k in w.columns})
+                if level_means
+                else w.mean()
+            )
+            df["level_cont_anom"] = (w - means).mean(axis=1).reindex(days)
             df["level_cont_n"] = w.notna().sum(axis=1).reindex(days).fillna(0)
     if "level_cont_anom" not in df:
         df["level_cont_anom"] = np.nan

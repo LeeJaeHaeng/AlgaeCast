@@ -1,0 +1,91 @@
+# 일일 자동화 (T8): 매일 KST 05:00 — 동결 모델(GitHub Release) 검증 → 공공 API 증분 수집 → as-of 피처 → 예측 → Supabase → backfill
+# → 라이브 벤치마크 결합 → 대시보드 revalidate. 물모아 스냅샷은 mulmoa_snapshot.yml 이 별도로 수행(중복 없음).
+# 러너에는 대회 데이터·모델 pickle 이 없다. 모델은 Release 자산에서 받는다. 제출 전까지 재학습 금지(sha256 검증 실패 시 중단).
+name: daily-forecast
+
+on:
+  schedule:
+    - cron: "0 20 * * *" # UTC 20:00 = KST 05:00
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "예측만 출력하고 Supabase 에 쓰지 않음"
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-forecast
+  cancel-in-progress: false
+
+env:
+  FROZEN_TAG: model-frozen-13ac483
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install
+        run: |
+          pip install -r requirements.txt
+          pip install -e . --no-deps
+
+      - name: Download frozen models (GitHub Release)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "$FROZEN_TAG" --repo "$GITHUB_REPOSITORY" --pattern "models-frozen-*.tar.gz" --dir dist
+          tar -xzf dist/models-frozen-*.tar.gz
+          python scripts/verify_frozen.py
+
+      - name: Daily run
+        id: run
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          API_NIER_ALGAE: https://apis.data.go.kr/1480523/nieragainstalgae/algaePreMeasure
+          API_KWATER_SLUICE: https://apis.data.go.kr/B500001/dam/sluicePresentCondition
+          API_KMA_ASOS_DAILY: https://apis.data.go.kr/1360000/AsosDalyInfoService/getWthrDataList
+          API_WAMIS_BASE: http://www.wamis.go.kr:8080/wamis/openapi
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          REVALIDATE_SECRET: ${{ secrets.REVALIDATE_SECRET }}
+          DASHBOARD_URL: https://algaecast-7.vercel.app
+        run: |
+          mkdir -p logs
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            python scripts/daily_run.py --dry-run 2>&1 | tee logs/daily_stdout.log
+          else
+            python scripts/daily_run.py 2>&1 | tee logs/daily_stdout.log
+          fi
+
+      - name: Commit live benchmark (if changed)
+        if: always()
+        continue-on-error: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/eval/live_benchmark.csv 2>/dev/null || true
+          if git diff --cached --quiet; then echo "no benchmark change"; exit 0; fi
+          git commit -m "data(benchmark): daily pred_level/p_alert 결합 $(date -u +'%Y-%m-%d') [skip ci]"
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          git push origin HEAD:"${GITHUB_REF_NAME}"
+
+      - name: Upload log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-forecast-log-${{ github.run_id }}
+          path: logs/
+          if-no-files-found: ignore
+          retention-days: 30
