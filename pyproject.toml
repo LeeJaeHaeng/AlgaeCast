@@ -16,7 +16,7 @@ where = ["src"]
 line-length = 110
 target-version = "py311"
 src = ["src", "tests", "scripts"]
-extend-exclude = ["notebooks", "web", "data"]
+extend-exclude = ["notebooks", "web", "data", "demo"]  # demo/tools = 영상 녹화·편집 일회성 스크립트
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "ANN"]
@@ -28,7 +28,7 @@ ignore = ["ANN401"]
 [tool.black]
 line-length = 110
 target-version = ["py311"]
-extend-exclude = "notebooks|web|data"
+extend-exclude = "notebooks|web|data|demo"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
