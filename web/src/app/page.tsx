@@ -22,7 +22,7 @@ const getBoardData = unstable_cache(
     return { status, sites, anyRun, events, obs, fc, metrics, collect };
   },
   ["board-data"],
-  { revalidate: 60 },
+  { revalidate: 60, tags: ["board-data"] },
 );
 
 function age(h: number, iso: string | null): LedState {
