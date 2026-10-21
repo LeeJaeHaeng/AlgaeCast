@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BOARD, COMBO, comboOf } from "@/lib/copy";
+import { BOARD, COMBO, comboOf, targetLabel } from "@/lib/copy";
 import { fmtCells, fmtCellsKo, fmtDate, tierOf } from "@/lib/format";
 import type { ObsLite, SiteStatus } from "@/lib/queries";
 
@@ -9,7 +9,7 @@ const toLog = (v: number | null | undefined) => (v == null ? null : Math.log10(M
  * 지점 모니터 미니 차트(서버 렌더). 데이터 범위 기반 로그 축: 최소 100, 최대 = max(관측 최대×1.5, 예상 범위 위쪽×1.1).
  * 선·점은 퍼센트 좌표 SVG(preserveAspectRatio none + non-scaling-stroke)라 패널을 꽉 채우고, 글자는 HTML 이라 크기가 유지된다.
  */
-export function MiniChart({ s, obs, days = 60, expert }: { s: SiteStatus; obs: ObsLite[]; days?: number; expert: boolean }) {
+export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus; obs: ObsLite[]; days?: number; expert: boolean; today: string }) {
   const t = tierOf(s.tier);
   const c = COMBO[comboOf(s.latest_alert_level, t)];
   const end = s.target_date ? new Date(s.target_date) : new Date();
@@ -37,6 +37,7 @@ export function MiniChart({ s, obs, days = 60, expert }: { s: SiteStatus; obs: O
     { lv: 4, label: BOARD.tile.axis.k10, color: "var(--alert)" },
     { lv: 5, label: BOARD.tile.axis.k100, color: "var(--severe)" },
   ].filter((k) => k.lv > yLo && k.lv < yHi);
+  const tl = targetLabel(s.target_date, today, s.q50, s.obs_cell_count, fmt, { withValues: false });
   const title = `${s.name}: ${BOARD.monitorLegend.obs} 최근 ${days}일, ${BOARD.monitorLegend.pred} ${fmt(s.q50)} ${BOARD.unit.cells}`;
   return (
     <Link href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`} className="panel flex min-h-0 flex-col p-2 hover:border-[var(--accent)]" aria-label={title}>
@@ -65,21 +66,23 @@ export function MiniChart({ s, obs, days = 60, expert }: { s: SiteStatus; obs: O
             {tx != null && lo != null && hi != null && <line x1={tx} x2={tx} y1={hi} y2={lo} stroke="var(--accent)" strokeWidth={8} strokeLinecap="round" opacity={0.35} vectorEffect="non-scaling-stroke" />}
             {last && tx != null && q50 != null && <line x1={last.x} y1={last.y} x2={tx} y2={q50} stroke="var(--accent)" strokeDasharray="3 4" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />}
             {tx != null && q50 != null && <path d={`M${tx.toFixed(2)},${q50.toFixed(2)}h0`} stroke="var(--accent)" strokeWidth={11} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
+            {tx != null && s.obs_cell_count != null && <path d={`M${tx.toFixed(2)},${yp(s.obs_cell_count)!.toFixed(2)}h0`} stroke="var(--line-obs)" strokeWidth={7} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
           </svg>
           <span className="absolute -bottom-5 left-0 text-xs text-dim">{fmtDate(start)}</span>
           {tx != null && (
             <span className="absolute -bottom-5 right-0 text-xs" style={{ color: "var(--accent)" }}>
-              {BOARD.tile.nextSub} {fmtDate(s.target_date)}
+              {tl.text}
             </span>
           )}
         </div>
       </div>
-      <div className="flex justify-between px-1 text-xs text-dim">
-        <span>
+      <div className="flex justify-between gap-2 whitespace-nowrap px-1 text-xs text-dim">
+        <span className="truncate">
           {BOARD.monitorLegend.obs} {fmt(s.latest_cell_count)} ({fmtDate(s.latest_obs_date)})
         </span>
-        <span style={{ color: "var(--accent)" }}>
-          {BOARD.monitorLegend.pred} {fmt(s.q50)} {BOARD.unit.cells}
+        <span className="truncate" style={{ color: "var(--accent)" }} title={BOARD.tile.next}>
+          {BOARD.monitorLegend.predShort} {fmt(s.q50)} {BOARD.unit.cells}
+          {tl.state === "verified" && ` → 실제 ${fmt(s.obs_cell_count)} ${tl.hit ? "✓" : "✗"}`}
         </span>
       </div>
     </Link>

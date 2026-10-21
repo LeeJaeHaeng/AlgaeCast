@@ -1,16 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { BOARD } from "@/lib/copy";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { BOARD, LOG_MORE } from "@/lib/copy";
 import { fmtDate, fmtDateTimeKST } from "@/lib/format";
 
 export type LogItem = { id: string; time: string; kind: "tier_change" | "observation" | "run"; text: string; tone: "alert" | "watch" | "normal" | "info" | "fail"; expertNote?: string; dateOnly?: boolean };
 
 const TONE: Record<LogItem["tone"], string> = { alert: "var(--alert)", watch: "var(--watch)", normal: "var(--safe)", info: "var(--accent)", fail: "var(--severe)" };
+const LINE_PX = 26;
 
-/** 실시간 상황 기록 — 지난 방문 이후 새로 들어온 줄은 3초 강조 */
-export function EventLog({ items, expert }: { items: LogItem[]; expert: boolean }) {
+/**
+ * 실시간 상황 기록 — 패널 높이에 들어가는 줄 수만 렌더(잘린 줄 없음), 나머지는 "이전 기록 n건" 링크(/log).
+ * 지난 방문 이후 새로 들어온 줄은 3초 강조.
+ */
+export function EventLog({ items, expert, fit = true }: { items: LogItem[]; expert: boolean; fit?: boolean }) {
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
+  const [max, setMax] = useState<number>(fit ? 8 : items.length);
+  const listRef = useRef<HTMLOListElement>(null);
   useEffect(() => {
     try {
       const seen = new Set<string>(JSON.parse(localStorage.getItem("algaecast.log.seen") ?? "[]"));
@@ -19,25 +26,44 @@ export function EventLog({ items, expert }: { items: LogItem[]; expert: boolean 
       localStorage.setItem("algaecast.log.seen", JSON.stringify(items.map((i) => i.id).slice(0, 200)));
     } catch {}
   }, [items]);
+  useEffect(() => {
+    if (!fit) return;
+    const el = listRef.current;
+    if (!el) return;
+    const measure = () => setMax(Math.max(1, Math.floor((el.clientHeight - LINE_PX) / LINE_PX)));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [fit]);
+  const shown = fit ? items.slice(0, max) : items;
+  const rest = items.length - shown.length;
   return (
     <section className="panel flex min-h-0 flex-col p-3" aria-label={BOARD.panels.log} aria-live="polite">
       <h2 className="panel-title mb-2">{BOARD.panels.log}</h2>
       {items.length === 0 ? (
         <p className="text-sm text-dim">{BOARD.log.empty}</p>
       ) : (
-        <ol className="scroll-thin min-h-0 flex-1 space-y-1 overflow-y-auto pr-1 text-sm">
-          {items.map((it) => (
-            <li key={it.id} className={`flex gap-2 rounded px-1 py-0.5 leading-snug ${newIds.has(it.id) ? "hl-new" : ""}`}>
-              <time className="shrink-0 font-mono text-xs text-dim" dateTime={it.time}>
-                {it.dateOnly ? fmtDate(it.time) : fmtDateTimeKST(it.time)}
+        <ol ref={listRef} className="min-h-0 flex-1 overflow-hidden text-sm">
+          {shown.map((it) => (
+            <li key={it.id} className={`flex items-center gap-2 rounded px-1 ${newIds.has(it.id) ? "hl-new" : ""}`} style={{ height: LINE_PX }}>
+              <time className="w-[5.6rem] shrink-0 whitespace-nowrap font-mono text-xs text-dim" dateTime={it.time}>
+                {it.dateOnly ? fmtDate(it.time) : fmtDateTimeKST(it.time).replace(/\. /g, ".")}
               </time>
-              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: TONE[it.tone] }} aria-hidden />
-              <span>
+              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: TONE[it.tone] }} aria-hidden />
+              <span className="truncate">
                 {it.text}
                 {expert && it.expertNote && <span className="ml-1 text-xs text-dim">{it.expertNote}</span>}
               </span>
             </li>
           ))}
+          {rest > 0 && (
+            <li className="flex items-center px-1 text-xs" style={{ height: LINE_PX }}>
+              <Link href={expert ? "/log?view=expert" : "/log"} className="underline" style={{ color: "var(--accent)" }}>
+                {LOG_MORE(rest)}
+              </Link>
+            </li>
+          )}
         </ol>
       )}
     </section>

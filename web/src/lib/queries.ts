@@ -23,6 +23,7 @@ export type SiteStatus = {
   priority_score: number | null;
   action: string | null;
   rationale_ko: string | null;
+  obs_cell_count: number | null;
 };
 
 export type Site = {

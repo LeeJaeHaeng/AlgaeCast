@@ -126,6 +126,8 @@ export const REASON: Record<FeatureGroup, { up: string; down: string }> = {
 };
 /** 물 온도 보조 문구: 25℃ 이상 n일 */
 export const reasonWaterDays = (n: number) => `(25℃ 이상 ${n}일)`;
+/** 최근 30일에 25℃ 이상이 없을 때의 물 온도 상승 요인 문장 */
+export const REASON_WATER_UP_MILD = "물 온도가 녹조에 유리한 수준입니다";
 
 /** §8.2 권고 조치 템플릿 */
 export const recommendation = (tier: Tier, site: string, pPct: number): string => {
@@ -174,7 +176,7 @@ export const BOARD = {
     runFail: "예측 갱신 실패 — 마지막 성공 결과를 표시 중",
     empty: "최근 30일 기록이 없습니다.",
   },
-  monitorLegend: { obs: "측정값", pred: "7일 뒤 예상", band: "예상 범위", l1: "관심 1,000", l2: "경계 10,000" },
+  monitorLegend: { obs: "측정", pred: "가장 가능성 높은 값", predShort: "예상", band: "예상 범위", l1: "관심 1,000", l2: "경계 10,000" },
   weather: { temp: "7일 평균 기온", rain: "7일 비 합계", basis: "기상청 단기·중기예보, 기준일 발표분", none: "예보 자료 없음" },
   score: {
     caught: (hit: number, total: number) => `경계 사건 ${total}건 중 ${hit}건을 미리 알림`,
@@ -197,12 +199,24 @@ export const SITE = {
   whyBox: "왜 이렇게 예상했나",
   historyBox: "지난 녹조 발생 기록과 미리 알림",
   recoBox: "권고 조치",
-  envBox: "물·날씨 상황",
+  envBox: "물·날씨 상황 (최근 6개월)",
+  verifyBox: "지난 예상은 맞았나",
   tabs: { water: "물 온도", flow: "물 흐름(댐·보 방류)", weather: "날씨(기온·비·바람)" },
-  chart: { title: "최근 1년 녹조 농도와 7일 뒤 예상", obs: "측정값", pastPred: "지난 예상값", band: "예상 범위", next: "7일 뒤 예상" },
-  history: { none: "기록된 경계 사건이 없습니다.", caught: (d: number) => `${d}일 앞서 알림`, missed: "미리 알리지 못함", cols: { first: "처음 넘은 날", official: "공식 발령일", watch: "주의 관찰 시작", lead: "미리 알린 기간" } },
+  chart: { title: "최근 1년 녹조 농도와 7일 뒤 예상", obs: "측정값", pastPred: "지난 예상값", band: "예상 범위", next: "가장 가능성 높은 값", legend: "흰 선·점 = 측정값 · 회색 점 = 그때그때의 예상값 · 파란 점·띠 = 이번 예상과 범위" },
+  history: { none: "기록된 경계 사건이 없습니다.", caught: (d: number) => `${d}일 앞서 알림`, missed: "미리 알리지 못함", posthoc: "올해(모델이 처음 보는 자료)", cols: { first: "처음 1만을 넘은 날", official: "공식 발령일", watch: "주의 관찰로 바뀐 날", lead: "미리 알린 기간" } },
   facility: (name: string) => `관련 시설: ${name}`,
   measuredBasis: "측정: 국립환경과학원 조류경보제",
+  /** 메인에서 ⓘ 에 의존하던 두 가지를 큰 글자로 푸는 문장 */
+  plain: {
+    whyHighChance: (q50: string, p: number) => `가장 가능성 높은 값은 ${q50} 개/mL로 1만 아래지만, 예상 범위의 위쪽이 1만을 넘기 때문에 다음 주 측정에서 1만을 넘을 가능성이 ${p}%로 나왔습니다.`,
+    whyLowChance: (q50: string, p: number) => `가장 가능성 높은 값은 ${q50} 개/mL이고, 예상 범위의 위쪽도 1만에 닿지 않아 다음 주 측정에서 1만을 넘을 가능성은 ${p}%로 낮습니다.`,
+    whyOver: (q50: string, p: number) => `가장 가능성 높은 값 ${q50} 개/mL 자체가 1만을 넘고, 다음 주 측정에서도 1만 이상일 가능성이 ${p}%입니다.`,
+    frozen: "이 예상은 2025년까지 자료로 만든 뒤 2026년 10월 20일에 봉인한 모델이 내놓은 것입니다. 올해 결과를 보고 고치지 않았으므로, 올해 성적은 처음 보는 자료에 대한 성적입니다.",
+  },
+  reasonsIntro: "예상값을 올리거나 내린 요인을 기여도가 큰 순서로 세 가지만 골랐습니다.",
+  verifySummary: (hit: number, n: number) => `최근 ${n}번의 예상 중 ${hit}번이 실제와 같은 단계였습니다.`,
+  verifyCols: { base: "기준일", target: "목표일", pred: "가장 가능성 높은 값", actual: "실제", same: "같은 단계" },
+  envNote: { water: "물 온도 25℃ 이상이면 녹조가 빨리 늡니다.", flow: "방류가 늘면 물이 흘러 녹조가 씻겨 내려갑니다.", weather: "덥고 비가 적은 날이 이어지면 녹조가 늡니다." },
 } as const;
 
 /** 얼마나 잘 맞혔나 (§5) */
@@ -219,6 +233,28 @@ export const PERF = {
 
 export const INSIGHTS = { title: "녹조 이야기", lead: "7년치 측정 자료에서 읽어 낸, 녹조가 언제 어디서 왜 늘어나는지에 대한 이야기입니다." } as const;
 export const ABOUT = { title: "이 시스템은", lead: "무엇을, 어떤 자료로, 어떻게 예상하는지 설명합니다." } as const;
+
+/** 공식 단계 기준(개/mL): 관심 1천, 경계 1만, 대발생 100만 */
+export const levelOfCells = (v: number | null | undefined): number => (v == null ? 0 : v >= 1_000_000 ? 3 : v >= 10_000 ? 2 : v >= 1_000 ? 1 : 0);
+
+/**
+ * 예측 목표일 표시 규칙 (오늘 KST 기준). 지난 날짜에는 "7일 뒤" 를 쓰지 않는다.
+ * - 목표일 > 오늘: "MM.DD 예상 (내일 / n일 뒤)"
+ * - 목표일 ≤ 오늘, 실측 없음: "MM.DD 예상 · 측정 결과 대기 중"
+ * - 실측 있음: "MM.DD 예상 7,400 → 실제 8,100 ✓/✗" (✓ = 예상값과 실측이 같은 공식 단계)
+ */
+export function targetLabel(targetDate: string | null | undefined, todayISO: string, q50: number | null | undefined, obs: number | null | undefined, fmt: (v: number | null | undefined) => string, opts: { withValues?: boolean } = {}): { text: string; state: "future" | "waiting" | "verified"; hit?: boolean } {
+  if (!targetDate) return { text: "–", state: "future" };
+  const mmdd = `${targetDate.slice(5, 7)}.${targetDate.slice(8, 10)}`;
+  const diff = Math.round((new Date(targetDate).getTime() - new Date(todayISO).getTime()) / 86_400_000);
+  if (diff > 0) return { text: `${mmdd} 예상 (${diff === 1 ? "내일" : `${diff}일 뒤`})`, state: "future" };
+  if (obs == null) return { text: `${mmdd} 예상 · 측정 결과 대기 중`, state: "waiting" };
+  const hit = levelOfCells(q50) === levelOfCells(obs);
+  const vals = opts.withValues === false ? "" : ` ${fmt(q50)} → 실제 ${fmt(obs)}`;
+  return { text: `${mmdd} 예상${vals} ${hit ? "✓" : "✗"}`, state: "verified", hit };
+}
+export const LOG_MORE = (n: number) => `이전 기록 ${n}건`;
+export const LOG_PAGE = { title: "상황 기록 (최근 30일)", back: "메인 상황판으로" };
 
 /** 쉽게 보기에서 금지하는 표현(자동 점검용, §7·§10). 소문자 비교. */
 export const BANNED_EASY = [

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Info } from "@/components/Info";
-import { BOARD, COMBO, OFFICIAL_LEVEL, TIER, TIER_EXPERT, comboOf } from "@/lib/copy";
-import { fmtCells, fmtCellsKo, fmtDate, pctInt, tierOf, trendArrow } from "@/lib/format";
+import { BOARD, COMBO, OFFICIAL_LEVEL, TERMS, TIER, comboOf, targetLabel } from "@/lib/copy";
+import { fmtCells, fmtCellsKo, fmtDateKo, pctInt, tierOf, trendArrow } from "@/lib/format";
 import type { SiteStatus } from "@/lib/queries";
 
 /** 고정 로그 축 100 ~ 1,000,000 (1천 = 25%, 1만 = 50%) */
@@ -9,7 +9,7 @@ const AX_LO = 2;
 const AX_HI = 6;
 export const axisPct = (v: number | null | undefined) => (v == null ? null : Math.max(0, Math.min(100, ((Math.log10(Math.max(v, 1) + 1) - AX_LO) / (AX_HI - AX_LO)) * 100)));
 
-/** 예상 범위 막대: q10~q90 범위 + 가장 가능성 높은 값 점 + 1천·1만 기준선(라벨 포함) */
+/** 예상 범위 막대: q10~q90 범위 + 가장 가능성 높은 값 점 + 1천·1만·10만 기준선(라벨 포함) */
 export function RangeBar({ q10, q50, q90, color, height = 10 }: { q10: number | null; q50: number | null; q90: number | null; color: string; height?: number }) {
   const lo = axisPct(q10);
   const hi = axisPct(q90);
@@ -31,8 +31,8 @@ export function RangeBar({ q10, q50, q90, color, height = 10 }: { q10: number | 
   );
 }
 
-/** 지점 현황 타일(≈380×120): 조합 라벨 / 공식·AI·날짜 / 현재 측정·가장 가능성 높은 값 / 예상 범위 막대 / 1만 넘을 가능성 */
-export function SiteTile({ s, expert, rank }: { s: SiteStatus; expert: boolean; rank: number }) {
+/** 지점 현황 타일: 지점명+조합 라벨+공식 발령 칩 / 현재 측정 → 가장 가능성 높은 값(32px) / 예상 범위 막대 / 1만 넘을 가능성 */
+export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: boolean; rank: number; today: string }) {
   const t = tierOf(s.tier);
   const combo = comboOf(s.latest_alert_level, t);
   const c = COMBO[combo];
@@ -40,6 +40,8 @@ export function SiteTile({ s, expert, rank }: { s: SiteStatus; expert: boolean; 
   const p = pctInt(s.p_alert);
   const arrow = trendArrow(s.latest_cell_count, s.q50);
   const fmt = expert ? fmtCells : fmtCellsKo;
+  const tl = targetLabel(s.target_date, today, s.q50, s.obs_cell_count, fmt, { withValues: false });
+  const datesTip = `${TERMS.baseDate.label} ${fmtDateKo(s.base_date)} (${TERMS.baseDate.tip}) · ${BOARD.tile.measuredOn} ${fmtDateKo(s.latest_obs_date)} · ${BOARD.tile.ai} ${TIER[t].label}`;
   return (
     <Link
       href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`}
@@ -49,56 +51,44 @@ export function SiteTile({ s, expert, rank }: { s: SiteStatus; expert: boolean; 
       style={combo === "enter" ? { boxShadow: `inset 0 0 0 1px ${c.color}, 0 0 14px color-mix(in srgb, ${c.color} 35%, transparent)` } : undefined}
     >
       <span className="absolute inset-y-0 left-0 w-1.5" style={{ background: c.color }} aria-hidden />
-      {/* 1행: 지점명 + 조합 라벨 */}
+      {/* 1행: 지점명 + 조합 라벨 + 공식 발령 칩 */}
       <div className="flex items-center gap-2 leading-tight">
-        <span className="shrink-0 whitespace-nowrap text-[17px] font-bold">{s.name}</span>
-        <span className={`truncate font-bold ${combo === "enter" ? "text-[17px]" : "text-[15px]"}`} style={{ color: c.color }}>
+        <span className="shrink-0 whitespace-nowrap text-[15px] font-bold">{s.name}</span>
+        <span className="truncate text-[15px] font-bold" style={{ color: c.color }}>
           {c.icon} {c.label}
         </span>
-        <Info text={c.tip} />
-      </div>
-      {/* 2행: 공식 발령 · AI 예상 · 날짜 */}
-      <div className="flex flex-wrap items-center gap-x-2 text-xs leading-tight text-dim">
-        <span title={BOARD.basis.nier}>
-          {BOARD.tile.official} <b style={{ color: OFFICIAL_LEVEL[lvl].color }}>{OFFICIAL_LEVEL[lvl].label}</b>
-        </span>
-        <span>·</span>
-        <span title={BOARD.basis.model}>
-          {BOARD.tile.ai} <b style={{ color: TIER[t].color }}>{TIER[t].label}</b>
-          {expert && <span className="ml-1 opacity-70">{TIER_EXPERT[t]}</span>}
-        </span>
-        <span>·</span>
-        <span>
-          {BOARD.tile.measuredOn} {fmtDate(s.latest_obs_date)} · {BOARD.tile.baseOn} {fmtDate(s.base_date)}
+        <Info text={`${c.tip} ${datesTip}`} />
+        <span className="ml-auto shrink-0 rounded border px-1.5 py-0.5 text-xs" style={{ borderColor: OFFICIAL_LEVEL[lvl].color, color: OFFICIAL_LEVEL[lvl].color }} title={BOARD.basis.nier}>
+          {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].label}
         </span>
       </div>
-      {/* 3행: 현재 측정 → 가장 가능성 높은 값 */}
-      <div className="flex items-end gap-3 leading-none">
-        <div>
-          <div className="text-xs text-dim">{BOARD.tile.now}</div>
-          <div className="text-[26px] font-bold leading-none">
-            {fmt(s.latest_cell_count)}
-            <span className="ml-1 text-xs font-normal text-dim">{BOARD.unit.cells}</span>
-          </div>
+      {/* 2행: 현재 측정 → 가장 가능성 높은 값 (라벨 줄 + 숫자 줄) */}
+      <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-end gap-x-3">
+        <div className="col-span-3 flex items-center whitespace-nowrap text-xs leading-4 text-dim">
+          {BOARD.tile.now}
+          <span className="mx-2 opacity-50">→</span>
+          {BOARD.tile.next}
+          <Info term="q50" />
+          <span className={`ml-1 truncate ${tl.state === "verified" ? (tl.hit ? "text-[var(--safe)]" : "text-[var(--severe)]") : "opacity-80"}`}>· {tl.text}</span>
         </div>
-        <div className="pb-0.5 text-xl text-dim" aria-label={`추세 ${arrow}`}>
+        <div className="tile-num whitespace-nowrap">
+          {fmt(s.latest_cell_count)}
+          <span className="ml-1 text-xs font-normal text-dim">{BOARD.unit.cells}</span>
+        </div>
+        <div className="pb-1 text-xl text-dim" aria-label={`추세 ${arrow}`}>
           {arrow}
         </div>
-        <div>
-          <div className="flex items-center text-xs text-dim">
-            {BOARD.tile.next}
-            <Info term="q50" />
-            <span className="ml-1 opacity-70">
-              ({BOARD.tile.nextSub} {fmtDate(s.target_date)})
+        <div className="tile-num whitespace-nowrap" style={{ color: c.color }}>
+          {fmt(s.q50)}
+          <span className="ml-1 text-xs font-normal text-dim">{BOARD.unit.cells}</span>
+          {tl.state === "verified" && s.obs_cell_count != null && (
+            <span className="ml-2 text-base font-semibold text-text">
+              → 실제 {fmt(s.obs_cell_count)} {tl.hit ? "✓" : "✗"}
             </span>
-          </div>
-          <div className="text-[26px] font-bold leading-none" style={{ color: c.color }}>
-            {fmt(s.q50)}
-            <span className="ml-1 text-xs font-normal text-dim">{BOARD.unit.cells}</span>
-          </div>
+          )}
         </div>
       </div>
-      {/* 4행: 예상 범위 막대 */}
+      {/* 3행: 예상 범위 막대 */}
       <div className="flex items-start gap-2">
         <span className="flex shrink-0 items-center pt-0.5 text-xs text-dim">
           {BOARD.tile.range}
@@ -109,7 +99,7 @@ export function SiteTile({ s, expert, rank }: { s: SiteStatus; expert: boolean; 
           <RangeBar q10={s.q10_cqr} q50={s.q50} q90={s.q90_cqr} color={c.color} />
         </div>
       </div>
-      {/* 5행: 1만 넘을 가능성 */}
+      {/* 4행: 1만 넘을 가능성 */}
       <div className="flex items-center gap-2 text-xs text-dim">
         <span className="flex shrink-0 items-center">
           {BOARD.tile.chance}
@@ -119,7 +109,7 @@ export function SiteTile({ s, expert, rank }: { s: SiteStatus; expert: boolean; 
           <div className="h-full rounded-full" style={{ width: `${p}%`, background: c.color }} />
           <div className="absolute -top-0.5 h-3 w-0.5 bg-text/70" style={{ left: "52%" }} title={BOARD.basis.chance} aria-hidden />
         </div>
-        <span className="w-9 shrink-0 text-right text-base font-bold text-text">{p}%</span>
+        <span className="w-10 shrink-0 text-right text-lg font-bold text-text">{p}%</span>
       </div>
     </Link>
   );

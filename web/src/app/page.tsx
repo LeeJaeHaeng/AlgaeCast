@@ -36,6 +36,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const dbOk = true; // 조회 실패 시 Next 가 오류 화면을 내므로 여기 도달하면 저장소 정상
   const { status, sites, anyRun, events, obs, fc, metrics, collect } = await getBoardData();
   const renderedAt = new Date().toISOString();
+  const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
   const nextRefresh = fmtTimeKST(new Date(Date.now() + 5 * 60_000));
 
   // 우선순위 = 공식 발령×AI 예상 조합 순위 → 가능성 내림차순 (가중치 없음, docs/07·docs/12 §8.4)
@@ -77,7 +78,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         <section className="order-1 flex min-h-0 flex-col gap-1.5 lg:row-span-1" aria-label={BOARD.panels.sites}>
           <h2 className="sr-only">{BOARD.panels.sites}</h2>
           {ranked.map((s, i) => (
-            <SiteTile key={s.site_id} s={s} expert={expert} rank={i + 1} />
+            <SiteTile key={s.site_id} s={s} expert={expert} rank={i + 1} today={today} />
           ))}
         </section>
         {/* 중: 지도 */}
@@ -93,7 +94,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         <section className="order-4 grid min-h-0 grid-cols-2 gap-2 md:grid-cols-5 lg:col-span-2" aria-label={BOARD.panels.monitors}>
           <h2 className="sr-only">{BOARD.panels.monitors}</h2>
           {ranked.map((s) => (
-            <MiniChart key={s.site_id} s={s} obs={obs.filter((o) => o.site_id === s.site_id)} expert={expert} />
+            <MiniChart key={s.site_id} s={s} obs={obs.filter((o) => o.site_id === s.site_id)} expert={expert} today={today} />
           ))}
         </section>
         <div className="order-5 min-h-0">
