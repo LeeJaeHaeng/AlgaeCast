@@ -64,3 +64,8 @@ supabase/.temp/
 
 # 제출 패키지(대회 데이터 포함) — 커밋 금지
 submission_package/
+
+# make reproduce 산출물(제출본과 비교용)
+submission/submission_reproduced.csv
+# 방법설명서 렌더링 중간물
+reports/방법설명서.html

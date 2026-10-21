@@ -97,10 +97,16 @@ upload:
 	@echo TODO [T6] $(PY) -m algaecast.db.upload
 
 submission:
-	@echo TODO [T9-b] $(PY) -m algaecast.models.predict --sample data/raw/competition/sample_submission.csv
+	$(PY) scripts/verify_frozen.py
+	$(PY) -m algaecast.models.predict --out submission/submission.csv
 
-reproduce: features train submission
-	@echo TODO [T9-b] diff submission/submission.csv submission/submission_final.csv
+# 동결 모델 해시 확인 -> 정렬 -> 피처 -> 예측(별도 파일) -> 제출본과 바이트 비교 (재학습 없음)
+reproduce:
+	$(PY) scripts/verify_frozen.py
+	$(PY) -m algaecast.align.run --strategy S1
+	$(PY) -m algaecast.features.run --strategy S1
+	$(PY) -m algaecast.models.predict --out submission/submission_reproduced.csv
+	$(PY) -c "import sys, pathlib; a = pathlib.Path('submission/submission_reproduced.csv').read_bytes(); b = pathlib.Path('submission/submission.csv').read_bytes(); print('diff 0 (byte identical)' if a == b else 'DIFF'); sys.exit(a != b)"
 
 clean:
 	$(PY) -c "import shutil,pathlib; [shutil.rmtree(p, ignore_errors=True) for p in map(pathlib.Path, ['.pytest_cache', '.ruff_cache', 'build', 'src/algaecast.egg-info'])]"
