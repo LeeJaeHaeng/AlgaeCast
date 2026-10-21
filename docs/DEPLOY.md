@@ -62,3 +62,8 @@ npx vercel --prod --yes --token "$VERCEL_TOKEN"
 4. `models/registry.json` current 갱신 → `models/FROZEN_v2.md` 작성 → tarball 을 Release `model-v2-<commit>` 에 첨부 → `daily.yml` 의 `FROZEN_TAG` 변경.
 5. `python scripts/verify_frozen.py` 가 v2 파일을 가리키도록 FROZEN.md 경로 인자화(또는 FROZEN_v2.md 로 교체) 후 workflow_dispatch 로 검증.
 6. 대시보드 소개·성능 페이지에 "v2(≤2026 학습)" 표기와 2025·2026 재평가 표 추가.
+
+### 첫 실행 기록 (2026-10-21, run 39530775993)
+- 전 단계 성공(모델 다운로드·sha256 검증 → 수집 → 예측 판단 → 관측 135행 upsert → backfill → revalidate 200). 최신 base_date(10/12~10/15)가 이미 predictions 에 있어 새 run 은 만들지 않음(설계대로 건너뜀).
+- **알려진 제약**: GitHub 러너에서 WAMIS(wamis.go.kr:8080) 연결이 실패해 연속 수위(level_cont_*) 2개 피처가 결측으로 들어간다(시간 예산 240초 후 생략). 로컬 재현 검증(94.6%)과 달리 러너 예측은 이 두 피처가 NaN 인 상태의 LightGBM 예측이다. 대안: 자체 호스트 러너 또는 WAMIS 미러(차후).
+- 첫 디스패치(39527640920)는 WAMIS 재시도 대기로 35분 이상 지연돼 취소 → 요청 20초·재시도 1회·예산 240초로 수정 후 재실행 성공(총 4분).
