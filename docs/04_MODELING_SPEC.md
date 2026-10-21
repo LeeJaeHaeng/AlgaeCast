@@ -162,6 +162,9 @@ alpha log 1e-4~10, l1_ratio 0~1 — trial 50
 | 라이브 검증 | `scripts/update_live_benchmark.py` 가 매일 물모아 발표와 조류경보제 실측을 (site_code, issued_date, target_date) 로 매칭해 `reports/eval/live_benchmark.csv` 누적 (컬럼 site_code, issued_date, target_date, mulmoa_level, obs_cells, obs_level, hit). T5 이후 같은 키로 `pred_level`, `p_over_10k` 를 붙인다 |
 
 ## 7. 설명가능성·의사결정 변환
+- **2단계 경보 운영 체계(T5 확정)**: 감시(watch) = CQR 보정 q90 ≥ 10,000 → "모니터링 강화·설비 준비 점검" / 경보(alert) = 분류기(b, +4~+10일 창) p ≥ 0.52(비용비 r=3 운영점) → "녹조제거설비 선제 배치 권고" / 둘 다 아니면 정상(normal).
+- **헤드라인(전 문서·대시보드·발표 통일)**: "공식 경계 발령 20건 중 18건(90%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 감시 단계로 포착(지속성 1건, 5%)" — 발령일 기준으로는 중앙 21일(각주). 출처 reports/eval/tbl_leadtime.md (T5, 2020~2025).
+- 수문 그룹 서술: 세포수 회귀 정확도·융합 가치 근거로만 쓰고, 진입(onset) 탐지 근거로는 쓰지 않는다(T5 ablation: 제거 시 진입 Recall 0.21→0.33 상승).
 - SHAP TreeExplainer → 전역 중요도, 지점별 요약, 사례 waterfall
 - 담당자 문장 생성 규칙: 상위 3개 기여 피처를 그룹명으로 치환 ("수온 상승", "방류량 감소", "누적강우 부족") + 기여 비율(%)
 - 설비 배치 우선순위: score = p(경계 초과) × 취수 가중치(물금 1.0, 강정고령 0.8, 회남 0.7, 해평 0.5, 칠서 0.5; 취수능력 기반, `config/sites.yaml`) → 내림차순, 상위 N개 권고

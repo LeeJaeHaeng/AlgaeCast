@@ -55,3 +55,6 @@ desktop.ini
 
 # ---- 모델 레지스트리: 메타(json)만 커밋, pickle 은 make train 으로 재생성 ----
 models/**/*.pkl
+# web 로컬 환경변수
+web/.env.local
+web/.env*.local
