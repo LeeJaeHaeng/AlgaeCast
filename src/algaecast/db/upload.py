@@ -403,14 +403,10 @@ def shap_and_reco_rows(run_id: str, cfg: dict, latest: pd.DataFrame) -> tuple[li
                     "rank": rank,
                 }
             )
-    p = pd.Series(pr["p_alert"].to_numpy(), index=latest["station_id"].astype(str).to_numpy())
-    prio = DEC.deployment_priority(p)
-    tier_by_sid = dict(zip(latest["station_id"].astype(str), pr["tier"], strict=True))
-    tier_rank = {"alert": 0, "watch": 1, "normal": 2}
-    prio["tier"] = prio["station_id"].map(tier_by_sid)
-    prio = prio.sort_values(
-        ["tier", "우선도"], key=lambda s: s.map(tier_rank) if s.name == "tier" else -s
-    ).reset_index(drop=True)
+    sids = latest["station_id"].astype(str).to_numpy()
+    p = pd.Series(pr["p_alert"].to_numpy(), index=sids)
+    tier_s = pd.Series(pr["tier"].to_numpy(), index=sids)
+    prio = DEC.deployment_priority(p, tier=tier_s)  # 단계 → p_alert 내림차순, 가중치 미사용
     sid_map = {s["station_id"]: s["site_code"] for s in cfg["sites"]}
     base_by_sid = dict(zip(latest["station_id"].astype(str), latest["base_date"], strict=True))
     for k, r in prio.iterrows():
@@ -427,7 +423,7 @@ def shap_and_reco_rows(run_id: str, cfg: dict, latest: pd.DataFrame) -> tuple[li
                 "action": action,
                 "rationale_ko": (
                     f"[{ {'alert': '경보', 'watch': '감시', 'normal': '정상'}[r['tier']] }] {r['권고']} — "
-                    f"p_alert {r['p_over_10k']:.2f}, 취수 가중치 {r['취수 가중치']}. {sentence}"
+                    f"p_alert {r['p_over_10k']:.2f}. {sentence}"
                 ),
             }
         )

@@ -30,4 +30,4 @@ repos:
         entry: '(serviceKey=[^&\s인]|[A-Za-z0-9+/%]{80,}={0,2})'
         language: pygrep
         types: [text]
-        exclude: '(^\.pre-commit-config\.yaml$|^requirements\.lock\.txt$|\.ipynb$|\.svg$)'
+        exclude: '(^\.pre-commit-config\.yaml$|^requirements\.lock\.txt$|\.ipynb$|\.svg$|package-lock\.json$|^web/public/)'

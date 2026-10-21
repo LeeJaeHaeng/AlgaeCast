@@ -111,8 +111,17 @@ def explain_sentence(shap_row: pd.Series, *, top: int = 3) -> str:
     return "주요 근거: " + ", ".join(parts)
 
 
-def deployment_priority(p_over: pd.Series, *, as_of: str | None = None) -> pd.DataFrame:
-    """지점별 경계 초과 확률 × 취수 가중치(sites.yaml intake_weight) → 설비 배치 우선순위."""
+def deployment_priority(
+    p_over: pd.Series, *, tier: pd.Series | None = None, as_of: str | None = None, use_intake: bool = False
+) -> pd.DataFrame:
+    """설비 배치 우선순위 (T6 승인 후 확정): 단계(경보→감시→정상) 안에서 p_alert 내림차순. 가중치는
+    곱하지 않는다.
+
+    ``use_intake=True`` 는 대시보드 '취수량 반영' 토글용으로만 — 지점별 취수 시설용량의 공식 출처가
+    모두 확인될 때만 활성화
+    (config/sites.yaml intake_capacity_source). 현재 강정·고령(매곡) 은 지자체 공식 자료 미확인이라
+    토글 비활성.
+    """
     cfg = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))
     rows = []
     for s in cfg["sites"]:
@@ -120,23 +129,37 @@ def deployment_priority(p_over: pd.Series, *, as_of: str | None = None) -> pd.Da
         if sid not in p_over.index:
             continue
         p = float(p_over[sid])
-        w = float(s.get("intake_weight", 0.5))
+        t = str(tier[sid]) if tier is not None and sid in tier.index else ("alert" if p >= 0.52 else "normal")
+        cap = s.get("intake_capacity_tpd")
+        score = p * (float(cap) / 1_000_000 if (use_intake and cap) else 1.0)
         rows.append(
             {
                 "station_id": sid,
                 "지점": s["name"],
+                "tier": t,
                 "p_over_10k": p,
-                "취수 가중치": w,
-                "우선도": p * w,
-                "취수능력(톤/일)": s.get("intake_capacity_tpd"),
-                "권고": _advice(p),
+                "우선도": score,
+                "취수능력(톤/일)": cap,
+                "권고": _advice_tier(t),
             }
         )
-    d = pd.DataFrame(rows).sort_values("우선도", ascending=False).reset_index(drop=True)
+    d = pd.DataFrame(rows)
+    order = {"alert": 0, "watch": 1, "normal": 2}
+    d = d.sort_values(["tier", "우선도"], key=lambda c: c.map(order) if c.name == "tier" else -c).reset_index(
+        drop=True
+    )
     d.insert(0, "순위", np.arange(1, len(d) + 1))
     if as_of:
         d.insert(1, "기준일", as_of)
     return d
+
+
+def _advice_tier(t: str) -> str:
+    return {
+        "alert": "녹조제거설비 선제 배치 권고",
+        "watch": "모니터링 강화·설비 준비 점검",
+        "normal": "통상 운영",
+    }.get(t, "통상 운영")
 
 
 def _advice(p: float) -> str:
