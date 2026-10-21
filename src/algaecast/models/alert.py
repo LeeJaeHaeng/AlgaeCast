@@ -35,6 +35,7 @@ log = logging.getLogger(__name__)
 EVAL = ROOT / "reports" / "eval"
 EXP = ROOT / "reports" / "experiments"
 T10K, T1K = 10_000.0, 1_000.0
+OOF_PATH = ROOT / "data" / "processed" / "oof_predictions.parquet"
 
 
 def _md(t: pd.DataFrame, nd: int = 3) -> str:
@@ -141,6 +142,8 @@ def main(argv: list[str] | None = None) -> int:
     pred_sets = {"회귀 C1(smearing)": reg_c1, "회귀 C3 hurdle": reg_c3, "회귀 C2 tweedie": reg_c2}
     b0 = np.clip(10 ** df["cell_log_t0"].fillna(0).to_numpy(dtype=float) - 1, 0, None)
     quant = cv_quantiles(df, cols, spec_c1)
+    stack_p: dict[str, np.ndarray] = {}
+    stack_thr: dict[str, float] = {}
     for tname, y in (("over_target", y_a), ("over_window", y_b)):
         p_clf = probs[tname]
         thr = tuned[tname]["thr"]
@@ -202,6 +205,7 @@ def main(argv: list[str] | None = None) -> int:
                     **C.cls_metrics(y[m], ind[m], 0.5),
                 }
             )
+        stack_p[tname], stack_thr[tname] = p_st, thr_st
         if tname == "over_target":
             p_st_a, thr_st_a = p_st, thr_st
     clf_tbl = pd.DataFrame(clf_rows)
@@ -408,6 +412,38 @@ def main(argv: list[str] | None = None) -> int:
         meta={"train_through": 2025, "quantiles": [0.1, 0.5, 0.9]},
     )
 
+    # ---- OOF 예측 캐시 (T5 평가 모듈이 재학습 없이 사용; test 행 없음)
+    oof = pd.DataFrame(
+        {
+            "station_id": df["station_id"].astype(str).to_numpy(),
+            "base_date": df["base_date"].to_numpy(),
+            "target_date": df["target_date"].to_numpy(),
+            "year": years,
+            "target_cells": obs,
+            "cell_log_t0": df["cell_log_t0"].to_numpy(dtype=float),
+            "over_target": y_a,
+            "over_window": y_b,
+            "b0": b0,
+            "reg_c1": reg_c1,
+            "reg_c3": reg_c3,
+            "reg_c2": reg_c2,
+            "ens": ens,
+            "clf_a": probs["over_target"],
+            "clf_b": probs["over_window"],
+            "stack_a": stack_p["over_target"],
+            "stack_b": stack_p["over_window"],
+            "q10": quant["q10"],
+            "q50": quant["q50"],
+            "q90": quant["q90"],
+        }
+    )
+    oof.to_parquet(OOF_PATH, index=False)
+    thresholds = {
+        "clf_a": float(tuned["over_target"]["thr"]),
+        "clf_b": float(tuned["over_window"]["thr"]),
+        "stack_a": float(stack_thr["over_target"]),
+        "stack_b": float(stack_thr["over_window"]),
+    }
     # ---- 저장
     cfg["alert"] = {
         t: {"params": tuned[t]["params"], "thr": tuned[t]["thr"], "cv_pr_auc": tuned[t]["cv_pr_auc"]}
@@ -426,6 +462,7 @@ def main(argv: list[str] | None = None) -> int:
         "cv_rmse_log_ens": float(cv_en["rmse_log"]),
     }
     cfg["registry_current"] = R.current_versions()
+    cfg["thresholds"] = thresholds
     (CONFIG_DIR / "model.yaml").write_text(
         yaml.safe_dump(cfg, allow_unicode=True, sort_keys=False, width=200), encoding="utf-8"
     )

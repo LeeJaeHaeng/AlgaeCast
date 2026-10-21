@@ -87,7 +87,8 @@ alert:
 	$(PY) -m algaecast.models.alert --trials 150
 
 evaluate:
-	@echo TODO [T5] $(PY) -m algaecast.eval.report
+	$(PY) -m algaecast.eval.transitions
+	$(PY) -m algaecast.eval.report --boot 1000
 
 predict:
 	@echo TODO [T8] $(PY) -m algaecast.models.predict --as-of $(END)

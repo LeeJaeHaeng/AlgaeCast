@@ -1,7 +1,7 @@
 {
- "name": "classifier",
- "version": "20261021_083408",
- "created": "2026-10-21T08:34:08",
+ "name": "regression",
+ "version": "20261021_091108",
+ "created": "2026-10-21T09:11:09",
  "features": [
   "cell_log_t0",
   "cell_max_4w",
@@ -36,15 +36,23 @@
  ],
  "features_hash": "5bdc74f7c30d",
  "metrics_holdout": {
-  "pr_auc": 0.8034,
-  "brier": 0.0828,
-  "f1": 0.6947,
-  "thr": 0.83
+  "rmse_log": 0.7079,
+  "r2_log": 0.7802,
+  "r2_raw": 0.1658,
+  "r2_pearson_raw": 0.1938,
+  "nse_raw": 0.1658,
+  "f1_10k": 0.6824
  },
  "meta": {
   "train_through": 2025,
-  "target": "over_window(+4~+10일 창 ≥10k)",
-  "purpose": "dashboard probability"
+  "study": "log_w_composite_perc75_S1",
+  "purpose": "submission cells",
+  "kind": "ensemble",
+  "ensemble_weights": {
+   "회귀 C1(smearing)": 0.14584582361965182,
+   "회귀 C3 hurdle": 0.3807592344903002,
+   "회귀 C2 tweedie": 0.47339494189004805
+  }
  },
- "path": "models/classifier/20261021_083408/model.pkl"
+ "path": "models/regression/20261021_091108/model.pkl"
 }

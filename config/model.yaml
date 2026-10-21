@@ -163,6 +163,22 @@ ensemble:
   cv_rmse_log_c1: 0.8180313030427953
   cv_rmse_log_ens: 0.8045559304865254
 registry_current:
-  regression: '20261021_083407'
-  classifier: '20261021_083408'
-  quantile: '20261021_083409'
+  regression: '20261021_091108'
+  classifier: '20261021_091109'
+  quantile: '20261021_091110'
+thresholds:
+  clf_a: 0.6399999999999999
+  clf_b: 0.83
+  stack_a: 0.8999999999999999
+  stack_b: 0.8999999999999999
+operating_point:
+  prob_source: clf_b
+  cost_ratio: 3
+  threshold: 0.52
+cqr:
+  alpha: 0.2
+  qhat_log10: 0.1574868459595269
+  n_calib: 531
+  calib_years:
+  - 2023
+  - 2024

@@ -1,7 +1,7 @@
 {
- "name": "quantile",
- "version": "20261021_083409",
- "created": "2026-10-21T08:34:09",
+ "name": "classifier",
+ "version": "20261021_091109",
+ "created": "2026-10-21T09:11:09",
  "features": [
   "cell_log_t0",
   "cell_max_4w",
@@ -36,16 +36,15 @@
  ],
  "features_hash": "5bdc74f7c30d",
  "metrics_holdout": {
-  "picp80": 0.6602,
-  "mpiw80_log": 1.3752
+  "pr_auc": 0.8034,
+  "brier": 0.0828,
+  "f1": 0.6947,
+  "thr": 0.83
  },
  "meta": {
   "train_through": 2025,
-  "quantiles": [
-   0.1,
-   0.5,
-   0.9
-  ]
+  "target": "over_window(+4~+10일 창 ≥10k)",
+  "purpose": "dashboard probability"
  },
- "path": "models/quantile/20261021_083409/model.pkl"
+ "path": "models/classifier/20261021_091109/model.pkl"
 }

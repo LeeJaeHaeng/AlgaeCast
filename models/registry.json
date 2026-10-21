@@ -1,14 +1,14 @@
 {
  "current": {
-  "regression": "20261021_083407",
-  "classifier": "20261021_083408",
-  "quantile": "20261021_083409"
+  "regression": "20261021_091108",
+  "classifier": "20261021_091109",
+  "quantile": "20261021_091110"
  },
  "versions": [
   {
    "name": "regression",
-   "version": "20261021_083407",
-   "created": "2026-10-21T08:34:07",
+   "version": "20261021_091108",
+   "created": "2026-10-21T09:11:09",
    "features": [
     "cell_log_t0",
     "cell_max_4w",
@@ -61,12 +61,12 @@
      "회귀 C2 tweedie": 0.47339494189004805
     }
    },
-   "path": "models/regression/20261021_083407/model.pkl"
+   "path": "models/regression/20261021_091108/model.pkl"
   },
   {
    "name": "classifier",
-   "version": "20261021_083408",
-   "created": "2026-10-21T08:34:08",
+   "version": "20261021_091109",
+   "created": "2026-10-21T09:11:09",
    "features": [
     "cell_log_t0",
     "cell_max_4w",
@@ -111,12 +111,12 @@
     "target": "over_window(+4~+10일 창 ≥10k)",
     "purpose": "dashboard probability"
    },
-   "path": "models/classifier/20261021_083408/model.pkl"
+   "path": "models/classifier/20261021_091109/model.pkl"
   },
   {
    "name": "quantile",
-   "version": "20261021_083409",
-   "created": "2026-10-21T08:34:09",
+   "version": "20261021_091110",
+   "created": "2026-10-21T09:11:10",
    "features": [
     "cell_log_t0",
     "cell_max_4w",
@@ -162,7 +162,7 @@
      0.9
     ]
    },
-   "path": "models/quantile/20261021_083409/model.pkl"
+   "path": "models/quantile/20261021_091110/model.pkl"
   }
  ]
 }
