@@ -1,4 +1,4 @@
-"""의사결정 변환 (T5, docs/04 §7): SHAP 상위 3 → 그룹명 문장, 설비 배치 우선순위(p_over_10k × 취수 가중치)."""
+"""의사결정 변환 (T5, docs/04 §7): SHAP 상위 3 → 그룹명 문장, 설비 배치 우선순위(단계 → p_alert)."""
 
 from __future__ import annotations
 

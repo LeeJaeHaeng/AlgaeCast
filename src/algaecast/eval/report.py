@@ -12,13 +12,14 @@ import pickle
 import warnings
 
 import matplotlib
+import matplotlib.ticker
 import numpy as np
 import pandas as pd
 import yaml
 from scipy import stats
 
 from algaecast.collect.nier_forecast import level_from_cells
-from algaecast.config import CONFIG_DIR, ROOT
+from algaecast.config import CONFIG_DIR, MODELS_DIR, ROOT
 from algaecast.eval import decision as DEC
 from algaecast.eval.metrics import (
     bootstrap_ci,
@@ -398,7 +399,7 @@ def main(argv: list[str] | None = None) -> int:
         "의사결정 변환 데모 — 진입 사례 설명 문장·설비 배치 우선순위",
         "## 진입 사례 5건 (2025)\n"
         + _md(pd.DataFrame(case_rows))
-        + "\n\n## 설비 배치 우선순위 (p_over_10k × 취수 가중치)\n"
+        + "\n\n## 설비 배치 우선순위 (단계 → p_alert 내림차순, 가중치 없음)\n"
         + _md(prio),
     )
 
@@ -414,6 +415,10 @@ def main(argv: list[str] | None = None) -> int:
         ax.axhline(10_000, ls="--", color="orange", label="경계 10,000")
         ax.axhline(1_000, ls=":", color="green", label="관심 1,000")
         ax.set_yscale("symlog", linthresh=100)
+        # 세포수는 0 이상이다. 자동 여백이 음수 눈금을 만들지 않게 하한을 0 으로 두고,
+        # 눈금은 천 단위 쉼표 정수로 표기한다(수학 기호 글리프 누락 방지).
+        ax.set_ylim(bottom=0)
+        ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
         ax.set_title(f"{sid} 2025 — 관측 vs 7일 예측")
         ax.legend(fontsize=8)
         fig.tight_layout()
@@ -443,10 +448,10 @@ def main(argv: list[str] | None = None) -> int:
 def json_load_registry() -> dict:
     import json
 
-    reg = json.loads((ROOT / "models" / "registry.json").read_text(encoding="utf-8"))
+    reg = json.loads((MODELS_DIR / "registry.json").read_text(encoding="utf-8"))
     ver = reg["current"]["regression"]
     entry = next(e for e in reg["versions"] if e["name"] == "regression" and e["version"] == ver)
-    with (ROOT / entry["path"]).open("rb") as f:
+    with (MODELS_DIR / entry["name"] / entry["version"] / "model.pkl").open("rb") as f:
         return pickle.load(f)
 
 
