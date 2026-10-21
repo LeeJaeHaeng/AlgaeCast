@@ -96,5 +96,48 @@
    "3008685",
    "3008680"
   ]
- }
+ },
+ "dam_station_map": {
+  "2001685": {
+   "dam_name": "안동댐",
+   "facility_code": "2001110",
+   "kwater_code": "2001110"
+  },
+  "2002677": {
+   "dam_name": "임하댐",
+   "facility_code": "2002110",
+   "kwater_code": "2002110"
+  },
+  "2002609": {
+   "dam_name": "성덕댐",
+   "facility_code": "2002111",
+   "kwater_code": "2002111"
+  },
+  "2008603": {
+   "dam_name": "군위댐",
+   "facility_code": "2008110",
+   "kwater_code": "2008101"
+  },
+  "2010625": {
+   "dam_name": "김천부항댐",
+   "facility_code": "2010101",
+   "kwater_code": "2010101"
+  },
+  "2015680": {
+   "dam_name": "합천댐",
+   "facility_code": "2015110",
+   "kwater_code": "2015110"
+  },
+  "2021660": {
+   "dam_name": "밀양댐",
+   "facility_code": "2021110",
+   "kwater_code": "2021110"
+  },
+  "3008690": {
+   "dam_name": "대청댐",
+   "facility_code": "3008110",
+   "kwater_code": "3008110"
+  }
+ },
+ "_about_dam_map": "본댐 수위 관측소 → K-water delist 댐수위(rwl)로 대체 가능(T1-b 일치 99%). wl_adj = rwl + wamis_offset_m. 방수로·조정지·하굿둑·대리 는 WAMIS 전용(실패 시 결측)."
 }

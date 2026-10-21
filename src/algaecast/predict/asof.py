@@ -45,6 +45,12 @@ def _fast(col: object) -> object:
     return col
 
 
+def window_start(today: date, min_days: int = 400) -> date:
+    """as-of 수집 창 시작: 올해 1월 1일과 today−min_days 중 이른 날 (consecutive_over_1k 등 장기
+    이력 피처 재현용)."""
+    return min(date(today.year, 1, 1), today - timedelta(days=min_days))
+
+
 def load_cfgs() -> tuple[dict, dict]:
     sites = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))
     feats = yaml.safe_load((CONFIG_DIR / "features.yaml").read_text(encoding="utf-8"))
@@ -82,8 +88,13 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
             kw = cat.loc[cat["facility_code"].astype(str) == s["facility_dam_code"], "kwater_code"]
             if len(kw):
                 codes.add(str(kw.iloc[0]))
+    stats = json.loads(LEVEL_STATS.read_text(encoding="utf-8")) if LEVEL_STATS.exists() else None
+    dam_map = (stats or {}).get("dam_station_map", {})
+    for v in dam_map.values():
+        codes.add(str(v["kwater_code"]))
     sl = _fast(KwaterSluiceCollector())
     longs = []
+    delist_level: dict[str, pd.DataFrame] = {}  # kwater_code → (obs_date, rwl)
     for kw in sorted(codes):
         try:
             d = sl.fetch(kw, start, end)
@@ -93,6 +104,9 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
         if d.empty:
             continue
         fc = k2f.get(kw, kw)
+        delist_level[kw] = pd.DataFrame(
+            {"obs_date": pd.to_datetime(d["obs_date"]), "rwl": d["rwl"].astype(float)}
+        )
         for v in ("rwl", "iqty", "tdqty", "rf", "rsvwtqy", "rsvwtrt"):
             if v in d:
                 longs.append(
@@ -112,13 +126,19 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
         if longs
         else pd.DataFrame(columns=["facility_code", "kwater_code", "obs_date", "variable", "value", "source"])
     )
-    # 연속 수위 (WAMIS 관측소, 집계 통계로 wl_adj 계산)
-    stats = json.loads(LEVEL_STATS.read_text(encoding="utf-8")) if LEVEL_STATS.exists() else None
+    # 연속 수위: 본댐 수위 관측소는 delist 댐수위(rwl)로 대체
+    # 가능(ASOF_LEVEL_SOURCE=auto|wamis|delist), 나머지는 WAMIS
+    level_source = os.environ.get("ASOF_LEVEL_SOURCE", "auto")
     if stats:
         wl = _fast(WamisLevelCollector())
         rows = []
         t0, fails = time.monotonic(), 0
-        for code in sorted({c for v in stats["site_stations"].values() for c in v}):
+        all_codes = sorted({c for v in stats["site_stations"].values() for c in v})
+        if level_source == "delist":
+            wamis_codes = [c for c in all_codes if c not in dam_map]
+        else:
+            wamis_codes = all_codes
+        for code in wamis_codes:
             if time.monotonic() - t0 > WAMIS_BUDGET_S or fails >= 3:
                 log.warning(
                     "wamis wl: 시간 예산/연속 실패 초과 — 나머지 관측소 생략 (level_cont 는 가용분만)"
@@ -143,6 +163,19 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
                     }
                 )
             )
+        got = {str(r["station_code"].iloc[0]) for r in rows if len(r)}
+        if level_source != "wamis":
+            for code, m in dam_map.items():
+                if code in got:
+                    continue
+                d = delist_level.get(str(m["kwater_code"]))
+                if d is None or d.empty:
+                    continue
+                off = float(stats["wamis_offset_m"].get(code, 0.0))
+                rows.append(
+                    pd.DataFrame({"station_code": code, "obs_date": d["obs_date"], "wl_adj": d["rwl"] + off})
+                )
+                log.info("level_cont %s(%s): delist 댐수위로 대체", code, m["dam_name"])
         if rows:
             out["level_cont"] = pd.concat(rows, ignore_index=True)
     # ASOS: asos_by_var 관측소 전부
@@ -217,7 +250,7 @@ def feature_rows(
 
 
 # ---------------------------------------------------------------- 검증
-def validate_against_bundle(days: int = 120, n_base: int = 30, cols: list[str] | None = None) -> pd.DataFrame:
+def validate_against_bundle(days: int = 400, n_base: int = 30, cols: list[str] | None = None) -> pd.DataFrame:
     """번들 기반 features_S1 의 최근 n_base 개 base_date 를 API-only 증분 달력으로 재계산해 일치율을 낸다."""
     sites_cfg, feat_cfg = load_cfgs()
     from algaecast.models import data as D
@@ -228,7 +261,7 @@ def validate_against_bundle(days: int = 120, n_base: int = 30, cols: list[str] |
     cols = cols or feature_sets()["perc75"]
     recent = feat.sort_values("base_date").groupby("station_id", observed=True).tail(n_base // 5 + 1)
     end = recent["base_date"].max().date()
-    start = end - timedelta(days=days)
+    start = window_start(end, days)
     src = collect_recent(sites_cfg, start, end)
     daily = build_daily(sites_cfg, feat_cfg, src, start, end)
     rows = []
@@ -281,7 +314,7 @@ def write_validation_report(df: pd.DataFrame, path: Path) -> dict:
     overall = float(df["match_1pct"].mean())
     exact = float((df["rel_diff"].fillna(1) <= 1e-9).mean())
     lines = [
-        "# as-of 피처 재현 검증 — 대회 번들 없이 공공 API 최근 120일만으로 재계산",
+        "# as-of 피처 재현 검증 — 대회 번들 없이 공공 API 수집 창(올해 1/1 또는 ≥400일)만으로 재계산",
         "",
         f"- 비교 대상: 번들 기반 features_S1 의 최근 {df['base_date'].nunique()}개 base_date × "
         f"5지점 × 피처 {df['feature'].nunique()}개 = {len(df):,} 값",

@@ -67,3 +67,8 @@ npx vercel --prod --yes --token "$VERCEL_TOKEN"
 - 전 단계 성공(모델 다운로드·sha256 검증 → 수집 → 예측 판단 → 관측 135행 upsert → backfill → revalidate 200). 최신 base_date(10/12~10/15)가 이미 predictions 에 있어 새 run 은 만들지 않음(설계대로 건너뜀).
 - **알려진 제약**: GitHub 러너에서 WAMIS(wamis.go.kr:8080) 연결이 실패해 연속 수위(level_cont_*) 2개 피처가 결측으로 들어간다(시간 예산 240초 후 생략). 로컬 재현 검증(94.6%)과 달리 러너 예측은 이 두 피처가 NaN 인 상태의 LightGBM 예측이다. 대안: 자체 호스트 러너 또는 WAMIS 미러(차후).
 - 첫 디스패치(39527640920)는 WAMIS 재시도 대기로 35분 이상 지연돼 취소 → 요청 20초·재시도 1회·예산 240초로 수정 후 재실행 성공(총 4분).
+
+### 운영 보완 (2026-10-21, T8 승인 후)
+- 연속 수위: 본댐 8개소(안동·임하·성덕·군위·김천부항·합천·밀양·대청)는 WAMIS 실패 시 K-water delist 댐수위(rwl)+오프셋으로 대체(`config/level_cont_stats.json dam_station_map`, `ASOF_LEVEL_SOURCE=auto|wamis|delist`). 최근 30 base_date 비교: 평균 |Δlog q50| 0.0004(최대 0.011), p_alert 차 0.0004, tier 일치 100%(`reports/eval/tbl_level_source_compare.md`). 방수로·조정지·하굿둑·대리는 WAMIS 전용(실패 시 결측).
+- 수집 창: 올해 1/1 또는 ≥400일(`window_start`). 재검증 1,050값 일치 95.9%(≤1%), 완전 83.2%; consecutive_over_1k 100% 로 해결, 남은 불일치는 level_cont 2개(WAMIS 비본댐 관측소 수집 실패분).
+- 현재 WAMIS(wamis.go.kr:8080)는 로컬에서도 연결 재설정이 잦아 delist 대체가 사실상 기본 경로다.

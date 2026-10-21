@@ -17,7 +17,7 @@ import os
 import subprocess
 import sys
 import traceback
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import Any
 
 import pandas as pd
@@ -26,7 +26,14 @@ import yaml
 
 from algaecast.collect.base import KST
 from algaecast.config import CONFIG_DIR, ROOT, get_env
-from algaecast.predict.asof import build_daily, collect_recent, feature_rows, latest_base_dates, load_cfgs
+from algaecast.predict.asof import (
+    build_daily,
+    collect_recent,
+    feature_rows,
+    latest_base_dates,
+    load_cfgs,
+    window_start,
+)
 
 log = logging.getLogger("daily")
 LOG_DIR = ROOT / "logs"
@@ -180,7 +187,9 @@ def revalidate(dry: bool) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--days", type=int, default=120)
+    ap.add_argument(
+        "--days", type=int, default=400, help="최소 수집 일수(실제 시작 = min(올해 1/1, today−days))"
+    )
     ap.add_argument("--today", type=date.fromisoformat, default=date.today())
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
@@ -195,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
         verify_frozen()
         summary["steps"]["verify_frozen"] = "ok"
         sites_cfg, feat_cfg = load_cfgs()
-        start = args.today - timedelta(days=args.days)
+        start = window_start(args.today, args.days)
         src = collect_recent(sites_cfg, start, args.today)
         summary["steps"]["collect"] = {k: int(len(v)) for k, v in src.items()}
         daily = build_daily(sites_cfg, feat_cfg, src, start, args.today)
