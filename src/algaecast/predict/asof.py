@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import time
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -30,6 +32,17 @@ from algaecast.features.run import GROUPS
 
 log = logging.getLogger(__name__)
 LEVEL_STATS = CONFIG_DIR / "level_cont_stats.json"
+FAST_TIMEOUT = int(
+    os.environ.get("ASOF_HTTP_TIMEOUT", "20")
+)  # 증분 모드: 요청 20초·재시도 1회 (러너 네트워크 지연 대비)
+FAST_RETRIES = int(os.environ.get("ASOF_HTTP_RETRIES", "1"))
+WAMIS_BUDGET_S = int(os.environ.get("ASOF_WAMIS_BUDGET_S", "240"))  # 연속 수위 수집 전체 시간 예산
+
+
+def _fast(col: object) -> object:
+    col.timeout = FAST_TIMEOUT  # type: ignore[attr-defined]
+    col.retries = FAST_RETRIES  # type: ignore[attr-defined]
+    return col
 
 
 def load_cfgs() -> tuple[dict, dict]:
@@ -44,7 +57,7 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
     out: dict[str, pd.DataFrame] = {}
     # 조류경보제 (전 지점) — 2consec 단계는 창 내 계산값(피처에 미사용)
     frames = []
-    col = NierAlgaeCollector()
+    col = _fast(NierAlgaeCollector())
     for s in sites_cfg["sites"]:
         try:
             frames.append(col.fetch(s["site_code"], start, end))
@@ -69,7 +82,7 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
             kw = cat.loc[cat["facility_code"].astype(str) == s["facility_dam_code"], "kwater_code"]
             if len(kw):
                 codes.add(str(kw.iloc[0]))
-    sl = KwaterSluiceCollector()
+    sl = _fast(KwaterSluiceCollector())
     longs = []
     for kw in sorted(codes):
         try:
@@ -102,12 +115,20 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
     # 연속 수위 (WAMIS 관측소, 집계 통계로 wl_adj 계산)
     stats = json.loads(LEVEL_STATS.read_text(encoding="utf-8")) if LEVEL_STATS.exists() else None
     if stats:
-        wl = WamisLevelCollector()
+        wl = _fast(WamisLevelCollector())
         rows = []
+        t0, fails = time.monotonic(), 0
         for code in sorted({c for v in stats["site_stations"].values() for c in v}):
+            if time.monotonic() - t0 > WAMIS_BUDGET_S or fails >= 3:
+                log.warning(
+                    "wamis wl: 시간 예산/연속 실패 초과 — 나머지 관측소 생략 (level_cont 는 가용분만)"
+                )
+                break
             try:
                 d = wl.fetch(code, start, end)
-            except CollectError as exc:
+                fails = 0
+            except (CollectError, OSError) as exc:
+                fails += 1
                 log.warning("wamis wl %s: %s", code, exc)
                 continue
             if d.empty:
@@ -130,7 +151,7 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
         for v in s.get("asos_by_var", {}).values():
             stns.add(int(s["asos_primary"]) if v == "primary" else int(v))
         stns.add(int(s["asos_primary"]))
-    ka = KmaAsosCollector()
+    ka = _fast(KmaAsosCollector())
     frames = []
     for stn in sorted(stns):
         try:

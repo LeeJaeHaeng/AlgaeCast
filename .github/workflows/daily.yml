@@ -51,6 +51,7 @@ jobs:
 
       - name: Daily run
         id: run
+        timeout-minutes: 30
         env:
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
           API_NIER_ALGAE: https://apis.data.go.kr/1480523/nieragainstalgae/algaePreMeasure
