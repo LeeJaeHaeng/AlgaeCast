@@ -1,0 +1,27 @@
+// reports/eval·eda 의 표(md)·그림(png) 과 models/FROZEN.md 를 web 로 동기화: md 는 src/generated/reports.json(빌드 시 임포트), png 는 public/reports
+import fs from "node:fs";
+import path from "node:path";
+
+const root = path.resolve(process.cwd(), "..");
+const srcDirs = [path.join(root, "reports", "eval"), path.join(root, "reports", "eda")];
+// Vercel 빌드처럼 상위 저장소가 없으면(web/ 만 업로드) 커밋된 src/generated/reports.json 을 그대로 쓴다
+if (!srcDirs.some((d) => fs.existsSync(d))) {
+  console.log("reports/ 없음 — 커밋된 src/generated/reports.json 유지");
+  process.exit(0);
+}
+const pubDir = path.join(process.cwd(), "public", "reports");
+fs.mkdirSync(pubDir, { recursive: true });
+const md = {};
+for (const d of srcDirs) {
+  if (!fs.existsSync(d)) continue;
+  for (const f of fs.readdirSync(d)) {
+    const p = path.join(d, f);
+    if (f.endsWith(".md") && f.startsWith("tbl_")) md[f] = fs.readFileSync(p, "utf8");
+    if (f.endsWith(".png")) fs.copyFileSync(p, path.join(pubDir, f));
+  }
+}
+const frozen = path.join(root, "models", "FROZEN.md");
+if (fs.existsSync(frozen)) md["FROZEN.md"] = fs.readFileSync(frozen, "utf8");
+fs.mkdirSync(path.join(process.cwd(), "src", "generated"), { recursive: true });
+fs.writeFileSync(path.join(process.cwd(), "src", "generated", "reports.json"), JSON.stringify(md));
+console.log(`reports.json: ${Object.keys(md).length} md, png copied to public/reports`);
