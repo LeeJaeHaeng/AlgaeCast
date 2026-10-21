@@ -12,12 +12,18 @@ import yaml
 from dotenv import load_dotenv
 
 ROOT: Path = Path(__file__).resolve().parents[2]
-CONFIG_DIR: Path = ROOT / "config"
+# 제출 패키지(공지 #564 구조: README.md·data/·model/·src/·notebooks/·scripts/·demo/·figures/)에서는
+# 설정 src/config/, 동결 모델 model/, 표·보고서 figures/reports/, 제출 파일 루트 submission.csv.
+# 저장소에서는 기존 경로(config/, models/, reports/, submission/submission.csv)를 그대로 쓴다.
+PACKAGE_LAYOUT: bool = (ROOT / "src" / "config").is_dir() and not (ROOT / "config").is_dir()
+CONFIG_DIR: Path = ROOT / "src" / "config" if PACKAGE_LAYOUT else ROOT / "config"
+MODELS_DIR: Path = ROOT / "model" if PACKAGE_LAYOUT else ROOT / "models"
+REPORTS_DIR: Path = ROOT / "figures" / "reports" if PACKAGE_LAYOUT else ROOT / "reports"
+SUBMISSION_PATH: Path = ROOT / "submission.csv" if PACKAGE_LAYOUT else ROOT / "submission" / "submission.csv"
 DATA_DIR: Path = ROOT / "data"
 RAW_DIR: Path = DATA_DIR / "raw"
 INTERIM_DIR: Path = DATA_DIR / "interim"
 PROCESSED_DIR: Path = DATA_DIR / "processed"
-REPORTS_DIR: Path = ROOT / "reports"
 
 
 @lru_cache(maxsize=1)

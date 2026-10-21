@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from algaecast.config import CONFIG_DIR, DATA_DIR, ROOT
+from algaecast.config import CONFIG_DIR, DATA_DIR, MODELS_DIR, ROOT
 from algaecast.db.upload import predict_registry
 from algaecast.eval.live import load_test_targets
 from algaecast.eval.metrics import compute_all
@@ -29,7 +29,7 @@ OUT = DATA_DIR / "processed" / "posthoc_2026.parquet"
 
 
 def frozen_commit() -> str:
-    text = (ROOT / "models" / "FROZEN.md").read_text(encoding="utf-8")
+    text = (MODELS_DIR / "FROZEN.md").read_text(encoding="utf-8")
     m = re.search(r"동결 커밋: `([0-9a-f]+)`", text)
     return m.group(1)[:12] if m else "unknown"
 

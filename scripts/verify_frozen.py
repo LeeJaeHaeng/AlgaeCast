@@ -6,14 +6,14 @@ import hashlib
 import re
 import sys
 
-from algaecast.config import ROOT
+from algaecast.config import MODELS_DIR
 
 
 def main() -> int:
-    text = (ROOT / "models" / "FROZEN.md").read_text(encoding="utf-8")
+    text = (MODELS_DIR / "FROZEN.md").read_text(encoding="utf-8")
     ok = True
     for name, ver, h in re.findall(r"\| (\w+) \| (\d+_\d+) \| `([0-9a-f]{64})` \|", text):
-        p = ROOT / "models" / name / ver / "model.pkl"
+        p = MODELS_DIR / name / ver / "model.pkl"
         cur = hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else "(missing)"
         print(f"{name}/{ver}: {'OK' if cur == h else 'MISMATCH'}")
         ok &= cur == h

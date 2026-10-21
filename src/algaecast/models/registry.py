@@ -14,9 +14,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from algaecast.config import ROOT
+from algaecast.config import MODELS_DIR, ROOT
 
-REG_DIR = ROOT / "models"
+REG_DIR = MODELS_DIR
 REG_FILE = REG_DIR / "registry.json"
 
 
@@ -71,7 +71,8 @@ def load_current(name: str) -> tuple[Any, dict]:
     if version is None:
         raise KeyError(f"registry current 에 {name} 없음")
     entry = next(e for e in reg["versions"] if e["name"] == name and e["version"] == version)
-    with (ROOT / entry["path"]).open("rb") as f:
+    # registry.json 의 경로는 저장소 기준(models/...) — 실제 위치는 MODELS_DIR 기준으로 푼다(패키지: model/)
+    with (REG_DIR / name / version / "model.pkl").open("rb") as f:
         return pickle.load(f), entry
 
 

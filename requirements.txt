@@ -26,6 +26,7 @@ matplotlib>=3.8
 seaborn>=0.13
 jupytext>=1.16
 ipykernel>=6.29
+jupyterlab>=4.2  # 노트북을 화면에서 열어 실행(jupyter lab notebooks/01_train_eval.ipynb)
 nbconvert>=7.16
 # --- 개발 ---
 pytest>=8.0

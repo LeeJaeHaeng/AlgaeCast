@@ -5,6 +5,8 @@
 #     text_representation:
 #       extension: .py
 #       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.6
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -14,17 +16,20 @@
 # %% [markdown]
 # # AlgaeCast-7 — 데이터 로드 → 피처 → 학습(동결 파라미터) → 2025 검증 → submission.csv
 #
-# 이 노트북은 제출 패키지(`submission_package/`)의 `data/`(대회 번들 + 외부 원천 스냅샷)와 `model/`(동결 모델)만으로
+# 이 노트북은 제출 패키지의 `data/`(대회 번들 + 외부 원천 스냅샷)와 `model/`(동결 모델)만으로
 # 위에서 아래로 한 번에 실행된다. 외부 API 호출은 없다. 재현 순서:
 #
-# 1. 동결 모델 sha256 검증 → 2. 일 달력 정렬(S1) → 3. 피처 생성·분할(test 타깃 격리) → 4. 동결 파라미터로 재학습해 동결 모델과 비교
-# → 5. 2025 홀드아웃 지표 → 6. `submission/submission.csv` 생성·검증 → 7. 핵심 그림 저장(`figures/`)
+# 1. 동결 모델 sha256 검증 → 2. 일 달력 정렬(S1) → 3. 피처 생성·분할(test 타깃 격리) → 4. 동결 파라미터로 재학습
+# → 5. 2025 홀드아웃 지표 → 6. `submission.csv`(패키지 루트) 생성·검증 → 7. 핵심 그림 저장(`figures/`)
+#
+# 소요 시간: 약 20분(대부분 3단계 피처 생성, 8코어 CPU 기준, GPU 미사용). 실행 결과(출력)를 포함해 저장되어 있다.
 
 # %%
 import json
 import subprocess
 import sys
 import time
+import warnings
 from pathlib import Path
 
 import matplotlib
@@ -34,13 +39,22 @@ import yaml
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.ticker  # noqa: E402
 
-ROOT = Path.cwd() if (Path.cwd() / "config").exists() else Path.cwd().parent
+warnings.filterwarnings("ignore", message="IProgress not found")  # tqdm 진행 막대 위젯 안내(결과와 무관)
+ROOT = Path.cwd() if (Path.cwd() / "src").exists() else Path.cwd().parent
 sys.path.insert(0, str(ROOT / "src"))
-from algaecast.config import CONFIG_DIR  # noqa: E402
+from algaecast.config import CONFIG_DIR, MODELS_DIR, SUBMISSION_PATH  # noqa: E402
 
 T0 = time.time()
-print("ROOT", ROOT, "| Python", sys.version.split()[0])
+print(
+    "Python",
+    sys.version.split()[0],
+    "| 설정",
+    CONFIG_DIR.relative_to(ROOT).as_posix(),
+    "| 동결 모델",
+    MODELS_DIR.relative_to(ROOT).as_posix(),
+)
 for f in ("Malgun Gothic", "NanumGothic", "AppleGothic", "DejaVu Sans"):
     if any(ft.name == f for ft in matplotlib.font_manager.fontManager.ttflist):
         plt.rcParams["font.family"] = f
@@ -50,7 +64,7 @@ FIG = ROOT / "figures"
 FIG.mkdir(exist_ok=True)
 
 # %% [markdown]
-# ## 1. 동결 모델 검증 (models/FROZEN.md 의 sha256 과 대조)
+# ## 1. 동결 모델 검증 (`model/FROZEN.md` 의 sha256 과 대조)
 
 # %%
 r = subprocess.run(
@@ -91,7 +105,7 @@ print(
 assert "target_log" not in test.columns, "test 타깃이 로더에 노출됨"
 
 # %% [markdown]
-# ## 4. 학습 — 동결 파라미터(config/model.yaml)로 C1·C3·C2 를 재학습하고, 동결 모델(model/)의 2025 예측과 비교
+# ## 4. 학습 — 동결 파라미터(설정 `model.yaml`)로 C1·C3·C2 를 재학습(train ≤2024)해 2025 검증용 예측을 만든다
 #
 # LightGBM 은 시드·데이터·파라미터가 같으면 결정론적이므로 재학습 결과가 동결 모델과 일치해야 한다(라이브러리 버전 동일 가정).
 
@@ -180,8 +194,9 @@ if oof is not None:
 from algaecast.models.predict import make_submission, validate_submission  # noqa: E402
 
 sub = make_submission()
-out = ROOT / "submission" / "submission.csv"
+out = SUBMISSION_PATH
 out.parent.mkdir(exist_ok=True)
+print("저장:", out.relative_to(ROOT).as_posix())
 sub.to_csv(out, index=False, encoding="utf-8-sig", lineterminator="\n")
 print(validate_submission(out))
 print(sub.head(8).to_string(index=False))
@@ -190,6 +205,8 @@ print(sub.head(8).to_string(index=False))
 # ## 7. 핵심 그림 — 2025 예측 vs 실측(물금·매리), 리드타임 요약
 
 # %%
+from IPython.display import Image, display  # noqa: E402
+
 va2 = va.assign(pred=ens_retrain).sort_values(["station_id", "target_date"])
 fig, axes = plt.subplots(5, 1, figsize=(12, 15), sharex=False)
 for ax, (sid, g) in zip(axes, va2.groupby("station_id", observed=True)):
@@ -198,11 +215,14 @@ for ax, (sid, g) in zip(axes, va2.groupby("station_id", observed=True)):
     ax.axhline(10_000, ls="--", color="orange")
     ax.axhline(1_000, ls=":", color="green")
     ax.set_yscale("symlog", linthresh=100)
+    ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:,.0f}"))
     ax.set_title(f"{sid} 2025")
     ax.legend(fontsize=8)
 fig.tight_layout()
 fig.savefig(FIG / "fig_2025_pred_vs_obs.png", dpi=130)
 plt.close(fig)
+display(Image(filename=str(FIG / "fig_2025_pred_vs_obs.png"), width=900))  # 실행본에 그림 포함
+# 리드타임 집계(예측값 아님): figures/reports/eval/tbl_leadtime.md(2020~2025 18/20, 지속성 1/20)·tbl_holdout_2026_posthoc.md(2026 7/8, 지속성 2/8)
 lead = {"2020~2025 감시(q90≥10k)": (18, 20), "2026 사후 감시": (7, 8), "지속성(2020~2026)": (3, 28)}
 fig, ax = plt.subplots(figsize=(7, 3.5))
 ax.barh(list(lead), [v[0] / v[1] for v in lead.values()], color=["#d97706", "#dc2626", "#6b7280"])
@@ -214,4 +234,5 @@ ax.set_title("리드타임 실적 (첫 경계 초과 측정 기준)")
 fig.tight_layout()
 fig.savefig(FIG / "fig_leadtime_summary.png", dpi=130)
 plt.close(fig)
-print(f"총 소요 {(time.time() - T0) / 60:.1f} 분, 그림 → {FIG}")
+display(Image(filename=str(FIG / "fig_leadtime_summary.png"), width=600))
+print(f"총 소요 {(time.time() - T0) / 60:.1f} 분, 그림 → {FIG.relative_to(ROOT).as_posix()}/")

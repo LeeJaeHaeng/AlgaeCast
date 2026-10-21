@@ -24,7 +24,7 @@ import yaml
 from scipy import stats
 
 from algaecast.collect import competition as comp
-from algaecast.config import CONFIG_DIR, DATA_DIR, ROOT
+from algaecast.config import CONFIG_DIR, DATA_DIR, REPORTS_DIR
 from algaecast.features.ar import make_ar_features
 from algaecast.features.forecast import make_forecast_features
 from algaecast.features.hydro import make_hydro_features
@@ -291,7 +291,7 @@ def main(argv: list[str] | None = None) -> int:
         }
         cat = catalog(feats, feature_cols)
         if s == "S1":
-            rep = ROOT / "reports" / "features" / "feature_catalog.md"
+            rep = REPORTS_DIR / "features" / "feature_catalog.md"
             rep.parent.mkdir(parents=True, exist_ok=True)
             by_year = (
                 feats[feats["split"].isin(["train", "valid", "test"])]

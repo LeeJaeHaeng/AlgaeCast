@@ -18,13 +18,13 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from algaecast.config import ROOT
+from algaecast.config import ROOT, SUBMISSION_PATH
 from algaecast.db.upload import predict_registry
 from algaecast.models import data as D
 
 log = logging.getLogger(__name__)
 DEFAULT_SAMPLE = ROOT / "data" / "raw" / "competition" / "algae_contest_2026" / "sample_submission.csv"
-DEFAULT_OUT = ROOT / "submission" / "submission.csv"
+DEFAULT_OUT = SUBMISSION_PATH
 
 
 def make_submission(sample_path: Path = DEFAULT_SAMPLE, strategy: str = "S1") -> pd.DataFrame:
