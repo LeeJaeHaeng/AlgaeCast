@@ -161,6 +161,7 @@ for name, pred in (
 holdout = pd.DataFrame(rows)
 print(holdout.to_string(index=False))
 if oof is not None:
+    oof["base_date"] = pd.to_datetime(oof["base_date"])
     o25 = oof[oof["year"] == 2025].merge(
         va[["station_id", "base_date"]].assign(
             station_id=va["station_id"].astype(str), base_date=pd.to_datetime(va["base_date"])

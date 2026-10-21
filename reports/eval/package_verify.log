@@ -1,0 +1,6 @@
+# 패키지 재현 검증 2026-10-21 11:27
+zip: C:\Users\user\OneDrive\Desktop\경진대회\algaecast\dist\AlgaeCast_녹조7일예측_이재행.zip
+
+$ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_jazp2mni\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt

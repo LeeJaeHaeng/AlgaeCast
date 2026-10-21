@@ -61,3 +61,6 @@ web/.env*.local
 
 # Supabase CLI 임시 파일
 supabase/.temp/
+
+# 제출 패키지(대회 데이터 포함) — 커밋 금지
+submission_package/

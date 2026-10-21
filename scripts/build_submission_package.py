@@ -36,7 +36,7 @@ RAW_FILES = [
     "MANIFEST.md",
 ]
 SRC_SKIP = {"db", "predict"}  # 대시보드 업로드·일일 운영 코드는 재현에 불필요
-SRC_SKIP_FILES = {"live.py"}  # test 타깃 로더(사후 검증 전용) — 패키지에서 제외
+SRC_SKIP_FILES = {"live.py", "posthoc.py"}  # test 타깃 로더·사후 검증(전용) — 패키지에서 제외
 SCRIPTS = ["verify_frozen.py", "leakage_audit.py"]
 SECRET_PATTERNS = [
     r"serviceKey" "=",
