@@ -73,7 +73,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           {BOARD.failBanner(fmtDateTimeKST(anyRun.run_at))}
         </div>
       )}
-      <main className="grid min-h-0 grid-cols-1 gap-2 p-2 lg:grid-cols-[380px_minmax(0,1fr)_440px] lg:grid-rows-[minmax(0,1fr)_minmax(0,250px)]">
+      <main className="grid min-h-0 grid-cols-1 gap-2 p-2 lg:grid-cols-[380px_minmax(0,1fr)_440px] 2xl:grid-rows-[minmax(0,1fr)_minmax(0,250px)]">
         {/* 좌: 지점 현황 */}
         <section className="order-1 flex min-h-0 flex-col gap-1.5 lg:row-span-1" aria-label={BOARD.panels.sites}>
           <h2 className="sr-only">{BOARD.panels.sites}</h2>
@@ -82,11 +82,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           ))}
         </section>
         {/* 중: 지도 */}
-        <section className="panel order-3 min-h-[320px] overflow-hidden lg:order-2 lg:min-h-0">
+        <section className="panel order-3 min-h-[360px] overflow-hidden lg:order-2 2xl:min-h-0">
           <ControlMap sites={mapSites} expert={expert} />
         </section>
         {/* 우: 오늘의 조치 + 실시간 상황 기록 */}
-        <div className="order-2 grid min-h-0 grid-rows-[minmax(0,60%)_minmax(0,1fr)] gap-2 lg:order-3">
+        <div className="order-2 grid min-h-0 gap-2 lg:order-3 2xl:grid-rows-[minmax(0,60%)_minmax(0,1fr)]">
           <Actions groups={actions} />
           <EventLog items={logItems} expert={expert} />
         </div>

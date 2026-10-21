@@ -104,7 +104,8 @@ a {
 .btn:hover {
   border-color: var(--accent);
 }
-.btn[aria-pressed="true"] {
+.btn[aria-pressed="true"],
+.btn[data-active="true"] {
   background: color-mix(in srgb, var(--accent) 20%, transparent);
   border-color: var(--accent);
 }
@@ -171,18 +172,16 @@ a {
   background: transparent;
   border: 0;
 }
-/* 메인 상황판: 1920×1080 한 화면에 맞춤 (스크롤 없음) */
+/* 메인 상황판: 1920×1080(이상)에서는 한 화면에 맞춤(스크롤 없음), 더 작은 화면은 자연 높이로 세로 스크롤 */
 .board {
-  height: 100dvh;
   display: grid;
-  grid-template-rows: 56px 48px minmax(0, 1fr) 40px;
-  overflow: hidden;
+  grid-template-rows: 56px 48px auto 40px;
 }
-@media (max-width: 1023px) {
+@media (min-width: 1600px) and (min-height: 900px) {
   .board {
-    height: auto;
-    overflow: visible;
-    grid-template-rows: auto;
+    height: 100dvh;
+    grid-template-rows: 56px 48px minmax(0, 1fr) 40px;
+    overflow: hidden;
   }
 }
 .scroll-thin {

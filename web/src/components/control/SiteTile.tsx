@@ -46,15 +46,15 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
     <Link
       href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`}
       data-site={s.site_id}
-      className="panel relative flex min-h-0 flex-1 flex-col justify-between overflow-hidden px-3 py-1 pl-4 transition-colors hover:border-[var(--accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
-      aria-label={`${rank}순위 ${s.name} ${c.label}`}
+      className="panel relative flex min-h-[132px] flex-1 flex-col justify-between gap-1 overflow-hidden px-3 py-1 pl-4 2xl:min-h-0 2xl:gap-0 transition-colors hover:border-[var(--accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+      aria-label={`${s.name} ${c.label} (${rank}순위)`}
       style={combo === "enter" ? { boxShadow: `inset 0 0 0 1px ${c.color}, 0 0 14px color-mix(in srgb, ${c.color} 35%, transparent)` } : undefined}
     >
       <span className="absolute inset-y-0 left-0 w-1.5" style={{ background: c.color }} aria-hidden />
       {/* 1행: 지점명 + 조합 라벨 + 공식 발령 칩 */}
       <div className="flex items-center gap-2 leading-tight">
         <span className="shrink-0 whitespace-nowrap text-[15px] font-bold tracking-tight">{s.name}</span>
-        <span className="truncate text-[15px] font-bold tracking-tight" style={{ color: c.color }}>
+        <span className="min-w-0 truncate text-[15px] font-bold tracking-tight" style={{ color: c.color }}>
           {c.icon} {c.label}
         </span>
         <Info text={`${c.tip} ${datesTip}`} />
@@ -64,12 +64,12 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
       </div>
       {/* 2행: 현재 측정 → 가장 가능성 높은 값 (라벨 줄 + 숫자 줄) */}
       <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-end gap-x-3">
-        <div className="col-span-3 flex items-center whitespace-nowrap text-xs leading-4 text-dim">
+        <div className="col-span-3 flex min-w-0 items-center text-xs leading-4 text-dim lg:whitespace-nowrap">
           {BOARD.tile.now}
           <span className="mx-2 opacity-50">→</span>
           {BOARD.tile.next}
           <Info term="q50" />
-          <span className={`ml-1 truncate ${tl.state === "verified" ? (tl.hit ? "text-[var(--safe)]" : "text-[var(--severe)]") : "opacity-80"}`}>· {tl.text}</span>
+          <span className={`ml-1 min-w-0 truncate ${tl.state === "verified" ? (tl.hit ? "text-[var(--safe)]" : "text-[var(--severe)]") : ""}`}>· {tl.text}</span>
         </div>
         <div className="tile-num whitespace-nowrap">
           {fmt(s.latest_cell_count)}
@@ -101,8 +101,8 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
       </div>
       {/* 4행: 1만 넘을 가능성 */}
       <div className="flex items-center gap-2 text-xs text-dim">
-        <span className="flex shrink-0 items-center">
-          {BOARD.tile.chance}
+        <span className="flex min-w-0 shrink items-center">
+          <span className="truncate">{BOARD.tile.chance}</span>
           <Info term="pAlert" />
         </span>
         <div className="relative h-2 min-w-0 flex-1 rounded-full bg-[var(--panel-border)]" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={p} aria-label={BOARD.tile.chance}>

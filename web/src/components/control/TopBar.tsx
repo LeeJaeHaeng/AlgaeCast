@@ -100,7 +100,7 @@ export function TopBar({ leds, renderedAt, rotation, expert }: { leds: Leds; ren
   const remainMin = Math.max(0, Math.ceil((nextAt - (now?.getTime() ?? nextAt)) / 60000));
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b border-border bg-panel px-4" role="banner">
+    <header className="flex min-h-14 flex-wrap items-center gap-x-4 gap-y-1 border-b border-border bg-panel px-4 py-1 2xl:h-14 2xl:flex-nowrap 2xl:py-0" role="banner">
       <Link href={expert ? "/?view=expert" : "/"} className="flex items-baseline gap-2">
         <span className="text-lg font-bold tracking-tight">{APP.title}</span>
         <span className="hidden text-xs text-dim xl:inline">{APP.subtitle}</span>
@@ -114,14 +114,14 @@ export function TopBar({ leds, renderedAt, rotation, expert }: { leds: Leds; ren
           </span>
         ))}
       </div>
-      <div className="ml-auto flex items-center gap-4 text-sm">
-        <span className="text-dim">
+      <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1 text-sm 2xl:ml-auto 2xl:flex-nowrap">
+        <span className="hidden text-dim md:inline">
           {BOARD.lastRefresh} <span className="text-text">{fmtDateTimeKST(renderedAt)}</span>
           <span className="mx-1.5 opacity-50">·</span>
           {BOARD.nextRefresh(remainMin)}
           <span className="sr-only">({BOARD.autoRefresh})</span>
         </span>
-        <time className="rounded-md border border-border px-2 py-0.5 font-mono text-base" dateTime={now?.toISOString()} suppressHydrationWarning>
+        <time className="hidden rounded-md border border-border px-2 py-0.5 font-mono text-base md:inline" dateTime={now?.toISOString()} suppressHydrationWarning>
           {now ? clockText(now) : "--:--:--"}
         </time>
         {!kiosk && (
@@ -131,7 +131,7 @@ export function TopBar({ leds, renderedAt, rotation, expert }: { leds: Leds; ren
                 {n.label}
               </Link>
             ))}
-            <Link href={q({ view: expert ? null : "expert" })} className="btn" aria-pressed={expert}>
+            <Link href={q({ view: expert ? null : "expert" })} className="btn" data-active={expert ? "true" : undefined}>
               {expert ? BOARD.btn.easy : BOARD.btn.expert}
             </Link>
             <button type="button" className="btn" onClick={toggleLight} aria-pressed={light}>

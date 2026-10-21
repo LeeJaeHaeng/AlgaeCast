@@ -23,7 +23,7 @@ export function PageFrame({ title, lead, expert, children, back }: { title: stri
               {back.label}
             </Link>
           )}
-          <Link href={expert ? "?" : "?view=expert"} className="btn" aria-pressed={expert}>
+          <Link href={expert ? "?" : "?view=expert"} className="btn" data-active={expert ? "true" : undefined}>
             {expert ? BOARD.btn.easy : BOARD.btn.expert}
           </Link>
         </div>

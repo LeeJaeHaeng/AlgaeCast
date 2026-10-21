@@ -6,7 +6,7 @@ export function Info({ term, text, className = "" }: { term?: keyof typeof TERMS
   if (!tip) return null;
   return (
     <span className={`group relative inline-block align-middle ${className}`}>
-      <button type="button" className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full border border-current text-[10px] leading-none text-dim opacity-80 hover:opacity-100 focus:opacity-100" aria-label={`설명: ${tip}`}>
+      <button type="button" className="ml-1 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current text-[11px] leading-none text-dim hover:text-text focus:text-text" aria-label={`설명: ${tip}`}>
         i
       </button>
       <span role="tooltip" className="pointer-events-none absolute left-1/2 top-full z-50 mt-1 w-64 -translate-x-1/2 rounded-lg border border-border bg-panel p-2 text-left text-xs font-normal leading-relaxed text-text opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">

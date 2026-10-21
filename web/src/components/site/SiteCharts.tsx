@@ -27,6 +27,7 @@ export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; heig
   const ticks = [LOW_Y, 2, 3, 4, 5, 6].filter((t) => t <= maxLv);
   const label = (v: number) => (v === LOW_Y ? "100 미만" : LOG_LABEL[v] ?? "");
   return (
+    <div style={{ height, minHeight: height }}>
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 12, right: 92, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={C.grid} />
@@ -54,12 +55,14 @@ export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; heig
         <Scatter dataKey="q50" name={SITE.chart.next} fill={C.pred} shape="circle" isAnimationActive={false} />
       </ComposedChart>
     </ResponsiveContainer>
+    </div>
   );
 }
 
 /** 물·날씨 보조 차트 */
 export function EnvChart({ data, keys, height = 200, unit }: { data: Record<string, unknown>[]; keys: { k: string; label: string; color: string }[]; height?: number; unit?: string }) {
   return (
+    <div style={{ height, minHeight: height }}>
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={C.grid} />
@@ -71,5 +74,6 @@ export function EnvChart({ data, keys, height = 200, unit }: { data: Record<stri
         ))}
       </ComposedChart>
     </ResponsiveContainer>
+    </div>
   );
 }

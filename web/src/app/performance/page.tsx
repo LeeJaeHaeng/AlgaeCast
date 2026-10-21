@@ -3,23 +3,12 @@ import { MdTable } from "@/components/MdTable";
 import { PageFrame } from "@/components/PageFrame";
 import { Timeline } from "@/components/perf/Timeline";
 import { PERF, TERMS } from "@/lib/copy";
-import { getBloomEvents, getMetrics } from "@/lib/queries";
+import { NUMBERS } from "@/lib/numbers";
+import { getBloomEvents } from "@/lib/queries";
 import { firstParagraphs, parseTables, readReport } from "@/lib/reports";
 
 export const revalidate = 3600;
 
-/** reports/eval 표에서 특정 행(첫 칸 prefix)·열(헤더 이름) 값을 읽는다 — "0.727 [0.62, 0.82]" 는 앞 숫자만 */
-function cell(file: string, rowPrefix: string, col: string, tableIdx = 0): number | null {
-  const md = readReport(file);
-  if (!md) return null;
-  const t = parseTables(md)[tableIdx]?.table;
-  if (!t) return null;
-  const j = t.header.indexOf(col);
-  const row = t.rows.find((r) => r[0].replace(/\*\*/g, "").startsWith(rowPrefix));
-  if (j < 0 || !row) return null;
-  const m = row[j].match(/-?\d+(\.\d+)?/);
-  return m ? Number(m[0]) : null;
-}
 const f2 = (v: number | null | undefined) => (v == null ? "–" : v.toFixed(2));
 
 function Section({ file, title, pick = [0], maxRows }: { file: string; title: string; pick?: number[]; maxRows?: number }) {
@@ -56,27 +45,12 @@ function Big({ label, value, sub, tone }: { label: string; value: string; sub: s
 export default async function PerformancePage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const expert = sp.view === "expert";
-  const [metrics, events] = await Promise.all([getMetrics(), getBloomEvents()]);
-  const g = (split: string, m: string) => metrics.find((x) => x.split === split && x.site_id == null && x.metric === m)?.value ?? null;
-  const ev25 = g("holdout2025", "leadtime_events") ?? 0;
-  const det25 = g("holdout2025", "leadtime_detected_watch") ?? 0;
-  const ev26 = g("posthoc2026", "leadtime_events") ?? 0;
-  const det26 = g("posthoc2026", "leadtime_detected_watch") ?? 0;
-  const med25 = g("holdout2025", "leadtime_median_days_watch_E") ?? 0;
-  const med26 = g("posthoc2026", "leadtime_median_days_watch_E") ?? 0;
-  const r2log25 = g("holdout2025", "r2_log");
-  const r2log26 = g("posthoc2026", "r2_log");
-  const f125 = g("holdout2025", "f1_10k");
-  const f126 = g("posthoc2026", "f1_10k");
-  const b025 = cell("tbl_holdout_2025.md", "B0", "f1_10k");
-  const b026 = cell("tbl_holdout_2026_posthoc.md", "B0", "f1_10k");
-  const r2raw25 = g("holdout2025", "r2_raw");
-  const r2raw26 = g("posthoc2026", "r2_raw");
-  const nse25 = g("holdout2025", "nse_raw");
-  const nse26 = g("posthoc2026", "nse_raw");
-  const allN = events.length || ev25 + ev26;
-  const allHit = events.length ? events.filter((e) => e.detected_watch).length : det25 + det26;
-  const onsetPct = allN ? Math.round((allHit / allN) * 100) : 0;
+  const events = await getBloomEvents();
+  const allN = NUMBERS.events.total;
+  const allHit = NUMBERS.events.detected;
+  const onsetPct = Math.round((allHit / allN) * 100);
+  const b0Hit = NUMBERS.events.persistenceDetected;
+  const b0Pct = Math.round((b0Hit / allN) * 100);
   const bench = readReport("tbl_benchmark_nier.md");
   const benchN = Number(bench?.match(/n=(\d+)/)?.[1] ?? "0");
 
@@ -84,10 +58,10 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
     <PageFrame title={PERF.title} lead={PERF.lead} expert={expert}>
       {/* 큰 숫자 4개 — 같은 크기, 약한 숫자도 그대로 */}
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <Big label={PERF.big.caught.label} value={`${allN}건 중 ${allHit}건`} sub={PERF.big.caught.sub(med25)} tone="var(--safe)" />
-        <Big label={PERF.big.y2026.label} value={`${ev26}건 중 ${det26}건`} sub={PERF.big.y2026.sub(med26)} tone="var(--safe)" />
-        <Big label={PERF.big.r2log.label} value={PERF.big.r2log.value(f2(r2log25), f2(r2log26))} sub={PERF.big.r2log.sub} tone="var(--watch)" />
-        <Big label={PERF.big.f1.label} value={`${f2(f125)} / ${f2(f126)}`} sub={PERF.big.f1.sub(f2(f125), f2(b025), f2(f126), f2(b026))} tone="var(--watch)" />
+        <Big label={PERF.big.caught.label} value={`${allN}건 중 ${allHit}건`} sub={PERF.big.caught.sub(NUMBERS.events.medianLeadDays)} tone="var(--safe)" />
+        <Big label={PERF.big.y2026.label} value={`${NUMBERS.y2026.total}건 중 ${NUMBERS.y2026.detected}건`} sub={PERF.big.y2026.sub(NUMBERS.y2026.medianLeadDays)} tone="var(--safe)" />
+        <Big label={PERF.big.r2log.label} value={PERF.big.r2log.value(f2(NUMBERS.r2log.y2025), f2(NUMBERS.r2log.y2026))} sub={PERF.big.r2log.sub} tone="var(--watch)" />
+        <Big label={PERF.big.f1.label} value={`${f2(NUMBERS.f1_10k.y2025)} / ${f2(NUMBERS.f1_10k.y2026)}`} sub={PERF.big.f1.sub(f2(NUMBERS.f1_10k.y2025), f2(NUMBERS.f1_10k.persistence2025), f2(NUMBERS.f1_10k.y2026), f2(NUMBERS.f1_10k.persistence2026))} tone="var(--watch)" />
       </div>
       <p className="text-xs text-dim">{PERF.basis}</p>
 
@@ -99,7 +73,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
         </h2>
         <div className="mt-2 space-y-2">
           <Bar label={PERF.onset.ours} pct={onsetPct} note={`${allHit}/${allN}건`} color="var(--safe)" />
-          <Bar label={PERF.onset.persist} pct={0} note={`0/${allN}건 · ${PERF.onset.persistNote}`} color="var(--severe)" />
+          <Bar label={PERF.onset.persist} pct={b0Pct} note={`${b0Hit}/${allN}건 · ${PERF.onset.persistNote}`} color="var(--severe)" />
         </div>
       </section>
 
@@ -112,7 +86,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
         <section className="panel p-4">
           <h2 className="text-lg font-semibold">{PERF.target.title}</h2>
           <ul className="mt-2 space-y-1 text-base">
-            {PERF.target.rows(f2(r2raw25), f2(r2raw26), f2(nse25), f2(nse26)).map((r) => (
+            {PERF.target.rows(f2(NUMBERS.r2raw.y2025), f2(NUMBERS.r2raw.y2026), f2(NUMBERS.nseraw.y2025), f2(NUMBERS.nseraw.y2026)).map((r) => (
               <li key={r} className="font-semibold" style={{ color: "var(--severe)" }}>
                 {r}
               </li>

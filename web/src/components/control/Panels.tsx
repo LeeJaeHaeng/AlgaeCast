@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Info } from "@/components/Info";
 import { BOARD, COMBO, COMBO_ORDER, banner as bannerText, comboOf } from "@/lib/copy";
 import { fmtDate, tierOf } from "@/lib/format";
+import { NUMBERS } from "@/lib/numbers";
 import type { ForecastLite, Metric, SiteStatus } from "@/lib/queries";
 
 /** 상황 배너(48px): 색 = 가장 높은 조합, 문구 = §8.3 템플릿(조합별 "지점, 지점 라벨" 을 · 로 연결), 우측 = 조합별 개수 */
@@ -17,12 +18,12 @@ export function Banner({ status, nextRefresh }: { status: SiteStatus[]; nextRefr
   const top = byCombo.find((g) => g.sites.length)?.combo ?? "safe";
   const color = COMBO[top].color;
   return (
-    <div className="flex h-12 items-center justify-between gap-4 border-b border-border px-4" style={{ background: `color-mix(in srgb, ${color} 18%, var(--bg))` }} role="status" aria-live="polite">
-      <div className="flex items-center gap-3 truncate font-bold" style={{ fontSize: "var(--banner-font)", color }}>
+    <div className="flex min-h-12 items-center justify-between gap-4 border-b border-border px-4" style={{ background: `color-mix(in srgb, ${color} 18%, var(--bg))` }} role="status" aria-live="polite">
+      <div className="flex min-w-0 items-center gap-3 truncate font-bold" style={{ fontSize: "var(--banner-font)", color }}>
         <span aria-hidden>{COMBO[top].icon}</span>
         <span className="truncate">{text}</span>
       </div>
-      <div className="flex shrink-0 items-center gap-4 text-base">
+      <div className="hidden shrink-0 items-center gap-4 text-base xl:flex">
         {byCombo.map((g) => (
           <Count key={g.combo} label={COMBO[g.combo].bannerWord} n={g.sites.length} color={COMBO[g.combo].color} icon={COMBO[g.combo].icon} />
         ))}
@@ -79,24 +80,17 @@ export function WeatherPanel({ sites, fc }: { sites: SiteStatus[]; fc: ForecastL
 /** 성적표 띠(40px): 2020~2026 경계 사건 포착·중앙 리드타임·2026 사후 — 고정된 모델 */
 export function ScoreStrip({ metrics, expert }: { metrics: Metric[]; expert: boolean }) {
   const g = (split: string, m: string) => metrics.find((x) => x.split === split && x.site_id == null && x.metric === m)?.value ?? null;
-  const ev25 = g("holdout2025", "leadtime_events") ?? 0;
-  const det25 = g("holdout2025", "leadtime_detected_watch") ?? 0;
-  const ev26 = g("posthoc2026", "leadtime_events") ?? 0;
-  const det26 = g("posthoc2026", "leadtime_detected_watch") ?? 0;
-  const med = g("posthoc2026", "leadtime_median_days_watch_E") ?? g("holdout2025", "leadtime_median_days_watch_E") ?? 0;
+  const { events: ev, y2026 } = NUMBERS; // 헤드라인 숫자는 numbers.ts(빌드 전 reports/eval 과 대조)
   return (
     <footer className="flex h-10 items-center gap-6 border-t border-border bg-panel px-4 text-sm" aria-label={BOARD.panels.score}>
       <span className="panel-title">{BOARD.panels.score}</span>
       <span>
-        <b className="text-base">{BOARD.score.caught(det25 + det26, ev25 + ev26)}</b>
-        <span className="text-dim"> (2020~2026년)</span>
-      </span>
-      <span>
-        {BOARD.score.year2026(det26, ev26)}
+        <b className="text-base">{BOARD.score.caught(ev.detected, ev.total)}</b>
+        <span className="text-dim"> ({BOARD.score.lead(ev.medianLeadDays)} · 2020~2026년)</span>
         <Info term="leadTime" />
       </span>
       <span>
-        {BOARD.score.lead(med)} <span className="text-dim">(2026년, 처음 넘은 날 기준)</span>
+        {BOARD.score.year2026(y2026.detected, y2026.total)} <span className="text-dim">({BOARD.score.lead(y2026.medianLeadDays)})</span>
       </span>
       {expert && (
         <span className="text-dim">

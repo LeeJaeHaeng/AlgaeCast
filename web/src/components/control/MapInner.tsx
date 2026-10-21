@@ -52,7 +52,7 @@ export default function MapInner({ sites, expert, light }: { sites: MapSite[]; e
         const html = `<div class="relative" style="width:28px;height:28px"><div class="${combo === "enter" ? "pulse" : ""} absolute inset-0 rounded-full" style="background:${c.hex};border:3px solid ${OFFICIAL_HEX[lvl]};box-shadow:0 0 10px ${c.hex}"></div></div>`;
         const icon = L.divIcon({ html, className: "", iconSize: [28, 28], iconAnchor: [14, 14] });
         return (
-          <Marker key={s.site_id} position={[s.lat, s.lon]} icon={icon} alt={`${s.name} ${c.label}`}>
+          <Marker key={s.site_id} position={[s.lat, s.lon]} icon={icon} alt={`${s.name} ${c.label}`} title={`${s.name} ${c.label}`} keyboard={false}>
             <Tooltip permanent direction="right" offset={[16, 0]} className="!border-0 !bg-transparent !shadow-none !text-current" opacity={1}>
               <span className="rounded bg-panel/90 px-1.5 py-0.5 text-sm font-semibold" style={{ color: c.hex }}>
                 {c.icon} {s.name} <span className="font-normal">{c.bannerWord}</span>

@@ -40,7 +40,7 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
   const tl = targetLabel(s.target_date, today, s.q50, s.obs_cell_count, fmt, { withValues: false });
   const title = `${s.name}: ${BOARD.monitorLegend.obs} 최근 ${days}일, ${BOARD.monitorLegend.pred} ${fmt(s.q50)} ${BOARD.unit.cells}`;
   return (
-    <Link href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`} className="panel flex min-h-0 flex-col p-2 hover:border-[var(--accent)]" aria-label={title}>
+    <Link href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`} className="panel flex min-h-[240px] flex-col p-2 hover:border-[var(--accent)] 2xl:min-h-0" aria-label={title}>
       <div className="flex items-center justify-between px-1 text-sm">
         <span className="font-semibold">{s.name}</span>
         <span style={{ color: c.color }}>
