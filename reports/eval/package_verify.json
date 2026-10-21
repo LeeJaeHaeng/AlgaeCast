@@ -1,0 +1,13 @@
+{
+ "when": "2026-10-21 17:25",
+ "returncode": 0,
+ "submission_regenerated": true,
+ "submission_identical": true,
+ "submission_sha256": "182f4cb83812293b79781c00a26646f03a69cb75d099e1c260102da6ea5d4987",
+ "notebook_errors": 0,
+ "notebook_stderr_warnings": 0,
+ "notebook_abs_paths": 0,
+ "demo_sha256": "6a0d78e374f8e0280425e60f3f605787968fd8483ee3db8e1cd1af503794c1b6",
+ "demo_sha_ok": true,
+ "minutes": 8.7
+}
