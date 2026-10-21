@@ -1,35 +1,31 @@
 import Link from "next/link";
 import { Info } from "@/components/Info";
-import { BOARD, TIER, banner as bannerText } from "@/lib/copy";
-import { fmtDate, tierOf, trendArrow } from "@/lib/format";
+import { BOARD, COMBO, COMBO_ORDER, banner as bannerText, comboOf } from "@/lib/copy";
+import { fmtDate, tierOf } from "@/lib/format";
 import type { ForecastLite, Metric, SiteStatus } from "@/lib/queries";
 
-/** 상황 배너(48px): 색 = 가장 높은 단계, 문구 = §8.3 템플릿, 우측 = 대응 필요/주의 관찰/안전 개수 */
+/** 상황 배너(48px): 색 = 가장 높은 조합, 문구 = §8.3 템플릿(조합별 "지점, 지점 라벨" 을 · 로 연결), 우측 = 조합별 개수 */
 export function Banner({ status, nextRefresh }: { status: SiteStatus[]; nextRefresh: string }) {
-  const alerts = status.filter((s) => tierOf(s.tier) === "alert").sort((a, b) => (b.p_alert ?? 0) - (a.p_alert ?? 0));
-  const watches = status.filter((s) => tierOf(s.tier) === "watch");
-  const safe = status.length - alerts.length - watches.length;
-  const top = alerts[0] ?? null;
-  const rising = top ? trendArrow(top.latest_cell_count, top.q50) === "↑" : false;
-  const text = bannerText(
-    alerts.map((s) => s.name),
-    watches.map((s) => s.name),
-    top?.name ?? null,
-    nextRefresh,
-    rising,
-  );
-  const tone = alerts.length ? "alert" : watches.length ? "watch" : "normal";
-  const color = TIER[tone].color;
+  const byCombo = COMBO_ORDER.map((k) => ({
+    combo: k,
+    sites: status
+      .filter((s) => comboOf(s.latest_alert_level, tierOf(s.tier)) === k)
+      .sort((x, y) => (y.p_alert ?? 0) - (x.p_alert ?? 0))
+      .map((s) => s.name),
+  }));
+  const text = bannerText(byCombo, nextRefresh);
+  const top = byCombo.find((g) => g.sites.length)?.combo ?? "safe";
+  const color = COMBO[top].color;
   return (
     <div className="flex h-12 items-center justify-between gap-4 border-b border-border px-4" style={{ background: `color-mix(in srgb, ${color} 18%, var(--bg))` }} role="status" aria-live="polite">
       <div className="flex items-center gap-3 truncate font-bold" style={{ fontSize: "var(--banner-font)", color }}>
-        <span aria-hidden>{TIER[tone].icon}</span>
+        <span aria-hidden>{COMBO[top].icon}</span>
         <span className="truncate">{text}</span>
       </div>
       <div className="flex shrink-0 items-center gap-4 text-base">
-        <Count label={BOARD.counts.alert} n={alerts.length} color={TIER.alert.color} icon={TIER.alert.icon} />
-        <Count label={BOARD.counts.watch} n={watches.length} color={TIER.watch.color} icon={TIER.watch.icon} />
-        <Count label={BOARD.counts.safe} n={safe} color={TIER.normal.color} icon={TIER.normal.icon} />
+        {byCombo.map((g) => (
+          <Count key={g.combo} label={COMBO[g.combo].bannerWord} n={g.sites.length} color={COMBO[g.combo].color} icon={COMBO[g.combo].icon} />
+        ))}
       </div>
     </div>
   );

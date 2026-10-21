@@ -36,7 +36,7 @@ export const TERMS = {
   tierAlert: { label: "대응 필요", tip: "1주일 안에 경계 수준을 넘을 가능성이 높습니다(가능성 52% 이상). 녹조제거설비 배치를 미리 준비해야 합니다." },
   q50: { label: "가장 가능성 높은 값", tip: "7일 뒤 녹조 농도로 가장 가능성이 높은 한 값입니다. 실제 값은 이보다 높거나 낮을 수 있습니다." },
   range: { label: "예상 범위", tip: "7일 뒤 녹조 농도가 10번 중 8번은 이 범위 안에 들어오도록 맞춘 구간입니다(2023~2024년 자료로 보정)." },
-  pAlert: { label: "경계 넘을 가능성", tip: "7일 뒤 전후(4~10일 뒤)에 녹조 농도가 경계 수준 10,000개/mL 이상이 될 가능성입니다." },
+  pAlert: { label: "다음 주(4~10일 뒤) 측정에서 1만을 넘을 가능성", tip: "다음 주(4~10일 뒤) 측정 중 한 번이라도 녹조 농도가 1만 개/mL 이상일 가능성입니다. 가장 가능성 높은 값이 1만 아래여도 예상 범위 위쪽이 1만을 넘으면 넘을 가능성이 높게 나올 수 있습니다." },
   baseDate: { label: "기준일", tip: "예상을 만들 때 마지막으로 사용한 측정일입니다. 이 날 이후의 자료는 쓰지 않았습니다." },
   targetDate: { label: "7일 뒤", tip: "기준일로부터 7일 뒤, 예상의 대상이 되는 날입니다." },
   leadTime: { label: "미리 알린 기간", tip: "실제로 경계 수준을 처음 넘은 날보다 며칠 앞서 '주의 관찰' 이상으로 바뀌었는지입니다." },
@@ -54,6 +54,48 @@ export const TIER: Record<Tier, { label: string; icon: string; color: string; ac
 };
 /** 전문가 보기에서 병기하는 내부 명칭 */
 export const TIER_EXPERT: Record<Tier, string> = { normal: "normal", watch: "watch (q90 ≥ 1만)", alert: "alert (p ≥ 0.52)" };
+
+
+/** 공식 발령(측정) × AI 예상 단계 조합 라벨 — 타일·조치·지도 범례·배너의 공통 체계 (docs/12 §8.4). rank 가 낮을수록 위 */
+export type Combo = "enter" | "watch" | "persist" | "improve" | "safe";
+export function comboOf(officialLevel: number | null | undefined, tier: Tier): Combo {
+  const over = (officialLevel ?? 0) >= 2; // 공식 경계 이상
+  if (!over) return tier === "alert" ? "enter" : tier === "watch" ? "watch" : "safe";
+  return tier === "alert" ? "persist" : "improve";
+}
+export const COMBO: Record<Combo, { rank: number; label: string; bannerWord: string; icon: string; color: string; hex: string; tip: string; actions: string[]; reco: (site: string, pPct: number) => string }> = {
+  enter: {
+    rank: 1, label: "경계 진입 예상 — 미리 대비", bannerWord: "경계 진입 예상", icon: "◆", color: "var(--severe)", hex: "#EF4444",
+    tip: "지금은 공식 경계가 아니지만, 다음 주 측정에서 1만 개/mL를 넘을 가능성이 높습니다. 가장 먼저 대비할 지점입니다.",
+    actions: ["녹조제거설비 배치 위치·인력 확인하기", "정수장에 고도처리(분말활성탄·오존) 준비 요청하기", "취수구 수심 조정 가능 여부 확인하기"],
+    reco: (site, p) => `${site}: 다음 주 측정에서 1만 개/mL를 넘을 가능성이 높습니다(${p}%). 녹조제거설비를 미리 배치하고, 정수장에 고도처리 준비를 요청하세요.`,
+  },
+  watch: {
+    rank: 2, label: "지켜보기", bannerWord: "지켜보기", icon: "▲", color: "var(--watch)", hex: "#FACC15",
+    tip: "공식 경계는 아니고, 예상 범위의 위쪽이 1만 개/mL에 닿습니다. 자주 확인해야 합니다.",
+    actions: ["채수를 주 2회로 늘리기", "설비 가동 준비 상태 점검하기"],
+    reco: (site) => `${site}: 경계 수준을 넘을 수도 있습니다. 채수를 주 2회로 늘리고 상황을 자주 확인하세요.`,
+  },
+  persist: {
+    rank: 3, label: "경계 계속될 듯", bannerWord: "경계 계속", icon: "◆", color: "var(--alert)", hex: "#F97316",
+    tip: "이미 공식 경계이고, 다음 주에도 1만 개/mL 이상이 이어질 가능성이 높습니다. 현재 대응을 유지합니다.",
+    actions: ["설비 가동·고도처리 등 현재 대응 유지하기", "새 측정 결과 확인하고 관계 기관과 공유하기"],
+    reco: (site, p) => `${site}: 경계가 다음 주에도 계속될 가능성이 높습니다(${p}%). 녹조제거설비 가동과 정수장 고도처리 등 현재 대응을 유지하세요.`,
+  },
+  improve: {
+    rank: 4, label: "나아질 가능성 — 해제 준비", bannerWord: "나아질 가능성", icon: "▼", color: "var(--accent)", hex: "#38BDF8",
+    tip: "지금은 공식 경계이지만, 다음 주에는 1만 개/mL 아래로 내려갈 가능성이 있습니다. 해제에 대비합니다.",
+    actions: ["해제 판단에 대비해 채수 주기 유지하기", "설비 축소 시점 미리 검토하기"],
+    reco: (site) => `${site}: 녹조가 줄어들 가능성이 있습니다. 해제 판단에 대비해 채수를 유지하고 상황을 확인하세요.`,
+  },
+  safe: {
+    rank: 5, label: "안전", bannerWord: "안전", icon: "●", color: "var(--safe)", hex: "#22C55E",
+    tip: "공식 경계가 아니고, 다음 주에 1만 개/mL를 넘을 가능성도 낮습니다.",
+    actions: ["평소 일정대로 측정 결과 확인하기"],
+    reco: (site) => `${site}: 1주일 안에 큰 변화는 없을 것으로 보입니다. 평소대로 관리하세요.`,
+  },
+};
+export const COMBO_ORDER: Combo[] = ["enter", "watch", "persist", "improve", "safe"];
 
 /** 공식 발령 단계(측정 기준) */
 export const OFFICIAL_LEVEL: Record<number, { label: string; color: string }> = {
@@ -99,11 +141,11 @@ export const ACTIONS: Record<Tier, string[]> = {
   normal: ["평소 일정대로 측정 결과 확인하기"],
 };
 
-/** §8.3 상황 배너 템플릿 */
-export const banner = (alertSites: string[], watchSites: string[], topAlert: string | null, nextRefresh: string, topRising: boolean): string => {
-  if (alertSites.length) return `${alertSites.join("·")} 대응 필요 · ${topAlert ?? alertSites[0]} ${topRising ? "녹조 증가 중" : "녹조 높은 상태 지속"}`;
-  if (watchSites.length) return `${watchSites.join("·")} 주의 관찰 · 큰 위험은 없음`;
-  return `전 지점 안전 · 다음 갱신 ${nextRefresh}`;
+/** §8.3 상황 배너 템플릿 — 조합 순위 순으로 "{지점, 지점} {라벨}" 을 · 로 잇는다. 전부 안전이면 다음 갱신 시각 */
+export const banner = (groups: { combo: Combo; sites: string[] }[], nextRefresh: string): string => {
+  const live = groups.filter((g) => g.combo !== "safe" && g.sites.length);
+  if (!live.length) return `전 지점 안전 · 다음 갱신 ${nextRefresh}`;
+  return live.map((g) => `${g.sites.join(", ")} ${COMBO[g.combo].bannerWord}`).join(" · ");
 };
 
 /** 메인 상황판 문구 */
@@ -111,20 +153,23 @@ export const BOARD = {
   leds: { collect: "수집", predict: "예측", db: "저장소" },
   ledTip: { ok: "정상 (24시간 이내 갱신)", stale: "지연 (24시간 넘게 갱신 없음)", fail: "실패 (마지막 작업이 실패했습니다)", unknown: "확인 중" },
   lastRefresh: "마지막 갱신",
-  nextRefresh: "다음 갱신",
+  nextRefresh: (min: number) => `화면 새로고침 ${min}분 뒤 · 데이터 갱신 매일 05:00`,
   autoRefresh: "5분마다 자동 갱신",
   btn: { fullscreen: "전체화면", exitFullscreen: "전체화면 끝내기", present: "발표모드", presentOff: "관제모드", kiosk: "순환", kioskOff: "순환 끝내기", easy: "쉽게 보기", expert: "전문가 보기" },
   counts: { alert: "대응 필요", watch: "주의 관찰", safe: "안전" },
   panels: { sites: "지점 현황", map: "지점 지도", actions: "오늘의 조치", log: "실시간 상황 기록", monitors: "지점 모니터 (최근 60일)", weather: "향후 7일 날씨", score: "성적표" },
-  tile: { now: "현재 측정", next: "7일 뒤 예상", chance: "경계 넘을 가능성", official: "공식 발령", measuredOn: "측정일", baseOn: "기준일" },
-  mapLegend: "마커 색 = 예상 단계 · 테두리 = 공식 발령",
-  mapPulse: "대응 필요 지점은 깜빡입니다",
+  tile: { now: "현재 측정", next: "가장 가능성 높은 값", nextSub: "7일 뒤", range: "예상 범위", chance: "다음 주(4~10일 뒤) 측정에서 1만을 넘을 가능성", official: "공식 발령", ai: "AI 예상", measuredOn: "측정일", baseOn: "기준일", axis: { k1: "1천", k10: "1만", k100: "10만" } },
+  mapLegend: "마커 색 = 상태 라벨 · 테두리 = 공식 발령 · 물길 = 낙동강·금강 본류",
+  mapPulse: "경계 진입 예상 지점은 깜빡입니다",
+  mapRivers: "물길 © OpenStreetMap contributors",
   actionsDone: (done: number, total: number) => `${total}개 중 ${done}개 완료`,
   actionsEmpty: "오늘 할 조치가 없습니다.",
   actionsReset: "오늘 체크 초기화",
+  actionsMore: (n: number) => `+${n}개 더 보기`,
+  actionsLess: "접기",
   log: {
     tierChange: (site: string, from: string | null, to: string) => (from ? `${site} 예상 단계 ${from} → ${to}` : `${site} 예상 단계 ${to}`),
-    observation: (site: string, cells: string, official: string) => `${site} 새 측정 ${cells} · 공식 ${official}`,
+    observation: (site: string, cells: string, official: string) => `${site} 새 측정 ${cells} · 공식 발령 ${official}`,
     runOk: "예측 갱신 완료",
     runFail: "예측 갱신 실패 — 마지막 성공 결과를 표시 중",
     empty: "최근 30일 기록이 없습니다.",
@@ -141,7 +186,7 @@ export const BOARD = {
   failBanner: (when: string) => `${when} 예측 갱신이 실패했습니다. 마지막 성공 결과를 표시하고 있습니다.`,
   staleBanner: (days: number) => `마지막 측정이 ${days}일 전입니다. 측정 주기(주 1~2회)보다 오래 비어 있으면 수집 상태를 확인하세요.`,
   unit: { cells: "개/mL", pct: "%", days: "일", temp: "℃", mm: "mm" },
-  basis: { nier: "국립환경과학원 조류경보제 측정값", model: "고정된 모델 예상값", cqr: "10번 중 8번 들어오는 범위" },
+  basis: { nier: "국립환경과학원 조류경보제 측정값", model: "고정된 모델 예상값", cqr: "10번 중 8번 들어오는 범위", chance: "대응 필요 기준 52%" },
 } as const;
 
 /** 지점 상세 문구 (§4) */

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Actions, type ActionItem } from "@/components/control/Actions";
+import { Actions, type ActionGroup } from "@/components/control/Actions";
 import { ControlMap } from "@/components/control/ControlMap";
 import { Escalation } from "@/components/control/Escalation";
 import { EventLog } from "@/components/control/EventLog";
@@ -7,12 +7,23 @@ import { MiniChart } from "@/components/control/MiniChart";
 import { Banner, ScoreStrip, WeatherPanel } from "@/components/control/Panels";
 import { SiteTile } from "@/components/control/SiteTile";
 import { TopBar, type Leds, type LedState } from "@/components/control/TopBar";
-import { ACTIONS, BOARD } from "@/lib/copy";
+import { unstable_cache } from "next/cache";
+import { BOARD, COMBO, comboOf } from "@/lib/copy";
 import { toLogItems } from "@/lib/eventlog";
-import { TIER_ORDER, fmtDateTimeKST, fmtTimeKST, tierOf } from "@/lib/format";
+import { fmtDateTimeKST, fmtTimeKST, tierOf } from "@/lib/format";
 import { getCollectStatus, getEventLog, getForecastAll, getLatestRunAny, getMetrics, getRecentObsAll, getSiteStatus, getSites } from "@/lib/queries";
 
 export const revalidate = 300;
+
+/** Supabase 조회는 60초 캐시 (화면 새로고침 5분·여러 화면이 동시에 열려도 DB 부하 일정) */
+const getBoardData = unstable_cache(
+  async () => {
+    const [status, sites, anyRun, events, obs, fc, metrics, collect] = await Promise.all([getSiteStatus(), getSites(), getLatestRunAny(), getEventLog(30, 80), getRecentObsAll(70), getForecastAll(), getMetrics(), getCollectStatus()]);
+    return { status, sites, anyRun, events, obs, fc, metrics, collect };
+  },
+  ["board-data"],
+  { revalidate: 60 },
+);
 
 function age(h: number, iso: string | null): LedState {
   if (!iso) return "unknown";
@@ -22,16 +33,14 @@ function age(h: number, iso: string | null): LedState {
 export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const expert = sp.view === "expert";
-  let dbOk = true;
-  const [status, sites, anyRun, events, obs, fc, metrics, collect] = await Promise.all([getSiteStatus(), getSites(), getLatestRunAny(), getEventLog(30, 80), getRecentObsAll(70), getForecastAll(), getMetrics(), getCollectStatus()]).catch((e) => {
-    dbOk = false;
-    throw e;
-  });
+  const dbOk = true; // 조회 실패 시 Next 가 오류 화면을 내므로 여기 도달하면 저장소 정상
+  const { status, sites, anyRun, events, obs, fc, metrics, collect } = await getBoardData();
   const renderedAt = new Date().toISOString();
   const nextRefresh = fmtTimeKST(new Date(Date.now() + 5 * 60_000));
 
-  // 우선순위 = 단계 → 경계 넘을 가능성 (가중치 없음, docs/07)
-  const ranked = [...status].sort((a, b) => TIER_ORDER[tierOf(a.tier)] - TIER_ORDER[tierOf(b.tier)] || (b.p_alert ?? 0) - (a.p_alert ?? 0));
+  // 우선순위 = 공식 발령×AI 예상 조합 순위 → 가능성 내림차순 (가중치 없음, docs/07·docs/12 §8.4)
+  const rankOf = (s: (typeof status)[number]) => COMBO[comboOf(s.latest_alert_level, tierOf(s.tier))].rank;
+  const ranked = [...status].sort((a, b) => rankOf(a) - rankOf(b) || (b.p_alert ?? 0) - (a.p_alert ?? 0));
   const latestBase = status.map((s) => s.base_date).filter(Boolean).sort().at(-1) ?? null;
   const latestObs = status.map((s) => s.latest_obs_date).filter(Boolean).sort().at(-1) ?? null;
   const leds: Leds = {
@@ -40,9 +49,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
     db: dbOk ? "ok" : "fail",
   };
 
-  const actions: ActionItem[] = ranked.flatMap((s) => {
-    const t = tierOf(s.tier);
-    return ACTIONS[t].map((text, i) => ({ id: `${s.site_id}-${t}-${i}`, site: s.name, tier: t, text }));
+  const actions: ActionGroup[] = ranked.map((s) => {
+    const combo = comboOf(s.latest_alert_level, tierOf(s.tier));
+    return { siteId: s.site_id, site: s.name, combo, items: COMBO[combo].actions.map((text, i) => ({ id: `${s.site_id}-${combo}-${i}`, text })) };
   });
   const logItems = toLogItems(events);
   const mapSites = sites.map((s) => {
@@ -63,9 +72,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           {BOARD.failBanner(fmtDateTimeKST(anyRun.run_at))}
         </div>
       )}
-      <main className="grid min-h-0 grid-cols-1 gap-2 p-2 lg:grid-cols-[380px_minmax(0,1fr)_440px] lg:grid-rows-[minmax(0,1fr)_minmax(0,300px)]">
+      <main className="grid min-h-0 grid-cols-1 gap-2 p-2 lg:grid-cols-[380px_minmax(0,1fr)_440px] lg:grid-rows-[minmax(0,1fr)_minmax(0,250px)]">
         {/* 좌: 지점 현황 */}
-        <section className="order-1 flex min-h-0 flex-col gap-2 lg:row-span-1" aria-label={BOARD.panels.sites}>
+        <section className="order-1 flex min-h-0 flex-col gap-1.5 lg:row-span-1" aria-label={BOARD.panels.sites}>
           <h2 className="sr-only">{BOARD.panels.sites}</h2>
           {ranked.map((s, i) => (
             <SiteTile key={s.site_id} s={s} expert={expert} rank={i + 1} />
@@ -76,8 +85,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           <ControlMap sites={mapSites} expert={expert} />
         </section>
         {/* 우: 오늘의 조치 + 실시간 상황 기록 */}
-        <div className="order-2 grid min-h-0 grid-rows-[minmax(0,44%)_minmax(0,1fr)] gap-2 lg:order-3">
-          <Actions items={actions} />
+        <div className="order-2 grid min-h-0 grid-rows-[minmax(0,60%)_minmax(0,1fr)] gap-2 lg:order-3">
+          <Actions groups={actions} />
           <EventLog items={logItems} expert={expert} />
         </div>
         {/* 하: 지점 모니터 5분할 + 날씨 */}

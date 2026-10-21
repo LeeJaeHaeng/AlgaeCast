@@ -118,7 +118,7 @@ export function TopBar({ leds, renderedAt, rotation, expert }: { leds: Leds; ren
         <span className="text-dim">
           {BOARD.lastRefresh} <span className="text-text">{fmtDateTimeKST(renderedAt)}</span>
           <span className="mx-1.5 opacity-50">·</span>
-          {BOARD.nextRefresh} <span className="text-text">{remainMin}분 뒤</span>
+          {BOARD.nextRefresh(remainMin)}
           <span className="sr-only">({BOARD.autoRefresh})</span>
         </span>
         <time className="rounded-md border border-border px-2 py-0.5 font-mono text-base" dateTime={now?.toISOString()} suppressHydrationWarning>

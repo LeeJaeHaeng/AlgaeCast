@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { BOARD } from "@/lib/copy";
-import { fmtDateTimeKST } from "@/lib/format";
+import { fmtDate, fmtDateTimeKST } from "@/lib/format";
 
-export type LogItem = { id: string; time: string; kind: "tier_change" | "observation" | "run"; text: string; tone: "alert" | "watch" | "normal" | "info" | "fail"; expertNote?: string };
+export type LogItem = { id: string; time: string; kind: "tier_change" | "observation" | "run"; text: string; tone: "alert" | "watch" | "normal" | "info" | "fail"; expertNote?: string; dateOnly?: boolean };
 
 const TONE: Record<LogItem["tone"], string> = { alert: "var(--alert)", watch: "var(--watch)", normal: "var(--safe)", info: "var(--accent)", fail: "var(--severe)" };
 
@@ -29,7 +29,7 @@ export function EventLog({ items, expert }: { items: LogItem[]; expert: boolean 
           {items.map((it) => (
             <li key={it.id} className={`flex gap-2 rounded px-1 py-0.5 leading-snug ${newIds.has(it.id) ? "hl-new" : ""}`}>
               <time className="shrink-0 font-mono text-xs text-dim" dateTime={it.time}>
-                {fmtDateTimeKST(it.time)}
+                {it.dateOnly ? fmtDate(it.time) : fmtDateTimeKST(it.time)}
               </time>
               <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: TONE[it.tone] }} aria-hidden />
               <span>
