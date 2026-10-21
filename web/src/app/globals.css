@@ -175,6 +175,7 @@ a {
 /* 메인 상황판: 1920×1080(이상)에서는 한 화면에 맞춤(스크롤 없음), 더 작은 화면은 자연 높이로 세로 스크롤 */
 .board {
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* 상단바 등 넓은 항목이 격자 폭을 키우지 않게 */
   grid-template-rows: 56px 48px auto 40px;
 }
 @media (min-width: 1600px) and (min-height: 900px) {
@@ -187,4 +188,10 @@ a {
 .scroll-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--panel-border) transparent;
+}
+/* 좁은 화면에서 격자 항목이 내용 최소 폭으로 늘어나 가로 스크롤이 생기지 않게 */
+.board main > *,
+.board .panel,
+.board li {
+  min-width: 0;
 }

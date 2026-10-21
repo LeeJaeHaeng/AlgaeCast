@@ -13,3 +13,5 @@
 | 헤드라인 숫자 대조 | 통과 | `web/scripts/check_numbers.mjs` 22/22 일치 (prebuild) |
 | npm run build 경고 0 | 통과 | `✓ Compiled successfully`, 경고 없음 |
 | Vercel 프로덕션 반영 | 대기 | main 머지 승인 후 배포 |
+
+주: 390×844 메인 스크린샷은 Lighthouse 모바일 에뮬레이션(폭 390) 렌더에서 잘라냈다. Windows 헤드리스 Edge 는 창 최소 폭(약 500px) 때문에 `--window-size=390` 으로는 실제 390px 레이아웃이 나오지 않는다(다른 페이지의 390 캡처는 이 한계로 약 500px 레이아웃이 잘린 상태이며, 모바일 순서 배너→타일→조치→기록→지도→모니터는 `main_390_full.png` 로 확인).

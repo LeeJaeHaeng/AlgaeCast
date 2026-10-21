@@ -73,9 +73,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           {BOARD.failBanner(fmtDateTimeKST(anyRun.run_at))}
         </div>
       )}
-      <main className="grid min-h-0 grid-cols-1 gap-2 p-2 lg:grid-cols-[380px_minmax(0,1fr)_440px] 2xl:grid-rows-[minmax(0,1fr)_minmax(0,250px)]">
+      <main className="grid min-h-0 grid-cols-[minmax(0,1fr)] gap-2 p-2 lg:grid-cols-[380px_minmax(0,1fr)_440px] 2xl:grid-rows-[minmax(0,1fr)_minmax(0,250px)]">
         {/* 좌: 지점 현황 */}
-        <section className="order-1 flex min-h-0 flex-col gap-1.5 lg:row-span-1" aria-label={BOARD.panels.sites}>
+        <section className="order-1 flex min-h-0 min-w-0 flex-col gap-1.5 lg:row-span-1" aria-label={BOARD.panels.sites}>
           <h2 className="sr-only">{BOARD.panels.sites}</h2>
           {ranked.map((s, i) => (
             <SiteTile key={s.site_id} s={s} expert={expert} rank={i + 1} today={today} />
@@ -86,12 +86,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           <ControlMap sites={mapSites} expert={expert} />
         </section>
         {/* 우: 오늘의 조치 + 실시간 상황 기록 */}
-        <div className="order-2 grid min-h-0 gap-2 lg:order-3 2xl:grid-rows-[minmax(0,60%)_minmax(0,1fr)]">
+        <div className="order-2 grid min-h-0 min-w-0 gap-2 lg:order-3 2xl:grid-rows-[minmax(0,60%)_minmax(0,1fr)]">
           <Actions groups={actions} />
           <EventLog items={logItems} expert={expert} />
         </div>
         {/* 하: 지점 모니터 5분할 + 날씨 */}
-        <section className="order-4 grid min-h-0 grid-cols-2 gap-2 md:grid-cols-5 lg:col-span-2" aria-label={BOARD.panels.monitors}>
+        <section className="order-4 grid min-h-0 min-w-0 grid-cols-[repeat(2,minmax(0,1fr))] gap-2 md:grid-cols-[repeat(5,minmax(0,1fr))] lg:col-span-2" aria-label={BOARD.panels.monitors}>
           <h2 className="sr-only">{BOARD.panels.monitors}</h2>
           {ranked.map((s) => (
             <MiniChart key={s.site_id} s={s} obs={obs.filter((o) => o.site_id === s.site_id)} expert={expert} today={today} />

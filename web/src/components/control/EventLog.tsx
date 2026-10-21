@@ -51,7 +51,7 @@ export function EventLog({ items, expert, fit = true }: { items: LogItem[]; expe
                 {it.dateOnly ? fmtDate(it.time) : fmtDateTimeKST(it.time).replace(/\. /g, ".")}
               </time>
               <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: TONE[it.tone] }} aria-hidden />
-              <span className="truncate">
+              <span className="min-w-0 truncate">
                 {it.text}
                 {expert && it.expertNote && <span className="ml-1 text-xs text-dim">{it.expertNote}</span>}
               </span>
