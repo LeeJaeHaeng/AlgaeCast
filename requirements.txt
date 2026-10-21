@@ -35,3 +35,4 @@ pre-commit>=3.7
 nbstripout>=0.7
 # --- 이 패키지 자체 (src 레이아웃, editable) ---
 -e .
+psycopg[binary]>=3.1,<4

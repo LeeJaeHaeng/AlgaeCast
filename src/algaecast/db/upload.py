@@ -50,24 +50,36 @@ def client() -> Any:
     return create_client(url, key)
 
 
+INT_COLS = {
+    "horizon_days", "pred_alert_level", "alert_level", "rank", "priority_rank", "n",
+    "lead_days_watch_e", "lead_days_alert_e", "lead_days_watch_d", "lead_days_alert_d",
+}  # fmt: skip
+
+
 def _clean(df: pd.DataFrame) -> list[dict]:
     d = df.replace({np.nan: None})
     for c in d.columns:
+        if c in INT_COLS:
+            d[c] = d[c].map(lambda v: None if v is None or (isinstance(v, float) and np.isnan(v)) else int(v))
         if d[c].dtype.kind == "M" or c.endswith("_date") or c == "obs_date":
             d[c] = d[c].map(
                 lambda v: v.isoformat()[:10] if isinstance(v, (pd.Timestamp, datetime, date)) else v
             )
-    return [
-        {
-            k: (
-                float(v)
-                if isinstance(v, (np.floating,))
-                else int(v) if isinstance(v, (np.integer,)) else bool(v) if isinstance(v, np.bool_) else v
-            )
-            for k, v in r.items()
-        }
-        for r in d.to_dict("records")
-    ]
+
+    def fix(v: object) -> object:
+        if isinstance(v, (np.floating, float)):
+            return None if not np.isfinite(float(v)) else float(v)
+        if isinstance(v, np.integer):
+            return int(v)
+        if isinstance(v, np.bool_):
+            return bool(v)
+        return v
+
+    def fix_int(k: str, v: object) -> object:
+        v = fix(v)
+        return int(v) if (k in INT_COLS and v is not None) else v
+
+    return [{k: fix_int(k, v) for k, v in r.items()} for r in d.to_dict("records")]
 
 
 def upsert(sb: Any, table: str, rows: list[dict], on_conflict: str | None, dry: bool) -> int:
@@ -327,6 +339,8 @@ def predictions_rows(
         f_rows["alert_flag"], "alert", np.where(f_rows["watch_flag"], "watch", "normal")
     )
     f_rows["operating_point"] = json.dumps({**op, "watch_rule": "q90_cqr>=10000", "note": "2025 holdout OOF"})
+    f_rows["horizon_days"] = f_rows["horizon_days"].astype(int)
+    f_rows["pred_alert_level"] = f_rows["pred_alert_level"].astype(int)
     rows += _clean(f_rows)
     # (2) 2026 test 조합 + (3) 최신 as-of (각 지점 마지막 base_date) — 레지스트리 모델
     feat = pd.read_parquet(D.PROCESSED / "features_S1.parquet")
@@ -347,7 +361,8 @@ def predictions_rows(
     )
     for c in pr.columns:
         t_rows[c] = pr[c].to_numpy()
-    t_rows["pred_alert_level"] = level_of(t_rows["pred_cell_count"].to_numpy())
+    t_rows["pred_alert_level"] = level_of(t_rows["pred_cell_count"].to_numpy()).astype(int)
+    t_rows["horizon_days"] = t_rows["horizon_days"].astype(int)
     t_rows["p_over_10k"] = None
     t_rows["obs_cell_count"] = None  # 2026 실측은 backfill_obs 가 채움 (test 타깃 격리 준수)
     rows += _clean(t_rows)
