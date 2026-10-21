@@ -13,35 +13,43 @@ const fromLog = (v: number) => Math.round(10 ** v - 1);
 
 /** 지점 상세 큰 차트: 측정(선+점), 지난 예상값(회색 점), 이번 예상(파란 점 + 범위 띠), 관심/경계 기준선. 로그 축 */
 export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; height?: number }) {
+  const FLOOR = 2; // 100 개/mL — 로그 축 바닥
+  const LOW_Y = 1.6; // 100 미만·미검출 표시 높이(축 아래)
+  const clampLow = (v: number | null) => (v == null ? null : v < FLOOR ? null : v);
   const data = points.map((p) => {
     const q = toLog(p.q50);
     const lo = toLog(p.lo);
     const hi = toLog(p.hi);
-    return { date: p.date, obs: toLog(p.obs), q50: q, band: lo != null && hi != null ? [lo, hi] : null, past_pred: toLog(p.past_pred) };
+    const o = toLog(p.obs);
+    return { date: p.date, obs: clampLow(o), low: o != null && o < FLOOR ? LOW_Y : null, q50: q, band: lo != null && hi != null ? [Math.max(lo, FLOOR), hi] : null, past_pred: clampLow(toLog(p.past_pred)) };
   });
   const maxLv = Math.max(4.5, ...data.flatMap((d) => [d.obs ?? 0, d.q50 ?? 0, d.past_pred ?? 0, (d.band?.[1] as number) ?? 0])) + 0.3;
-  const ticks = [0, 2, 3, 4, 5, 6].filter((t) => t <= maxLv);
+  const ticks = [LOW_Y, 2, 3, 4, 5, 6].filter((t) => t <= maxLv);
+  const label = (v: number) => (v === LOW_Y ? "100 미만" : LOG_LABEL[v] ?? "");
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <ComposedChart data={data} margin={{ top: 12, right: 20, left: 0, bottom: 0 }}>
+      <ComposedChart data={data} margin={{ top: 12, right: 92, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={C.grid} />
         <XAxis dataKey="date" tickFormatter={fmtDate} minTickGap={40} fontSize={12} stroke={C.text} />
-        <YAxis domain={[0, maxLv]} ticks={ticks} tickFormatter={(v: number) => LOG_LABEL[v] ?? ""} fontSize={12} width={44} stroke={C.text} />
+        <YAxis domain={[LOW_Y - 0.2, maxLv]} ticks={ticks} tickFormatter={label} fontSize={12} width={56} stroke={C.text} />
         <Tooltip
           contentStyle={{ background: "#111A2E", border: "1px solid #1E2A44", color: "#E6EDF7" }}
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           formatter={((v: any, name: any) => {
+            if (name === SITE.chartLow) return ["100 개/mL 미만 또는 미검출", String(name)];
             if (Array.isArray(v)) return [`${fmtCells(fromLog(v[0] as number))} ~ ${fmtCells(fromLog(v[1] as number))} 개/mL`, SITE.chart.band];
             return [typeof v === "number" ? `${fmtCells(fromLog(v))} 개/mL` : "–", String(name)];
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           }) as any}
           labelFormatter={(l) => `날짜 ${fmtDate(String(l))}`}
         />
-        <ReferenceLine y={3} stroke={C.l1} strokeDasharray="4 4" label={{ value: "관심 1천", fontSize: 12, position: "insideTopLeft", fill: C.l1 }} />
-        <ReferenceLine y={4} stroke={C.l2} strokeDasharray="4 4" label={{ value: "경계 1만", fontSize: 12, position: "insideTopLeft", fill: C.l2 }} />
-        {maxLv > 6 && <ReferenceLine y={6} stroke={C.l3} strokeDasharray="4 4" label={{ value: "대발생 100만", fontSize: 12, position: "insideTopLeft", fill: C.l3 }} />}
+        <ReferenceLine y={3} stroke={C.l1} strokeDasharray="4 4" label={{ value: "관심 1천", fontSize: 12, position: "right", fill: C.l1 }} />
+        <ReferenceLine y={4} stroke={C.l2} strokeDasharray="4 4" label={{ value: "경계 1만", fontSize: 12, position: "right", fill: C.l2 }} />
+        {maxLv > 6 && <ReferenceLine y={6} stroke={C.l3} strokeDasharray="4 4" label={{ value: "대발생 100만", fontSize: 12, position: "right", fill: C.l3 }} />}
+        <ReferenceLine y={FLOOR} stroke={C.grid} />
+        <Scatter dataKey="low" name={SITE.chartLow} fill={C.past} shape="circle" isAnimationActive={false} />
         <Scatter dataKey="past_pred" name={SITE.chart.pastPred} fill={C.past} shape="circle" isAnimationActive={false} />
-        <Line dataKey="obs" name={SITE.chart.obs} stroke={C.obs} strokeWidth={1.6} dot={{ r: 2.5, fill: C.obs }} connectNulls isAnimationActive={false} />
+        <Line dataKey="obs" name={SITE.chart.obs} stroke={C.obs} strokeWidth={1.6} dot={{ r: 2.5, fill: C.obs }} connectNulls={false} isAnimationActive={false} />
         <Area dataKey="band" name={SITE.chart.band} stroke={C.pred} strokeWidth={1} fill={C.pred} fillOpacity={0.3} connectNulls={false} isAnimationActive={false} />
         <Scatter dataKey="q50" name={SITE.chart.next} fill={C.pred} shape="circle" isAnimationActive={false} />
       </ComposedChart>

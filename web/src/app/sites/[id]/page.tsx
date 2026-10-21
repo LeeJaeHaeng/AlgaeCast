@@ -89,7 +89,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
         <section className="panel p-3">
           <div className="flex items-baseline justify-between">
             <h2 className="text-lg font-semibold">{SITE.chart.title}</h2>
-            <span className="text-xs text-dim">{SITE.chart.legend}</span>
+            <span className="text-xs text-dim">{SITE.chart.legend} · 회색 작은 점 = {SITE.chartLow}</span>
           </div>
           <BigChart points={pts} height={360} />
         </section>
@@ -152,10 +152,13 @@ export default async function SitePage({ params, searchParams }: { params: Promi
                 <span className="mt-0.5 text-lg font-bold" style={{ color: r.v >= 0 ? "var(--alert)" : "var(--safe)" }}>
                   {["①", "②", "③"][i]}
                 </span>
-                <span>
+                <span className="min-w-0 flex-1">
                   <span className="font-semibold">{r.text}</span>
                   <span className="ml-2 text-xs text-dim">
                     {GROUP_LABEL[r.g]} · {r.v >= 0 ? "올림" : "내림"} {Math.round((Math.abs(r.v) / total) * 100)}%
+                  </span>
+                  <span className="mt-1 block h-2 w-full rounded-full bg-[var(--panel-border)]" aria-hidden>
+                    <span className="block h-full rounded-full" style={{ width: `${Math.round((Math.abs(r.v) / total) * 100)}%`, background: r.v >= 0 ? "var(--alert)" : "var(--safe)" }} />
                   </span>
                 </span>
               </li>
@@ -192,6 +195,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
             {SITE.historyBox}
             <Info term="leadTime" />
           </h2>
+          {events.length > 0 && <p className="mt-1 text-base font-semibold">{SITE.eventSummary(events.length, events.filter((e) => e.detected_watch).length)}</p>}
           {events.length ? (
             <table className="tbl mt-2">
               <thead>
@@ -203,7 +207,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
                 </tr>
               </thead>
               <tbody>
-                {events.slice(0, 8).map((e) => (
+                {events.map((e) => (
                   <tr key={e.event_id}>
                     <td>
                       {fmtDateFull(e.first_exceed_date)}
@@ -264,7 +268,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-dim">
+          <p className="mt-3 text-sm text-dim">
             {BOARD.tile.official} {ALERT_LEVEL_LABEL[lvl]} ({SITE.measuredBasis}) 과 {BOARD.tile.ai} {TIER[t].label} 을 함께 본 판단입니다. 공식 발령을 대체하지 않습니다.
           </p>
         </section>
