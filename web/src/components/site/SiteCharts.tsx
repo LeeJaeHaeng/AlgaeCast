@@ -1,6 +1,6 @@
 "use client";
 
-import { CartesianGrid, ComposedChart, ErrorBar, Line, ReferenceLine, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Scatter, Tooltip, XAxis, YAxis } from "recharts";
 import { SITE } from "@/lib/copy";
 import { fmtCells, fmtDate } from "@/lib/format";
 
@@ -17,7 +17,7 @@ export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; heig
     const q = toLog(p.q50);
     const lo = toLog(p.lo);
     const hi = toLog(p.hi);
-    return { date: p.date, obs: toLog(p.obs), q50: q, err: q != null && lo != null && hi != null ? [q - lo, hi - q] : undefined, band: lo != null && hi != null ? [lo, hi] : null, past_pred: toLog(p.past_pred) };
+    return { date: p.date, obs: toLog(p.obs), q50: q, band: lo != null && hi != null ? [lo, hi] : null, past_pred: toLog(p.past_pred) };
   });
   const maxLv = Math.max(4.5, ...data.flatMap((d) => [d.obs ?? 0, d.q50 ?? 0, d.past_pred ?? 0, (d.band?.[1] as number) ?? 0])) + 0.3;
   const ticks = [0, 2, 3, 4, 5, 6].filter((t) => t <= maxLv);
@@ -42,9 +42,8 @@ export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; heig
         {maxLv > 6 && <ReferenceLine y={6} stroke={C.l3} strokeDasharray="4 4" label={{ value: "대발생 100만", fontSize: 12, position: "insideTopLeft", fill: C.l3 }} />}
         <Scatter dataKey="past_pred" name={SITE.chart.pastPred} fill={C.past} shape="circle" isAnimationActive={false} />
         <Line dataKey="obs" name={SITE.chart.obs} stroke={C.obs} strokeWidth={1.6} dot={{ r: 2.5, fill: C.obs }} connectNulls isAnimationActive={false} />
-        <Scatter dataKey="q50" name={SITE.chart.next} fill={C.pred} shape="circle" isAnimationActive={false}>
-          <ErrorBar dataKey="err" direction="y" width={14} strokeWidth={6} stroke={C.pred} opacity={0.45} />
-        </Scatter>
+        <Area dataKey="band" name={SITE.chart.band} stroke={C.pred} strokeWidth={1} fill={C.pred} fillOpacity={0.3} connectNulls={false} isAnimationActive={false} />
+        <Scatter dataKey="q50" name={SITE.chart.next} fill={C.pred} shape="circle" isAnimationActive={false} />
       </ComposedChart>
     </ResponsiveContainer>
   );

@@ -4,7 +4,7 @@ import { PageFrame } from "@/components/PageFrame";
 import { RangeBar } from "@/components/control/SiteTile";
 import { BigChart, EnvChart } from "@/components/site/SiteCharts";
 import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, SITE, TERMS, TIER, TIER_EXPERT, comboOf, levelOfCells, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
-import { ALERT_LEVEL_LABEL, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
+import { ALERT_LEVEL_LABEL, addDays, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
 import { getBloomEvents, getHydro, getLatestRun, getObservations, getPredictions, getShap, getSiteStatus, getSites, getWeather } from "@/lib/queries";
 
 export const revalidate = 300;
@@ -35,7 +35,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
   // 큰 차트: 1년 측정 + 지난 예상(회색) + 이번 예상(파란 점·띠)
   const latest = preds.at(-1);
   const pastByTarget = new Map(preds.filter((x) => x.target_date !== latest?.target_date).map((x) => [x.target_date, x.q50]));
-  const pts = [...obs.map((o) => ({ date: o.obs_date, obs: o.cell_count, past_pred: pastByTarget.get(o.obs_date) ?? null })), ...(latest ? [{ date: latest.target_date, obs: null, q50: latest.q50, lo: latest.q10_cqr, hi: latest.q90_cqr }] : [])].sort((a, b) => a.date.localeCompare(b.date));
+  const pts = [...obs.map((o) => ({ date: o.obs_date, obs: o.cell_count, past_pred: pastByTarget.get(o.obs_date) ?? null })), ...(latest ? [-2, 0, 2].map((d) => ({ date: addDays(latest.target_date, d).toISOString().slice(0, 10), obs: null, q50: d === 0 ? latest.q50 : null, lo: latest.q10_cqr, hi: latest.q90_cqr })) : [])].sort((a, b) => a.date.localeCompare(b.date));
 
   // 왜 이렇게 예상했나: 그룹별 기여 합 → 상위 3개 → §8.1 템플릿
   const byGroup = new Map<FeatureGroup, number>();

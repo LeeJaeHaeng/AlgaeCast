@@ -53,12 +53,12 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
       <span className="absolute inset-y-0 left-0 w-1.5" style={{ background: c.color }} aria-hidden />
       {/* 1행: 지점명 + 조합 라벨 + 공식 발령 칩 */}
       <div className="flex items-center gap-2 leading-tight">
-        <span className="shrink-0 whitespace-nowrap text-[15px] font-bold">{s.name}</span>
-        <span className="truncate text-[15px] font-bold" style={{ color: c.color }}>
+        <span className="shrink-0 whitespace-nowrap text-[15px] font-bold tracking-tight">{s.name}</span>
+        <span className="truncate text-[15px] font-bold tracking-tight" style={{ color: c.color }}>
           {c.icon} {c.label}
         </span>
         <Info text={`${c.tip} ${datesTip}`} />
-        <span className="ml-auto shrink-0 rounded border px-1.5 py-0.5 text-xs" style={{ borderColor: OFFICIAL_LEVEL[lvl].color, color: OFFICIAL_LEVEL[lvl].color }} title={BOARD.basis.nier}>
+        <span className="ml-auto shrink-0 rounded border px-1 py-0.5 text-[11px]" style={{ borderColor: OFFICIAL_LEVEL[lvl].color, color: OFFICIAL_LEVEL[lvl].color }} title={BOARD.basis.nier}>
           {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].label}
         </span>
       </div>
