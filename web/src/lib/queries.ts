@@ -184,3 +184,75 @@ export async function getLatestRunAny(): Promise<{ run_at: string; status: strin
   const { data } = await supabase().from("model_runs").select("run_at,status,notes").order("run_at", { ascending: false }).limit(1);
   return (data?.[0] as { run_at: string; status: string; notes: string | null }) ?? null;
 }
+
+/* ---------- T7-R 관제 상황판 추가 질의 ---------- */
+export type EventRow = {
+  event_time: string;
+  event_date: string;
+  kind: "tier_change" | "observation" | "run";
+  site_id: string | null;
+  site_name: string | null;
+  tier_from: string | null;
+  tier_to: string | null;
+  cell_count: number | null;
+  alert_level: number | null;
+  p_alert: number | null;
+  q50: number | null;
+  q90_cqr: number | null;
+  status: string | null;
+  notes: string | null;
+};
+
+/** 실시간 상황 기록 (v_event_log, 최근 days 일) */
+export async function getEventLog(days = 30, limit = 80): Promise<EventRow[]> {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const { data } = await supabase()
+    .from("v_event_log")
+    .select("*")
+    .gte("event_date", since.toISOString().slice(0, 10))
+    .order("event_time", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as EventRow[];
+}
+
+export type ObsLite = { site_id: string; obs_date: string; cell_count: number | null; alert_level: number | null; water_temp: number | null };
+/** 전 지점 최근 관측 (지점 모니터용) */
+export async function getRecentObsAll(days = 60): Promise<ObsLite[]> {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const { data } = await supabase()
+    .from("observations")
+    .select("site_id,obs_date,cell_count,alert_level,water_temp")
+    .gte("obs_date", since.toISOString().slice(0, 10))
+    .order("obs_date");
+  return (data ?? []) as ObsLite[];
+}
+
+export type ForecastLite = { site_id: string; obs_date: string; fc_ta_mean_d1_7: number | null; fc_rn_sum_d1_7: number | null };
+/** 지점별 가장 최근 7일 예보 요약 (weather_daily 의 fc_* 컬럼, 발표일 기준) */
+export async function getForecastAll(): Promise<ForecastLite[]> {
+  const since = new Date();
+  since.setDate(since.getDate() - 14);
+  const { data } = await supabase()
+    .from("weather_daily")
+    .select("site_id,obs_date,fc_ta_mean_d1_7,fc_rn_sum_d1_7")
+    .gte("obs_date", since.toISOString().slice(0, 10))
+    .not("fc_ta_mean_d1_7", "is", null)
+    .order("obs_date", { ascending: false });
+  const seen = new Set<string>();
+  const out: ForecastLite[] = [];
+  for (const r of (data ?? []) as ForecastLite[]) {
+    if (seen.has(r.site_id)) continue;
+    seen.add(r.site_id);
+    out.push(r);
+  }
+  return out;
+}
+
+/** 수집 상태 LED 용: 관측 최신 적재 시각·최신 측정일 */
+export async function getCollectStatus(): Promise<{ fetched_at: string | null; obs_date: string | null }> {
+  const { data } = await supabase().from("observations").select("fetched_at,obs_date").order("obs_date", { ascending: false }).limit(1);
+  const r = data?.[0] as { fetched_at: string | null; obs_date: string | null } | undefined;
+  return { fetched_at: r?.fetched_at ?? null, obs_date: r?.obs_date ?? null };
+}
