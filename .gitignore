@@ -58,3 +58,6 @@ models/**/*.pkl
 # web 로컬 환경변수
 web/.env.local
 web/.env*.local
+
+# Supabase CLI 임시 파일
+supabase/.temp/
