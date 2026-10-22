@@ -23,8 +23,8 @@ PDF = REP / "방법설명서.pdf"
 EDGE = Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
 
 CSS = """
-@page { size: A4; margin: 14mm 14mm 15mm 14mm; }
-html { font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif; font-size: 9pt; color: #111; }
+@page { size: A4; margin: 13mm 14mm 14mm 14mm; }
+html { font-family: 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif; font-size: 8.85pt; color: #111; }
 p, li, h1, h2, h3, h4, .cover, blockquote { word-break: keep-all; overflow-wrap: break-word; }
 td, th { word-break: normal; }
 section.footnotes p, section.footnotes li { word-break: normal; overflow-wrap: anywhere; text-align: left; margin: 0; }
@@ -39,14 +39,14 @@ table { border-collapse: collapse; width: 100%; margin: 2mm 0 3mm; font-size: 7.
 tr { page-break-inside: avoid; }
 th, td { border: 1px solid #9aa7b5; padding: 0.7mm 1.2mm; vertical-align: top; }
 th { background: #e8eef5; }
-img { display: block; max-width: 100%; max-height: 70mm; margin: 1.5mm auto 1mm; page-break-inside: avoid; }
+img { display: block; max-width: 100%; max-height: 62mm; margin: 1.5mm auto 1mm; page-break-inside: avoid; }
 .cap { text-align: center; font-size: 8.6pt; color: #444; margin: 0 0 4mm; }
 code { font-family: Consolas, monospace; font-size: 8.8pt; background: #f3f5f8; padding: 0 1mm; }
 pre { background: #f3f5f8; padding: 2.5mm; font-size: 8.5pt; white-space: pre-wrap; page-break-inside: avoid; }
 blockquote { border-left: 3px solid #1f4e79; margin: 3mm 0; padding: 1mm 4mm; background: #f6f9fc; }
 section.footnotes ol { columns: 2; column-gap: 6mm; padding-left: 6mm; margin: 0; }
 section.footnotes li { margin: 0 0 0.6mm; text-align: left; }
-section.footnotes { font-size: 6.6pt; line-height: 1.25; color: #333; border-top: 1px solid #bbb; margin-top: 6mm; }
+section.footnotes { font-size: 6.2pt; line-height: 1.2; color: #333; border-top: 1px solid #bbb; margin-top: 6mm; }
 .cover { height: 250mm; display: flex; flex-direction: column; justify-content: center; }
 .cover .sub { font-size: 13pt; color: #333; margin-bottom: 10mm; }
 .cover .meta { font-size: 11pt; line-height: 2; }
