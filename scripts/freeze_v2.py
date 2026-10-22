@@ -32,9 +32,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml
 
 from algaecast.collect.base import KST
-from algaecast.config import DATA_DIR, MODELS_DIR, ROOT, SUBMISSION_PATH
+from algaecast.config import CONFIG_DIR, DATA_DIR, MODELS_DIR, ROOT, SUBMISSION_PATH
 from algaecast.eval.metrics import compute_all
 from algaecast.models import registry as R
 from algaecast.models import v2 as V2
@@ -119,12 +120,17 @@ def frozen_v2_md(
         for r in rows
     )
     head = "# 모델 동결 v2 (FROZEN_v2) — 운영 모델 C" + (" — dry-run 초안(동결 아님)" if dry else "")
+    mc = yaml.safe_load((CONFIG_DIR / "model.yaml").read_text(encoding="utf-8"))
+    op = {k: mc.get(k) for k in ("operating_point", "thresholds", "cqr")}
     return f"""{head}
 
 - 동결 커밋: `{PLACEHOLDER}` (이 커밋 이후 v2 모델·가중치·피처·운영점을 변경하지 않는다)
 - 동결 시각(KST): {frozen_at}
 - 근거: 사전등록 확인 실험 EXP-confirm 통과(reports/experiments/EXP-confirm/RESULT.md),
-  설계·동등성 reports/v2/BUILD.md
+  설계·동등성 reports/v2/BUILD.md. 원단위 고도화 2차(EXP-005) 최종 판정 기준 미충족·P3(단기예보 격자) 미통과로
+  C 를 그대로 동결한다(reports/experiments/EXP-005/EXP-summary2.md, P3/RESULT.md)
+- 운영점: {json.dumps(op["operating_point"], ensure_ascii=False)}; 임계 {json.dumps(op["thresholds"])};
+  CQR {json.dumps(op["cqr"])} (config/model.yaml, v1 동결값 그대로)
 - 구성: 회귀 = v1 로그 앙상블(c1 C1 smearing·c3 C3 hurdle·c2 C2 tweedie, v1 하이퍼파라미터) + 속별 구성원 cg
   (G2 = Microcystis + 나머지 3속, 부분별 log 회귀(C1 설정)·smearing), 결합 = log10 공간 NNLS(합=1)
 - 피처 {len(model.cols)}개 = v1 선택 30(perc75, 결측 전략 S1)
