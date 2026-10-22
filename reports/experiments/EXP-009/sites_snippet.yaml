@@ -1,0 +1,32 @@
+# EXP-009(R6) config/sites.yaml 조각 — 메인 세션이 sites[] 각 항목에 통합
+# autowq_primary: 최근접 본류 수질자동측정소(국립환경과학원 수질 DB getRealTimeWaterQualityList 의 siteId)
+# autowq_secondary: 차순위 본류 측정소(주 측정소 결측일·미측정 항목 TN·TP 보충)
+# 거리: 물환경정보시스템 GIS(reach_V3/MapServer/96) 좌표 간 직선거리(2026-10-21 조회)
+# precise_lat/lon: 같은 GIS 층 I002 '상수원구간'의 조류경보 지점 좌표(sites.yaml lat/lon 근사값 대체 후보)
+sites:
+  - station_id: HP
+    precise_lat: 36.1949
+    precise_lon: 128.3652
+    autowq_primary: { code: S02012, name: 해평, distance_km: 0.3, note: "감천 합류 5 km 하류 숭선대교; TN·TP 미측정" }
+    autowq_secondary: { code: S02021, name: 도개, distance_km: 8.9, note: "구미보 상류 일선교(본류)" }
+  - station_id: GJGR
+    precise_lat: 35.8660
+    precise_lon: 128.3839
+    autowq_primary: { code: S02009, name: 다산, distance_km: 2.6, note: "강정고령보 상류 5 km 월암양수장; PO4-P·NH3-N·NO3-N 도 측정" }
+    autowq_secondary: { code: S02003, name: 왜관, distance_km: 12.8, note: "제2왜관교(본류); TN·TP 미측정" }
+  - station_id: CS
+    precise_lat: 35.3853
+    precise_lon: 128.4489
+    autowq_primary: { code: S02007, name: 칠서, distance_km: 1.0, note: "남강 합류 1 km 하류; TN·TP 미측정" }
+    autowq_secondary: { code: S02006, name: 청암, distance_km: 6.7, note: "창녕함안보 상류 3.5 km(본류, 칠서 하류)" }
+  - station_id: MGMR
+    precise_lat: 35.3483
+    precise_lon: 128.9335
+    autowq_primary: { code: S02017, name: 상동, distance_km: 3.1, note: "매리취수장 상류 2~5.6 km" }
+    autowq_secondary: { code: S02008, name: 창암, distance_km: 9.9, note: "밀양강 합류 1.2 km 하류 신삼랑진교(본류)" }
+    autowq_note: "양산 S02056(9.9 km, 물금읍)은 2022-08 설치·Chl-a 미측정이라 제외"
+  - station_id: DCHN
+    precise_lat: 36.4314
+    precise_lon: 127.5522
+    autowq_primary: { code: S03003, name: 대청호, distance_km: 0.2, note: "회남대교 지점(1998~); 탁도 미측정" }
+    autowq_secondary: { code: S03007, name: 장계, distance_km: 9.7, note: "대청호 장계교 지점" }
