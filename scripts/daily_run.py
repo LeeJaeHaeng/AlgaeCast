@@ -2,9 +2,12 @@
 
 동결 모델 검증 → 증분 수집 → as-of 피처 → 예측 → Supabase → backfill → 라이브 벤치마크 → revalidate.
 
-- 제출 전(2026-11-06)까지 재학습 금지: models/FROZEN.md 의 sha256 과 불일치하면 즉시 중단(종료코드 2).
+- 제출 전(2026-11-06)까지 재학습 금지: models/FROZEN.md(v1)·FROZEN_v2.md(있으면)의 sha256 과 불일치하면
+  즉시 중단(종료코드 2).
 - 실패 시 model_runs 에 status='failed' 행을 남긴다(대시보드 배너). 대회 번들·모델 pickle 은 저장소에 없고
-  모델은 GitHub Release(model-frozen-13ac483) 에서 워크플로가 내려받는다.
+  모델은 GitHub Release(환경변수 FROZEN_TAG, 기본 model-frozen-13ac483) 에서 워크플로가 내려받는다.
+- 회귀 current 가 ensemble_v2(v2 운영 모델)이면 as-of 피처 행에 상류 피처 5열을 붙여 예측한다
+  (추가 수집 없음 — 이번에 모은 5지점 조류 자료를 행의 기준일까지 잘라 계산). v1 이면 동작이 이전과 같다.
 사용: python scripts/daily_run.py [--days 120] [--today YYYY-MM-DD] [--dry-run] [--skip-collect]
 """
 
@@ -27,6 +30,7 @@ import yaml
 from algaecast.collect.base import KST
 from algaecast.config import CONFIG_DIR, ROOT, get_env
 from algaecast.predict.asof import (
+    attach_model_features,
     build_daily,
     collect_recent,
     feature_rows,
@@ -37,6 +41,8 @@ from algaecast.predict.asof import (
 
 log = logging.getLogger("daily")
 LOG_DIR = ROOT / "logs"
+# 동결 모델 Release 태그(워크플로 env FROZEN_TAG). v2 동결 후 워크플로에서 교체한다.
+FROZEN_TAG = os.environ.get("FROZEN_TAG", "model-frozen-13ac483")
 
 
 def verify_frozen() -> None:
@@ -62,7 +68,7 @@ def record_failed(exc: BaseException, dry: bool) -> None:
             {
                 "run_at": datetime.now(tz=KST).isoformat(),
                 "model_name": "algaecast7-ensemble",
-                "model_version": "frozen-13ac483",
+                "model_version": FROZEN_TAG.removeprefix("model-"),
                 "git_commit": os.environ.get("GITHUB_SHA", "")[:7] or None,
                 "status": "failed",
                 "notes": f"daily_run 실패: {type(exc).__name__}: {str(exc)[:300]}",
@@ -72,11 +78,17 @@ def record_failed(exc: BaseException, dry: bool) -> None:
         log.error("failed 기록 실패: %s", e2)
 
 
-def upload_predictions(feat: pd.DataFrame, cfg_sites: dict, dry: bool) -> tuple[str, int]:
-    from algaecast.db.upload import _clean, level_of, predict_registry, shap_and_reco_rows, upsert
-    from algaecast.models.registry import current_versions
+def upload_predictions(
+    feat: pd.DataFrame, cfg_sites: dict, dry: bool, algae: pd.DataFrame | None = None
+) -> tuple[str, int]:
+    """as-of 피처 행 예측 → Supabase.
 
-    pr = predict_registry(feat)
+    algae = 이번에 수집한 조류 자료(v2 상류 피처가 feat 에 없을 때만 사용).
+    """
+    from algaecast.db.upload import _clean, level_of, predict_registry, shap_and_reco_rows, upsert
+    from algaecast.models.registry import current_kind, current_versions
+
+    pr = predict_registry(feat, algae=algae)
     mcfg = yaml.safe_load((CONFIG_DIR / "model.yaml").read_text(encoding="utf-8"))
     run = {
         "run_at": datetime.now(tz=KST).isoformat(),
@@ -88,7 +100,8 @@ def upload_predictions(feat: pd.DataFrame, cfg_sites: dict, dry: bool) -> tuple[
                 "registry": current_versions(),
                 "operating_point": mcfg.get("operating_point"),
                 "cqr": mcfg.get("cqr"),
-                "frozen": "model-frozen-13ac483",
+                "frozen": FROZEN_TAG,
+                "regression_kind": current_kind("regression"),
             }
         ),
         "status": "success",
@@ -119,7 +132,7 @@ def upload_predictions(feat: pd.DataFrame, cfg_sites: dict, dry: bool) -> tuple[
     rows["p_over_10k"] = None
     rows["obs_cell_count"] = None
     n = upsert(sb, "predictions", _clean(rows), "run_id,site_id,base_date,target_date", False)
-    shap_rows, reco_rows = shap_and_reco_rows(run_id, cfg_sites, feat)
+    shap_rows, reco_rows = shap_and_reco_rows(run_id, cfg_sites, feat, algae=algae)
     upsert(sb, "shap_contributions", shap_rows, None, False)
     upsert(sb, "recommendations", reco_rows, None, False)
     return run_id, n
@@ -228,7 +241,9 @@ def main(argv: list[str] | None = None) -> int:
         summary["new_bases"] = {k: str(v) for k, v in bases.items()}
         if bases:
             feat = feature_rows(daily, sites_cfg, bases)
-            run_id, n = upload_predictions(feat, sites_cfg, args.dry_run)
+            # v2(ensemble_v2) 이면 상류 피처 5열을 같은 조류 자료로 붙인다(v1 이면 그대로)
+            feat = attach_model_features(feat, src.get("algae"))
+            run_id, n = upload_predictions(feat, sites_cfg, args.dry_run, algae=src.get("algae"))
             summary["steps"]["predict"] = {"run_id": run_id, "n": n}
         else:
             summary["steps"]["predict"] = "skipped (새 측정 없음)"

@@ -4,7 +4,7 @@
 패키지 루트(공지 #564): README.md, data/, model/, src/, notebooks/, scripts/, demo/, figures/
   + 루트 파일: submission.csv(제출본), 방법설명서.pdf, requirements.txt(pip freeze), pyproject.toml(설치용)
 - data/   : 대회 번들 + 외부 수집 원천 parquet + MANIFEST.md (git 미포함, 패키지 전용)
-- model/  : 동결 모델 3종 + registry.json + FROZEN.md(sha256)
+- model/  : 동결 모델(registry current + FROZEN.md·FROZEN_v2.md 표에 적힌 버전) + registry.json + 동결 문서(sha256)
 - src/    : 파이썬 패키지 algaecast(재현에 필요한 코드만) + src/config/(설정) + src/docs/(설계 문서)
 - scripts/: verify_frozen.py, leakage_audit.py, verify_package.py
 - demo/   : 저장소 루트 demo/ 에서 복사(AlgaeCast_demo.mp4·.srt·script.md·README_DEMO.md·captures/). raw/·tools/·.gitignore·*.webm 제외.
@@ -435,10 +435,15 @@ def build(out: Path) -> int:
         (out / "data" / sub / ".gitkeep").write_text("", encoding="utf-8")
     # model/ (동결 모델 — 코드가 model/ 을 읽도록 algaecast.config 가 패키지 구조를 감지)
     reg = json.loads((ROOT / "models" / "registry.json").read_text(encoding="utf-8"))
-    for name, ver in reg["current"].items():
+    versions = set(reg["current"].items())
+    for doc in ("FROZEN.md", "FROZEN_v2.md"):  # v2 동결 후: verify_frozen 이 두 문서의 파일을 모두 검증한다
+        if (ROOT / "models" / doc).exists():
+            text = (ROOT / "models" / doc).read_text(encoding="utf-8")
+            versions |= set(re.findall(r"\| (\w+) \| (\d+_\d+) \| `[0-9a-f]{64}` \|", text))
+            copy(ROOT / "models" / doc, out / "model" / doc)
+    for name, ver in sorted(versions):
         copy(ROOT / "models" / name / ver, out / "model" / name / ver)
     copy(ROOT / "models" / "registry.json", out / "model" / "registry.json")
-    copy(ROOT / "models" / "FROZEN.md", out / "model" / "FROZEN.md")
     # src/ (필요 모듈) + src/config/ + src/docs/
     pkg = ROOT / "src" / "algaecast"
     for p in pkg.rglob("*.py"):

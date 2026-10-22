@@ -18,6 +18,7 @@ import json
 import logging
 import subprocess
 from datetime import date, datetime
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -29,7 +30,7 @@ from algaecast.config import CONFIG_DIR, DATA_DIR, ROOT, get_env
 from algaecast.eval import decision as DEC
 from algaecast.eval.transitions import T10K, leadtime_table, load_oof, official_events, transition_table
 from algaecast.models import data as D
-from algaecast.models.registry import current_versions, load_current
+from algaecast.models.registry import current_versions, explain_member, load_current
 
 log = logging.getLogger(__name__)
 INTERIM = DATA_DIR / "interim"
@@ -233,16 +234,40 @@ def daily_rows(cfg: dict, days: int) -> tuple[list[dict], list[dict]]:
 
 
 # ---------------------------------------------------------------- 예측
-def predict_registry(feat: pd.DataFrame, cols_hint: list[str] | None = None) -> pd.DataFrame:
-    """레지스트리 current(회귀 앙상블/단일 · 분류기 b · 분위)로 feat 행 예측 → q10/q50/q90(+CQR), "
-    "p_alert, tier."""
-    reg, _ = load_current("regression")
-    clf, _ = load_current("classifier")
-    qm, _ = load_current("quantile")
+def predict_registry(
+    feat: pd.DataFrame,
+    cols_hint: list[str] | None = None,
+    *,
+    reg_dir: Path | None = None,
+    algae: pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """레지스트리 current(회귀 앙상블/단일 · 분류기 b · 분위)로 feat 행 예측.
+
+    출력: 점예측·q10/q50/q90(+CQR)·p_alert·tier.
+
+    회귀가 ensemble_v2(v2 운영 모델)이면 feat 에 상류 피처(features.upstream)를 붙여 회귀만 v2 로 예측하고,
+    분위·분류기는 v1 동결본 입력(v1 30열·범주)으로 예측한다. 상류 피처가 feat 에 이미 있으면 그대로 쓰고,
+    없으면 algae(조류경보제 5지점 원자료, None 이면 data/raw parquet)를 행의 기준일까지 잘라 계산한다.
+    reg_dir: 레지스트리 디렉터리(None = models/). v1 회귀(ensemble·log_w)일 때 동작은 이전과 같다.
+    """
+    reg, _ = load_current("regression", reg_dir=reg_dir)
+    clf, _ = load_current("classifier", reg_dir=reg_dir)
+    qm, _ = load_current("quantile", reg_dir=reg_dir)
     mcfg = yaml.safe_load((CONFIG_DIR / "model.yaml").read_text(encoding="utf-8"))
     qhat = mcfg.get("cqr", {}).get("qhat_log10", 0.0)
     op = mcfg.get("operating_point", {"prob_source": "clf_b", "cost_ratio": 3, "threshold": 0.5})
-    cols, cats = reg["cols"], reg["cats"]
+    if reg.get("kind") == "ensemble_v2":
+        from algaecast.models.v2 import V2Model
+
+        v2m = V2Model.from_registry(reg)
+        feat = v2m.features(feat, algae)
+        aux = reg.get("aux") or {}
+        cols, cats = aux.get("cols", clf["cols"]), aux.get("cats", clf["cats"])
+        base_categories = aux.get("categories", clf["categories"])
+    else:
+        v2m = None
+        cols, cats = reg["cols"], reg["cats"]
+        base_categories = reg["categories"]
 
     def prep(X: pd.DataFrame, categories: dict) -> pd.DataFrame:
         X = X[cols].copy()
@@ -250,8 +275,10 @@ def predict_registry(feat: pd.DataFrame, cols_hint: list[str] | None = None) -> 
             X[c] = pd.Categorical(X[c].astype(str), categories=categories[c])
         return X
 
-    X = prep(feat, reg["categories"])
-    if reg.get("kind") == "ensemble":
+    if v2m is not None:
+        pred = v2m.predict(feat)
+    elif reg.get("kind") == "ensemble":
+        X = prep(feat, reg["categories"])
         parts = {}
         for name, m in reg["members"].items():
             if m["kind"] == "log_w":
@@ -266,8 +293,9 @@ def predict_registry(feat: pd.DataFrame, cols_hint: list[str] | None = None) -> 
         z = sum(reg["weights"][n] * np.log10(parts[n] + 1) for n in parts)
         pred = np.clip(10**z - 1, 0, None)
     else:
+        X = prep(feat, reg["categories"])
         pred = np.clip(10 ** np.clip(reg["model"].predict(X), 0, 7) - 1, 0, None) * reg["smear"]
-    Xq = prep(feat, qm.get("categories", reg["categories"]))
+    Xq = prep(feat, qm.get("categories", base_categories))
     lp = {q: np.asarray(m.predict(Xq), dtype=float) for q, m in qm["models"].items()}
     lo, hi = np.minimum(lp[0.1], lp[0.9]), np.maximum(lp[0.1], lp[0.9])
     mid = np.clip(lp[0.5], lo, hi)
@@ -369,18 +397,29 @@ def predictions_rows(
     return rows, latest
 
 
-def shap_and_reco_rows(run_id: str, cfg: dict, latest: pd.DataFrame) -> tuple[list[dict], list[dict]]:
+def shap_and_reco_rows(
+    run_id: str,
+    cfg: dict,
+    latest: pd.DataFrame,
+    *,
+    reg_dir: Path | None = None,
+    algae: pd.DataFrame | None = None,
+) -> tuple[list[dict], list[dict]]:
     import shap
 
-    reg, _ = load_current("regression")
-    clf, _ = load_current("classifier")
-    c1 = reg["members"]["회귀 C1(smearing)"] if reg.get("kind") == "ensemble" else reg
+    reg, _ = load_current("regression", reg_dir=reg_dir)
+    clf, _ = load_current("classifier", reg_dir=reg_dir)
+    if reg.get("kind") == "ensemble_v2":  # v2: C1 구성원 입력에 상류 피처가 포함된다
+        from algaecast.models.v2 import V2Model
+
+        latest = V2Model.from_registry(reg).features(latest, algae)
+    c1 = explain_member(reg)
     cols, cats = c1["cols"], c1["cats"]
     X = latest[cols].copy()
     for c in cats:
         X[c] = pd.Categorical(X[c].astype(str), categories=c1["categories"][c])
     sv = pd.DataFrame(shap.TreeExplainer(c1["model"]).shap_values(X), columns=cols, index=latest.index)
-    pr = predict_registry(latest)
+    pr = predict_registry(latest, reg_dir=reg_dir, algae=algae)
     shap_rows, reco = [], []
     for i, r in latest.iterrows():
         s = sv.loc[i]

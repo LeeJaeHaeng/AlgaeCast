@@ -4,6 +4,8 @@
 - 수집: 조류경보제(NIER), K-water delist(보·댐), WAMIS wl_dtdata(연속 수위 관측소), ASOS, 예보 CSV(저장소)
 - 연속 수위 편차는 config/level_cont_stats.json(전기간 평균·오프셋 집계값)으로 계산
 - base_date = 오늘 이전 가장 최근 조류 측정일(지점별). 새 측정 없으면 해당 지점 건너뜀
+- 회귀 current 가 ensemble_v2(v2 운영 모델)이면 ``attach_model_features`` 가 같은 조류 자료로 상류 피처 5열을
+  붙인다(추가 수집 없음, 원자료는 행의 기준일까지만). v1 이면 피처 행을 그대로 쓴다.
 - ``validate_against_bundle`` 는 로컬에서 번들 기반 features_S1 과 최근 30 base_date 의 피처 일치율을 계산
 """
 
@@ -247,6 +249,36 @@ def feature_rows(
         )
         rows.append(feats)
     return pd.DataFrame(rows)
+
+
+def attach_model_features(
+    feat: pd.DataFrame, algae: pd.DataFrame | None, *, reg_dir: Path | None = None
+) -> pd.DataFrame:
+    """회귀 current 가 ensemble_v2 이면 as-of 피처 행에 v2 추가 피처(상류 5열)를 붙인다. v1 이면 feat 그대로.
+
+    추가 수집 없이 collect_recent 가 모은 5지점 조류 자료(algae)를 행의 기준일까지 잘라 계산한다
+    (features.upstream.build_upstream). algae 가 None 이면 data/raw parquet(로컬),
+    비어 있으면 상류 열을 NaN 으로 둔다.
+    """
+    from algaecast.models.registry import current_entry
+
+    try:
+        meta = current_entry("regression", reg_dir).get("meta", {})
+    except KeyError:
+        return feat
+    if meta.get("kind") != "ensemble_v2":
+        return feat
+    from algaecast.models.v2 import V2Config, ensure_features
+
+    cfg = V2Config.from_dict(meta["config"])
+    if algae is not None and algae.empty:
+        log.warning("as-of 조류 자료가 비어 v2 추가 피처 %s 를 NaN 으로 둔다", cfg.extra_features)
+        out = feat.copy()
+        for c in cfg.extra_features:
+            if c not in out.columns:
+                out[c] = np.nan
+        return out
+    return ensure_features(feat, cfg, algae)
 
 
 # ---------------------------------------------------------------- 검증
