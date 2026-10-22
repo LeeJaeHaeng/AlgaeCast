@@ -19,6 +19,8 @@ def load_test_targets(*, i_know_this_is_for_post_hoc_only: bool = False) -> pd.D
             "test 타깃은 사후 검증 전용 — i_know_this_is_for_post_hoc_only=True 로 명시하라"
         )
     df = pd.read_parquet(TEST_TARGETS_PATH)
+    if "quarantine" in df.columns:  # 목표일 2026 인 2025 검증 행(target_2026)은 test 평가 대상이 아니다
+        df = df[df["quarantine"] == "test"].drop(columns="quarantine").reset_index(drop=True)
     df["base_date"] = pd.to_datetime(df["base_date"]).dt.date
     df["target_date"] = pd.to_datetime(df["target_date"]).dt.date
     return df

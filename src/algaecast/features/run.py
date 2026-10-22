@@ -208,21 +208,31 @@ TEST_TARGETS_PATH = PROCESSED / "test_targets_DO_NOT_USE.parquet"
 TARGET_COLS = ["target_cells", "target_log"]
 
 
-def quarantine_test_targets(feats: pd.DataFrame, path: Path = TEST_TARGETS_PATH) -> pd.DataFrame:
-    """test split 의 타깃을 별도 파일로 분리 저장하고 피처 프레임의 test 타깃은 NaN 으로 비운다.
+QUARANTINE_TARGET_FROM = date(2026, 1, 1)  # 정답이 2026 측정인 행은 split 과 무관하게 격리한다
 
-    분리 파일은 사후 검증 전용(eval/live).
+
+def quarantine_test_targets(feats: pd.DataFrame, path: Path = TEST_TARGETS_PATH) -> pd.DataFrame:
+    """test split 과 '목표일이 2026 이상인 행'(예: 기준일 2025-12-29 → 목표일 2026-01-05)의 타깃을
+    별도 파일로 분리 저장하고 피처 프레임에서는 NaN 으로 비운다.
+
+    분리 파일은 사후 검증 전용(eval/live). 열 ``quarantine`` = "test" | "target_2026".
+    목표일 2026 행은 타깃이 비므로 학습·검증 로더(drop_missing_target)에서 빠진다.
     """
     d = feats.copy()
     is_test = d["split"] == "test"
-    tt = d.loc[is_test, ["station_id", "site_code", "base_date", "target_date", *TARGET_COLS]].copy()
+    is_2026 = pd.to_datetime(d["target_date"]) >= pd.Timestamp(QUARANTINE_TARGET_FROM)
+    q = is_test | is_2026
+    tt = d.loc[q, ["station_id", "site_code", "base_date", "target_date", *TARGET_COLS]].copy()
+    tt["quarantine"] = np.where(is_test[q].to_numpy(), "test", "target_2026")
     if path.exists():
         prev = pd.read_parquet(path)
         prev["base_date"] = pd.to_datetime(prev["base_date"]).dt.date
+        if "quarantine" not in prev.columns:
+            prev["quarantine"] = "test"
         tt = pd.concat([prev, tt]).drop_duplicates(["station_id", "base_date"], keep="last")
     path.parent.mkdir(parents=True, exist_ok=True)
     tt.to_parquet(path, index=False)
-    d.loc[is_test, TARGET_COLS] = np.nan
+    d.loc[q, TARGET_COLS] = np.nan
     return d
 
 

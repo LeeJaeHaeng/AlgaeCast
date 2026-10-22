@@ -172,4 +172,5 @@ def test_v1_treatment_reproduces_baseline_c1() -> None:
     res, _ = R.cv_member(df, H.base_columns(), "c1", R.Treatment())
     a, b = np.log10(res["pred"] + 1), np.log10(base["c1"] + 1)
     ok = np.isfinite(a) & np.isfinite(b)
-    assert ok.sum() == 1534 and float(np.max(np.abs(a[ok] - b[ok]))) == 0.0
+    # 2020~2025 행 1,530(목표일 2026 인 2025-12 기준일 4행은 격리 — 2026-10-22)
+    assert ok.sum() == 1530 and float(np.max(np.abs(a[ok] - b[ok]))) == 0.0

@@ -351,6 +351,8 @@ def save_oof(df: pd.DataFrame, preds: dict[str, np.ndarray], path: Path) -> Path
     out["year"] = years_of(df)
     for k, v in preds.items():
         out[k] = np.asarray(v, dtype=float)
+    # 목표일이 2026 이상인 행(정답이 2026 측정)은 어떤 캐시에도 남기지 않는다
+    out = out[pd.to_datetime(out["target_date"]) < pd.Timestamp("2026-01-01")]
     out.to_parquet(path, index=False)
     return path
 
