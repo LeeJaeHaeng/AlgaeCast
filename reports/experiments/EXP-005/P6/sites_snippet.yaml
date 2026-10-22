@@ -1,0 +1,22 @@
+# config/sites.yaml 조각 — P6 상류 댐 호소 연결(통합은 메인 세션, 기존 키 변경 없음)
+# 각 sites[] 항목에 dam_reservoir_links 키를 더한다. 거리(km)·이동시간(일)은 가정값(±30%, 미검증):
+#   지류(자유 흐름) 0.5 m/s, 보로 막힌 낙동강 본류 0.1 m/s, 호소 상류부 0.05 m/s.
+#   강정고령보→칠서 87 km·칠서→물금매리 60 km 는 R2(r2_upstream.RIVER_KM) 값, 나머지는 지도 기준 대략값.
+# 코드: src/algaecast/exp/r2nd_p6_damres.py LINKS
+HP:
+  dam_reservoir_links: [] # 상류 댐(안동·임하·영주·군위·성덕) 호소에 조류경보 지점 없음
+GJGR:
+  dam_reservoir_links: [] # 위 + 김천부항 — 조류경보 지점 없음
+CS:
+  dam_reservoir_links:
+    - { reservoir: 영천호, algae_sites: ["2012G20"], dam: "2012210", dam_name: 영천, trib_km: 95, main_km: 87, travel_days: 12.3, certain: true, via: 자호천→금호강→낙동강(강정고령보) }
+    - { reservoir: 진양호, algae_sites: ["2018G20", "2018G30"], dam: "2018110", dam_name: 남강, trib_km: 75, main_km: 2, travel_days: 2.0, certain: false, via: 남강→낙동강(남지), note: 남강 합류점과 측정지점 상하류 관계 미확인(upstream_dams_uncertain) }
+MGMR:
+  dam_reservoir_links:
+    - { reservoir: 영천호, algae_sites: ["2012G20"], dam: "2012210", dam_name: 영천, trib_km: 95, main_km: 147, travel_days: 19.2, certain: true, via: 자호천→금호강→낙동강 }
+    - { reservoir: 진양호, algae_sites: ["2018G20", "2018G30"], dam: "2018110", dam_name: 남강, trib_km: 75, main_km: 62, travel_days: 8.9, certain: true, via: 남강→낙동강→칠서→물금·매리 }
+    - { reservoir: 운문호, algae_sites: ["2021G10", "2021G20"], dam: "2021210", dam_name: 운문, trib_km: 55, main_km: 11, travel_days: 2.5, certain: true, via: 동창천→밀양강→낙동강(삼랑진) }
+DCHN:
+  dam_reservoir_links:
+    - { reservoir: 용담호, algae_sites: ["3001G20", "3001G40"], dam: "3001110", dam_name: 용담, trib_km: 105, lake_km: 20, travel_days: 7.1, certain: true, via: 금강 본류→대청호 상류부 }
+# 제외: 공산지(2012G55·2012G56, 방류 자료 없음), 밀양댐(호소 조류 지점 없음), 대청호 추동·문의(회남 하류)
