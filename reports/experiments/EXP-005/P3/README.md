@@ -1,5 +1,7 @@
 # EXP-005(2차) P3 — 기상청 단기예보 과거 발표분 피처: 수집 불가(blocked)
 
+> **갱신(2026-10-22 16시).** 이 문서는 활용신청 전(12시대) 기록이다. 같은 날 격자자료 활용신청이 승인된 뒤 다시 시도했다. 자료 확인은 [`PROBE_GRID.md`](PROBE_GRID.md), 사전등록은 [`PREREG_P3.md`](PREREG_P3.md), 결과는 [`RESULT.md`](RESULT.md)(판정: 미통과), 독립 검증은 [`VERIFY_P3.md`](VERIFY_P3.md)에 있다. 피처 정의는 재시도 때 사용자 지시(최고·최저기온·강수확률·하늘상태·강수량)에 맞게 바꿨다(아래 3절의 옛 정의는 쓰지 않는다).
+
 2026-10-22. 시간 상한 8시간 중 약 0.2시간을 썼다(12:12~12:25). 점검 코드는 `src/algaecast/collect/kma_apihub_fcst.py`다(재실행: `python -m algaecast.collect.kma_apihub_fcst`, 약 10초). 점검 결과 원본은 [`probe.json`](probe.json)이다. 키 값과 키 일부는 어디에도 기록하지 않았다.
 
 ## 0. 결론
