@@ -36,7 +36,9 @@ from algaecast.config import ROOT
 PKG_NAME = "AlgaeCast_녹조7일예측_이재행"
 ZIP_NAME = f"{PKG_NAME}.zip"
 ZIP_NOVIDEO = f"{PKG_NAME}_영상제외.zip"
-DEMO_SHA_PREFIX = "43761cbc"  # 2026-10-22 v2 재녹화본(v1 승인본 6a0d78e3 → dist/backup_demo_20261022_v1)
+DEMO_SHA_PREFIX = "5363e22a"  # 2026-10-22 v3(운영 화면 v2 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc → dist/backup_demo_20261022_*
+# DataON 유래 파일이 있는(또는 노트북 실행으로 생기는) 폴더 — LICENSE_DataON.txt 를 붙인다
+DATAON_DIRS = ("data/raw/dataon", "data/interim", "data/processed", "src/config")
 DEMO_FILES = ["AlgaeCast_demo.mp4", "AlgaeCast_demo.srt", "script.md", "README_DEMO.md"]
 RAW_FILES = [
     "nier_algae/nier_algae_2012_2026.parquet",
@@ -286,7 +288,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 
 ## 2. 데이터·모델 요약
 - 타깃: 조류경보제 5지점(해평·강정고령·칠서·물금매리·회남) 유해남조류 세포수(cells/mL), 기준일(base_date)+7일(±3일 매칭) 예측.
-- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5 — 원 배포 파일(연도별 xlsx)은 미포함, 피처 계산용 연속 수위 파일만 포함), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
+- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — 원 배포 파일(연도별 xlsx)은 미포함, 피처 계산용 연속 수위 파일만 포함, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
 - 모델: **제출·운영 모델 v2**(2026-10-22 동결, 커밋 `{frozen['v2']}`) = LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.000 · c3 0.266 · c2 0.373 · cg 0.361) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률) + 분위 회귀 q10/50/90(CQR 보정, 감시 규칙). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점은 v1 동결본 그대로라 감시·경보 결과는 v1 과 같다. **블라인드 검증 모델 v1**(2026-10-21 09:44 KST 봉인, 커밋 `{frozen['v1']}`) = 같은 3종 NNLS 앙상블, 피처 30개.
 - 검증: 연도 expanding-window CV(2020~2024) → 2025 홀드아웃 → **v1 동결** → 2026 블라인드 사후 검증(모델 선택·튜닝에 미사용) → v2 는 사전등록 확인 실험(EXP-confirm)으로 채택·동결 → 2026 사후 계산(모델 선택에 2026 미사용. 단 팀은 v1의 2026 결과를 이미 본 뒤 v2를 선택함, 블라인드 아님). 누수 감사: 전 샘플 재계산 불일치 0.
 - 핵심 결과: 2025 홀드아웃(같은 252행) v2 log R² 0.779 · 경계 F1 0.705 · 원단위 R² 0.176, v1 0.780 · 0.682 · 0.164(지속성 F1 0.727, 봉우리 1건이 분산의 43%). **2020~2026년 경계 사건 28건 중 25건(89%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 감시 단계로 포착(지속성 3건)**, v1 봉인 후 처음 보는 **2026년 8건 중 7건을 중앙 21일 앞서** 포착(지속성 2건, 감시·경보는 v2 도 같음). 2026 test 124조합: v1(블라인드) log R² 0.488 · 원단위 R² −0.054 · F1@10k 0.705, v2(블라인드 아님) 0.521 · −0.010 · 0.824(지속성 F1 0.841). 2026 사후 성능 저하와 한계는 방법설명서 6.11절·10장.
@@ -345,7 +347,11 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 - **최종 선택 이유**: CV 복합점수 기준 채택 절차를 고정해 홀드아웃 과적합을 막았고, 제출 모델 교체(v1 → v2)도 실행 전에 등록한 조건으로만 판정했다. 운영 목적(발령 선행 판단)에 맞는 지표(log R²·경보 F1·리드타임)로 평가했으며, 재현 가능한 동결 모델과 공개 데이터 스냅샷으로 전 과정을 패키지화했다.
 
 ## 6. 라이선스·출처
-`data/raw/MANIFEST.md` 참조. DataON 자료(CC BY-NC-SA, 원 배포처 약관상 제3자 제공 금지)는 원 배포 파일(연도별 xlsx)을 넣지 않았고, 원 자료의 DOI와 접속 주소를 MANIFEST(HY-05)에 적었다. 다만 노트북 재현에 필요한 연속 수위 파일 `data/raw/dataon/level_continuous_long.parquet`(24개 관측소, 144,068행)은 포함했다. 이 파일은 DataON 일평균수위(2010~2024) 128,279행에 WAMIS 일수위(2025년 이후, 기준면 오프셋 보정) 15,789행을 이어 붙인 것이다. **[검토 필요: 이 파일 포함이 원 배포처 약관과 충돌하지 않는지 제출 전 확인]** 대회 제공 데이터는 대회 규정에 따라 평가 목적으로만 포함했다.
+`data/raw/MANIFEST.md` 참조(첫 표 라이선스 칸과 '라이선스 확인' 절 — 2026-10-22 각 출처 페이지에서 다시 확인). 공공데이터포털 자료는 공공누리 제1유형(출처표시) 또는 이용허락범위 제한 없음이고, DataON 수위 자료는 CC BY-NC-SA(저작자표시-비영리-동일조건변경허락)다. 출처 페이지에서 라이선스를 확인하지 못한 자료(WAMIS, 대회 자료 규정 원문, 물환경정보시스템 측정소 목록)는 MANIFEST 에 '미확인'으로 적었다.
+
+- **DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다.** 원 자료: 「댐유역 하천 일평균수위」(국가참조표준), 생산 한국수자원공사 오재우·이영창·이재용, 발행 국가참조표준센터, DOI 10.20925/KSRD.74670854.v5, 제·개정 2025-12-16.
+- 이 패키지의 DataON 유래 파일: `data/raw/dataon/level_continuous_long.parquet`(24개 관측소, 144,068행 — DataON 일평균수위(2010~2024) 128,279행에 WAMIS 일수위(2025년 이후, 기준면 오프셋 보정) 15,789행을 이은 연속 시계열), `src/config/level_cont_stats.json`(집계 통계), 노트북 실행으로 생기는 `data/interim`·`data/processed` 의 `level_cont_*` 열. 해당 폴더마다 `LICENSE_DataON.txt` 를 붙였다. 원 배포 파일(연도별 xlsx)은 넣지 않았다.
+- 대회 제공 데이터는 평가 목적으로만 포함했다.
 
 ## 7. 제출 전 확인사항 (공지 #564)
 {check_md}
@@ -482,6 +488,11 @@ def build(out: Path) -> int:
     for f in CONFIG_FILES:
         if (ROOT / "config" / f).exists():
             copy(ROOT / "config" / f, out / "src" / "config" / f)
+    # DataON 유래 파일(원값·가공물)이 있는 폴더마다 라이선스 안내(CC BY-NC-SA·저작자·DOI)를 붙인다
+    lic = ROOT / "docs" / "reference" / "LICENSE_DataON.txt"
+    for d in DATAON_DIRS:
+        (out / d).mkdir(parents=True, exist_ok=True)
+        shutil.copy2(lic, out / d / "LICENSE_DataON.txt")
     copy(ROOT / "docs", out / "src" / "docs")
     copy(ROOT / "pyproject.toml", out / "pyproject.toml")
     for s in SCRIPTS:
