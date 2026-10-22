@@ -3,7 +3,7 @@ import { Info } from "@/components/Info";
 import { PageFrame } from "@/components/PageFrame";
 import { RangeBar } from "@/components/control/SiteTile";
 import { BigChart, EnvChart } from "@/components/site/SiteCharts";
-import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, SITE, TERMS, TIER, TIER_EXPERT, comboOf, levelOfCells, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
+import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, SITE, TERMS, TIER, TIER_EXPERT, UPSTREAM_PREFIX, comboOf, levelOfCells, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
 import { ALERT_LEVEL_LABEL, addDays, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
 import { getBloomEvents, getHydro, getLatestRun, getObservations, getPredictions, getShap, getSiteStatus, getSites, getWeather } from "@/lib/queries";
 
@@ -13,7 +13,7 @@ export async function generateStaticParams() {
   return ["2011G26", "2011G56", "2020G33", "2022G05", "3008G30"].map((id) => ({ id }));
 }
 
-const GROUPS: FeatureGroup[] = ["ar", "water", "hydro", "weather", "forecast", "time_site"];
+const GROUPS: FeatureGroup[] = ["ar", "water", "hydro", "weather", "forecast", "time_site", "upstream"];
 
 export default async function SitePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string | undefined>> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
@@ -40,7 +40,8 @@ export default async function SitePage({ params, searchParams }: { params: Promi
   // 왜 이렇게 예상했나: 그룹별 기여 합 → 상위 3개 → §8.1 템플릿
   const byGroup = new Map<FeatureGroup, number>();
   for (const s of shap) {
-    const g = (GROUPS.includes(s.feature_group as FeatureGroup) ? s.feature_group : "time_site") as FeatureGroup;
+    // v2 상류 피처(up1_*)는 DB 그룹이 "etc" → 이름 접두어로 상류 그룹에 묶는다(그 밖의 미분류는 계절·지점 특성)
+    const g = (s.feature_name.startsWith(UPSTREAM_PREFIX) ? "upstream" : GROUPS.includes(s.feature_group as FeatureGroup) ? s.feature_group : "time_site") as FeatureGroup;
     byGroup.set(g, (byGroup.get(g) ?? 0) + (s.shap_value ?? 0));
   }
   const hotDays = obs.filter((o) => o.obs_date >= new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10) && (o.water_temp ?? 0) >= 25).length;

@@ -1,6 +1,7 @@
 // 헤드라인 숫자 대조 (docs/12 §10): src/lib/numbers.ts 의 값이 reports/eval 원천 표와 같은지 빌드 전에 확인한다.
 // 대상: 큰 숫자 4개(미리 알림 25/28·중앙 리드, 2026 7/8·중앙 리드, 로그 R², F1@10k vs 지속성), 비교 막대(지속성 3/28), 성적표 띠.
 // 원천: tbl_leadtime.md(2020~2025, q90≥임계·B0), tbl_holdout_2026_posthoc.md(2026 감시·B0), tbl_holdout_2025.md(앙상블·B0).
+// v2(2026-10-22): MODELS·V2CMP 를 tbl_holdout_2025_v2.md(같은 252행)·tbl_holdout_2026_posthoc_v2.md(비블라인드 고지)·models/FROZEN*.md 와 대조.
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -45,6 +46,7 @@ const N = {
   f1: { y2025: pick("f1_10k", "y2025"), y2026: pick("f1_10k", "y2026"), b025: pick("f1_10k", "persistence2025"), b026: pick("f1_10k", "persistence2026") },
   r2raw: { y2025: pick("r2raw", "y2025"), y2026: pick("r2raw", "y2026") },
   nse: { y2025: pick("nseraw", "y2025"), y2026: pick("nseraw", "y2026") },
+  picp: { y2025: pick("picp80", "y2025"), y2026: pick("picp80", "y2026") },
 };
 
 // 원천 값
@@ -76,6 +78,7 @@ const S = {
   f1: { y2025: num(ens25[col(h25, "f1_10k")]), y2026: num(ens26[col(phAll, "f1_10k")]), b025: num(b0all25[col(h25, "f1_10k")]), b026: num(b0all26[col(phAll, "f1_10k")]) },
   r2raw: { y2025: num(ens25[col(h25, "r2_raw")]), y2026: num(ens26[col(phAll, "r2_raw")]) },
   nse: { y2025: num(ens25[col(h25, "nse_raw")]), y2026: num(ens26[col(phAll, "nse_raw")]) },
+  picp: { y2025: num(ens25[col(h25, "PICP80(CQR)")]), y2026: num(ens26[col(phAll, "PICP80(CQR)")]) },
 };
 S.events = { total: S.prior.total + S.y2026.total, detected: S.prior.detected + S.y2026.detected, med: median([...priorLeads, ...leads26]), b0: S.prior.b0 + S.y2026.b0 };
 if (priorLeads.length !== S.prior.detected || leads26.length !== S.y2026.detected) {
@@ -107,7 +110,91 @@ const checks = [
   ["r2_raw 2026", N.r2raw.y2026, r2(S.r2raw.y2026)],
   ["nse_raw 2025", N.nse.y2025, r2(S.nse.y2025)],
   ["nse_raw 2026", N.nse.y2026, r2(S.nse.y2026)],
+  ["PICP80(CQR) 2025 (v1·v2 공통)", N.picp.y2025, r2(S.picp.y2025)],
+  ["PICP80(CQR) 2026 (v1·v2 공통)", N.picp.y2026, r2(S.picp.y2026)],
 ];
+
+// ── v2(제출·운영) vs v1(블라인드 검증) ──────────────────────────────────────────
+const NOTICE = "모델 선택에 2026 미사용. 단 팀은 v1의 2026 결과를 이미 본 뒤 v2를 선택함(블라인드 아님).";
+const metricBlock = (b) => ({ n: pick(b, "n"), rmse: pick(b, "rmselog"), r2log: pick(b, "r2log"), r2raw: pick(b, "r2raw"), nse: pick(b, "nseraw"), f1: pick(b, "f1_10k") });
+const srcMetrics = (t, row) => ({ n: num(row[col(t, "n")]), rmse: r2(num(row[col(t, "rmse_log")])), r2log: r2(num(row[col(t, "r2_log")])), r2raw: r2(num(row[col(t, "r2_raw")])), nse: r2(num(row[col(t, "nse_raw")])), f1: r2(num(row[col(t, "f1_10k")])) });
+const pushMetrics = (label, ours, theirs) => {
+  for (const k of ["n", "rmse", "r2log", "r2raw", "nse", "f1"]) checks.push([`${label} ${{ n: "n", rmse: "rmse_log", r2log: "r2_log", r2raw: "r2_raw", nse: "nse_raw", f1: "f1_10k" }[k]}`, ours[k], theirs[k]]);
+};
+
+// 2025 같은 252행
+const v25 = tables(read("tbl_holdout_2025_v2.md"));
+const v25h = v25[0];
+const v25cv = v25[1];
+pushMetrics("2025 같은행 v2", metricBlock("h25v2"), srcMetrics(v25h, findRow(v25h, "v2")));
+pushMetrics("2025 같은행 v1", metricBlock("h25v1"), srcMetrics(v25h, findRow(v25h, "v1")));
+pushMetrics("2025 같은행 B0", metricBlock("h25b0"), srcMetrics(v25h, findRow(v25h, "B0")));
+const cvCol = v25cv.header.findIndex((h) => h.startsWith("r2_raw 통합"));
+checks.push(["CV 2020~24 통합 r2_raw v2", pick("cvR2raw", "v2"), r2(num(findRow(v25cv, "v2")[cvCol]))]);
+checks.push(["CV 2020~24 통합 r2_raw v1", pick("cvR2raw", "v1"), r2(num(findRow(v25cv, "v1")[cvCol]))]);
+checks.push(["CV 2020~24 통합 r2_raw B0", pick("cvR2raw", "b0"), r2(num(findRow(v25cv, "B0")[cvCol]))]);
+
+// 2026 사후(124조합) — v2 는 비블라인드
+const p26md = read("tbl_holdout_2026_posthoc_v2.md");
+const p26 = tables(p26md);
+const p26all = p26[0];
+pushMetrics("2026 v2", metricBlock("p26v2"), srcMetrics(p26all, findRow(p26all, "v2")));
+pushMetrics("2026 v1", metricBlock("p26v1"), srcMetrics(p26all, findRow(p26all, "v1")));
+pushMetrics("2026 B0", metricBlock("p26b0"), srcMetrics(p26all, findRow(p26all, "B0")));
+const p26lead = p26.find((t) => t.header.includes("방식") && t.header.includes("선행 탐지 수"));
+const leadRow = (m, how) => p26lead.rows.find((r) => r[0] === m && r[1].startsWith(how));
+const p26det = p26.find((t) => t.header.includes("v2 감시 리드(E)"));
+const leadsOf = (h) => p26det.rows.map((r) => r[col(p26det, h)]).filter((c) => c !== "").map(num);
+const wV2 = leadsOf("v2 감시 리드(E)");
+const wV1 = leadsOf("v1 감시 리드(E)");
+checks.push(["2026 사건 수(v2 표)", pick("p26watch", "total"), num(leadRow("v2", "감시")[col(p26lead, "사건 수")])]);
+checks.push(["2026 감시 선행 탐지 v2", pick("p26watch", "v2"), num(leadRow("v2", "감시")[col(p26lead, "선행 탐지 수")])]);
+checks.push(["2026 감시 선행 탐지 v1(v2 표)", pick("p26watch", "v1"), num(leadRow("v1", "감시")[col(p26lead, "선행 탐지 수")])]);
+checks.push(["2026 감시 중앙 리드 v2", pick("p26watch", "medianLeadV2"), median(wV2)]);
+checks.push(["2026 감시 중앙 리드 v1(v2 표)", pick("p26watch", "medianLeadV1"), median(wV1)]);
+checks.push(["2026 감시 v1·v2 사건별 리드 동일(차 0)", 0, wV1.length === wV2.length && wV1.every((v, i) => v === wV2[i]) ? 0 : 1]);
+checks.push(["2026 감시 v2 = 헤드라인(7/8·21일)", 0, pick("p26watch", "v2") === N.y2026.detected && pick("p26watch", "medianLeadV2") === N.y2026.med ? 0 : 1]);
+checks.push(["2026 점예측 포착 사건 수", pick("p26point", "total"), num(leadRow("v2", "점예측")[col(p26lead, "사건 수")])]);
+checks.push(["2026 점예측 포착 v2", pick("p26point", "v2"), num(leadRow("v2", "점예측")[col(p26lead, "선행 탐지 수")])]);
+checks.push(["2026 점예측 포착 v1", pick("p26point", "v1"), num(leadRow("v1", "점예측")[col(p26lead, "선행 탐지 수")])]);
+checks.push(["2026 점예측 포착 v2(사건별 표)", pick("p26point", "v2"), leadsOf("v2 점예측 리드(E)").length]);
+checks.push(["2026 지속성 선행 탐지(v2 표)", pick("p26point", "persistence"), num(leadRow("v2", "B0")[col(p26lead, "선행 탐지 수")])]);
+// 2026 v2 의 모든 표 앞에 비블라인드 고지가 있는지, copy.ts 에 같은 고지문이 있는지
+{
+  const lines = p26md.split(/\r?\n/);
+  let tablesSeen = 0;
+  let missing = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (!(lines[i].startsWith("|") && lines[i + 1]?.startsWith("|---"))) continue;
+    tablesSeen++;
+    let j = i - 1;
+    while (j >= 0 && !lines[j].startsWith("#") && !lines[j].includes(NOTICE)) j--;
+    if (j < 0 || !lines[j].includes(NOTICE)) missing++;
+    while (lines[i + 1]?.startsWith("|")) i++;
+  }
+  checks.push([`2026 v2 원천 표 ${tablesSeen}개 중 고지문 없는 표`, 0, missing]);
+  const copySrc = readFileSync(resolve(process.cwd(), "src/lib/copy.ts"), "utf-8");
+  checks.push(["copy.ts 고지문 = 원천 고지문", 0, copySrc.includes(NOTICE) ? 0 : 1]);
+}
+
+// 동결 정보 (models/FROZEN.md·FROZEN_v2.md)
+{
+  const pickStr = (block, key) => src.match(new RegExp(`${block}:\\s*\\{[^}]*\\b${key}:\\s*"([^"]+)"`))?.[1];
+  const fv1 = readFileSync(resolve(root, "models", "FROZEN.md"), "utf-8");
+  const fv2 = readFileSync(resolve(root, "models", "FROZEN_v2.md"), "utf-8");
+  const c1 = fv1.match(/동결 커밋: `([0-9a-f]+)`/)?.[1] ?? "";
+  const c2 = fv2.match(/동결 커밋: `([0-9a-f]+)`/)?.[1] ?? "";
+  checks.push([`v1 동결 커밋 ${pickStr("v1meta", "commit")} ⊂ FROZEN.md ${c1.slice(0, 12)}`, 0, c1.startsWith(pickStr("v1meta", "commit") ?? "-") ? 0 : 1]);
+  checks.push([`v2 동결 커밋 ${pickStr("v2meta", "commit")} ⊂ FROZEN_v2.md ${c2.slice(0, 12)}`, 0, c2.startsWith(pickStr("v2meta", "commit") ?? "-") ? 0 : 1]);
+  checks.push([`v2 동결 시각 ${pickStr("v2meta", "frozenKST")}`, 0, fv2.includes(`동결 시각(KST): ${pickStr("v2meta", "frozenKST")}`) ? 0 : 1]);
+  checks.push([`v1 봉인 시각 ${pickStr("v1meta", "sealedKST")}`, 0, p26md.includes(`v1 은 ${pickStr("v1meta", "sealedKST")} KST 봉인`) ? 0 : 1]);
+  checks.push(["v2 피처 수", pick("v2meta", "features"), num(fv2.match(/피처 (\d+)개/)?.[1])]);
+  checks.push(["v2 상류 피처 수", pick("v2meta", "upstreamFeatures"), num(fv2.match(/상류 (\d+)\(/)?.[1])]);
+  checks.push(["v1 피처 수", pick("v1meta", "features"), num(fv1.match(/perc75, (\d+)개/)?.[1])]);
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+  const w = (k) => r3(num(fv2.match(new RegExp(`결합 가중치[^\\n]*?${k} (-?[\\d.]+)`))?.[1]));
+  for (const k of ["c1", "c3", "c2", "cg"]) checks.push([`v2 결합 가중치 ${k} (소수 셋째 자리)`, pick("v2weights", k), w(k)]);
+}
 let bad = 0;
 for (const [name, ours, theirs] of checks) {
   const ok = Math.abs(ours - theirs) < 1e-9;

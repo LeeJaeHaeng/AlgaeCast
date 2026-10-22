@@ -2,10 +2,36 @@
  * 화면 문구 모음 (docs/12_CONTROL_ROOM_UI.md §7·§8). 컴포넌트에는 문자열을 직접 쓰지 않고 여기서 가져온다.
  * - 쉽게 보기(기본): 영어 약어·내부 변수명 금지, 모든 숫자에 단위·기준 표기, 단정 대신 "가능성·예상"
  * - 전문가 보기(?view=expert): 기존 지표·내부 명칭 병기 허용
+ * - 숫자는 numbers.ts(빌드 전 reports/eval 과 대조)에서 가져와 문장에 끼운다.
  */
+import { MODELS, NUMBERS, V2CMP } from "./numbers";
 
 export type Tier = "normal" | "watch" | "alert";
-export type FeatureGroup = "ar" | "water" | "hydro" | "weather" | "forecast" | "time_site";
+export type FeatureGroup = "ar" | "water" | "hydro" | "weather" | "forecast" | "time_site" | "upstream";
+
+/** "YYYY-MM-DD HH:MM"(한국 시간) → "2026년 10월 22일 오후 4시 27분" */
+export const kstKo = (s: string): string => {
+  const [d, t] = s.split(" ");
+  const [y, m, dd] = d.split("-").map(Number);
+  const [h, mi] = t.split(":").map(Number);
+  return `${y}년 ${m}월 ${dd}일 ${h < 12 ? "오전" : "오후"} ${h % 12 === 0 ? 12 : h % 12}시${mi ? ` ${mi}분` : ""}`;
+};
+/** 소수 둘째 자리, 음수는 유니코드 마이너스 */
+export const n2 = (v: number): string => v.toFixed(2).replace("-", "−");
+const V1_SEALED = kstKo(MODELS.v1meta.sealedKST);
+const V2_FROZEN = kstKo(MODELS.v2meta.frozenKST);
+
+/** 2026 v2 수치 옆에 붙이는 비블라인드 고지 — 원천 표(tbl_holdout_2026_posthoc_v2.md)와 같은 문장(check_numbers 가 대조) */
+export const V2_NOTICE = `모델 선택에 2026 미사용. 단 팀은 v1의 2026 결과를 이미 본 뒤 v2를 선택함(블라인드 아님). 동결 커밋 ${MODELS.v2meta.commit}`;
+
+/** 모델 두 가지 — v1 = 블라인드 검증(봉인 뒤 2026 을 처음 계산), v2 = 제출·운영(최종 모델 C). 감시·경보·범위는 v1·v2 공통 */
+export const MODEL = {
+  v1: "v1 블라인드 검증 모델",
+  v2: "v2 제출·운영 모델",
+  v1Short: "v1(블라인드 검증)",
+  v2Short: "v2(제출·운영)",
+  note: `제출·운영 모델은 v2(${V2_FROZEN} 고정, 커밋 ${MODELS.v2meta.commit})입니다. '올해 처음 보는 사건' 성적은 ${V1_SEALED}에 봉인한 v1이 봉인 뒤 처음 계산한 블라인드 검증입니다. 미리 알림·넘을 가능성·예상 범위는 v2도 v1 봉인본을 그대로 써서 결과가 같고, v2에서 바뀐 것은 한 값 예측(대회 제출값)뿐입니다.`,
+} as const;
 
 /** 서비스 이름·내비게이션 (§5 페이지 이름) */
 export const APP = {
@@ -42,7 +68,7 @@ export const TERMS = {
   leadTime: { label: "미리 알린 기간", tip: "실제로 경계 수준을 처음 넘은 날보다 며칠 앞서 '주의 관찰' 이상으로 바뀌었는지입니다." },
   persistence: { label: "지난주 값 그대로 쓰는 방법", tip: "'다음 주도 이번 주와 같을 것'이라고 보는 가장 단순한 비교 기준입니다." },
   why: { label: "왜 이렇게 예상했나", tip: "예상값을 올리거나 내린 요인을 기여도가 큰 순서로 보여 줍니다." },
-  frozen: { label: "고정된 모델", tip: "2026년 10월 21일 오전 9시 44분(한국 시간)에 봉인한 모델입니다. 제출 전까지 다시 학습하지 않습니다." },
+  frozen: { label: "고정된 모델", tip: `제출·운영 모델 v2는 ${V2_FROZEN}(한국 시간)에 고정했고 제출 전까지 다시 학습하지 않습니다. 2026년을 처음 보는 블라인드 검증은 ${V1_SEALED}에 봉인한 v1으로 했습니다. 예상 범위·넘을 가능성·단계는 v1·v2가 같습니다.` },
   trend: { label: "추세", tip: "가장 가능성 높은 값이 현재 측정값보다 높으면 ↑, 낮으면 ↓, 비슷하면 → 입니다(±20% 기준)." },
 } as const;
 
@@ -113,6 +139,7 @@ export const GROUP_LABEL: Record<FeatureGroup, string> = {
   weather: "날씨(기온·비·바람)",
   forecast: "날씨 예보",
   time_site: "계절·지점 특성",
+  upstream: "바로 위(상류) 지점 측정",
 };
 
 /** §8.1 근거 문장 템플릿 — 그룹별 기여 방향(+ 올림 / − 내림) */
@@ -123,7 +150,10 @@ export const REASON: Record<FeatureGroup, { up: string; down: string }> = {
   weather: { up: "한 달간 더웠고 비가 적었습니다", down: "비가 와서 녹조가 씻겨 나갈 수 있습니다" },
   forecast: { up: "앞으로 덥고 비가 적을 것으로 예보됐습니다", down: "앞으로 비가 올 것으로 예보됐습니다" },
   time_site: { up: "녹조가 많이 생기는 시기입니다", down: "녹조가 줄어드는 시기입니다" },
+  upstream: { up: "바로 위(상류) 지점의 최근 측정이 녹조를 늘리는 쪽입니다", down: "바로 위(상류) 지점의 최근 측정이 녹조를 줄이는 쪽입니다" },
 };
+/** v2 상류 피처(up1_*) — DB 의 feature_group 은 "etc" 라 이름 접두어로 묶는다 */
+export const UPSTREAM_PREFIX = "up1_";
 /** 물 온도 보조 문구: 25℃ 이상 n일 */
 export const reasonWaterDays = (n: number) => `(25℃ 이상 ${n}일)`;
 /** 최근 30일에 25℃ 이상이 없을 때의 물 온도 상승 요인 문장 */
@@ -182,7 +212,9 @@ export const BOARD = {
     caught: (hit: number, total: number) => `경계 사건 ${total}건 중 ${hit}건을 미리 알림`,
     lead: (days: number) => `중앙값 ${days}일 앞서`,
     year2026: (hit: number, total: number) => `2026년 처음 보는 사건 ${total}건 중 ${hit}건`,
-    frozen: "고정된 모델",
+    year2026Sub: "v1 블라인드 검증 · v2도 같음",
+    frozen: "제출·운영 v2",
+    expert: (v2a: string, v1a: string, v2b: string, v1b: string) => `점예측 F1@10k 2025(같은 252행) v2 ${v2a} · v1 ${v1a} / 2026 사후 v2 ${v2b}(비블라인드) · v1 ${v1b}`,
     detail: "자세히 보기",
   },
   failBanner: (when: string) => `${when} 예측 갱신이 실패했습니다. 마지막 성공 결과를 표시하고 있습니다.`,
@@ -211,7 +243,7 @@ export const SITE = {
     whyHighChance: (q50: string, p: number) => `가장 가능성 높은 값은 ${q50} 개/mL로 1만 아래지만, 예상 범위의 위쪽이 1만을 넘기 때문에 다음 주 측정에서 1만을 넘을 가능성이 ${p}%로 나왔습니다.`,
     whyLowChance: (q50: string, p: number) => `가장 가능성 높은 값은 ${q50} 개/mL이고, 예상 범위의 위쪽도 1만에 닿지 않아 다음 주 측정에서 1만을 넘을 가능성은 ${p}%로 낮습니다.`,
     whyOver: (q50: string, p: number) => `가장 가능성 높은 값 ${q50} 개/mL 자체가 1만을 넘고, 다음 주 측정에서도 1만 이상일 가능성이 ${p}%입니다.`,
-    frozen: "이 예상은 2025년까지 자료로 만든 뒤 2026년 10월 21일 오전 9시 44분(한국 시간)에 봉인한 모델이 내놓은 것입니다. 올해 결과를 보고 고치지 않았으므로, 올해 성적은 처음 보는 자료에 대한 성적입니다.",
+    frozen: `이 화면의 가장 가능성 높은 값·예상 범위·넘을 가능성은 2025년까지 자료로 만든 뒤 ${V1_SEALED}(한국 시간)에 봉인한 v1 부분을 그대로 씁니다. 제출·운영 모델 v2(${V2_FROZEN} 고정)도 이 값들은 같고, v2에서 바뀐 것은 대회 제출용 한 값 예측뿐입니다. '올해 처음 보는 자료' 성적은 v1이 봉인 뒤 처음 계산한 것입니다.`,
   },
   reasonsIntro: "예상값을 올리거나 내린 요인을 기여도가 큰 순서로 세 가지만 골랐습니다.",
   verifySummary: (hit: number, n: number) => `공식 경보 단계 기준으로 최근 ${n}번의 예상 중 ${hit}번이 실제와 같은 단계였습니다.`,
@@ -226,22 +258,53 @@ export const PERF = {
   title: "얼마나 잘 맞혔나",
   lead: "2020년부터 2026년까지 실제 경계 사건을 얼마나 앞서 알렸는지, 그리고 약한 부분은 무엇인지 숨기지 않고 보여 줍니다.",
   big: {
-    caught: { label: "경계 사건 미리 알림", sub: (med: number) => `중앙값 ${med}일 앞서 · 2020~2026년` },
-    y2026: { label: "올해 처음 보는 사건", sub: (med: number) => `중앙값 ${med}일 앞서 · 고정된 모델` },
-    r2log: { label: "녹조 농도 맞히기", value: (a: string, b: string) => `${a} / ${b}`, sub: "로그 기준 설명력 · 2025년 / 2026년 (1에 가까울수록 좋음)" },
-    f1: { label: "경계 여부 맞히기", sub: (a: string, b: string, c: string, d: string) => `지난주 값 그대로 쓰는 방법과 비슷 · 2025년 ${a} vs ${b} · 2026년 ${c} vs ${d}` },
+    caught: { label: "경계 사건 미리 알림", sub: (med: number) => `중앙값 ${med}일 앞서 · 2020~2026년 · v1·v2 공통` },
+    y2026: { label: "올해 처음 보는 사건", sub: (med: number) => `중앙값 ${med}일 앞서 · v1 봉인 뒤 처음 계산(블라인드) · v2도 같음` },
+    r2log: { label: "녹조 농도 맞히기", value: (a: string, b: string) => `${a} / ${b}`, sub: "로그 기준 설명력 · 2025년 / 2026년 · 큰 숫자 = v1(블라인드 검증) · 1에 가까울수록 좋음" },
+    f1: { label: "경계 여부 맞히기", sub: (a: string, b: string, c: string, d: string) => `큰 숫자 = v1(블라인드 검증) · 지난주 값 그대로 쓰는 방법과 비슷 · 2025년 ${a} vs ${b} · 2026년 ${c} vs ${d}` },
+    v2line: (a: string, b: string) => `v2(제출·운영) ${a} / ${b}※`,
+  },
+  models: MODEL.note,
+  v2Footnote: `※ 2026년 v2 값: ${V2_NOTICE}`,
+  compare: {
+    title: "v1·v2 나란히 — 한 값 예측 성적 (좋은 지표·나쁜 지표 모두)",
+    lead: "v2에서 바뀐 것은 대회 제출용 한 값 예측뿐입니다. 2025년은 두 모델을 같은 자료로, 2026년은 v2 고정 뒤 한 번 계산해 v1과 나란히 놓았습니다.",
+    cols: ["지표", "v2 제출·운영", "v1 블라인드 검증", "지난주 값 그대로", "좋은 방향"],
+    y2025: (n: number) => `2025년 검증 자료 — 같은 ${n}건으로 비교`,
+    y2026: (n: number) => `2026년 사후 계산 — ${n}건 · v2는 블라인드 아님※`,
+    rows: {
+      r2log: { label: "로그 기준 설명력", better: "1에 가까울수록", expert: "r2_log" },
+      rmselog: { label: "로그 기준 오차", better: "작을수록", expert: "rmse_log" },
+      r2raw: { label: "원단위 결정계수 (목표 0.6)", better: "1에 가까울수록 · 0 아래면 평균값보다 못함", expert: "r2_raw" },
+      nseraw: { label: "원단위 효율계수 (목표 0.5)", better: "1에 가까울수록", expert: "nse_raw" },
+      f1: { label: "경계(1만) 여부 맞히기", better: "1에 가까울수록", expert: "f1_10k" },
+      point: { label: "한 값 예측이 1만 넘는 사건을 미리 잡은 수", better: "많을수록", expert: "점예측≥임계 선행 탐지" },
+      watch: { label: "주의 관찰 단계로 미리 알린 사건 (중앙 앞선 날)", better: "많을수록", expert: "감시 q90_cqr≥임계" },
+    },
+    count: (hit: number, total: number) => `${total}건 중 ${hit}건`,
+    countLead: (hit: number, total: number, med: number) => `${total}건 중 ${hit}건 (${med}일)`,
+    note2025: (sameV1: string, pubV1: string) => `같은 252건 비교입니다. 위 큰 숫자·목표 지표의 v1 2025년 값은 공개 표(256건, 2026년 1월 5일이 목표일인 4건 포함) 기준이라 소수 둘째 자리에서 다를 수 있습니다(v1 원단위 결정계수: 같은 252건 ${sameV1} · 공개 256건 ${pubV1}).`,
+    cv: (v2: string, v1: string, b0: string) => `2020~2024년 연도별 교차검증(통합) 원단위 결정계수: v2 ${v2} · v1 ${v1} · 지난주 값 그대로 ${b0}. v2의 결합 가중치를 이 자료로 정했으므로 같은 자료에서 잰 값입니다(v1 가중치도 같은 방식).`,
+    common: (hit: number, n: number, med: number, all: number, allN: number, allMed: number) => `미리 알림(주의 관찰 단계)·넘을 가능성·예상 범위는 v2도 v1 봉인본을 그대로 써서 결과가 같습니다(차이 0 확인): 2026년 ${n}건 중 ${hit}건(중앙 ${med}일 앞서), 2020~2026년 ${allN}건 중 ${all}건(중앙 ${allMed}일 앞서).`,
+    good: (p2: number, p1: number, n: number, f2: string, f1: string) => `좋아진 점: 2026년 한 값 예측이 1만 넘는 사건을 미리 잡은 수가 v1 ${n}건 중 ${p1}건 → v2 ${p2}건, 경계 여부 맞히기 ${f1} → ${f2}(v2는 블라인드 아님※).`,
+    weak: (r26: string, f25: string, b25: string, f26: string, b26: string) => `약한 점: 2026년 원단위 결정계수는 v2도 ${r26}로 0 아래라 봉우리 높이는 여전히 못 맞힙니다. 경계 여부 맞히기는 v2도 지난주 값 그대로 쓰는 방법보다 조금 낮습니다(2025년 ${f25} 대 ${b25}, 2026년 ${f26} 대 ${b26}). 2025년 로그 기준 설명력·오차는 v1과 거의 같습니다.`,
+    source: "출처 reports/eval/tbl_holdout_2025_v2.md · tbl_holdout_2026_posthoc_v2.md · models/FROZEN_v2.md",
   },
   sentence: "지난주 값을 그대로 쓰면 이미 경계인 곳은 잘 맞히지만, 경계로 처음 넘어가는 순간은 미리 알 수 없습니다. 이 시스템은 그 순간을 미리 알리는 데 강합니다.",
   onset: { title: "경계 사건을 미리 알린 비율", ours: "이 시스템 (주의 관찰 단계)", persist: "지난주 값 그대로 쓰는 방법", persistNote: "지난주 값을 그대로 쓰면 측정 간격이 벌어진 경우가 아니면 미리 알 수 없습니다" },
   timeline: { title: "경계 사건 28건 시간표", legend: "선 = 처음 알린 날 → 실제로 1만을 넘은 날 · 빨간 점 = 미리 알리지 못함 · 파란 테두리 점 = 올해(처음 보는 자료)", missed: "미리 알리지 못함", posthoc: "처음 보는 자료" },
   target: {
     title: "원래 목표였던 지표",
-    rows: (r25: string, r26: string, n25: string, n26: string) => [`원단위 결정계수: 목표 0.6 → 실제 2025년 ${r25}, 2026년 ${r26}`, `원단위 효율계수: 목표 0.5 → 실제 2025년 ${n25}, 2026년 ${n26}`],
-    why: ["2025년 가장 높았던 봉우리 1건(회남 8월 18일, 19만 개/mL)이 그 해 변화량의 43%를 차지해, 봉우리 높이를 못 맞히면 이 지표는 바로 낮아집니다.", "6가지 모델 방법과 3가지 보정 방법을 모두 시험했지만 어떤 조합도 0.2를 넘지 못했습니다. 주 1~2회 측정 자료로 7일 뒤 봉우리 높이를 맞히는 데는 한계가 있습니다."],
+    rows: (v1: { r25: string; r26: string; n25: string; n26: string }, v2: { r25: string; r26: string; n25: string; n26: string }) => [
+      `원단위 결정계수: 목표 0.6 → v1(블라인드 검증) 2025년 ${v1.r25}, 2026년 ${v1.r26} · v2(제출·운영) 2025년 ${v2.r25}, 2026년 ${v2.r26}※`,
+      `원단위 효율계수: 목표 0.5 → v1(블라인드 검증) 2025년 ${v1.n25}, 2026년 ${v1.n26} · v2(제출·운영) 2025년 ${v2.n25}, 2026년 ${v2.n26}※`,
+    ],
+    rowsNote: (sameV1: string) => `v1 2025년은 공개 표(256건) 값, v2 2025년은 같은 252건 값입니다(같은 252건의 v1은 ${sameV1}). ※ 2026년 v2 값은 블라인드가 아닙니다.`,
+    why: ["2025년 가장 높았던 봉우리 1건(회남 8월 18일, 19만 개/mL)이 그 해 변화량의 43%를 차지해, 봉우리 높이를 못 맞히면 이 지표는 바로 낮아집니다.", "6가지 모델 방법과 3가지 보정 방법을 모두 시험했지만 어떤 조합도 0.2를 넘지 못했습니다. 주 1~2회 측정 자료로 7일 뒤 봉우리 높이를 맞히는 데는 한계가 있습니다.", `바로 위(상류) 지점 측정과 녹조 종류별 예측을 더한 v2도 2025년 ${n2(V2CMP.h25v2.r2raw)}(같은 252건의 v1 ${n2(V2CMP.h25v1.r2raw)}), 2026년 ${n2(V2CMP.p26v2.r2raw)}에 그쳤습니다. 그 뒤 추가 고도화 실험도 미리 정한 채택 기준을 넘지 못해 v2를 그대로 고정했습니다.`],
   },
   mulmoa: { title: "국립환경과학원 물모아(공식 예측)와 비교", text: (n: number) => `자료 쌓는 중 (지금까지 ${n}건). 2026년 10월 19일 발표분부터 매일 저장하고 있으며, 실측이 도착하면 단계 맞힘 비교표가 채워집니다.` },
   expertTitle: "전문가용 지표표 (reports/eval)",
-  basis: "출처: 2025년 = 학습에 쓰지 않은 검증 자료, 2026년 = 모델을 봉인한 뒤 사후 검증. 미리 알림 = 실제로 1만을 처음 넘은 날보다 앞서 '주의 관찰' 이상으로 바뀐 사건.",
+  basis: "출처: 2025년 = 학습에 쓰지 않은 검증 자료, 2026년 = v1을 봉인한 뒤 처음 계산한 사후 검증(블라인드). 미리 알림 = 실제로 1만을 처음 넘은 날보다 앞서 '주의 관찰' 이상으로 바뀐 사건.",
 } as const;
 
 export const INSIGHTS = {
@@ -279,8 +342,8 @@ export const ABOUT = {
   what: "낙동강 네 곳(해평·강정·고령·칠서·물금·매리)과 금강 회남의 취수원에서, 마지막 측정일 기준 7일 뒤 녹조 농도를 예상하고 '안전 / 주의 관찰 / 대응 필요' 세 단계로 알려 주는 시스템입니다.",
   steps: [
     { n: "①", title: "자료 모으기", body: "매일 새벽 5시에 조류경보제 측정값, 댐·보 운영 자료, 하천 수위, 기상 관측과 예보를 받아 옵니다." },
-    { n: "②", title: "특징 만들기", body: "기준일까지의 자료만으로 30가지 특징을 계산합니다(최근 녹조 흐름, 물 온도, 방류와 수위, 기온·비·바람, 계절·지점). 기준일 뒤의 자료는 절대 쓰지 않습니다." },
-    { n: "③", title: "예상하기", body: "2025년까지 자료로 학습해 봉인한 모델이 가장 가능성 높은 값, 예상 범위, 다음 주 1만을 넘을 가능성을 냅니다." },
+    { n: "②", title: "특징 만들기", body: `기준일까지의 자료만으로 특징을 계산합니다(최근 녹조 흐름, 물 온도, 방류와 수위, 기온·비·바람, 계절·지점 ${MODELS.v1meta.features}가지, v2 한 값 예측은 바로 위(상류) 지점의 최근 측정 ${MODELS.v2meta.upstreamFeatures}가지를 더해 ${MODELS.v2meta.features}가지). 기준일 뒤의 자료는 절대 쓰지 않습니다.` },
+    { n: "③", title: "예상하기", body: "2025년까지 자료로 학습해 고정한 모델이 가장 가능성 높은 값, 예상 범위, 다음 주 1만을 넘을 가능성(이상 v1 봉인본)과 대회 제출용 한 값 예측(v2)을 냅니다." },
     { n: "④", title: "단계 판정", body: "예상 범위 위쪽이 1만에 닿으면 주의 관찰, 넘을 가능성이 52% 이상이면 대응 필요. 공식 발령과 함께 보여 '경계 진입 예상 / 계속될 듯 / 나아질 가능성'으로 정리합니다." },
   ],
   dataTitle: "쓰는 자료와 출처",
@@ -297,16 +360,32 @@ export const ABOUT = {
   aida: "AIDA(KISTI 인공지능 데이터)의 정규격자 기상·레이더 자료는 계획(docs/02 §6)에 올렸으나 이번 제출 모델에는 쓰지 않았습니다. 관측소 1곳 의존을 줄이는 다음 단계 과제입니다.",
   limitsTitle: "아직 못 하는 것 (솔직한 한계)",
   limits: [
-    "올해(2026년) 성적은 지난해보다 낮습니다. 로그 기준 설명력 0.78 → 0.49, 예상 범위 적중률 0.86 → 0.69. 올해 자료는 모델이 처음 보는 자료이고, 이례적으로 이른 발생 같은 새로운 패턴이 섞여 있습니다.",
+    `올해(2026년) 성적은 지난해보다 낮습니다. 로그 기준 설명력 v1 ${n2(NUMBERS.r2log.y2025)} → ${n2(NUMBERS.r2log.y2026)}(v2 ${n2(V2CMP.h25v2.r2log)} → ${n2(V2CMP.p26v2.r2log)}※), 예상 범위 적중률 ${n2(NUMBERS.picp80.y2025)} → ${n2(NUMBERS.picp80.y2026)}(v1·v2 같음). 올해 자료는 v1이 처음 보는 자료이고, 이례적으로 이른 발생 같은 새로운 패턴이 섞여 있습니다.`,
     "강정·고령의 2026년 5월 18일 이례적 조기 관심 발령은 미리 알리지 못했습니다(첫 초과 당일에야 주의 관찰). 봄철 자료가 학습 구간에 거의 없었기 때문입니다.",
-    "원래 목표였던 원단위 결정계수 0.6 · 효율계수 0.5는 이루지 못했습니다(2025년 0.17, 2026년 −0.05). 봉우리 높이를 맞히는 데 약합니다.",
+    `원래 목표였던 원단위 결정계수 0.6 · 효율계수 0.5는 이루지 못했습니다(v1 2025년 ${n2(NUMBERS.r2raw.y2025)}, 2026년 ${n2(NUMBERS.r2raw.y2026)} · v2 2025년 ${n2(V2CMP.h25v2.r2raw)}, 2026년 ${n2(V2CMP.p26v2.r2raw)}※). 봉우리 높이를 맞히는 데 약합니다.`,
     "CCTV 영상이나 위성 사진은 아직 쓰지 않습니다. 주 1~2회 측정 사이의 변화를 보려면 다음 단계에서 필요합니다.",
   ],
   notOfficial: "이 시스템의 예상은 운영 참고용입니다. 국립환경과학원 조류경보제의 공식 발령을 대체하지 않으며, 화면에는 항상 공식 발령과 예상을 나란히 둡니다.",
   reproTitle: "다시 만들어 보려면",
-  repro: ["저장소를 받아 Python 3.11 가상환경에 설치합니다(make setup).", "대회 자료를 data/raw/competition 에 두고 외부 자료를 받습니다(make collect).", "일 달력 정렬 → 특징 → 학습 → 평가(make align features train eval). 봉인 모델 해시는 models/FROZEN.md 와 대조합니다.", "제출용 예측은 python -m algaecast.models.predict 로 다시 만들어지며, 새 환경에서 바이트 단위로 같은 파일이 나오는지 확인했습니다."],
+  repro: ["저장소를 받아 Python 3.11 가상환경에 설치합니다(make setup).", "대회 자료를 data/raw/competition 에 두고 외부 자료를 받습니다(make collect).", "일 달력 정렬 → 특징 → 학습 → 평가(make align features train eval). 고정 모델 해시는 models/FROZEN.md(v1)·FROZEN_v2.md(v2)와 대조합니다(scripts/verify_frozen.py).", "제출용 예측은 python -m algaecast.models.predict 로 다시 만들어지며, 새 환경에서 바이트 단위로 같은 파일이 나오는지 확인했습니다."],
   reproExpert: "GitHub: LeeJaeHaeng/AlgaeCast (비공개). 분할 학습 ≤2024 / 검증 2025 / 평가 2026, 연 단위 확장 창 교차검증, 시드 42, 누수 테스트 tests/test_no_leakage.py.",
-  frozenLine: "모델 봉인: 2026년 10월 21일 오전 9시 44분(한국 시간), 커밋 13ac483. 제출 전까지 다시 학습하지 않습니다.",
+  frozenLine: `블라인드 검증 모델 v1 봉인: ${V1_SEALED}(한국 시간), 커밋 ${MODELS.v1meta.commit} · 제출·운영 모델 v2 고정: ${V2_FROZEN}, 커밋 ${MODELS.v2meta.commit}. v2 고정 뒤에는 제출 전까지 다시 학습하지 않습니다.`,
+  limitsFootnote: `※ 2026년 v2 값: ${V2_NOTICE}`,
+  models: {
+    title: "모델 두 가지 — v1 블라인드 검증 · v2 제출·운영",
+    lead: MODEL.note,
+    cols: ["", "v1 블라인드 검증 모델", "v2 제출·운영 모델"],
+    rows: [
+      ["고정 시각", `${V1_SEALED} (커밋 ${MODELS.v1meta.commit})`, `${V2_FROZEN} (커밋 ${MODELS.v2meta.commit})`],
+      ["한 값 예측 (대회 제출값)", `세 가지 예측의 가중 평균 · 특징 ${MODELS.v1meta.features}가지`, `v1의 세 가지 예측 + 녹조 종류별 예측(마이크로시스티스와 나머지 3속을 따로 예측해 합침)의 가중 평균 · 특징 ${MODELS.v2meta.features}가지(바로 위 지점의 최근 측정 ${MODELS.v2meta.upstreamFeatures}가지 추가) · 가중치: 세 가지 예측 ${MODELS.v2weights.c1.toFixed(3)} · ${MODELS.v2weights.c3.toFixed(3)} · ${MODELS.v2weights.c2.toFixed(3)}, 녹조 종류별 ${MODELS.v2weights.cg.toFixed(3)}`],
+      ["가장 가능성 높은 값 · 예상 범위 · 넘을 가능성 · 단계", "v1 봉인본", "v1 봉인본 그대로 (결과 같음)"],
+      ["2026년 성적의 성격", "봉인 뒤 처음 계산 — 블라인드 검증", V2_NOTICE],
+      ["2026년 한 값 예측이 1만 넘는 사건을 미리 잡은 수", `${V2CMP.p26point.total}건 중 ${V2CMP.p26point.v1}건`, `${V2CMP.p26point.total}건 중 ${V2CMP.p26point.v2}건 (블라인드 아님)`],
+      ["채택 근거", "–", "미리 등록한 확인 실험을 통과해 채택. 그 뒤 추가 고도화 실험과 단기예보 재시도는 기준을 넘지 못해 그대로 고정"],
+    ] as [string, string, string][],
+    expert: `v2 = 최종 모델 C: v1 로그 앙상블(c1·c3·c2) + 상류 피처 5열(up1_*) + 속별 구성원 cg(Microcystis + 나머지 3속), log10 공간 NNLS 가중치 c1 ${MODELS.v2weights.c1.toFixed(3)} · c3 ${MODELS.v2weights.c3.toFixed(3)} · c2 ${MODELS.v2weights.c2.toFixed(3)} · cg ${MODELS.v2weights.cg.toFixed(3)}. 분류기(p_alert)·분위(q10/q50/q90)·CQR·운영점은 v1 동결본. 근거 reports/experiments/EXP-confirm/RESULT.md, 미채택 EXP-005(P0~P6)·P3.`,
+    frozenTable: "models/FROZEN_v2.md — 동결 모델 해시",
+  },
 } as const;
 
 /** 공식 단계 기준(개/mL): 관심 1천, 경계 1만, 대발생 100만 */

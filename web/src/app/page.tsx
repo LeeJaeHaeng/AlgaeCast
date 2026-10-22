@@ -11,15 +11,16 @@ import { unstable_cache } from "next/cache";
 import { BOARD, COMBO, comboOf } from "@/lib/copy";
 import { toLogItems } from "@/lib/eventlog";
 import { fmtDateTimeKST, fmtTimeKST, tierOf } from "@/lib/format";
-import { getCollectStatus, getEventLog, getForecastAll, getLatestRunAny, getMetrics, getRecentObsAll, getSiteStatus, getSites } from "@/lib/queries";
+import { getCollectStatus, getEventLog, getForecastAll, getLatestRunAny, getRecentObsAll, getSiteStatus, getSites } from "@/lib/queries";
 
 export const revalidate = 300;
 
 /** Supabase 조회는 60초 캐시 (화면 새로고침 5분·여러 화면이 동시에 열려도 DB 부하 일정) */
 const getBoardData = unstable_cache(
   async () => {
-    const [status, sites, anyRun, events, obs, fc, metrics, collect] = await Promise.all([getSiteStatus(), getSites(), getLatestRunAny(), getEventLog(30, 80), getRecentObsAll(70), getForecastAll(), getMetrics(), getCollectStatus()]);
-    return { status, sites, anyRun, events, obs, fc, metrics, collect };
+    // 성적표 띠 숫자는 numbers.ts(빌드 전 대조) — DB model_metrics(v1 값)는 읽지 않는다
+    const [status, sites, anyRun, events, obs, fc, collect] = await Promise.all([getSiteStatus(), getSites(), getLatestRunAny(), getEventLog(30, 80), getRecentObsAll(70), getForecastAll(), getCollectStatus()]);
+    return { status, sites, anyRun, events, obs, fc, collect };
   },
   ["board-data"],
   { revalidate: 60, tags: ["board-data"] },
@@ -34,7 +35,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const sp = await searchParams;
   const expert = sp.view === "expert";
   const dbOk = true; // 조회 실패 시 Next 가 오류 화면을 내므로 여기 도달하면 저장소 정상
-  const { status, sites, anyRun, events, obs, fc, metrics, collect } = await getBoardData();
+  const { status, sites, anyRun, events, obs, fc, collect } = await getBoardData();
   const renderedAt = new Date().toISOString();
   const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
   const nextRefresh = fmtTimeKST(new Date(Date.now() + 5 * 60_000));
@@ -101,7 +102,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           <WeatherPanel sites={ranked} fc={fc} />
         </div>
       </main>
-      <ScoreStrip metrics={metrics} expert={expert} />
+      <ScoreStrip expert={expert} />
       <Escalation tiers={tiers} />
     </div>
   );

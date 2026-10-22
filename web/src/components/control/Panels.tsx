@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Info } from "@/components/Info";
 import { BOARD, COMBO, COMBO_ORDER, banner as bannerText, comboOf } from "@/lib/copy";
 import { fmtDate, tierOf } from "@/lib/format";
-import { NUMBERS } from "@/lib/numbers";
-import type { ForecastLite, Metric, SiteStatus } from "@/lib/queries";
+import { NUMBERS, V2CMP } from "@/lib/numbers";
+import type { ForecastLite, SiteStatus } from "@/lib/queries";
 
 /** 상황 배너(48px): 색 = 가장 높은 조합, 문구 = §8.3 템플릿(조합별 "지점, 지점 라벨" 을 · 로 연결), 우측 = 조합별 개수 */
 export function Banner({ status, nextRefresh }: { status: SiteStatus[]; nextRefresh: string }) {
@@ -77,10 +77,10 @@ export function WeatherPanel({ sites, fc }: { sites: SiteStatus[]; fc: ForecastL
   );
 }
 
-/** 성적표 띠(40px): 2020~2026 경계 사건 포착·중앙 리드타임·2026 사후 — 고정된 모델 */
-export function ScoreStrip({ metrics, expert }: { metrics: Metric[]; expert: boolean }) {
-  const g = (split: string, m: string) => metrics.find((x) => x.split === split && x.site_id == null && x.metric === m)?.value ?? null;
+/** 성적표 띠(40px): 2020~2026 경계 사건 포착·중앙 리드타임(v1·v2 공통)·2026 블라인드 검증(v1) — 제출·운영 모델 v2 */
+export function ScoreStrip({ expert }: { expert: boolean }) {
   const { events: ev, y2026 } = NUMBERS; // 헤드라인 숫자는 numbers.ts(빌드 전 reports/eval 과 대조)
+  const f2 = (v: number) => v.toFixed(2);
   return (
     <footer className="flex h-10 items-center gap-6 border-t border-border bg-panel px-4 text-sm" aria-label={BOARD.panels.score}>
       <span className="panel-title">{BOARD.panels.score}</span>
@@ -90,12 +90,13 @@ export function ScoreStrip({ metrics, expert }: { metrics: Metric[]; expert: boo
         <Info term="leadTime" />
       </span>
       <span>
-        {BOARD.score.year2026(y2026.detected, y2026.total)} <span className="text-dim">({BOARD.score.lead(y2026.medianLeadDays)})</span>
+        {BOARD.score.year2026(y2026.detected, y2026.total)}{" "}
+        <span className="text-dim">
+          ({BOARD.score.lead(y2026.medianLeadDays)} · {BOARD.score.year2026Sub})
+        </span>
       </span>
       {expert && (
-        <span className="text-dim">
-          2025 홀드아웃 rmse_log {g("holdout2025", "rmse_log")?.toFixed(3)} · F1@10k {g("holdout2025", "f1_10k")?.toFixed(3)} · 2026 사후 F1@10k {g("posthoc2026", "f1_10k")?.toFixed(3)}
-        </span>
+        <span className="text-dim">{BOARD.score.expert(f2(V2CMP.h25v2.f1_10k), f2(V2CMP.h25v1.f1_10k), f2(V2CMP.p26v2.f1_10k), f2(V2CMP.p26v1.f1_10k))}</span>
       )}
       <span className="ml-auto flex items-center gap-3 text-dim">
         <span>

@@ -1,12 +1,15 @@
 import { Info } from "@/components/Info";
+import { MdTable } from "@/components/MdTable";
 import { PageFrame } from "@/components/PageFrame";
 import { ABOUT, TERMS } from "@/lib/copy";
+import { parseTables, readReport } from "@/lib/reports";
 
 export const revalidate = 86400;
 
 export default async function AboutPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const expert = sp.view === "expert";
+  const frozenV2 = parseTables(readReport("FROZEN_v2.md") ?? "")[0];
   return (
     <PageFrame title={ABOUT.title} lead={ABOUT.lead} expert={expert}>
       <section className="panel p-4">
@@ -39,6 +42,38 @@ export default async function AboutPage({ searchParams }: { searchParams: Promis
           {TERMS.frozen.label}
           <Info term="frozen" /> · {ABOUT.frozenLine}
         </p>
+      </section>
+
+      {/* 모델 두 가지: v1 블라인드 검증 · v2 제출·운영 */}
+      <section className="panel p-4" style={{ borderColor: "var(--accent)" }}>
+        <h2 className="text-xl font-semibold">{ABOUT.models.title}</h2>
+        <p className="mt-1 text-sm leading-relaxed text-dim">{ABOUT.models.lead}</p>
+        <div className="mt-2 overflow-x-auto">
+          <table className="tbl">
+            <thead>
+              <tr>
+                {ABOUT.models.cols.map((c, i) => (
+                  <th key={i}>{c}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {ABOUT.models.rows.map((r) => (
+                <tr key={r[0]}>
+                  <td className="font-semibold">{r[0]}</td>
+                  <td>{r[1]}</td>
+                  <td>{r[2]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {expert && (
+          <div className="mt-2 space-y-2">
+            <p className="text-sm text-dim">{ABOUT.models.expert}</p>
+            {frozenV2 && <MdTable table={frozenV2.table} caption={ABOUT.models.frozenTable} />}
+          </div>
+        )}
       </section>
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
@@ -77,6 +112,9 @@ export default async function AboutPage({ searchParams }: { searchParams: Promis
               </li>
             ))}
           </ul>
+          <p className="mt-2 text-xs font-semibold" style={{ color: "var(--watch)" }}>
+            {ABOUT.limitsFootnote}
+          </p>
         </section>
       </div>
 
