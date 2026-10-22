@@ -1,0 +1,27 @@
+# EXP-005(R2) 상류 사슬·이동시간 대략값의 기하 가정 — config/sites.yaml 통합 후보(메인 세션이 판단).
+# 거리는 안동댐 기준 하류 거리(km). verified = docs/reference/sites_facts_verified.json 에 근거 문장 있음,
+# sites_yaml = config/sites.yaml 주석, assumed = 이번 실험에서 둔 가정(1차 출처 미확인).
+upstream_chain: # 낙동강 본류 조류경보 지점(상류 → 하류). 회남(DCHN)은 금강 수계 → 해당 없음
+  HP: { up1: null, up2: null }
+  GJGR: { up1: HP, up2: null }
+  CS: { up1: GJGR, up2: HP }
+  MGMR: { up1: CS, up2: GJGR }
+  DCHN: { up1: null, up2: null }
+river_km_from_andong_dam:
+  구미보: { km: 114, grade: verified }
+  칠곡보: { km: 141, grade: verified }
+  강정고령보: { km: 166, grade: verified, note: 칠곡보 하류 25 km }
+  달성보: { km: 184, grade: assumed, note: 강정고령보 하류 18 km 가정(1차 출처 미확인) }
+  합천창녕보: { km: 222, grade: verified, note: 달성보 하류 38 km }
+  창녕함안보: { km: 265, grade: verified, note: 합천창녕보 하류 43 km }
+  낙동강하굿둑: { km: 340, grade: verified, note: 창녕함안보 하류 75 km }
+sites_river_km:
+  HP: { km: 118, grade: sites_yaml, note: 해평취수장 = 칠곡보 상류 23 km }
+  GJGR: { km: 159, grade: sites_yaml, note: 측정지점 = 강정고령보 상류 7 km }
+  CS: { km: 253, grade: sites_yaml, note: 창녕함안보 상류 12 km }
+  MGMR: { km: 313, grade: sites_yaml, note: 하굿둑 상류 26~28 km 의 가운데 27 km }
+facility_pool: # 지점 시설 저수 구간 길이(바로 위 보 → 이 보)와 제원 저수량(백만 m³)
+  HP: { facility: 칠곡보, pool_km: 27, storage_mcm: 88.8 }
+  GJGR: { facility: 강정고령보, pool_km: 25, storage_mcm: 92.3 }
+  CS: { facility: 창녕함안보, pool_km: 43, storage_mcm: 100.9 }
+  MGMR: { facility: 낙동강하굿둑, pool_km: 75, storage_mcm: null, note: 제원 없음 → fac_storage 7일 중앙값만 사용 }
