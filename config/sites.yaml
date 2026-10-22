@@ -93,8 +93,14 @@ sites:
     lon: 128.3873
     asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(대구 0.1%·안동 0.2%) 중 최근접 대구 40.3 km
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 143 }
-    kma_mid_reg_id_ta: "11H10602" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_ta: "11H10602" # 중기기온예보 지역코드 구미 — API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
     kma_mid_reg_id_land: "11H10000" # 중기육상예보(getMidLandFcst) 광역코드
+    kma_fcst_regions: # P3 예보·특보 구역. API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
+      grid: { nx: 85, ny: 97 } # 단기예보 격자(LCC 변환, kma_forecast.latlon_to_grid) — P3 피처가 실제로 쓰는 값
+      shrt: "11H10602" # 단기 도시 구미(상위 11H10600 경북남서내륙 · 11H10000 경상북도). 측정지점 구미시 해평면
+      medm_ta: "11H10602" # 중기 기온 구미
+      medm_land: "11H10000" # 중기 육상 경상북도
+      wrn: "L1070300" # 특보구역 구미시(상위 L1070000 경상북도)
     dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
       - { code: "2001685", name: 안동시(안동댐), use: true }
       - { code: "2001680", name: 안동시(안동댐방수로), use: true }
@@ -149,8 +155,14 @@ sites:
     lon: 128.453
     asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(대구·안동) 중 최근접 대구 18.4 km
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 143 }
-    kma_mid_reg_id_ta: "11H10701" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_ta: "11H10701" # 중기기온예보 지역코드 대구 — API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
     kma_mid_reg_id_land: "11H10000" # 중기육상예보(getMidLandFcst) 광역코드
+    kma_fcst_regions: # P3 예보·특보 구역. API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
+      grid: { nx: 86, ny: 90 }
+      shrt: "11H10701" # 단기 도시 대구(상위 11H10700 대구.경북중남부내륙). 측정지점 대구 달성군 다사읍(달성군 단기 구역은 따로 없음), 대안 11H10604 고령
+      medm_ta: "11H10701" # 중기 기온 대구
+      medm_land: "11H10000" # 중기 육상 경상북도(대구 포함)
+      wrn: "L1140210" # 특보구역 달성군북부(2026-05-31 신설; 그 전은 L1140000 대구광역시). 다사읍=달성군 북부라는 위치 판단
     dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
       - { code: "2001685", name: 안동시(안동댐), use: true }
       - { code: "2001680", name: 안동시(안동댐방수로), use: true }
@@ -206,8 +218,14 @@ sites:
     lon: 128.48
     asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보 없음(밀양 89·창원 25·합천 100%) → 최소인 창원 사용, 결측 구간은 일조시간 대체(T3)
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 155 }
-    kma_mid_reg_id_ta: "11H20601" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_ta: "11H20603" # 중기기온예보 지역코드 함안(정정: 이전 값 11H20601 은 조회 결과 밀양) — API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
     kma_mid_reg_id_land: "11H20000" # 중기육상예보(getMidLandFcst) 광역코드
+    kma_fcst_regions: # P3 예보·특보 구역. API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
+      grid: { nx: 87, ny: 80 }
+      shrt: "11H20603" # 단기 도시 함안(상위 11H20600 경남중부내륙 · 11H20000 경상남도). 칠서취수장=함안군 칠서면, 대안 11H20604 창녕
+      medm_ta: "11H20603" # 중기 기온 함안
+      medm_land: "11H20000" # 중기 육상 경상남도
+      wrn: "L1081200" # 특보구역 함안군(상위 L1080000 경상남도)
     dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
       - { code: "2015680", name: 합천군(합천댐), use: true }
       - { code: "2016630", name: 합천군(합천댐방수로), use: true }
@@ -260,8 +278,14 @@ sites:
     lon: 128.99
     asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(양산시 0.4%·부산 1.9%) 중 최근접 양산시 2.7 km
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 257 }
-    kma_mid_reg_id_ta: "11H20102" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_ta: "11H20304" # 중기기온예보 지역코드 김해(이전 값 11H20102 양산 → 2025-08 이후 채수지점 매리취수장 소재지 김해로) — API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
     kma_mid_reg_id_land: "11H20000" # 중기육상예보(getMidLandFcst) 광역코드
+    kma_fcst_regions: # P3 예보·특보 구역. API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
+      grid: { nx: 96, ny: 79 }
+      shrt: "11H20304" # 단기 도시 김해(상위 11H20300 경남중부남해안). 매리취수장=김해시 상동면 매리, 대안 11H20102 양산(물금, 맞은편 기슭)
+      medm_ta: "11H20304" # 중기 기온 김해
+      medm_land: "11H20000" # 중기 육상 경상남도
+      wrn: "L1080900" # 특보구역 김해시, 대안 L1080500 양산시
     dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
       - { code: "2022696", name: 부산시(낙동강하구언(내)), use: true }
       - { code: "2022697", name: 부산시(낙동강하구언(외)), use: false } # 조석 영향 → 피처 제외
@@ -314,8 +338,14 @@ sites:
     lon: 127.6
     asos_by_var: # T1-c 승인 시 지시: 변수별 관측소. primary = asos_primary. si(일사)는 일사 결측률 <5% 후보(청주 0.1%·대전 0.4%) 중 최근접 대전 20.6 km
       { ta: primary, rn: primary, ws: primary, hm: primary, ss: primary, si: 133 }
-    kma_mid_reg_id_ta: "11C10301" # 중기기온예보(getMidTa) 지역코드 — 중기예보 서비스 미승인(코드 30, 2026-10-20) 상태라 미검증
+    kma_mid_reg_id_ta: "11C10302" # 중기기온예보 지역코드 보은(이전 값 11C10301 청주 → 측정지점 소재 보은 구역이 있어 교체) — API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
     kma_mid_reg_id_land: "11C10000" # 중기육상예보(getMidLandFcst) 광역코드
+    kma_fcst_regions: # P3 예보·특보 구역. API허브 구역 목록 조회 2026-10-22(fct_shrt_reg·fct_medm_reg·wrn_reg, tmfc=0) — EXP-005/P3/PROBE_GRID.md 4절
+      grid: { nx: 71, ny: 102 }
+      shrt: "11C10302" # 단기 도시 보은(상위 11C10300 충북중부내륙 · 11C10000 충청북도). 측정지점 보은군 회남면, 대안 11C10403 옥천
+      medm_ta: "11C10302" # 중기 기온 보은
+      medm_land: "11C10000" # 중기 육상 충청북도
+      wrn: "L1040300" # 특보구역 보은군(상위 L1040000 충청북도)
     dataon_stations: # HY-05 DataON(≤2024-12-31) + WAMIS wl_dtdata(2025~) 연속 시계열. code = WAMIS 수위관측소 코드(2020 파일 헤더 7자리). use:false 는 피처 제외
       - { code: "3008690", name: 청주시(대청댐), use: true }
       - { code: "3008685", name: 청주시(대청댐방수로), use: true }

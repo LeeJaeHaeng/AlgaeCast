@@ -8,6 +8,9 @@ HTTP 403 "활용신청이 필요한 API 입니다"를 돌려준다. 공공데이
 제공한다(resultCode 10). 따라서 자료 수집은 하지 않았고, 이 모듈은 접근 점검과 격자 정보만 담는다.
 API허브에서 해당 API 활용신청이 승인되면 ``python -m algaecast.collect.kma_apihub_fcst`` 로 다시 점검한다.
 
+갱신(2026-10-22 15시): 격자자료(``nph-dfs_shrt_grd``) 활용신청이 승인됐다. 과거 발표분 수집은
+``algaecast.collect.kma_fcst_grid_hist`` 가 맡는다(reports/experiments/EXP-005/P3/PROBE_GRID.md).
+
 키 취급: ``authKey`` 는 요청 인자로만 쓰고, 응답·예외 문자열에서 키 값을 지운 뒤 기록한다(``scrub``).
 점검 결과는 캐시하지 않는다(현재 상태 확인용). 키 값·키 일부는 어떤 출력에도 남기지 않는다.
 

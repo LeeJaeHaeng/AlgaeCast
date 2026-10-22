@@ -1,25 +1,26 @@
-"""EXP-005 2차 P3 — 기상청 단기예보 과거 발표분 피처(기준일 05시 발표분, +1~+3일). 수집 불가로 평가하지 못함.
+"""EXP-005 2차 P3 — 기상청 단기예보 과거 발표분 피처(기준일 05시 발표분, +1~+3일). 사전등록: PREREG_P3.md.
 
-상태(2026-10-22): API허브 단기예보 자료 API 가 HTTP 403("활용신청이 필요한 API 입니다")이라
-원자료를 받지 못했다(``algaecast.collect.kma_apihub_fcst`` 점검 결과,
-reports/experiments/EXP-005/P3/probe.json).
-이 모듈은 자료가 들어오면 바로 쓸 수 있도록 as_of 규칙 피처 함수와 누수 테스트
-(tests/test_exp_r2nd_p3_kmafcst.py)만 둔다.
-C + 예보 피처 평가는 하지 않았다.
+원자료: API허브 단기예보 격자자료(``nph-dfs_shrt_grd``) 과거 발표분의 5지점 격자값
+(``algaecast.collect.kma_fcst_grid_hist`` → data/raw/kma_fcst_grid/calls.jsonl → ``calls_to_long``).
+중기예보(+4~+7일)·기상특보는 승인된 API 가 구역 목록 조회뿐이라 자료가 없다(PREREG_P3.md 2절).
 
-피처 정의(사용자 지시)
-- 5지점 격자(nx, ny)의 기준일 당일 05시 발표분, 없으면 직전 발표분(issued_at ≤ base_date 05:00 KST).
-  직전 발표분은 MAX_LAG_H(24시간) 안의 것만 쓴다. 그보다 오래된 발표분만 있으면 결측으로 둔다.
-- 목표일 = 기준일 +1·+2·+3일. 변수: 최고기온(TMX, 없으면 TMP 최대), 평균기온(TMP 평균), 강수량(PCP 합),
-  강수확률(POP 최대), 하늘상태(SKY 평균, 1 맑음·3 구름많음·4 흐림), 풍속(WSD 평균).
-- 열: ``p3_fc_<변수>_d<1|2|3>`` 18개 + ``p3_fc_issue_lag_h``(05시 기준 발표 지연 시간) + ``p3_fc_available``.
+피처 정의(사용자 지시 2026-10-22, 자료 형식에 맞춘 세부는 PREREG_P3.md 3절)
+- 5지점 격자(nx, ny)의 기준일 당일 05시 발표분, 없으면 직전 발표분(issued_at ≤ base_date 05:00 KST,
+  24시간 안). 그보다 오래된 발표분만 있으면 결측.
+- 목표일 = 기준일 +1·+2·+3일. 변수:
+  최고기온(TMX), 최저기온(TMN), 강수확률(POP, 09·15·21시 최대), 하늘상태(SKY, 09·15·21시 평균),
+  강수량(구 동네예보 R06 6시간 4개 합 / 단기예보 PCP 09·15·21시 평균 × 24 = 일 환산 mm).
+- 결측 구조(자료 사실): POP·SKY 는 2021-06-30 발표분부터, +3일은 2021-11-29 발표분부터 있다.
+- 열: ``p3_fc_<변수>_d<1|2|3>`` 15개 + ``p3_fc_issue_lag_h``·``p3_fc_available``(모형 입력 아님, 점검용).
 
-원자료 형식(long, 시간 단위): station_id, issued_at(발표시각 KST, tz 없는 Timestamp), fcst_at(발효시각 KST),
-category(TMP·TMX·TMN·POP·PCP·SKY·WSD), value(float, -90 이하는 결측).
+원자료 형식(long): station_id, issued_at(발표시각 KST, tz 없는 Timestamp),
+fcst_at(발효시각 KST; R06 은 6시간 구간 시작 시각), category(TMX·TMN·POP·SKY·PCP·R06),
+value(float, -90 이하는 결측).
 """
 
 from __future__ import annotations
 
+import json
 import math
 from datetime import date
 from pathlib import Path
@@ -32,17 +33,25 @@ from algaecast.config import RAW_DIR as RAW_ROOT
 from algaecast.exp import harness as H
 from algaecast.features.base import cut_as_of
 
-RAW_DIR = RAW_ROOT / "kma_fcst_hist"
+RAW_DIR = RAW_ROOT / "kma_fcst_grid"
+CALLS = RAW_DIR / "calls.jsonl"
+LONG_PATH = RAW_DIR / "fcst_long.parquet"
 ISSUE_HOUR = 5  # 05시 발표분
 LEADS: tuple[int, ...] = (1, 2, 3)
-VARS: tuple[str, ...] = ("ta_max", "ta_mean", "rn_sum", "pop_max", "sky_mean", "ws_mean")
-FEATURE_COLS: list[str] = [f"p3_fc_{v}_d{d}" for d in LEADS for v in VARS] + [
-    "p3_fc_issue_lag_h",
-    "p3_fc_available",
-]
+VARS: tuple[str, ...] = ("ta_max", "ta_min", "pop_max", "sky_mean", "rn_day")
+SAMPLE_HOURS: tuple[int, ...] = (9, 15, 21)  # POP·SKY·PCP 는 이 시각 값만 쓴다(과거 수집과 실시간을 같게)
+FC_COLS: list[str] = [f"p3_fc_{v}_d{d}" for d in LEADS for v in VARS]
+META_COLS: list[str] = ["p3_fc_issue_lag_h", "p3_fc_available"]
+FEATURE_COLS: list[str] = FC_COLS + META_COLS
+BUNDLES: dict[str, list[str]] = {  # 사전등록 묶음(PREREG_P3.md 4절). 메타 열은 모형에 넣지 않는다.
+    "T": [f"p3_fc_{v}_d{d}" for d in LEADS for v in ("ta_max", "ta_min")],
+    "TS": [f"p3_fc_{v}_d{d}" for d in LEADS for v in ("ta_max", "ta_min", "pop_max", "sky_mean")],
+    "TSR": FC_COLS,
+}
 LONG_COLS = ("station_id", "issued_at", "fcst_at", "category", "value")
-MISSING_BELOW = -90.0  # 격자 자료 결측값(-99 등)
+MISSING_BELOW = -90.0  # 격자 자료 결측값(-99)
 MAX_LAG_H = 24.0  # 05시 발표분이 없을 때 대신 쓸 직전 발표분의 최대 지연(시간)
+R06_N = 4  # 하루 6시간 구간 수
 
 
 def issue_cutoff(as_of: date | pd.Timestamp) -> pd.Timestamp:
@@ -69,6 +78,28 @@ def _empty() -> dict[str, float]:
     return out
 
 
+def day_values(gd: pd.DataFrame) -> dict[str, float]:
+    """한 목표일의 발표분 행(v 열 = 숫자) → 변수 5개."""
+    hour = pd.to_datetime(gd["fcst_at"]).dt.hour
+    sampled = hour.isin(SAMPLE_HOURS).to_numpy()
+    by = {c: gd.loc[gd["category"] == c, "v"].dropna() for c in ("TMX", "TMN", "R06")}
+    for c in ("POP", "SKY", "PCP"):
+        by[c] = gd.loc[(gd["category"] == c).to_numpy() & sampled, "v"].dropna()
+    if len(by["R06"]):
+        rn = float(by["R06"].sum()) if len(by["R06"]) == R06_N else math.nan
+    elif len(by["PCP"]):
+        rn = float(by["PCP"].mean() * 24.0) if len(by["PCP"]) == len(SAMPLE_HOURS) else math.nan
+    else:
+        rn = math.nan
+    return {
+        "ta_max": float(by["TMX"].max()) if len(by["TMX"]) else math.nan,
+        "ta_min": float(by["TMN"].min()) if len(by["TMN"]) else math.nan,
+        "pop_max": float(by["POP"].max()) if len(by["POP"]) else math.nan,
+        "sky_mean": float(by["SKY"].mean()) if len(by["SKY"]) else math.nan,
+        "rn_day": rn,
+    }
+
+
 def forecast_features(fc_long: pd.DataFrame, as_of: date | pd.Timestamp, site: str) -> dict[str, float]:
     """(원자료, as_of, site) → 피처 dict. issued_at ≤ as_of 05:00 인 발표분 중 가장 늦은 것 하나만 쓴다.
 
@@ -91,33 +122,63 @@ def forecast_features(fc_long: pd.DataFrame, as_of: date | pd.Timestamp, site: s
         gd = g[lead.to_numpy() == d]
         if gd.empty:
             continue
-        by = {
-            c: gd.loc[gd["category"] == c, "v"].dropna() for c in ("TMP", "TMX", "POP", "PCP", "SKY", "WSD")
-        }
-        tmx = by["TMX"]
-        out[f"p3_fc_ta_max_d{d}"] = (
-            float(tmx.max()) if len(tmx) else (float(by["TMP"].max()) if len(by["TMP"]) else math.nan)
-        )
-        out[f"p3_fc_ta_mean_d{d}"] = float(by["TMP"].mean()) if len(by["TMP"]) else math.nan
-        out[f"p3_fc_rn_sum_d{d}"] = float(by["PCP"].sum()) if len(by["PCP"]) else math.nan
-        out[f"p3_fc_pop_max_d{d}"] = float(by["POP"].max()) if len(by["POP"]) else math.nan
-        out[f"p3_fc_sky_mean_d{d}"] = float(by["SKY"].mean()) if len(by["SKY"]) else math.nan
-        out[f"p3_fc_ws_mean_d{d}"] = float(by["WSD"].mean()) if len(by["WSD"]) else math.nan
-    if all(math.isnan(out[c]) for c in FEATURE_COLS[: len(LEADS) * len(VARS)]):
+        for v, x in day_values(gd).items():
+            out[f"p3_fc_{v}_d{d}"] = x
+    if all(math.isnan(out[c]) for c in FC_COLS):
         return _empty()  # +1~+3일 값이 하나도 없으면 발표분이 없는 것과 같다
     out["p3_fc_issue_lag_h"] = float((cutoff - latest) / pd.Timedelta(hours=1))
     out["p3_fc_available"] = 1.0
     return out
 
 
-def load_raw(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
-    """data/raw/kma_fcst_hist/*.parquet(long). 없으면 FileNotFoundError — 2026-10-22 현재 수집 불가(403)."""
-    files = sorted(Path(raw_dir).glob("*.parquet")) if Path(raw_dir).exists() else []
-    if not files:
-        raise FileNotFoundError(
-            f"P3 원자료가 없다({raw_dir}). API허브 단기예보 격자자료 활용신청 승인 후 수집해야 한다."
-        )
-    fc = pd.concat([pd.read_parquet(f, columns=list(LONG_COLS)) for f in files], ignore_index=True)
+# ---------------------------------------------------------------- 수집 기록 → long
+def calls_to_long(path: Path = CALLS) -> pd.DataFrame:
+    """calls.jsonl(호출 1건 = 발표·발효·변수 하나의 5지점 값) → long.
+
+    채택 규칙(자료 사실에 근거, PREREG_P3.md 3절):
+    - TMX·TMN·SKY: 육지 격자 status 가 ok 일 때만(전부 0 = 0채움, 전부 -99 = 결측은 버림).
+    - POP·PCP: 같은 (발표, 발효) 의 SKY 가 ok 일 때만(0 은 실제 0일 수 있어 SKY 로 유효성을 판단).
+    - R06: ok 또는 전국 0(실제 무강수일 수 있음).
+      해당 발표분의 TMX 가 ok 인 것만 쓰이도록 수집 단계에서 고른다.
+    - 지점 값 ≤ -90 은 결측. R06 의 fcst_at 은 6시간 구간 시작 시각(끝 시각 - 6시간)으로 둔다.
+    """
+    recs = [json.loads(x) for x in Path(path).read_text(encoding="utf-8").splitlines() if x.strip()]
+    recs = [r for r in recs if r.get("http") == 200 and r.get("status") in ("ok", "zero_fill", "missing")]
+    best: dict[tuple[str, str, str], dict] = {}
+    for r in recs:  # 같은 호출이 여러 번 기록됐으면 마지막 것
+        best[(r["tmfc"], r["tmef"], r["var"])] = r
+    sky_ok = {(k[0], k[1]) for k, r in best.items() if k[2] == "SKY" and r["status"] == "ok"}
+    rows = []
+    for (tmfc, tmef, var), r in best.items():
+        st = r["status"]
+        if var in ("TMX", "TMN", "SKY"):
+            keep = st == "ok"
+        elif var in ("POP", "PCP"):
+            keep = st in ("ok", "zero_fill") and (tmfc, tmef) in sky_ok
+        elif var == "R06":
+            keep = st in ("ok", "zero_fill")
+        else:
+            keep = False
+        if not keep:
+            continue
+        issued = pd.Timestamp(pd.to_datetime(tmfc, format="%Y%m%d%H"))
+        fcst = pd.Timestamp(pd.to_datetime(tmef, format="%Y%m%d%H"))
+        if var == "R06":
+            fcst = fcst - pd.Timedelta(hours=6)
+        for sid, val in r.get("site", {}).items():
+            if val is None or val <= MISSING_BELOW:
+                continue
+            rows.append((sid, issued, fcst, var, float(val)))
+    return pd.DataFrame(rows, columns=list(LONG_COLS)).sort_values(
+        ["station_id", "issued_at", "fcst_at", "category"]
+    )
+
+
+def load_raw(path: Path = LONG_PATH) -> pd.DataFrame:
+    """data/raw/kma_fcst_grid/fcst_long.parquet(long). 없으면 FileNotFoundError."""
+    if not Path(path).exists():
+        raise FileNotFoundError(f"P3 원자료가 없다({path}). kma_fcst_grid_hist --to-long 으로 만든다.")
+    fc = pd.read_parquet(path, columns=list(LONG_COLS))
     fc["issued_at"] = pd.to_datetime(fc["issued_at"])
     fc["fcst_at"] = pd.to_datetime(fc["fcst_at"])
     # 2026 발표분은 읽은 즉시 버린다(기준일 ≤ 2025-12-31 피처에는 쓰일 일이 없고 열람도 하지 않는다)
@@ -125,10 +186,7 @@ def load_raw(raw_dir: Path = RAW_DIR) -> pd.DataFrame:
 
 
 def build_features(df: pd.DataFrame, fc_long: pd.DataFrame | None = None) -> pd.DataFrame:
-    """df(harness.load_base 형식)의 행마다 forecast_features → 같은 인덱스의 DataFrame(FEATURE_COLS).
-
-    fc_long 을 주지 않으면 load_raw() 를 읽는다(현재는 원자료가 없어 FileNotFoundError).
-    """
+    """df(harness.load_base 형식)의 행마다 forecast_features → 같은 인덱스의 DataFrame(FEATURE_COLS)."""
     H.guard_no_2026(df)
     fc = load_raw() if fc_long is None else fc_long
     by_site = {s: g for s, g in fc.groupby(fc["station_id"].astype(str))}
