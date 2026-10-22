@@ -113,6 +113,15 @@ sites:
     intake_capacity_source: { grade: official, url: "https://www.kwater.or.kr/water/sub01/sub05/20060674/works.do?s_mid=1367&s_officecode=10730017&s_flag=1&brdId=KO27", note: "K-water 구미권지사 해평취수장 464천㎥/일" }
     intakes: [해평취수장]
     note: 대구 취수원 다변화(해평 공동이용 30만 톤/일 계획, 안동댐 직취수 '맑은물 하이웨이')
+    # --- 고도화 실험(2026-10-21) 측정소 매핑: EXP-007 수질측정망(R4), EXP-009 수질자동측정망(R6), EXP-005 상류 사슬(R2)
+    wq_station: {pt_no: 2011A10, name: 강정, addr: 경상북도 구미시 고아읍 봉한리 숭선교, lat: 36.195, lon: 128.365278, distance_km: 3.46}
+    wq_station_candidates:
+      - {pt_no: 2011A10, name: 강정, relation: primary, distance_km: 3.46, dates_per_year: 32.8}
+      - {pt_no: 2009A30, name: 선산, relation: upstream, distance_km: 8.64, dates_per_year: 51.4}
+      - {pt_no: 2011A20, name: 구미, relation: downstream, distance_km: 11.07, dates_per_year: 38.4}
+    autowq_primary: {code: S02012, name: 해평, distance_km: 0.3, note: 감천 합류 5 km 하류 숭선대교; TN·TP 미측정}
+    autowq_secondary: {code: S02021, name: 도개, distance_km: 8.9, note: 구미보 상류 일선교(본류)}
+    upstream_chain: {up1: null, up2: null}
   - site_code: "2011G56"
     station_id: GJGR
     name: 강정·고령
@@ -160,6 +169,15 @@ sites:
     intake_capacity_tpd: 770000 # 매곡취수장 770 천㎥/일 (정수 700). 문산취수장 용량 TODO; 문산+매곡 실제 취수 약 60만 톤/일, 대구 급수 70%
     intake_capacity_source: { grade: secondary, url: "https://www.grandculture.net/daegu/suseonggu/toc/GC40081074", note: "디지털대구문화대전 매곡정수사업소 취수 770천㎥/일 — 지자체(대구상수도사업본부) 공식 페이지 미확인 → 토글 근거 불충분" }
     intakes: [매곡취수장, 문산취수장]
+    # --- 고도화 실험(2026-10-21) 측정소 매핑: EXP-007 수질측정망(R4), EXP-009 수질자동측정망(R6), EXP-005 상류 사슬(R2)
+    wq_station: {pt_no: 2011A55, name: 다사, addr: 대구광역시 달성군 다사읍 죽곡리 강정고령보상류500m, lat: 35.842778, lon: 128.456944, distance_km: 0.36}
+    wq_station_candidates:
+      - {pt_no: 2011A55, name: 다사, relation: primary, distance_km: 0.36, dates_per_year: 51.5}
+      - {pt_no: 2011A60, name: 달성, relation: same_reach, distance_km: 0.83, dates_per_year: 48.1}
+      - {pt_no: 2011A40, name: 성주, relation: upstream, distance_km: 7.2, dates_per_year: 48.1}
+    autowq_primary: {code: S02009, name: 다산, distance_km: 2.6, note: 강정고령보 상류 5 km 월암양수장; PO4-P·NH3-N·NO3-N 도 측정}
+    autowq_secondary: {code: S02003, name: 왜관, distance_km: 12.8, note: 제2왜관교(본류); TN·TP 미측정}
+    upstream_chain: {up1: HP, up2: null}
   - site_code: "2020G33"
     station_id: CS
     name: 칠서
@@ -207,6 +225,14 @@ sites:
     intake_capacity_tpd: 440000 # 칠서취수장(창원시) 440,000 ㎥/일, 정수 400,000. 창원 수돗물 약 63% 의존
     intake_capacity_source: { grade: official, url: "https://www.changwon.go.kr/water/sub05/sub_05_03_01.do", note: "창원시 상수도 칠서취수장 취수용량 440,000㎥/일" }
     intakes: [칠서취수장]
+    # --- 고도화 실험(2026-10-21) 측정소 매핑: EXP-007 수질측정망(R4), EXP-009 수질자동측정망(R6), EXP-005 상류 사슬(R2)
+    wq_station: {pt_no: 2020A10, name: 남지, addr: 경상남도 함안군 칠서면 계내리 남지교, lat: 35.380833, lon: 128.473611, distance_km: 1.34}
+    wq_station_candidates:
+      - {pt_no: 2020A10, name: 남지, relation: primary, distance_km: 1.34, dates_per_year: 48.3}
+      - {pt_no: 2020A32, name: 함안, relation: downstream, distance_km: 6.36, dates_per_year: 51.4}
+    autowq_primary: {code: S02007, name: 칠서, distance_km: 1.0, note: 남강 합류 1 km 하류; TN·TP 미측정}
+    autowq_secondary: {code: S02006, name: 청암, distance_km: 6.7, note: '창녕함안보 상류 3.5 km(본류, 칠서 하류)'}
+    upstream_chain: {up1: GJGR, up2: HP}
   - site_code: "2022G05"
     station_id: MGMR
     name: 물금·매리
@@ -255,6 +281,14 @@ sites:
     intakes: [물금취수장, 매리취수장]
     river_level_stations: { 삼랑진교: "2022610", 대동낙동강교: "2022678", 구포대교: "2022680" } # WAMIS 수위관측소(물금·매리 상·하류 하천 수위)
     note: 2025년 경보 194일(관심 166·경계 28), 2022년 196일에 이어 2위
+    # --- 고도화 실험(2026-10-21) 측정소 매핑: EXP-007 수질측정망(R4), EXP-009 수질자동측정망(R6), EXP-005 상류 사슬(R2)
+    wq_station: {pt_no: 2022A10, name: 물금, addr: 경상남도 양산시 물금읍 물금리 물금 취수장 취수탑, lat: 35.315278, lon: 128.972222, distance_km: 1.72}
+    wq_station_candidates:
+      - {pt_no: 2022A10, name: 물금, relation: primary, distance_km: 1.72, dates_per_year: 48.2}
+      - {pt_no: 2020A60, name: 삼랑진2, relation: upstream, distance_km: 17.18, dates_per_year: 48.2}
+    autowq_primary: {code: S02017, name: 상동, distance_km: 3.1, note: 매리취수장 상류 2~5.6 km}
+    autowq_secondary: {code: S02008, name: 창암, distance_km: 9.9, note: 밀양강 합류 1.2 km 하류 신삼랑진교(본류)}
+    upstream_chain: {up1: CS, up2: GJGR}
   - site_code: "3008G30"
     station_id: DCHN
     name: 회남
@@ -295,3 +329,12 @@ sites:
     intake_capacity_source: { grade: official, url: "https://www.daejeon.go.kr/its/ItsdjNormalboardView.do?menuSeq=&boardSeq=3570&boardGubun=itsdj01&pageIndex=1", note: "대전시 상수도 일일 최대 시설용량 135만 톤(정수 기준, 대청호 취수)" }
     intakes: [대청댐취수탑(추동·삼정), 대청광역정수장]
     note: 회남은 대청호 3지점(추동·문의·회남) 중 최상류, 2026-07-20 경계 발령
+    # --- 고도화 실험(2026-10-21) 측정소 매핑: EXP-007 수질측정망(R4), EXP-009 수질자동측정망(R6), EXP-005 상류 사슬(R2)
+    wq_station: {pt_no: 3008B30, name: 대청댐5(대청호), addr: 충청북도 보은군 회남면 어성리 회남교, lat: 36.433056, lon: 127.5525, distance_km: 5.62}
+    wq_station_candidates:
+      - {pt_no: 3008B30, name: 대청댐5(대청호), relation: primary, distance_km: 5.62, dates_per_year: 12.1}
+      - {pt_no: 3008B20, name: 대청댐6, relation: downstream, distance_km: 4.06, dates_per_year: 12.0}
+      - {pt_no: 3008B10, name: 대청댐4, relation: upstream, distance_km: 4.46, dates_per_year: 11.9}
+    autowq_primary: {code: S03003, name: 대청호, distance_km: 0.2, note: 회남대교 지점(1998~); 탁도 미측정}
+    autowq_secondary: {code: S03007, name: 장계, distance_km: 9.7, note: 대청호 장계교 지점}
+    upstream_chain: {up1: null, up2: null}
