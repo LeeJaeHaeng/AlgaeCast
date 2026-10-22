@@ -25,7 +25,7 @@ def _frame() -> pd.DataFrame:
 def test_scope_masks_by_target_month() -> None:
     m = H2.scope_masks(_frame())
     assert m["cv"].tolist() == [True, False, False, False, False, False]
-    assert m["y25"].tolist() == [False, True, True, True, True, True]
+    assert m["y25"].tolist() == [False, True, True, True, True, False]  # 목표일 2026-01 행 제외
     # 2025-08-28 기준일의 목표일은 9월 4일 → 9~10월 구간
     assert m["y25a"].tolist() == [False, True, False, False, False, False]
     assert m["y25b"].tolist() == [False, False, True, True, True, False]

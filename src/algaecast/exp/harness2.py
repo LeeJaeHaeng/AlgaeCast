@@ -44,12 +44,16 @@ Builder = Callable[[pd.DataFrame, int], dict[str, np.ndarray]]
 
 # ---------------------------------------------------------------- 구간 마스크
 def scope_masks(df: pd.DataFrame) -> dict[str, np.ndarray]:
-    """CV(기준일 2020~2024)·2025(기준일 2025) 전체·목표일 1~8월·목표일 9~10월."""
+    """CV(기준일 2020~2024)·2025 전체·목표일 1~8월·목표일 9~10월.
+
+    2025 구간은 기준일 2025 이면서 목표일도 2025 년인 행만 쓴다. 기준일 2025-12 → 목표일 2026-01 인 4행은
+    정답이 2026 측정이라 2차 실험의 모든 지표에서 뺀다('2026 계산·열람 금지', PREREG_FINAL 명확화 2026-10-22).
+    """
     cv, fin = H.masks(df)
     td = pd.to_datetime(df["target_date"])
     tm, in25 = td.dt.month.to_numpy(), (td.dt.year == 2025).to_numpy()
-    # 1~8월·9~10월은 목표일이 2025 년인 행만(기준일 2025-12 → 목표일 2026-01 인 행은 '2025 전체'에만 포함)
-    return {"cv": cv, "y25": fin, "y25a": fin & in25 & (tm <= 8), "y25b": fin & in25 & np.isin(tm, (9, 10))}
+    y25 = fin & in25
+    return {"cv": cv, "y25": y25, "y25a": y25 & (tm <= 8), "y25b": y25 & np.isin(tm, (9, 10))}
 
 
 def v1_q90() -> np.ndarray:

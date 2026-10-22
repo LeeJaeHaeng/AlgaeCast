@@ -1,0 +1,3653 @@
+{
+ "generated": "2026-10-22T11:56:29+09:00",
+ "prereg": "reports/experiments/EXP-005/PREREG_P2.md 2절",
+ "bootstrap": {
+  "n": 5000,
+  "seed": 20261022,
+  "strata": "지점×기간",
+  "ci": "백분위 95%"
+ },
+ "periods": {
+  "pre": [
+   "2025-01-01",
+   "2025-08-31"
+  ],
+  "post": [
+   "2025-09-01",
+   "2025-10-31"
+  ],
+  "basis": "target_date"
+ },
+ "change_dates": {
+  "HP": "2025-08-25",
+  "GJGR": "2025-08-25",
+  "CS": "2025-08-25",
+  "MGMR": "2025-08-25"
+ },
+ "api_tags": {
+  "n_files": 41,
+  "n_items_le_2025": 51895,
+  "tags": [
+   "chckDe",
+   "detailAdres",
+   "iemBgalageAnba",
+   "iemBgalageApzo",
+   "iemBgalageCellCo",
+   "iemBgalageMicrosts",
+   "iemBgalageOsrtria",
+   "iemChla",
+   "iemDoc",
+   "iemGeosm",
+   "iemMib2",
+   "iemMicrostlr",
+   "iemPh",
+   "iemTrp",
+   "iemTur",
+   "iemWtrtp",
+   "riverLkmhSe",
+   "swmnCode",
+   "swmnDetailNm",
+   "swmnNm"
+  ],
+  "coordinate_like_tags": []
+ },
+ "p2_condition": {
+  "site_signs": {
+   "HP": 1.0,
+   "GJGR": -1.0,
+   "CS": -1.0,
+   "MGMR": -1.0
+  },
+  "signs_agree": false,
+  "pooled_ci_excludes_0": false,
+  "apply": false,
+  "decision": "미적용(조건 미충족)"
+ },
+ "did_v1": {
+  "main": {
+   "pooled": {
+    "mean": -0.251149,
+    "logvar": 0.792949,
+    "mean_ci": [
+     -0.584802,
+     0.087943
+    ],
+    "logvar_ci": [
+     -0.093024,
+     1.892421
+    ],
+    "mean_boot_var": 0.029148,
+    "treat_mean_change": -0.01525,
+    "ctrl_mean_change": 0.235898,
+    "treat_logvar_change": -1.646769,
+    "ctrl_logvar_change": -2.439719,
+    "n_pre": 112,
+    "n_post": 48,
+    "ctrl_n_pre": 34,
+    "ctrl_n_post": 13
+   },
+   "sites": {
+    "HP": {
+     "mean": 0.01016,
+     "logvar": 0.182511,
+     "mean_ci": [
+      -0.460496,
+      0.465786
+     ],
+     "logvar_ci": [
+      -1.760094,
+      1.527425
+     ],
+     "mean_boot_var": 0.05422,
+     "treat_mean_change": 0.246058,
+     "ctrl_mean_change": 0.235898,
+     "treat_logvar_change": -2.257208,
+     "ctrl_logvar_change": -2.439719,
+     "n_pre": 27,
+     "n_post": 8,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "GJGR": {
+     "mean": -0.190063,
+     "logvar": 0.79489,
+     "mean_ci": [
+      -0.655439,
+      0.296269
+     ],
+     "logvar_ci": [
+      -0.455647,
+      2.093753
+     ],
+     "mean_boot_var": 0.059922,
+     "treat_mean_change": 0.045836,
+     "ctrl_mean_change": 0.235898,
+     "treat_logvar_change": -1.644829,
+     "ctrl_logvar_change": -2.439719,
+     "n_pre": 30,
+     "n_post": 16,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "CS": {
+     "mean": -0.266854,
+     "logvar": 0.52779,
+     "mean_ci": [
+      -0.674802,
+      0.152896
+     ],
+     "logvar_ci": [
+      -0.797093,
+      1.905325
+     ],
+     "mean_boot_var": 0.045138,
+     "treat_mean_change": -0.030956,
+     "ctrl_mean_change": 0.235898,
+     "treat_logvar_change": -1.911928,
+     "ctrl_logvar_change": -2.439719,
+     "n_pre": 29,
+     "n_post": 12,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "MGMR": {
+     "mean": -0.517791,
+     "logvar": 0.698549,
+     "mean_ci": [
+      -0.990704,
+      -0.031054
+     ],
+     "logvar_ci": [
+      -0.656167,
+      2.038568
+     ],
+     "mean_boot_var": 0.06026,
+     "treat_mean_change": -0.281893,
+     "ctrl_mean_change": 0.235898,
+     "treat_logvar_change": -1.741169,
+     "ctrl_logvar_change": -2.439719,
+     "n_pre": 26,
+     "n_post": 12,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    }
+   },
+   "treat": [
+    "HP",
+    "GJGR",
+    "CS",
+    "MGMR"
+   ],
+   "ctrl": [
+    "DCHN"
+   ],
+   "n": {
+    "HP|pre": 27,
+    "HP|post": 8,
+    "GJGR|pre": 30,
+    "GJGR|post": 16,
+    "CS|pre": 29,
+    "CS|post": 12,
+    "MGMR|pre": 26,
+    "MGMR|post": 12,
+    "DCHN|pre": 34,
+    "DCHN|post": 13
+   },
+   "p2": {
+    "site_signs": {
+     "HP": 1.0,
+     "GJGR": -1.0,
+     "CS": -1.0,
+     "MGMR": -1.0
+    },
+    "signs_agree": false,
+    "pooled_ci_excludes_0": false,
+    "apply": false,
+    "decision": "미적용(조건 미충족)"
+   }
+  },
+  "b0_main": {
+   "pooled": {
+    "mean": -0.133766,
+    "logvar": 1.198268,
+    "mean_ci": [
+     -0.580466,
+     0.326098
+    ],
+    "logvar_ci": [
+     0.236957,
+     2.49471
+    ],
+    "mean_boot_var": 0.052985,
+    "treat_mean_change": -0.264275,
+    "ctrl_mean_change": -0.130509,
+    "treat_logvar_change": -2.065335,
+    "ctrl_logvar_change": -3.263603,
+    "n_pre": 112,
+    "n_post": 48,
+    "ctrl_n_pre": 34,
+    "ctrl_n_post": 13
+   },
+   "sites": {
+    "HP": {
+     "mean": -0.022929,
+     "logvar": 1.569287,
+     "mean_ci": [
+      -0.647934,
+      0.600725
+     ],
+     "logvar_ci": [
+      -0.730393,
+      3.186874
+     ],
+     "mean_boot_var": 0.099799,
+     "treat_mean_change": -0.153438,
+     "ctrl_mean_change": -0.130509,
+     "treat_logvar_change": -1.694316,
+     "ctrl_logvar_change": -3.263603,
+     "n_pre": 27,
+     "n_post": 8,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "GJGR": {
+     "mean": -0.209193,
+     "logvar": 1.533956,
+     "mean_ci": [
+      -0.790446,
+      0.400675
+     ],
+     "logvar_ci": [
+      0.351468,
+      2.95867
+     ],
+     "mean_boot_var": 0.094152,
+     "treat_mean_change": -0.339702,
+     "ctrl_mean_change": -0.130509,
+     "treat_logvar_change": -1.729647,
+     "ctrl_logvar_change": -3.263603,
+     "n_pre": 30,
+     "n_post": 16,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "CS": {
+     "mean": -0.062795,
+     "logvar": 0.260609,
+     "mean_ci": [
+      -0.620061,
+      0.500043
+     ],
+     "logvar_ci": [
+      -0.914979,
+      1.737452
+     ],
+     "mean_boot_var": 0.082812,
+     "treat_mean_change": -0.193304,
+     "ctrl_mean_change": -0.130509,
+     "treat_logvar_change": -3.002994,
+     "ctrl_logvar_change": -3.263603,
+     "n_pre": 29,
+     "n_post": 12,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "MGMR": {
+     "mean": -0.1803,
+     "logvar": 0.911256,
+     "mean_ci": [
+      -0.790129,
+      0.432684
+     ],
+     "logvar_ci": [
+      -0.493234,
+      2.530889
+     ],
+     "mean_boot_var": 0.097518,
+     "treat_mean_change": -0.310809,
+     "ctrl_mean_change": -0.130509,
+     "treat_logvar_change": -2.352346,
+     "ctrl_logvar_change": -3.263603,
+     "n_pre": 26,
+     "n_post": 12,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    }
+   },
+   "treat": [
+    "HP",
+    "GJGR",
+    "CS",
+    "MGMR"
+   ],
+   "ctrl": [
+    "DCHN"
+   ],
+   "n": {
+    "HP|pre": 27,
+    "HP|post": 8,
+    "GJGR|pre": 30,
+    "GJGR|post": 16,
+    "CS|pre": 29,
+    "CS|post": 12,
+    "MGMR|pre": 26,
+    "MGMR|post": 12,
+    "DCHN|pre": 34,
+    "DCHN|post": 13
+   }
+  },
+  "s1_change_date": {
+   "pooled": {
+    "mean": -0.154141,
+    "logvar": 1.066696,
+    "mean_ci": [
+     -0.4924,
+     0.196894
+    ],
+    "logvar_ci": [
+     0.164441,
+     2.130771
+    ],
+    "mean_boot_var": 0.031046,
+    "treat_mean_change": 0.067633,
+    "ctrl_mean_change": 0.221774,
+    "treat_logvar_change": -1.527504,
+    "ctrl_logvar_change": -2.5942,
+    "n_pre": 106,
+    "n_post": 54,
+    "ctrl_n_pre": 32,
+    "ctrl_n_post": 15
+   },
+   "sites": {
+    "HP": {
+     "mean": 0.012308,
+     "logvar": 0.201965,
+     "mean_ci": [
+      -0.455941,
+      0.452245
+     ],
+     "logvar_ci": [
+      -1.507149,
+      1.505187
+     ],
+     "mean_boot_var": 0.053421,
+     "treat_mean_change": 0.234082,
+     "ctrl_mean_change": 0.221774,
+     "treat_logvar_change": -2.392235,
+     "ctrl_logvar_change": -2.5942,
+     "n_pre": 26,
+     "n_post": 9,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "GJGR": {
+     "mean": -0.127999,
+     "logvar": 0.832664,
+     "mean_ci": [
+      -0.614462,
+      0.364186
+     ],
+     "logvar_ci": [
+      -0.38042,
+      2.041119
+     ],
+     "mean_boot_var": 0.064242,
+     "treat_mean_change": 0.093775,
+     "ctrl_mean_change": 0.221774,
+     "treat_logvar_change": -1.761536,
+     "ctrl_logvar_change": -2.5942,
+     "n_pre": 28,
+     "n_post": 18,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "CS": {
+     "mean": -0.172887,
+     "logvar": 0.999864,
+     "mean_ci": [
+      -0.608937,
+      0.267486
+     ],
+     "logvar_ci": [
+      -0.365691,
+      2.315212
+     ],
+     "mean_boot_var": 0.049825,
+     "treat_mean_change": 0.048887,
+     "ctrl_mean_change": 0.221774,
+     "treat_logvar_change": -1.594336,
+     "ctrl_logvar_change": -2.5942,
+     "n_pre": 28,
+     "n_post": 13,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "MGMR": {
+     "mean": -0.300024,
+     "logvar": 1.457869,
+     "mean_ci": [
+      -0.819144,
+      0.233988
+     ],
+     "logvar_ci": [
+      -0.014048,
+      2.858632
+     ],
+     "mean_boot_var": 0.070251,
+     "treat_mean_change": -0.07825,
+     "ctrl_mean_change": 0.221774,
+     "treat_logvar_change": -1.136331,
+     "ctrl_logvar_change": -2.5942,
+     "n_pre": 24,
+     "n_post": 14,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    }
+   },
+   "treat": [
+    "HP",
+    "GJGR",
+    "CS",
+    "MGMR"
+   ],
+   "ctrl": [
+    "DCHN"
+   ],
+   "n": {
+    "HP|pre": 26,
+    "HP|post": 9,
+    "GJGR|pre": 28,
+    "GJGR|post": 18,
+    "CS|pre": 28,
+    "CS|post": 13,
+    "MGMR|pre": 24,
+    "MGMR|post": 14,
+    "DCHN|pre": 32,
+    "DCHN|post": 15
+   }
+  },
+  "b0_s1_change_date": {
+   "pooled": {
+    "mean": 0.038529,
+    "logvar": 0.681927,
+    "mean_ci": [
+     -0.43023,
+     0.513636
+    ],
+    "logvar_ci": [
+     -0.370281,
+     2.246614
+    ],
+    "mean_boot_var": 0.058405,
+    "treat_mean_change": -0.192349,
+    "ctrl_mean_change": -0.230879,
+    "treat_logvar_change": -1.998704,
+    "ctrl_logvar_change": -2.680631,
+    "n_pre": 106,
+    "n_post": 54,
+    "ctrl_n_pre": 32,
+    "ctrl_n_post": 15
+   },
+   "sites": {
+    "HP": {
+     "mean": 0.118944,
+     "logvar": 0.880377,
+     "mean_ci": [
+      -0.529088,
+      0.724926
+     ],
+     "logvar_ci": [
+      -1.47403,
+      2.681807
+     ],
+     "mean_boot_var": 0.103097,
+     "treat_mean_change": -0.111934,
+     "ctrl_mean_change": -0.230879,
+     "treat_logvar_change": -1.800254,
+     "ctrl_logvar_change": -2.680631,
+     "n_pre": 26,
+     "n_post": 9,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "GJGR": {
+     "mean": -0.050361,
+     "logvar": 0.867215,
+     "mean_ci": [
+      -0.665572,
+      0.562519
+     ],
+     "logvar_ci": [
+      -0.375416,
+      2.496891
+     ],
+     "mean_boot_var": 0.10109,
+     "treat_mean_change": -0.281239,
+     "ctrl_mean_change": -0.230879,
+     "treat_logvar_change": -1.813415,
+     "ctrl_logvar_change": -2.680631,
+     "n_pre": 28,
+     "n_post": 18,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "CS": {
+     "mean": 0.091076,
+     "logvar": -0.090784,
+     "mean_ci": [
+      -0.494999,
+      0.673611
+     ],
+     "logvar_ci": [
+      -1.347346,
+      1.599204
+     ],
+     "mean_boot_var": 0.09193,
+     "treat_mean_change": -0.139802,
+     "ctrl_mean_change": -0.230879,
+     "treat_logvar_change": -2.771414,
+     "ctrl_logvar_change": -2.680631,
+     "n_pre": 28,
+     "n_post": 13,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "MGMR": {
+     "mean": 0.049044,
+     "logvar": 0.699413,
+     "mean_ci": [
+      -0.591848,
+      0.711304
+     ],
+     "logvar_ci": [
+      -0.926783,
+      2.601663
+     ],
+     "mean_boot_var": 0.112172,
+     "treat_mean_change": -0.181835,
+     "ctrl_mean_change": -0.230879,
+     "treat_logvar_change": -1.981218,
+     "ctrl_logvar_change": -2.680631,
+     "n_pre": 24,
+     "n_post": 14,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 15,
+     "ctrl": [
+      "DCHN"
+     ]
+    }
+   },
+   "treat": [
+    "HP",
+    "GJGR",
+    "CS",
+    "MGMR"
+   ],
+   "ctrl": [
+    "DCHN"
+   ],
+   "n": {
+    "HP|pre": 26,
+    "HP|post": 9,
+    "GJGR|pre": 28,
+    "GJGR|post": 18,
+    "CS|pre": 28,
+    "CS|post": 13,
+    "MGMR|pre": 24,
+    "MGMR|post": 14,
+    "DCHN|pre": 32,
+    "DCHN|post": 15
+   }
+  },
+  "s2_no_crossing": {
+   "pooled": {
+    "mean": -0.229278,
+    "logvar": 0.826333,
+    "mean_ci": [
+     -0.573551,
+     0.123806
+    ],
+    "logvar_ci": [
+     -0.060333,
+     1.915052
+    ],
+    "mean_boot_var": 0.031728,
+    "treat_mean_change": 0.012151,
+    "ctrl_mean_change": 0.241429,
+    "treat_logvar_change": -1.675005,
+    "ctrl_logvar_change": -2.501338,
+    "n_pre": 106,
+    "n_post": 48,
+    "ctrl_n_pre": 32,
+    "ctrl_n_post": 13
+   },
+   "sites": {
+    "HP": {
+     "mean": 0.00858,
+     "logvar": 0.205548,
+     "mean_ci": [
+      -0.451597,
+      0.462384
+     ],
+     "logvar_ci": [
+      -1.786081,
+      1.579944
+     ],
+     "mean_boot_var": 0.053724,
+     "treat_mean_change": 0.250009,
+     "ctrl_mean_change": 0.241429,
+     "treat_logvar_change": -2.29579,
+     "ctrl_logvar_change": -2.501338,
+     "n_pre": 26,
+     "n_post": 8,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "GJGR": {
+     "mean": -0.174842,
+     "logvar": 0.795057,
+     "mean_ci": [
+      -0.699579,
+      0.341438
+     ],
+     "logvar_ci": [
+      -0.467096,
+      2.087783
+     ],
+     "mean_boot_var": 0.068772,
+     "treat_mean_change": 0.066587,
+     "ctrl_mean_change": 0.241429,
+     "treat_logvar_change": -1.706281,
+     "ctrl_logvar_change": -2.501338,
+     "n_pre": 28,
+     "n_post": 16,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "CS": {
+     "mean": -0.247824,
+     "logvar": 0.583766,
+     "mean_ci": [
+      -0.663375,
+      0.198176
+     ],
+     "logvar_ci": [
+      -0.791928,
+      1.926598
+     ],
+     "mean_boot_var": 0.047923,
+     "treat_mean_change": -0.006395,
+     "ctrl_mean_change": 0.241429,
+     "treat_logvar_change": -1.917572,
+     "ctrl_logvar_change": -2.501338,
+     "n_pre": 28,
+     "n_post": 12,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "MGMR": {
+     "mean": -0.463132,
+     "logvar": 0.741746,
+     "mean_ci": [
+      -0.954497,
+      0.049755
+     ],
+     "logvar_ci": [
+      -0.612563,
+      2.150819
+     ],
+     "mean_boot_var": 0.065698,
+     "treat_mean_change": -0.221703,
+     "ctrl_mean_change": 0.241429,
+     "treat_logvar_change": -1.759592,
+     "ctrl_logvar_change": -2.501338,
+     "n_pre": 24,
+     "n_post": 12,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    }
+   },
+   "treat": [
+    "HP",
+    "GJGR",
+    "CS",
+    "MGMR"
+   ],
+   "ctrl": [
+    "DCHN"
+   ],
+   "n": {
+    "HP|pre": 26,
+    "HP|post": 8,
+    "GJGR|pre": 28,
+    "GJGR|post": 16,
+    "CS|pre": 28,
+    "CS|post": 12,
+    "MGMR|pre": 24,
+    "MGMR|post": 12,
+    "DCHN|pre": 32,
+    "DCHN|post": 13
+   }
+  },
+  "b0_s2_no_crossing": {
+   "pooled": {
+    "mean": -0.081815,
+    "logvar": 1.185491,
+    "mean_ci": [
+     -0.545983,
+     0.383062
+    ],
+    "logvar_ci": [
+     0.235204,
+     2.498584
+    ],
+    "mean_boot_var": 0.055574,
+    "treat_mean_change": -0.24991,
+    "ctrl_mean_change": -0.168095,
+    "treat_logvar_change": -2.114563,
+    "ctrl_logvar_change": -3.300053,
+    "n_pre": 106,
+    "n_post": 48,
+    "ctrl_n_pre": 32,
+    "ctrl_n_post": 13
+   },
+   "sites": {
+    "HP": {
+     "mean": 0.020946,
+     "logvar": 1.567563,
+     "mean_ci": [
+      -0.603004,
+      0.630773
+     ],
+     "logvar_ci": [
+      -0.753155,
+      3.182056
+     ],
+     "mean_boot_var": 0.099777,
+     "treat_mean_change": -0.14715,
+     "ctrl_mean_change": -0.168095,
+     "treat_logvar_change": -1.73249,
+     "ctrl_logvar_change": -3.300053,
+     "n_pre": 26,
+     "n_post": 8,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "GJGR": {
+     "mean": -0.1635,
+     "logvar": 1.500499,
+     "mean_ci": [
+      -0.783349,
+      0.474121
+     ],
+     "logvar_ci": [
+      0.283923,
+      2.916048
+     ],
+     "mean_boot_var": 0.101788,
+     "treat_mean_change": -0.331595,
+     "ctrl_mean_change": -0.168095,
+     "treat_logvar_change": -1.799554,
+     "ctrl_logvar_change": -3.300053,
+     "n_pre": 28,
+     "n_post": 16,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "CS": {
+     "mean": -0.01296,
+     "logvar": 0.264465,
+     "mean_ci": [
+      -0.572651,
+      0.56281
+     ],
+     "logvar_ci": [
+      -0.905506,
+      1.682591
+     ],
+     "mean_boot_var": 0.085284,
+     "treat_mean_change": -0.181055,
+     "ctrl_mean_change": -0.168095,
+     "treat_logvar_change": -3.035589,
+     "ctrl_logvar_change": -3.300053,
+     "n_pre": 28,
+     "n_post": 12,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    },
+    "MGMR": {
+     "mean": -0.111555,
+     "logvar": 0.883783,
+     "mean_ci": [
+      -0.754135,
+      0.534784
+     ],
+     "logvar_ci": [
+      -0.521977,
+      2.559234
+     ],
+     "mean_boot_var": 0.107023,
+     "treat_mean_change": -0.279651,
+     "ctrl_mean_change": -0.168095,
+     "treat_logvar_change": -2.41627,
+     "ctrl_logvar_change": -3.300053,
+     "n_pre": 24,
+     "n_post": 12,
+     "ctrl_n_pre": 32,
+     "ctrl_n_post": 13,
+     "ctrl": [
+      "DCHN"
+     ]
+    }
+   },
+   "treat": [
+    "HP",
+    "GJGR",
+    "CS",
+    "MGMR"
+   ],
+   "ctrl": [
+    "DCHN"
+   ],
+   "n": {
+    "HP|pre": 26,
+    "HP|post": 8,
+    "GJGR|pre": 28,
+    "GJGR|post": 16,
+    "CS|pre": 28,
+    "CS|post": 12,
+    "MGMR|pre": 24,
+    "MGMR|post": 12,
+    "DCHN|pre": 32,
+    "DCHN|post": 13
+   }
+  },
+  "placebo_years": {
+   "e_ens": {
+    "2020": {
+     "pooled_mean": 0.423172,
+     "pooled_logvar": -1.059428,
+     "HP_mean": 0.307282,
+     "GJGR_mean": 0.412997,
+     "CS_mean": 0.493088,
+     "MGMR_mean": 0.611531
+    },
+    "2021": {
+     "pooled_mean": -0.051465,
+     "pooled_logvar": 1.456975,
+     "HP_mean": 0.022451,
+     "GJGR_mean": 0.047173,
+     "CS_mean": -0.036384,
+     "MGMR_mean": -0.197221
+    },
+    "2022": {
+     "pooled_mean": -0.114975,
+     "pooled_logvar": 1.242864,
+     "HP_mean": -0.090494,
+     "GJGR_mean": -0.180031,
+     "CS_mean": -0.140018,
+     "MGMR_mean": -0.048099
+    },
+    "2023": {
+     "pooled_mean": -0.28685,
+     "pooled_logvar": 1.121227,
+     "HP_mean": -0.396414,
+     "GJGR_mean": -0.112111,
+     "CS_mean": -0.337916,
+     "MGMR_mean": -0.28012
+    },
+    "2024": {
+     "pooled_mean": 0.157898,
+     "pooled_logvar": 1.257976,
+     "HP_mean": -0.0026,
+     "GJGR_mean": -0.127409,
+     "CS_mean": 0.503761,
+     "MGMR_mean": 0.225764
+    },
+    "2025": {
+     "pooled_mean": -0.251149,
+     "pooled_logvar": 0.792949,
+     "HP_mean": 0.01016,
+     "GJGR_mean": -0.190063,
+     "CS_mean": -0.266854,
+     "MGMR_mean": -0.517791
+    }
+   },
+   "e_b0": {
+    "2020": {
+     "pooled_mean": 0.426764,
+     "pooled_logvar": -0.497917,
+     "HP_mean": 0.362644,
+     "GJGR_mean": 0.337538,
+     "CS_mean": 0.612888,
+     "MGMR_mean": 0.359126
+    },
+    "2021": {
+     "pooled_mean": 0.153476,
+     "pooled_logvar": 1.317014,
+     "HP_mean": -0.001125,
+     "GJGR_mean": 0.195397,
+     "CS_mean": 0.366425,
+     "MGMR_mean": 0.069763
+    },
+    "2022": {
+     "pooled_mean": 0.214166,
+     "pooled_logvar": 2.801522,
+     "HP_mean": 0.193198,
+     "GJGR_mean": 0.366733,
+     "CS_mean": 0.076328,
+     "MGMR_mean": 0.222291
+    },
+    "2023": {
+     "pooled_mean": 0.174848,
+     "pooled_logvar": 1.404741,
+     "HP_mean": -0.12354,
+     "GJGR_mean": 0.346101,
+     "CS_mean": 0.304926,
+     "MGMR_mean": 0.168605
+    },
+    "2024": {
+     "pooled_mean": 0.04503,
+     "pooled_logvar": 1.63774,
+     "HP_mean": -0.007234,
+     "GJGR_mean": -0.070008,
+     "CS_mean": 0.142524,
+     "MGMR_mean": 0.101058
+    },
+    "2025": {
+     "pooled_mean": -0.133766,
+     "pooled_logvar": 1.198268,
+     "HP_mean": -0.022929,
+     "GJGR_mean": -0.209193,
+     "CS_mean": -0.062795,
+     "MGMR_mean": -0.1803
+    }
+   }
+  }
+ },
+ "did_modelfree": {
+  "e_pers": {
+   "회남": {
+    "pooled": {
+     "mean": -0.090643,
+     "logvar": 1.248141,
+     "mean_ci": [
+      -0.549692,
+      0.369296
+     ],
+     "logvar_ci": [
+      0.31528,
+      2.537291
+     ],
+     "mean_boot_var": 0.054864,
+     "treat_mean_change": -0.279717,
+     "ctrl_mean_change": -0.189074,
+     "treat_logvar_change": -2.099743,
+     "ctrl_logvar_change": -3.347884,
+     "n_pre": 106,
+     "n_post": 48,
+     "ctrl_n_pre": 34,
+     "ctrl_n_post": 13
+    },
+    "sites": {
+     "HP": {
+      "mean": 0.035636,
+      "logvar": 1.653568,
+      "mean_ci": [
+       -0.605447,
+       0.637195
+      ],
+      "logvar_ci": [
+       -0.618307,
+       3.236485
+      ],
+      "mean_boot_var": 0.099727,
+      "treat_mean_change": -0.153438,
+      "ctrl_mean_change": -0.189074,
+      "treat_logvar_change": -1.694316,
+      "ctrl_logvar_change": -3.347884,
+      "n_pre": 27,
+      "n_post": 8,
+      "ctrl_n_pre": 34,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     },
+     "GJGR": {
+      "mean": 0.008194,
+      "logvar": 1.379492,
+      "mean_ci": [
+       -0.63759,
+       0.663562
+      ],
+      "logvar_ci": [
+       0.198418,
+       2.837847
+      ],
+      "mean_boot_var": 0.105355,
+      "treat_mean_change": -0.180881,
+      "ctrl_mean_change": -0.189074,
+      "treat_logvar_change": -1.968392,
+      "ctrl_logvar_change": -3.347884,
+      "n_pre": 29,
+      "n_post": 16,
+      "ctrl_n_pre": 34,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     },
+     "CS": {
+      "mean": -0.092511,
+      "logvar": 0.347605,
+      "mean_ci": [
+       -0.676711,
+       0.499316
+      ],
+      "logvar_ci": [
+       -0.821511,
+       1.866044
+      ],
+      "mean_boot_var": 0.088481,
+      "treat_mean_change": -0.281585,
+      "ctrl_mean_change": -0.189074,
+      "treat_logvar_change": -3.000279,
+      "ctrl_logvar_change": -3.347884,
+      "n_pre": 26,
+      "n_post": 12,
+      "ctrl_n_pre": 34,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     },
+     "MGMR": {
+      "mean": -0.277591,
+      "logvar": 1.193827,
+      "mean_ci": [
+       -0.880332,
+       0.319415
+      ],
+      "logvar_ci": [
+       -0.190748,
+       2.995875
+      ],
+      "mean_boot_var": 0.09363,
+      "treat_mean_change": -0.466666,
+      "ctrl_mean_change": -0.189074,
+      "treat_logvar_change": -2.154057,
+      "ctrl_logvar_change": -3.347884,
+      "n_pre": 24,
+      "n_post": 12,
+      "ctrl_n_pre": 34,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "DCHN"
+    ],
+    "n": {
+     "HP|pre": 27,
+     "HP|post": 8,
+     "GJGR|pre": 29,
+     "GJGR|post": 16,
+     "CS|pre": 26,
+     "CS|post": 12,
+     "MGMR|pre": 24,
+     "MGMR|post": 12,
+     "DCHN|pre": 34,
+     "DCHN|post": 13
+    }
+   },
+   "낙동강 보 관찰지점 8": {
+    "pooled": {
+     "mean": 0.07351,
+     "logvar": -0.819779,
+     "mean_ci": [
+      -0.224591,
+      0.38035
+     ],
+     "logvar_ci": [
+      -1.474767,
+      -0.109309
+     ],
+     "mean_boot_var": 0.024078,
+     "treat_mean_change": -0.279717,
+     "ctrl_mean_change": -0.353227,
+     "treat_logvar_change": -2.099743,
+     "ctrl_logvar_change": -1.279964,
+     "n_pre": 106,
+     "n_post": 48,
+     "ctrl_n_pre": 193,
+     "ctrl_n_post": 54
+    },
+    "sites": {
+     "HP": {
+      "mean": 0.199789,
+      "logvar": -0.414352,
+      "mean_ci": [
+       -0.318116,
+       0.697205
+      ],
+      "logvar_ci": [
+       -2.533107,
+       0.723038
+      ],
+      "mean_boot_var": 0.068014,
+      "treat_mean_change": -0.153438,
+      "ctrl_mean_change": -0.353227,
+      "treat_logvar_change": -1.694316,
+      "ctrl_logvar_change": -1.279964,
+      "n_pre": 27,
+      "n_post": 8,
+      "ctrl_n_pre": 193,
+      "ctrl_n_post": 54,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "GJGR": {
+      "mean": 0.172346,
+      "logvar": -0.688428,
+      "mean_ci": [
+       -0.349412,
+       0.735484
+      ],
+      "logvar_ci": [
+       -1.664071,
+       0.266284
+      ],
+      "mean_boot_var": 0.076098,
+      "treat_mean_change": -0.180881,
+      "ctrl_mean_change": -0.353227,
+      "treat_logvar_change": -1.968392,
+      "ctrl_logvar_change": -1.279964,
+      "n_pre": 29,
+      "n_post": 16,
+      "ctrl_n_pre": 193,
+      "ctrl_n_post": 54,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "CS": {
+      "mean": 0.071642,
+      "logvar": -1.720315,
+      "mean_ci": [
+       -0.397567,
+       0.556164
+      ],
+      "logvar_ci": [
+       -2.696096,
+       -0.636884
+      ],
+      "mean_boot_var": 0.05765,
+      "treat_mean_change": -0.281585,
+      "ctrl_mean_change": -0.353227,
+      "treat_logvar_change": -3.000279,
+      "ctrl_logvar_change": -1.279964,
+      "n_pre": 26,
+      "n_post": 12,
+      "ctrl_n_pre": 193,
+      "ctrl_n_post": 54,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "MGMR": {
+      "mean": -0.113439,
+      "logvar": -0.874093,
+      "mean_ci": [
+       -0.615891,
+       0.367646
+      ],
+      "logvar_ci": [
+       -2.141273,
+       0.527593
+      ],
+      "mean_boot_var": 0.062917,
+      "treat_mean_change": -0.466666,
+      "ctrl_mean_change": -0.353227,
+      "treat_logvar_change": -2.154057,
+      "ctrl_logvar_change": -1.279964,
+      "n_pre": 24,
+      "n_post": 12,
+      "ctrl_n_pre": 193,
+      "ctrl_n_post": 54,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "2007A25",
+     "2009A05",
+     "2009A30",
+     "2011A25",
+     "2011A55",
+     "2014A25",
+     "2014A70",
+     "2020A32"
+    ],
+    "n": {
+     "HP|pre": 27,
+     "HP|post": 8,
+     "GJGR|pre": 29,
+     "GJGR|post": 16,
+     "CS|pre": 26,
+     "CS|post": 12,
+     "MGMR|pre": 24,
+     "MGMR|post": 12,
+     "2007A25|pre": 26,
+     "2007A25|post": 7,
+     "2009A05|pre": 26,
+     "2009A05|post": 7,
+     "2009A30|pre": 24,
+     "2009A30|post": 7,
+     "2011A25|pre": 25,
+     "2011A25|post": 7,
+     "2011A55|pre": 21,
+     "2011A55|post": 7,
+     "2014A25|pre": 25,
+     "2014A25|post": 6,
+     "2014A70|pre": 26,
+     "2014A70|post": 7,
+     "2020A32|pre": 20,
+     "2020A32|post": 6
+    }
+   },
+   "대청호 추동·문의": {
+    "pooled": {
+     "mean": -0.157505,
+     "logvar": 0.480994,
+     "mean_ci": [
+      -0.45921,
+      0.150571
+     ],
+     "logvar_ci": [
+      -0.398438,
+      1.403568
+     ],
+     "mean_boot_var": 0.024406,
+     "treat_mean_change": -0.279717,
+     "ctrl_mean_change": -0.122212,
+     "treat_logvar_change": -2.099743,
+     "ctrl_logvar_change": -2.580737,
+     "n_pre": 106,
+     "n_post": 48,
+     "ctrl_n_pre": 66,
+     "ctrl_n_post": 27
+    },
+    "sites": {
+     "HP": {
+      "mean": -0.031226,
+      "logvar": 0.886421,
+      "mean_ci": [
+       -0.577205,
+       0.480333
+      ],
+      "logvar_ci": [
+       -1.406982,
+       2.172878
+      ],
+      "mean_boot_var": 0.070066,
+      "treat_mean_change": -0.153438,
+      "ctrl_mean_change": -0.122212,
+      "treat_logvar_change": -1.694316,
+      "ctrl_logvar_change": -2.580737,
+      "n_pre": 27,
+      "n_post": 8,
+      "ctrl_n_pre": 66,
+      "ctrl_n_post": 27,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     },
+     "GJGR": {
+      "mean": -0.058669,
+      "logvar": 0.612345,
+      "mean_ci": [
+       -0.59126,
+       0.502474
+      ],
+      "logvar_ci": [
+       -0.526936,
+       1.733551
+      ],
+      "mean_boot_var": 0.0763,
+      "treat_mean_change": -0.180881,
+      "ctrl_mean_change": -0.122212,
+      "treat_logvar_change": -1.968392,
+      "ctrl_logvar_change": -2.580737,
+      "n_pre": 29,
+      "n_post": 16,
+      "ctrl_n_pre": 66,
+      "ctrl_n_post": 27,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     },
+     "CS": {
+      "mean": -0.159373,
+      "logvar": -0.419542,
+      "mean_ci": [
+       -0.618438,
+       0.321931
+      ],
+      "logvar_ci": [
+       -1.616867,
+       0.771458
+      ],
+      "mean_boot_var": 0.057574,
+      "treat_mean_change": -0.281585,
+      "ctrl_mean_change": -0.122212,
+      "treat_logvar_change": -3.000279,
+      "ctrl_logvar_change": -2.580737,
+      "n_pre": 26,
+      "n_post": 12,
+      "ctrl_n_pre": 66,
+      "ctrl_n_post": 27,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     },
+     "MGMR": {
+      "mean": -0.344454,
+      "logvar": 0.42668,
+      "mean_ci": [
+       -0.846757,
+       0.136237
+      ],
+      "logvar_ci": [
+       -1.012761,
+       1.935146
+      ],
+      "mean_boot_var": 0.06181,
+      "treat_mean_change": -0.466666,
+      "ctrl_mean_change": -0.122212,
+      "treat_logvar_change": -2.154057,
+      "ctrl_logvar_change": -2.580737,
+      "n_pre": 24,
+      "n_post": 12,
+      "ctrl_n_pre": 66,
+      "ctrl_n_post": 27,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "3008G40",
+     "3008G50"
+    ],
+    "n": {
+     "HP|pre": 27,
+     "HP|post": 8,
+     "GJGR|pre": 29,
+     "GJGR|post": 16,
+     "CS|pre": 26,
+     "CS|post": 12,
+     "MGMR|pre": 24,
+     "MGMR|post": 12,
+     "3008G40|pre": 32,
+     "3008G40|post": 15,
+     "3008G50|pre": 34,
+     "3008G50|post": 12
+    }
+   },
+   "인근 보(지점별)": {
+    "pooled": {
+     "mean": 0.07351,
+     "logvar": -0.819779,
+     "mean_ci": [
+      -0.224591,
+      0.38035
+     ],
+     "logvar_ci": [
+      -1.474767,
+      -0.109309
+     ],
+     "mean_boot_var": 0.024078,
+     "treat_mean_change": -0.279717,
+     "ctrl_mean_change": -0.353227,
+     "treat_logvar_change": -2.099743,
+     "ctrl_logvar_change": -1.279964,
+     "n_pre": 106,
+     "n_post": 48,
+     "ctrl_n_pre": 193,
+     "ctrl_n_post": 54
+    },
+    "sites": {
+     "HP": {
+      "mean": 0.126003,
+      "logvar": -0.955278,
+      "mean_ci": [
+       -0.538339,
+       0.786529
+      ],
+      "logvar_ci": [
+       -3.13353,
+       0.489632
+      ],
+      "mean_boot_var": 0.112005,
+      "treat_mean_change": -0.153438,
+      "ctrl_mean_change": -0.279441,
+      "treat_logvar_change": -1.694316,
+      "ctrl_logvar_change": -0.739037,
+      "n_pre": 27,
+      "n_post": 8,
+      "ctrl_n_pre": 49,
+      "ctrl_n_post": 14,
+      "ctrl": [
+       "2009A30",
+       "2011A25"
+      ]
+     },
+     "GJGR": {
+      "mean": 0.158372,
+      "logvar": -0.460896,
+      "mean_ci": [
+       -0.484755,
+       0.822418
+      ],
+      "logvar_ci": [
+       -1.475104,
+       0.684923
+      ],
+      "mean_boot_var": 0.109753,
+      "treat_mean_change": -0.180881,
+      "ctrl_mean_change": -0.339253,
+      "treat_logvar_change": -1.968392,
+      "ctrl_logvar_change": -1.507496,
+      "n_pre": 29,
+      "n_post": 16,
+      "ctrl_n_pre": 46,
+      "ctrl_n_post": 14,
+      "ctrl": [
+       "2011A25",
+       "2011A55"
+      ]
+     },
+     "CS": {
+      "mean": 0.220807,
+      "logvar": -1.782597,
+      "mean_ci": [
+       -0.329375,
+       0.793363
+      ],
+      "logvar_ci": [
+       -3.109726,
+       -0.012176
+      ],
+      "mean_boot_var": 0.083377,
+      "treat_mean_change": -0.281585,
+      "ctrl_mean_change": -0.502392,
+      "treat_logvar_change": -3.000279,
+      "ctrl_logvar_change": -1.217682,
+      "n_pre": 26,
+      "n_post": 12,
+      "ctrl_n_pre": 46,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "MGMR": {
+      "mean": 0.241118,
+      "logvar": -1.27617,
+      "mean_ci": [
+       -0.440982,
+       0.951865
+      ],
+      "logvar_ci": [
+       -2.942816,
+       2.182863
+      ],
+      "mean_boot_var": 0.126119,
+      "treat_mean_change": -0.466666,
+      "ctrl_mean_change": -0.707783,
+      "treat_logvar_change": -2.154057,
+      "ctrl_logvar_change": -0.877887,
+      "n_pre": 24,
+      "n_post": 12,
+      "ctrl_n_pre": 20,
+      "ctrl_n_post": 6,
+      "ctrl": [
+       "2020A32"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "2007A25",
+     "2009A05",
+     "2009A30",
+     "2011A25",
+     "2011A55",
+     "2014A25",
+     "2014A70",
+     "2020A32"
+    ],
+    "n": {
+     "HP|pre": 27,
+     "HP|post": 8,
+     "GJGR|pre": 29,
+     "GJGR|post": 16,
+     "CS|pre": 26,
+     "CS|post": 12,
+     "MGMR|pre": 24,
+     "MGMR|post": 12,
+     "2007A25|pre": 26,
+     "2007A25|post": 7,
+     "2009A05|pre": 26,
+     "2009A05|post": 7,
+     "2009A30|pre": 24,
+     "2009A30|post": 7,
+     "2011A25|pre": 25,
+     "2011A25|post": 7,
+     "2011A55|pre": 21,
+     "2011A55|post": 7,
+     "2014A25|pre": 25,
+     "2014A25|post": 6,
+     "2014A70|pre": 26,
+     "2014A70|post": 7,
+     "2020A32|pre": 20,
+     "2020A32|post": 6
+    }
+   },
+   "placebo_years": {
+    "2020": {
+     "회남": {
+      "pooled_mean": 0.457016,
+      "pooled_logvar": -0.545402
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.099814,
+      "pooled_logvar": 0.420245
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.14757,
+      "pooled_logvar": 0.543829
+     },
+     "인근 보(지점별)": {
+      "HP_mean": 0.017775,
+      "GJGR_mean": -0.013944,
+      "CS_mean": 0.349381,
+      "MGMR_mean": 0.029937
+     }
+    },
+    "2021": {
+     "회남": {
+      "pooled_mean": 0.202909,
+      "pooled_logvar": 1.156866
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.160073,
+      "pooled_logvar": 0.465818
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.261062,
+      "pooled_logvar": 0.874255
+     },
+     "인근 보(지점별)": {
+      "HP_mean": 0.007001,
+      "GJGR_mean": 0.227296,
+      "CS_mean": 0.215577,
+      "MGMR_mean": -0.057082
+     }
+    },
+    "2022": {
+     "회남": {
+      "pooled_mean": 0.234511,
+      "pooled_logvar": 2.651817
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.268755,
+      "pooled_logvar": 0.293004
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.065434,
+      "pooled_logvar": 0.857951
+     },
+     "인근 보(지점별)": {
+      "HP_mean": 0.211899,
+      "GJGR_mean": 0.282163,
+      "CS_mean": -0.023975,
+      "MGMR_mean": 0.258297
+     }
+    },
+    "2023": {
+     "회남": {
+      "pooled_mean": 0.107442,
+      "pooled_logvar": 1.309485
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.052519,
+      "pooled_logvar": -0.906881
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": -0.006929,
+      "pooled_logvar": 0.554904
+     },
+     "인근 보(지점별)": {
+      "HP_mean": -0.063357,
+      "GJGR_mean": 0.23571,
+      "CS_mean": 0.019159,
+      "MGMR_mean": -0.017969
+     }
+    },
+    "2024": {
+     "회남": {
+      "pooled_mean": 0.129193,
+      "pooled_logvar": 1.669765
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.024006,
+      "pooled_logvar": -0.047792
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": -0.042703,
+      "pooled_logvar": 1.848748
+     },
+     "인근 보(지점별)": {
+      "HP_mean": -0.045981,
+      "GJGR_mean": 0.044082,
+      "CS_mean": 0.113254,
+      "MGMR_mean": 0.023212
+     }
+    },
+    "2025": {
+     "회남": {
+      "pooled_mean": -0.090643,
+      "pooled_logvar": 1.248141
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.07351,
+      "pooled_logvar": -0.819779
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": -0.157505,
+      "pooled_logvar": 0.480994
+     },
+     "인근 보(지점별)": {
+      "HP_mean": 0.126003,
+      "GJGR_mean": 0.158372,
+      "CS_mean": 0.220807,
+      "MGMR_mean": 0.241118
+     }
+    }
+   }
+  },
+  "e_clim": {
+   "회남": {
+    "pooled": {
+     "mean": 0.050113,
+     "logvar": 0.812548,
+     "mean_ci": [
+      -0.360049,
+      0.45563
+     ],
+     "logvar_ci": [
+      0.128556,
+      1.845147
+     ],
+     "mean_boot_var": 0.04261,
+     "treat_mean_change": 0.407148,
+     "ctrl_mean_change": 0.357035,
+     "treat_logvar_change": -1.58397,
+     "ctrl_logvar_change": -2.396519,
+     "n_pre": 121,
+     "n_post": 48,
+     "ctrl_n_pre": 36,
+     "ctrl_n_post": 13
+    },
+    "sites": {
+     "HP": {
+      "mean": -0.109845,
+      "logvar": 0.731084,
+      "mean_ci": [
+       -0.638084,
+       0.411546
+      ],
+      "logvar_ci": [
+       -0.396193,
+       1.89773
+      ],
+      "mean_boot_var": 0.070793,
+      "treat_mean_change": 0.24719,
+      "ctrl_mean_change": 0.357035,
+      "treat_logvar_change": -1.665435,
+      "ctrl_logvar_change": -2.396519,
+      "n_pre": 29,
+      "n_post": 9,
+      "ctrl_n_pre": 36,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     },
+     "GJGR": {
+      "mean": 0.241642,
+      "logvar": 0.376808,
+      "mean_ci": [
+       -0.294022,
+       0.777346
+      ],
+      "logvar_ci": [
+       -0.719417,
+       1.623742
+      ],
+      "mean_boot_var": 0.074937,
+      "treat_mean_change": 0.598677,
+      "ctrl_mean_change": 0.357035,
+      "treat_logvar_change": -2.019711,
+      "ctrl_logvar_change": -2.396519,
+      "n_pre": 33,
+      "n_post": 15,
+      "ctrl_n_pre": 36,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     },
+     "CS": {
+      "mean": 0.09689,
+      "logvar": 0.796479,
+      "mean_ci": [
+       -0.478121,
+       0.665692
+      ],
+      "logvar_ci": [
+       -0.328144,
+       2.014976
+      ],
+      "mean_boot_var": 0.086301,
+      "treat_mean_change": 0.453925,
+      "ctrl_mean_change": 0.357035,
+      "treat_logvar_change": -1.60004,
+      "ctrl_logvar_change": -2.396519,
+      "n_pre": 31,
+      "n_post": 12,
+      "ctrl_n_pre": 36,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     },
+     "MGMR": {
+      "mean": -0.165529,
+      "logvar": 0.775121,
+      "mean_ci": [
+       -0.758346,
+       0.438347
+      ],
+      "logvar_ci": [
+       -0.381499,
+       1.911294
+      ],
+      "mean_boot_var": 0.094964,
+      "treat_mean_change": 0.191506,
+      "ctrl_mean_change": 0.357035,
+      "treat_logvar_change": -1.621397,
+      "ctrl_logvar_change": -2.396519,
+      "n_pre": 28,
+      "n_post": 12,
+      "ctrl_n_pre": 36,
+      "ctrl_n_post": 13,
+      "ctrl": [
+       "DCHN"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "DCHN"
+    ],
+    "n": {
+     "HP|pre": 29,
+     "HP|post": 9,
+     "GJGR|pre": 33,
+     "GJGR|post": 15,
+     "CS|pre": 31,
+     "CS|post": 12,
+     "MGMR|pre": 28,
+     "MGMR|post": 12,
+     "DCHN|pre": 36,
+     "DCHN|post": 13
+    }
+   },
+   "낙동강 보 관찰지점 8": {
+    "pooled": {
+     "mean": 0.034288,
+     "logvar": -0.218865,
+     "mean_ci": [
+      -0.25279,
+      0.324172
+     ],
+     "logvar_ci": [
+      -0.667082,
+      0.221195
+     ],
+     "mean_boot_var": 0.021955,
+     "treat_mean_change": 0.407148,
+     "ctrl_mean_change": 0.37286,
+     "treat_logvar_change": -1.58397,
+     "ctrl_logvar_change": -1.365106,
+     "n_pre": 121,
+     "n_post": 48,
+     "ctrl_n_pre": 215,
+     "ctrl_n_post": 62
+    },
+    "sites": {
+     "HP": {
+      "mean": -0.125671,
+      "logvar": -0.300329,
+      "mean_ci": [
+       -0.572201,
+       0.328925
+      ],
+      "logvar_ci": [
+       -1.342971,
+       0.428224
+      ],
+      "mean_boot_var": 0.051457,
+      "treat_mean_change": 0.24719,
+      "ctrl_mean_change": 0.37286,
+      "treat_logvar_change": -1.665435,
+      "ctrl_logvar_change": -1.365106,
+      "n_pre": 29,
+      "n_post": 9,
+      "ctrl_n_pre": 215,
+      "ctrl_n_post": 62,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "GJGR": {
+      "mean": 0.225817,
+      "logvar": -0.654605,
+      "mean_ci": [
+       -0.209857,
+       0.686984
+      ],
+      "logvar_ci": [
+       -1.648871,
+       0.150206
+      ],
+      "mean_boot_var": 0.052576,
+      "treat_mean_change": 0.598677,
+      "ctrl_mean_change": 0.37286,
+      "treat_logvar_change": -2.019711,
+      "ctrl_logvar_change": -1.365106,
+      "n_pre": 33,
+      "n_post": 15,
+      "ctrl_n_pre": 215,
+      "ctrl_n_post": 62,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "CS": {
+      "mean": 0.081065,
+      "logvar": -0.234934,
+      "mean_ci": [
+       -0.43593,
+       0.573677
+      ],
+      "logvar_ci": [
+       -1.269603,
+       0.533976
+      ],
+      "mean_boot_var": 0.066116,
+      "treat_mean_change": 0.453925,
+      "ctrl_mean_change": 0.37286,
+      "treat_logvar_change": -1.60004,
+      "ctrl_logvar_change": -1.365106,
+      "n_pre": 31,
+      "n_post": 12,
+      "ctrl_n_pre": 215,
+      "ctrl_n_post": 62,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "MGMR": {
+      "mean": -0.181354,
+      "logvar": -0.256292,
+      "mean_ci": [
+       -0.697521,
+       0.358091
+      ],
+      "logvar_ci": [
+       -1.309645,
+       0.404882
+      ],
+      "mean_boot_var": 0.074769,
+      "treat_mean_change": 0.191506,
+      "ctrl_mean_change": 0.37286,
+      "treat_logvar_change": -1.621397,
+      "ctrl_logvar_change": -1.365106,
+      "n_pre": 28,
+      "n_post": 12,
+      "ctrl_n_pre": 215,
+      "ctrl_n_post": 62,
+      "ctrl": [
+       "2007A25",
+       "2009A05",
+       "2009A30",
+       "2011A25",
+       "2011A55",
+       "2014A25",
+       "2014A70",
+       "2020A32"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "2007A25",
+     "2009A05",
+     "2009A30",
+     "2011A25",
+     "2011A55",
+     "2014A25",
+     "2014A70",
+     "2020A32"
+    ],
+    "n": {
+     "HP|pre": 29,
+     "HP|post": 9,
+     "GJGR|pre": 33,
+     "GJGR|post": 15,
+     "CS|pre": 31,
+     "CS|post": 12,
+     "MGMR|pre": 28,
+     "MGMR|post": 12,
+     "2007A25|pre": 28,
+     "2007A25|post": 8,
+     "2009A05|pre": 27,
+     "2009A05|post": 8,
+     "2009A30|pre": 26,
+     "2009A30|post": 8,
+     "2011A25|pre": 27,
+     "2011A25|post": 8,
+     "2011A55|pre": 25,
+     "2011A55|post": 8,
+     "2014A25|pre": 29,
+     "2014A25|post": 7,
+     "2014A70|pre": 28,
+     "2014A70|post": 8,
+     "2020A32|pre": 25,
+     "2020A32|post": 7
+    }
+   },
+   "대청호 추동·문의": {
+    "pooled": {
+     "mean": 0.135968,
+     "logvar": -0.274308,
+     "mean_ci": [
+      -0.161635,
+      0.443487
+     ],
+     "logvar_ci": [
+      -0.827191,
+      0.341694
+     ],
+     "mean_boot_var": 0.023702,
+     "treat_mean_change": 0.407148,
+     "ctrl_mean_change": 0.27118,
+     "treat_logvar_change": -1.58397,
+     "ctrl_logvar_change": -1.309662,
+     "n_pre": 121,
+     "n_post": 48,
+     "ctrl_n_pre": 69,
+     "ctrl_n_post": 28
+    },
+    "sites": {
+     "HP": {
+      "mean": -0.023991,
+      "logvar": -0.355773,
+      "mean_ci": [
+       -0.466087,
+       0.432571
+      ],
+      "logvar_ci": [
+       -1.450745,
+       0.430252
+      ],
+      "mean_boot_var": 0.053426,
+      "treat_mean_change": 0.24719,
+      "ctrl_mean_change": 0.27118,
+      "treat_logvar_change": -1.665435,
+      "ctrl_logvar_change": -1.309662,
+      "n_pre": 29,
+      "n_post": 9,
+      "ctrl_n_pre": 69,
+      "ctrl_n_post": 28,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     },
+     "GJGR": {
+      "mean": 0.327497,
+      "logvar": -0.710049,
+      "mean_ci": [
+       -0.126851,
+       0.797439
+      ],
+      "logvar_ci": [
+       -1.806848,
+       0.191591
+      ],
+      "mean_boot_var": 0.054858,
+      "treat_mean_change": 0.598677,
+      "ctrl_mean_change": 0.27118,
+      "treat_logvar_change": -2.019711,
+      "ctrl_logvar_change": -1.309662,
+      "n_pre": 33,
+      "n_post": 15,
+      "ctrl_n_pre": 69,
+      "ctrl_n_post": 28,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     },
+     "CS": {
+      "mean": 0.182745,
+      "logvar": -0.290378,
+      "mean_ci": [
+       -0.325694,
+       0.679199
+      ],
+      "logvar_ci": [
+       -1.351152,
+       0.546778
+      ],
+      "mean_boot_var": 0.066222,
+      "treat_mean_change": 0.453925,
+      "ctrl_mean_change": 0.27118,
+      "treat_logvar_change": -1.60004,
+      "ctrl_logvar_change": -1.309662,
+      "n_pre": 31,
+      "n_post": 12,
+      "ctrl_n_pre": 69,
+      "ctrl_n_post": 28,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     },
+     "MGMR": {
+      "mean": -0.079674,
+      "logvar": -0.311736,
+      "mean_ci": [
+       -0.616619,
+       0.466963
+      ],
+      "logvar_ci": [
+       -1.401442,
+       0.470366
+      ],
+      "mean_boot_var": 0.077218,
+      "treat_mean_change": 0.191506,
+      "ctrl_mean_change": 0.27118,
+      "treat_logvar_change": -1.621397,
+      "ctrl_logvar_change": -1.309662,
+      "n_pre": 28,
+      "n_post": 12,
+      "ctrl_n_pre": 69,
+      "ctrl_n_post": 28,
+      "ctrl": [
+       "3008G40",
+       "3008G50"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "3008G40",
+     "3008G50"
+    ],
+    "n": {
+     "HP|pre": 29,
+     "HP|post": 9,
+     "GJGR|pre": 33,
+     "GJGR|post": 15,
+     "CS|pre": 31,
+     "CS|post": 12,
+     "MGMR|pre": 28,
+     "MGMR|post": 12,
+     "3008G40|pre": 33,
+     "3008G40|post": 16,
+     "3008G50|pre": 36,
+     "3008G50|post": 12
+    }
+   },
+   "인근 보(지점별)": {
+    "pooled": {
+     "mean": 0.034288,
+     "logvar": -0.218865,
+     "mean_ci": [
+      -0.25279,
+      0.324172
+     ],
+     "logvar_ci": [
+      -0.667082,
+      0.221195
+     ],
+     "mean_boot_var": 0.021955,
+     "treat_mean_change": 0.407148,
+     "ctrl_mean_change": 0.37286,
+     "treat_logvar_change": -1.58397,
+     "ctrl_logvar_change": -1.365106,
+     "n_pre": 121,
+     "n_post": 48,
+     "ctrl_n_pre": 215,
+     "ctrl_n_post": 62
+    },
+    "sites": {
+     "HP": {
+      "mean": -0.107529,
+      "logvar": -0.539435,
+      "mean_ci": [
+       -0.633702,
+       0.446258
+      ],
+      "logvar_ci": [
+       -1.675265,
+       0.536187
+      ],
+      "mean_boot_var": 0.076388,
+      "treat_mean_change": 0.24719,
+      "ctrl_mean_change": 0.354719,
+      "treat_logvar_change": -1.665435,
+      "ctrl_logvar_change": -1.126,
+      "n_pre": 29,
+      "n_post": 9,
+      "ctrl_n_pre": 53,
+      "ctrl_n_post": 16,
+      "ctrl": [
+       "2009A30",
+       "2011A25"
+      ]
+     },
+     "GJGR": {
+      "mean": -0.159649,
+      "logvar": -0.793476,
+      "mean_ci": [
+       -0.727894,
+       0.436808
+      ],
+      "logvar_ci": [
+       -1.843569,
+       0.283879
+      ],
+      "mean_boot_var": 0.086757,
+      "treat_mean_change": 0.598677,
+      "ctrl_mean_change": 0.758326,
+      "treat_logvar_change": -2.019711,
+      "ctrl_logvar_change": -1.226235,
+      "n_pre": 33,
+      "n_post": 15,
+      "ctrl_n_pre": 52,
+      "ctrl_n_post": 16,
+      "ctrl": [
+       "2011A25",
+       "2011A55"
+      ]
+     },
+     "CS": {
+      "mean": -0.419931,
+      "logvar": 0.26196,
+      "mean_ci": [
+       -1.022191,
+       0.176
+      ],
+      "logvar_ci": [
+       -0.950541,
+       1.542408
+      ],
+      "mean_boot_var": 0.09311,
+      "treat_mean_change": 0.453925,
+      "ctrl_mean_change": 0.873856,
+      "treat_logvar_change": -1.60004,
+      "ctrl_logvar_change": -1.861999,
+      "n_pre": 31,
+      "n_post": 12,
+      "ctrl_n_pre": 53,
+      "ctrl_n_post": 15,
+      "ctrl": [
+       "2014A70",
+       "2020A32"
+      ]
+     },
+     "MGMR": {
+      "mean": -0.702061,
+      "logvar": 0.37988,
+      "mean_ci": [
+       -1.437999,
+       0.071732
+      ],
+      "logvar_ci": [
+       -0.860836,
+       2.71387
+      ],
+      "mean_boot_var": 0.149304,
+      "treat_mean_change": 0.191506,
+      "ctrl_mean_change": 0.893568,
+      "treat_logvar_change": -1.621397,
+      "ctrl_logvar_change": -2.001278,
+      "n_pre": 28,
+      "n_post": 12,
+      "ctrl_n_pre": 25,
+      "ctrl_n_post": 7,
+      "ctrl": [
+       "2020A32"
+      ]
+     }
+    },
+    "treat": [
+     "HP",
+     "GJGR",
+     "CS",
+     "MGMR"
+    ],
+    "ctrl": [
+     "2007A25",
+     "2009A05",
+     "2009A30",
+     "2011A25",
+     "2011A55",
+     "2014A25",
+     "2014A70",
+     "2020A32"
+    ],
+    "n": {
+     "HP|pre": 29,
+     "HP|post": 9,
+     "GJGR|pre": 33,
+     "GJGR|post": 15,
+     "CS|pre": 31,
+     "CS|post": 12,
+     "MGMR|pre": 28,
+     "MGMR|post": 12,
+     "2007A25|pre": 28,
+     "2007A25|post": 8,
+     "2009A05|pre": 27,
+     "2009A05|post": 8,
+     "2009A30|pre": 26,
+     "2009A30|post": 8,
+     "2011A25|pre": 27,
+     "2011A25|post": 8,
+     "2011A55|pre": 25,
+     "2011A55|post": 8,
+     "2014A25|pre": 29,
+     "2014A25|post": 7,
+     "2014A70|pre": 28,
+     "2014A70|post": 8,
+     "2020A32|pre": 25,
+     "2020A32|post": 7
+    }
+   },
+   "placebo_years": {
+    "2020": {
+     "회남": {
+      "pooled_mean": 0.436615,
+      "pooled_logvar": -1.382265
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.146403,
+      "pooled_logvar": 0.560004
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.095234,
+      "pooled_logvar": 0.624719
+     },
+     "인근 보(지점별)": {
+      "HP_mean": 0.211844,
+      "GJGR_mean": 0.496779,
+      "CS_mean": 0.210187,
+      "MGMR_mean": 0.669586
+     }
+    },
+    "2021": {
+     "회남": {
+      "pooled_mean": -0.215648,
+      "pooled_logvar": 0.324824
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.11123,
+      "pooled_logvar": 0.070754
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.036987,
+      "pooled_logvar": 0.608793
+     },
+     "인근 보(지점별)": {
+      "HP_mean": 0.327547,
+      "GJGR_mean": 0.171542,
+      "CS_mean": 0.044059,
+      "MGMR_mean": 0.114071
+     }
+    },
+    "2022": {
+     "회남": {
+      "pooled_mean": -0.222175,
+      "pooled_logvar": 0.980461
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": -0.268275,
+      "pooled_logvar": -0.092934
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.028874,
+      "pooled_logvar": 1.052203
+     },
+     "인근 보(지점별)": {
+      "HP_mean": -0.350886,
+      "GJGR_mean": -0.418779,
+      "CS_mean": -0.106808,
+      "MGMR_mean": -0.009497
+     }
+    },
+    "2023": {
+     "회남": {
+      "pooled_mean": -0.449509,
+      "pooled_logvar": 1.402937
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": -0.074792,
+      "pooled_logvar": -0.368431
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": -0.32965,
+      "pooled_logvar": 0.38022
+     },
+     "인근 보(지점별)": {
+      "HP_mean": 0.088636,
+      "GJGR_mean": 0.284145,
+      "CS_mean": -0.650253,
+      "MGMR_mean": -0.194459
+     }
+    },
+    "2024": {
+     "회남": {
+      "pooled_mean": 0.445674,
+      "pooled_logvar": 1.237558
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.007406,
+      "pooled_logvar": -0.113607
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.379951,
+      "pooled_logvar": 1.825489
+     },
+     "인근 보(지점별)": {
+      "HP_mean": -0.30226,
+      "GJGR_mean": -0.526243,
+      "CS_mean": 0.22317,
+      "MGMR_mean": -0.344664
+     }
+    },
+    "2025": {
+     "회남": {
+      "pooled_mean": 0.050113,
+      "pooled_logvar": 0.812548
+     },
+     "낙동강 보 관찰지점 8": {
+      "pooled_mean": 0.034288,
+      "pooled_logvar": -0.218865
+     },
+     "대청호 추동·문의": {
+      "pooled_mean": 0.135968,
+      "pooled_logvar": -0.274308
+     },
+     "인근 보(지점별)": {
+      "HP_mean": -0.107529,
+      "GJGR_mean": -0.159649,
+      "CS_mean": -0.419931,
+      "MGMR_mean": -0.702061
+     }
+    }
+   }
+  }
+ },
+ "confirm_dates_table": [
+  {
+   "지점": "해평(HP)",
+   "확정 변경일": "2025-08-25",
+   "근거 등급": "공식 문서·보도(월 단위 '2025-08 말') + 일 단위는 규칙(8월 말 첫 정기 채수일)",
+   "8월 중순~9월 초 채수일": "08-18, 08-25, 09-01",
+   "단절 지지(|z|≥2 조합/전체)": "1/14 (세포수 0)",
+   "최적 분할일이 08-18~09-08 인 조합": "6/14"
+  },
+  {
+   "지점": "강정·고령(GJGR)",
+   "확정 변경일": "2025-08-25",
+   "근거 등급": "공식 문서·보도(월 단위 '2025-08 말') + 일 단위는 규칙(8월 말 첫 정기 채수일)",
+   "8월 중순~9월 초 채수일": "08-14, 08-18, 08-21, 08-25, 08-28, 09-01, 09-04",
+   "단절 지지(|z|≥2 조합/전체)": "2/14 (세포수 0)",
+   "최적 분할일이 08-18~09-08 인 조합": "5/14"
+  },
+  {
+   "지점": "칠서(CS)",
+   "확정 변경일": "2025-08-25",
+   "근거 등급": "공식 문서·보도(월 단위 '2025-08 말') + 일 단위는 규칙(8월 말 첫 정기 채수일)",
+   "8월 중순~9월 초 채수일": "08-18, 08-25, 08-28, 09-01, 09-04",
+   "단절 지지(|z|≥2 조합/전체)": "0/14 (세포수 0)",
+   "최적 분할일이 08-18~09-08 인 조합": "4/14"
+  },
+  {
+   "지점": "물금·매리(MGMR)",
+   "확정 변경일": "2025-08-25",
+   "근거 등급": "공식 문서·보도(월 단위 '2025-08 말') + 일 단위는 규칙(8월 말 첫 정기 채수일)",
+   "8월 중순~9월 초 채수일": "08-18, 08-21, 08-25, 08-28, 09-01, 09-04",
+   "단절 지지(|z|≥2 조합/전체)": "1/7 (세포수 0)",
+   "최적 분할일이 08-18~09-08 인 조합": "1/7"
+  }
+ ],
+ "pilot_pairs": [
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 혼합(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "log10 세포수",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.981,
+   "95% CI": "[-1.373, -0.585]",
+   "차의 SD": 1.237,
+   "중앙값": -0.698
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 혼합(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "수온(℃)",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.797,
+   "95% CI": "[0.313, 1.350]",
+   "차의 SD": 1.635,
+   "중앙값": 0.25
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 혼합(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "log10 탁도",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.102,
+   "95% CI": "[0.007, 0.197]",
+   "차의 SD": 0.306,
+   "중앙값": 0.005
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 혼합(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "투명도(m)",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.387,
+   "95% CI": "[0.171, 0.608]",
+   "차의 SD": 0.692,
+   "중앙값": 0.3
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 혼합(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "pH",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.232,
+   "95% CI": "[-0.179, 0.637]",
+   "차의 SD": 1.295,
+   "중앙값": 0.1
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "log10 세포수",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.924,
+   "95% CI": "[-1.378, -0.510]",
+   "차의 SD": 1.384,
+   "중앙값": -0.478
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "수온(℃)",
+   "n": 26,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.281,
+   "95% CI": "[-0.769, 1.054]",
+   "차의 SD": 2.416,
+   "중앙값": 0.4
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "log10 탁도",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.097,
+   "95% CI": "[-0.009, 0.200]",
+   "차의 SD": 0.33,
+   "중앙값": 0.035
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "투명도(m)",
+   "n": 38,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.382,
+   "95% CI": "[0.163, 0.589]",
+   "차의 SD": 0.683,
+   "중앙값": 0.3
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 강정·고령(공식, 옛 위치)",
+   "변수": "pH",
+   "n": 26,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.05,
+   "95% CI": "[-0.419, 0.262]",
+   "차의 SD": 0.92,
+   "중앙값": 0.2
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 고령 지점 혼합(취수구 500 m 상류)",
+   "변수": "log10 세포수",
+   "n": 39,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.055,
+   "95% CI": "[-0.279, 0.352]",
+   "차의 SD": 1.005,
+   "중앙값": 0.0
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 고령 지점 혼합(취수구 500 m 상류)",
+   "변수": "수온(℃)",
+   "n": 27,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.13,
+   "95% CI": "[-0.759, 0.719]",
+   "차의 SD": 2.141,
+   "중앙값": 0.4
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 고령 지점 혼합(취수구 500 m 상류)",
+   "변수": "log10 탁도",
+   "n": 39,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.006,
+   "95% CI": "[-0.041, 0.030]",
+   "차의 SD": 0.114,
+   "중앙값": -0.017
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 고령 지점 혼합(취수구 500 m 상류)",
+   "변수": "투명도(m)",
+   "n": 39,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.005,
+   "95% CI": "[-0.013, 0.000]",
+   "차의 SD": 0.022,
+   "중앙값": 0.0
+  },
+  {
+   "지점": "GJGR",
+   "비교": "고령 지점 표층(취수구 500 m 상류) − 고령 지점 혼합(취수구 500 m 상류)",
+   "변수": "pH",
+   "n": 27,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.252,
+   "95% CI": "[0.133, 0.381]",
+   "차의 SD": 0.337,
+   "중앙값": 0.2
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 혼합(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "log10 세포수",
+   "n": 37,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.42,
+   "95% CI": "[-0.665, -0.183]",
+   "차의 SD": 0.766,
+   "중앙값": -0.325
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 혼합(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "수온(℃)",
+   "n": 36,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.342,
+   "95% CI": "[-0.636, -0.031]",
+   "차의 SD": 0.906,
+   "중앙값": -0.4
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 혼합(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "log10 탁도",
+   "n": 37,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.146,
+   "95% CI": "[-0.026, 0.298]",
+   "차의 SD": 0.5,
+   "중앙값": 0.085
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 혼합(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "투명도(m)",
+   "n": 37,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.241,
+   "95% CI": "[0.016, 0.454]",
+   "차의 SD": 0.694,
+   "중앙값": 0.3
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 혼합(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "pH",
+   "n": 37,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.127,
+   "95% CI": "[-0.368, 0.132]",
+   "차의 SD": 0.804,
+   "중앙값": -0.2
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "log10 세포수",
+   "n": 37,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.231,
+   "95% CI": "[-0.472, 0.003]",
+   "차의 SD": 0.749,
+   "중앙값": -0.074
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "수온(℃)",
+   "n": 25,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.384,
+   "95% CI": "[-0.684, -0.092]",
+   "차의 SD": 0.768,
+   "중앙값": -0.3
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "log10 탁도",
+   "n": 37,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.175,
+   "95% CI": "[0.076, 0.279]",
+   "차의 SD": 0.325,
+   "중앙값": 0.136
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "투명도(m)",
+   "n": 37,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.251,
+   "95% CI": "[0.027, 0.465]",
+   "차의 SD": 0.681,
+   "중앙값": 0.3
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 물금·매리(공식, 옛 위치)",
+   "변수": "pH",
+   "n": 25,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": -0.136,
+   "95% CI": "[-0.364, 0.060]",
+   "차의 SD": 0.555,
+   "중앙값": 0.0
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 매리 지점 혼합(취수구 500 m 상류)",
+   "변수": "log10 세포수",
+   "n": 39,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.189,
+   "95% CI": "[-0.055, 0.463]",
+   "차의 SD": 0.843,
+   "중앙값": 0.057
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 매리 지점 혼합(취수구 500 m 상류)",
+   "변수": "수온(℃)",
+   "n": 27,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.189,
+   "95% CI": "[0.044, 0.359]",
+   "차의 SD": 0.428,
+   "중앙값": 0.1
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 매리 지점 혼합(취수구 500 m 상류)",
+   "변수": "log10 탁도",
+   "n": 39,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.019,
+   "95% CI": "[-0.123, 0.177]",
+   "차의 SD": 0.485,
+   "중앙값": -0.01
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 매리 지점 혼합(취수구 500 m 상류)",
+   "변수": "투명도(m)",
+   "n": 39,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.01,
+   "95% CI": "[-0.003, 0.028]",
+   "차의 SD": 0.05,
+   "중앙값": 0.0
+  },
+  {
+   "지점": "MGMR",
+   "비교": "매리 지점 표층(취수구 500 m 상류) − 매리 지점 혼합(취수구 500 m 상류)",
+   "변수": "pH",
+   "n": 27,
+   "기간": "2022-06-13~2023-10-30",
+   "평균 차": 0.159,
+   "95% CI": "[0.044, 0.296]",
+   "차의 SD": 0.344,
+   "중앙값": 0.0
+  }
+ ],
+ "level_variability": [
+  {
+   "집단": "HP",
+   "n 9~10월(2025/과거)": "9/43",
+   "기후 편차 1~8월 2025": -0.107,
+   "기후 편차 9~10월 2025": 0.141,
+   "0값 비율 9~10월 2025": 0.0,
+   "0값 비율 9~10월 과거": 0.023,
+   "주간 변동 SD 9~10월 2025": 0.415,
+   "주간 변동 SD 9~10월 과거": 0.733,
+   "주간 변동 SD 1~8월 2025": 1.011,
+   "주간 변동 SD 1~8월 과거": 1.045
+  },
+  {
+   "집단": "GJGR",
+   "n 9~10월(2025/과거)": "15/46",
+   "기후 편차 1~8월 2025": 0.084,
+   "기후 편차 9~10월 2025": 0.682,
+   "0값 비율 9~10월 2025": 0.0,
+   "0값 비율 9~10월 과거": 0.0,
+   "주간 변동 SD 9~10월 2025": 0.487,
+   "주간 변동 SD 9~10월 과거": 0.795,
+   "주간 변동 SD 1~8월 2025": 1.091,
+   "주간 변동 SD 1~8월 과거": 0.917
+  },
+  {
+   "집단": "CS",
+   "n 9~10월(2025/과거)": "12/46",
+   "기후 편차 1~8월 2025": -0.04,
+   "기후 편차 9~10월 2025": 0.414,
+   "0값 비율 9~10월 2025": 0.0,
+   "0값 비율 9~10월 과거": 0.0,
+   "주간 변동 SD 9~10월 2025": 0.236,
+   "주간 변동 SD 9~10월 과거": 0.552,
+   "주간 변동 SD 1~8월 2025": 1.054,
+   "주간 변동 SD 1~8월 과거": 0.954
+  },
+  {
+   "집단": "MGMR",
+   "n 9~10월(2025/과거)": "12/46",
+   "기후 편차 1~8월 2025": 0.173,
+   "기후 편차 9~10월 2025": 0.364,
+   "0값 비율 9~10월 2025": 0.0,
+   "0값 비율 9~10월 과거": 0.0,
+   "주간 변동 SD 9~10월 2025": 0.365,
+   "주간 변동 SD 9~10월 과거": 0.408,
+   "주간 변동 SD 1~8월 2025": 1.027,
+   "주간 변동 SD 1~8월 과거": 0.873
+  },
+  {
+   "집단": "DCHN",
+   "n 9~10월(2025/과거)": "13/45",
+   "기후 편차 1~8월 2025": 0.355,
+   "기후 편차 9~10월 2025": 0.712,
+   "0값 비율 9~10월 2025": 0.0,
+   "0값 비율 9~10월 과거": 0.022,
+   "주간 변동 SD 9~10월 2025": 0.221,
+   "주간 변동 SD 9~10월 과거": 0.582,
+   "주간 변동 SD 1~8월 2025": 1.091,
+   "주간 변동 SD 1~8월 과거": 1.098
+  },
+  {
+   "집단": "보 관찰지점 8",
+   "n 9~10월(2025/과거)": "62/325",
+   "기후 편차 1~8월 2025": -0.073,
+   "기후 편차 9~10월 2025": 0.3,
+   "0값 비율 9~10월 2025": 0.0,
+   "0값 비율 9~10월 과거": 0.009,
+   "주간 변동 SD 9~10월 2025": 0.539,
+   "주간 변동 SD 9~10월 과거": 0.728,
+   "주간 변동 SD 1~8월 2025": 1.004,
+   "주간 변동 SD 1~8월 과거": 1.049
+  },
+  {
+   "집단": "대청호 추동·문의",
+   "n 9~10월(2025/과거)": "28/101",
+   "기후 편차 1~8월 2025": 0.192,
+   "기후 편차 9~10월 2025": 0.463,
+   "0값 비율 9~10월 2025": 0.0,
+   "0값 비율 9~10월 과거": 0.0,
+   "주간 변동 SD 9~10월 2025": 0.194,
+   "주간 변동 SD 9~10월 과거": 0.293,
+   "주간 변동 SD 1~8월 2025": 0.672,
+   "주간 변동 SD 1~8월 과거": 0.798
+  }
+ ],
+ "skill_by_period": [
+  {
+   "집단": "낙동강 4",
+   "연도": 2020,
+   "구간": "1~8월",
+   "n": 110,
+   "관측≥10k": 2,
+   "rmse_log 앙상블": 0.95,
+   "rmse_log B0": 1.067,
+   "r2_log 앙상블": 0.412,
+   "r2_log B0": 0.258,
+   "F1@10k 앙상블": 0.667,
+   "F1@10k B0": 0.4,
+   "구간 적중(q10~q90)": 0.609,
+   "평균 잔차(앙상블)": 0.081
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2020,
+   "구간": "9~10월",
+   "n": 31,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.615,
+   "rmse_log B0": 0.666,
+   "r2_log 앙상블": -0.109,
+   "r2_log B0": -0.3,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.613,
+   "평균 잔차(앙상블)": 0.152
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2021,
+   "구간": "1~8월",
+   "n": 127,
+   "관측≥10k": 11,
+   "rmse_log 앙상블": 0.791,
+   "rmse_log B0": 0.993,
+   "r2_log 앙상블": 0.695,
+   "r2_log B0": 0.519,
+   "F1@10k 앙상블": 0.25,
+   "F1@10k B0": 0.273,
+   "구간 적중(q10~q90)": 0.591,
+   "평균 잔차(앙상블)": 0.015
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2021,
+   "구간": "9~10월",
+   "n": 34,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.519,
+   "rmse_log B0": 0.587,
+   "r2_log 앙상블": -0.721,
+   "r2_log B0": -1.203,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.735,
+   "평균 잔차(앙상블)": 0.085
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2022,
+   "구간": "1~8월",
+   "n": 153,
+   "관측≥10k": 49,
+   "rmse_log 앙상블": 0.882,
+   "rmse_log B0": 0.897,
+   "r2_log 앙상블": 0.8,
+   "r2_log B0": 0.793,
+   "F1@10k 앙상블": 0.611,
+   "F1@10k B0": 0.871,
+   "구간 적중(q10~q90)": 0.477,
+   "평균 잔차(앙상블)": 0.091
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2022,
+   "구간": "9~10월",
+   "n": 35,
+   "관측≥10k": 3,
+   "rmse_log 앙상블": 0.564,
+   "rmse_log B0": 0.611,
+   "r2_log 앙상블": 0.128,
+   "r2_log B0": -0.023,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.8,
+   "구간 적중(q10~q90)": 0.6,
+   "평균 잔차(앙상블)": 0.1
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2023,
+   "구간": "1~8월",
+   "n": 125,
+   "관측≥10k": 7,
+   "rmse_log 앙상블": 0.827,
+   "rmse_log B0": 0.968,
+   "r2_log 앙상블": 0.692,
+   "r2_log B0": 0.577,
+   "F1@10k 앙상블": 0.353,
+   "F1@10k B0": 0.267,
+   "구간 적중(q10~q90)": 0.648,
+   "평균 잔차(앙상블)": -0.049
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2023,
+   "구간": "9~10월",
+   "n": 36,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.56,
+   "rmse_log B0": 0.643,
+   "r2_log 앙상블": 0.325,
+   "r2_log B0": 0.108,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.806,
+   "평균 잔차(앙상블)": -0.167
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2024,
+   "구간": "1~8월",
+   "n": 137,
+   "관측≥10k": 13,
+   "rmse_log 앙상블": 0.799,
+   "rmse_log B0": 0.875,
+   "r2_log 앙상블": 0.67,
+   "r2_log B0": 0.604,
+   "F1@10k 앙상블": 0.762,
+   "F1@10k B0": 0.783,
+   "구간 적중(q10~q90)": 0.65,
+   "평균 잔차(앙상블)": -0.046
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2024,
+   "구간": "9~10월",
+   "n": 48,
+   "관측≥10k": 20,
+   "rmse_log 앙상블": 0.644,
+   "rmse_log B0": 0.66,
+   "r2_log 앙상블": 0.526,
+   "r2_log B0": 0.503,
+   "F1@10k 앙상블": 0.769,
+   "F1@10k B0": 0.744,
+   "구간 적중(q10~q90)": 0.521,
+   "평균 잔차(앙상블)": 0.207
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2025,
+   "구간": "1~8월",
+   "n": 112,
+   "관측≥10k": 19,
+   "rmse_log 앙상블": 0.85,
+   "rmse_log B0": 1.074,
+   "r2_log 앙상블": 0.72,
+   "r2_log B0": 0.553,
+   "F1@10k 앙상블": 0.452,
+   "F1@10k B0": 0.611,
+   "구간 적중(q10~q90)": 0.545,
+   "평균 잔차(앙상블)": 0.018
+  },
+  {
+   "집단": "낙동강 4",
+   "연도": 2025,
+   "구간": "9~10월",
+   "n": 48,
+   "관측≥10k": 15,
+   "rmse_log 앙상블": 0.371,
+   "rmse_log B0": 0.417,
+   "r2_log 앙상블": 0.646,
+   "r2_log B0": 0.551,
+   "F1@10k 앙상블": 0.8,
+   "F1@10k B0": 0.778,
+   "구간 적중(q10~q90)": 0.875,
+   "평균 잔차(앙상블)": 0.003
+  },
+  {
+   "집단": "회남",
+   "연도": 2020,
+   "구간": "1~8월",
+   "n": 34,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.873,
+   "rmse_log B0": 1.061,
+   "r2_log 앙상블": 0.605,
+   "r2_log B0": 0.416,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.618,
+   "평균 잔차(앙상블)": -0.107
+  },
+  {
+   "집단": "회남",
+   "연도": 2020,
+   "구간": "9~10월",
+   "n": 8,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 1.001,
+   "rmse_log B0": 0.939,
+   "r2_log 앙상블": 0.318,
+   "r2_log B0": 0.399,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.75,
+   "평균 잔차(앙상블)": -0.459
+  },
+  {
+   "집단": "회남",
+   "연도": 2021,
+   "구간": "1~8월",
+   "n": 33,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.876,
+   "rmse_log B0": 1.013,
+   "r2_log 앙상블": 0.506,
+   "r2_log B0": 0.339,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.818,
+   "평균 잔차(앙상블)": -0.35
+  },
+  {
+   "집단": "회남",
+   "연도": 2021,
+   "구간": "9~10월",
+   "n": 8,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.333,
+   "rmse_log B0": 0.305,
+   "r2_log 앙상블": 0.041,
+   "r2_log B0": 0.191,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.75,
+   "평균 잔차(앙상블)": -0.229
+  },
+  {
+   "집단": "회남",
+   "연도": 2022,
+   "구간": "1~8월",
+   "n": 34,
+   "관측≥10k": 1,
+   "rmse_log 앙상블": 0.891,
+   "rmse_log B0": 1.301,
+   "r2_log 앙상블": 0.604,
+   "r2_log B0": 0.155,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.588,
+   "평균 잔차(앙상블)": -0.106
+  },
+  {
+   "집단": "회남",
+   "연도": 2022,
+   "구간": "9~10월",
+   "n": 9,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.292,
+   "rmse_log B0": 0.246,
+   "r2_log 앙상블": 0.649,
+   "r2_log B0": 0.75,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 1.0,
+   "평균 잔차(앙상블)": 0.018
+  },
+  {
+   "집단": "회남",
+   "연도": 2023,
+   "구간": "1~8월",
+   "n": 33,
+   "관측≥10k": 1,
+   "rmse_log 앙상블": 0.793,
+   "rmse_log B0": 0.999,
+   "r2_log 앙상블": 0.693,
+   "r2_log B0": 0.512,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.697,
+   "평균 잔차(앙상블)": -0.322
+  },
+  {
+   "집단": "회남",
+   "연도": 2023,
+   "구간": "9~10월",
+   "n": 9,
+   "관측≥10k": 0,
+   "rmse_log 앙상블": 0.301,
+   "rmse_log B0": 0.365,
+   "r2_log 앙상블": 0.727,
+   "r2_log B0": 0.598,
+   "F1@10k 앙상블": 0.0,
+   "F1@10k B0": 0.0,
+   "구간 적중(q10~q90)": 0.889,
+   "평균 잔차(앙상블)": -0.153
+  },
+  {
+   "집단": "회남",
+   "연도": 2024,
+   "구간": "1~8월",
+   "n": 36,
+   "관측≥10k": 6,
+   "rmse_log 앙상블": 0.945,
+   "rmse_log B0": 1.158,
+   "r2_log 앙상블": 0.618,
+   "r2_log B0": 0.426,
+   "F1@10k 앙상블": 0.909,
+   "F1@10k B0": 0.909,
+   "구간 적중(q10~q90)": 0.556,
+   "평균 잔차(앙상블)": -0.08
+  },
+  {
+   "집단": "회남",
+   "연도": 2024,
+   "구간": "9~10월",
+   "n": 12,
+   "관측≥10k": 5,
+   "rmse_log 앙상블": 0.375,
+   "rmse_log B0": 0.442,
+   "r2_log 앙상블": 0.712,
+   "r2_log B0": 0.6,
+   "F1@10k 앙상블": 0.75,
+   "F1@10k B0": 0.667,
+   "구간 적중(q10~q90)": 0.667,
+   "평균 잔차(앙상블)": 0.015
+  },
+  {
+   "집단": "회남",
+   "연도": 2025,
+   "구간": "1~8월",
+   "n": 34,
+   "관측≥10k": 6,
+   "rmse_log 앙상블": 0.753,
+   "rmse_log B0": 1.093,
+   "r2_log 앙상블": 0.818,
+   "r2_log B0": 0.616,
+   "F1@10k 앙상블": 0.909,
+   "F1@10k B0": 0.909,
+   "구간 적중(q10~q90)": 0.618,
+   "평균 잔차(앙상블)": 0.078
+  },
+  {
+   "집단": "회남",
+   "연도": 2025,
+   "구간": "9~10월",
+   "n": 13,
+   "관측≥10k": 8,
+   "rmse_log 앙상블": 0.381,
+   "rmse_log B0": 0.216,
+   "r2_log 앙상블": -0.343,
+   "r2_log B0": 0.569,
+   "F1@10k 앙상블": 0.769,
+   "F1@10k B0": 0.75,
+   "구간 적중(q10~q90)": 0.615,
+   "평균 잔차(앙상블)": 0.314
+  }
+ ],
+ "placebo_z": [
+  {
+   "잔차·대조": "v1 앙상블 | 회남",
+   "항목": "pooled_mean",
+   "2025": "-0.251",
+   "위약 범위(2020~2024)": "[-0.287, +0.423]",
+   "z": -1.01,
+   "|위약|≥|2025| 연도 수": "2/5"
+  },
+  {
+   "잔차·대조": "v1 앙상블 | 회남",
+   "항목": "pooled_logvar",
+   "2025": "+0.793",
+   "위약 범위(2020~2024)": "[-1.059, +1.457]",
+   "z": -0.01,
+   "|위약|≥|2025| 연도 수": "5/5"
+  },
+  {
+   "잔차·대조": "v1 앙상블 | 회남",
+   "항목": "HP_mean",
+   "2025": "+0.010",
+   "위약 범위(2020~2024)": "[-0.396, +0.307]",
+   "z": 0.17,
+   "|위약|≥|2025| 연도 수": "4/5"
+  },
+  {
+   "잔차·대조": "v1 앙상블 | 회남",
+   "항목": "GJGR_mean",
+   "2025": "-0.190",
+   "위약 범위(2020~2024)": "[-0.180, +0.413]",
+   "z": -0.82,
+   "|위약|≥|2025| 연도 수": "1/5"
+  },
+  {
+   "잔차·대조": "v1 앙상블 | 회남",
+   "항목": "CS_mean",
+   "2025": "-0.267",
+   "위약 범위(2020~2024)": "[-0.338, +0.504]",
+   "z": -0.95,
+   "|위약|≥|2025| 연도 수": "3/5"
+  },
+  {
+   "잔차·대조": "v1 앙상블 | 회남",
+   "항목": "MGMR_mean",
+   "2025": "-0.518",
+   "위약 범위(2020~2024)": "[-0.280, +0.612]",
+   "z": -1.6,
+   "|위약|≥|2025| 연도 수": "1/5"
+  },
+  {
+   "잔차·대조": "B0 | 회남",
+   "항목": "pooled_mean",
+   "2025": "-0.134",
+   "위약 범위(2020~2024)": "[+0.045, +0.427]",
+   "z": -2.4,
+   "|위약|≥|2025| 연도 수": "4/5"
+  },
+  {
+   "잔차·대조": "B0 | 회남",
+   "항목": "pooled_logvar",
+   "2025": "+1.198",
+   "위약 범위(2020~2024)": "[-0.498, +2.802]",
+   "z": -0.11,
+   "|위약|≥|2025| 연도 수": "4/5"
+  },
+  {
+   "잔차·대조": "B0 | 회남",
+   "항목": "HP_mean",
+   "2025": "-0.023",
+   "위약 범위(2020~2024)": "[-0.124, +0.363]",
+   "z": -0.56,
+   "|위약|≥|2025| 연도 수": "3/5"
+  },
+  {
+   "잔차·대조": "B0 | 회남",
+   "항목": "GJGR_mean",
+   "2025": "-0.209",
+   "위약 범위(2020~2024)": "[-0.070, +0.367]",
+   "z": -2.42,
+   "|위약|≥|2025| 연도 수": "3/5"
+  },
+  {
+   "잔차·대조": "B0 | 회남",
+   "항목": "CS_mean",
+   "2025": "-0.063",
+   "위약 범위(2020~2024)": "[+0.076, +0.613]",
+   "z": -1.73,
+   "|위약|≥|2025| 연도 수": "5/5"
+  },
+  {
+   "잔차·대조": "B0 | 회남",
+   "항목": "MGMR_mean",
+   "2025": "-0.180",
+   "위약 범위(2020~2024)": "[+0.070, +0.359]",
+   "z": -3.19,
+   "|위약|≥|2025| 연도 수": "2/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 회남",
+   "항목": "pooled_mean",
+   "2025": "+0.050",
+   "위약 범위(2020~2024)": "[-0.450, +0.446]",
+   "z": 0.12,
+   "|위약|≥|2025| 연도 수": "5/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 회남",
+   "항목": "pooled_logvar",
+   "2025": "+0.813",
+   "위약 범위(2020~2024)": "[-1.382, +1.403]",
+   "z": 0.26,
+   "|위약|≥|2025| 연도 수": "4/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 낙동강 보 관찰지점 8",
+   "항목": "pooled_mean",
+   "2025": "+0.034",
+   "위약 범위(2020~2024)": "[-0.268, +0.146]",
+   "z": 0.3,
+   "|위약|≥|2025| 연도 수": "4/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 낙동강 보 관찰지점 8",
+   "항목": "pooled_logvar",
+   "2025": "-0.219",
+   "위약 범위(2020~2024)": "[-0.368, +0.560]",
+   "z": -0.67,
+   "|위약|≥|2025| 연도 수": "2/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 대청호 추동·문의",
+   "항목": "pooled_mean",
+   "2025": "+0.136",
+   "위약 범위(2020~2024)": "[-0.330, +0.380]",
+   "z": 0.37,
+   "|위약|≥|2025| 연도 수": "2/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 대청호 추동·문의",
+   "항목": "pooled_logvar",
+   "2025": "-0.274",
+   "위약 범위(2020~2024)": "[+0.380, +1.825]",
+   "z": -2.05,
+   "|위약|≥|2025| 연도 수": "5/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 인근 보(지점별)",
+   "항목": "HP_mean",
+   "2025": "-0.108",
+   "위약 범위(2020~2024)": "[-0.351, +0.328]",
+   "z": -0.34,
+   "|위약|≥|2025| 연도 수": "4/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 인근 보(지점별)",
+   "항목": "GJGR_mean",
+   "2025": "-0.160",
+   "위약 범위(2020~2024)": "[-0.526, +0.497]",
+   "z": -0.36,
+   "|위약|≥|2025| 연도 수": "5/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 인근 보(지점별)",
+   "항목": "CS_mean",
+   "2025": "-0.420",
+   "위약 범위(2020~2024)": "[-0.650, +0.223]",
+   "z": -1.01,
+   "|위약|≥|2025| 연도 수": "1/5"
+  },
+  {
+   "잔차·대조": "기후 편차 | 인근 보(지점별)",
+   "항목": "MGMR_mean",
+   "2025": "-0.702",
+   "위약 범위(2020~2024)": "[-0.345, +0.670]",
+   "z": -1.92,
+   "|위약|≥|2025| 연도 수": "0/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 회남",
+   "항목": "pooled_mean",
+   "2025": "-0.091",
+   "위약 범위(2020~2024)": "[+0.107, +0.457]",
+   "z": -2.28,
+   "|위약|≥|2025| 연도 수": "5/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 회남",
+   "항목": "pooled_logvar",
+   "2025": "+1.248",
+   "위약 범위(2020~2024)": "[-0.545, +2.652]",
+   "z": -0.0,
+   "|위약|≥|2025| 연도 수": "3/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 낙동강 보 관찰지점 8",
+   "항목": "pooled_mean",
+   "2025": "+0.074",
+   "위약 범위(2020~2024)": "[+0.024, +0.269]",
+   "z": -0.49,
+   "|위약|≥|2025| 연도 수": "3/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 낙동강 보 관찰지점 8",
+   "항목": "pooled_logvar",
+   "2025": "-0.820",
+   "위약 범위(2020~2024)": "[-0.907, +0.466]",
+   "z": -1.52,
+   "|위약|≥|2025| 연도 수": "1/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 대청호 추동·문의",
+   "항목": "pooled_mean",
+   "2025": "-0.158",
+   "위약 범위(2020~2024)": "[-0.043, +0.261]",
+   "z": -1.98,
+   "|위약|≥|2025| 연도 수": "1/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 대청호 추동·문의",
+   "항목": "pooled_logvar",
+   "2025": "+0.481",
+   "위약 범위(2020~2024)": "[+0.544, +1.849]",
+   "z": -0.85,
+   "|위약|≥|2025| 연도 수": "5/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 인근 보(지점별)",
+   "항목": "HP_mean",
+   "2025": "+0.126",
+   "위약 범위(2020~2024)": "[-0.063, +0.212]",
+   "z": 0.92,
+   "|위약|≥|2025| 연도 수": "1/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 인근 보(지점별)",
+   "항목": "GJGR_mean",
+   "2025": "+0.158",
+   "위약 범위(2020~2024)": "[-0.014, +0.282]",
+   "z": 0.03,
+   "|위약|≥|2025| 연도 수": "3/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 인근 보(지점별)",
+   "항목": "CS_mean",
+   "2025": "+0.221",
+   "위약 범위(2020~2024)": "[-0.024, +0.349]",
+   "z": 0.57,
+   "|위약|≥|2025| 연도 수": "1/5"
+  },
+  {
+   "잔차·대조": "7일 지속성 | 인근 보(지점별)",
+   "항목": "MGMR_mean",
+   "2025": "+0.241",
+   "위약 범위(2020~2024)": "[-0.057, +0.258]",
+   "z": 1.58,
+   "|위약|≥|2025| 연도 수": "1/5"
+  }
+ ],
+ "elapsed_h_run": 0.001776
+}
