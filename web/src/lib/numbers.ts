@@ -2,6 +2,8 @@
  * 헤드라인 숫자 — 단일 원천. 빌드 전에 scripts/check_numbers.mjs 가 reports/eval 표와 대조해 다르면 빌드를 멈춘다.
  * 리드타임 기준: 첫 경계(1만 개/mL) 초과 측정일(E). 2020~2025 = tbl_leadtime.md(q90≥임계), 2026 = tbl_holdout_2026_posthoc.md(감시 q90_cqr≥임계).
  * NUMBERS 의 점예측 지표(r2log·f1_10k·r2raw·nseraw)는 v1(블라인드 검증) 공개 원천 그대로다(2025 = tbl_holdout_2025.md 256행).
+ * 지표 값은 reports/eval/headline_metrics.json 의 전체 정밀도 값에서 한 번만 반올림한 값이다(2026-10-22 정정: 0.7049·0.7045 를
+ * 셋째 자리 0.705 로 거쳐 0.71 로 쓰던 이중 반올림을 0.70 으로 고침).
  * 감시·경보(리드타임)와 예상 범위 적중률(picp80)은 v1·v2 공통(분위·CQR·분류기는 v1 동결본).
  */
 export const NUMBERS = {
@@ -9,7 +11,7 @@ export const NUMBERS = {
   y2026: { total: 8, detected: 7, medianLeadDays: 21, persistenceDetected: 2 },
   prior: { total: 20, detected: 18, medianLeadDays: 14, persistenceDetected: 1 },
   r2log: { y2025: 0.78, y2026: 0.49 },
-  f1_10k: { y2025: 0.68, y2026: 0.71, persistence2025: 0.73, persistence2026: 0.84 },
+  f1_10k: { y2025: 0.68, y2026: 0.7, persistence2025: 0.73, persistence2026: 0.84 },
   r2raw: { y2025: 0.17, y2026: -0.05 },
   nseraw: { y2025: 0.17, y2026: -0.05 },
   picp80: { y2025: 0.86, y2026: 0.69 },
@@ -32,12 +34,12 @@ export const MODELS = {
  * 2026 = tbl_holdout_2026_posthoc_v2.md(test 124조합). v2 의 2026 값은 블라인드가 아니다(화면에 고지문 필수, copy.ts V2_NOTICE).
  */
 export const V2CMP = {
-  h25v2: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.71 },
+  h25v2: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.7 },
   h25v1: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.16, nseraw: 0.16, f1_10k: 0.68 },
   h25b0: { n: 252, rmselog: 0.9, r2log: 0.65, r2raw: -0.28, nseraw: -0.28, f1_10k: 0.73 },
   cvR2raw: { v2: 0.29, v1: 0.17, b0: 0 },
   p26v2: { n: 124, rmselog: 0.72, r2log: 0.52, r2raw: -0.01, nseraw: -0.01, f1_10k: 0.82 },
-  p26v1: { n: 124, rmselog: 0.74, r2log: 0.49, r2raw: -0.05, nseraw: -0.05, f1_10k: 0.71 },
+  p26v1: { n: 124, rmselog: 0.74, r2log: 0.49, r2raw: -0.05, nseraw: -0.05, f1_10k: 0.7 },
   p26b0: { n: 124, rmselog: 0.9, r2log: 0.24, r2raw: -0.3, nseraw: -0.3, f1_10k: 0.84 },
   /** 2026 경계 사건 8건 — 점예측이 1만 이상을 미리 낸 사건 수(달라짐), 감시 단계 선행 탐지(v1·v2 같음) */
   p26point: { total: 8, v2: 5, v1: 2, persistence: 2 },

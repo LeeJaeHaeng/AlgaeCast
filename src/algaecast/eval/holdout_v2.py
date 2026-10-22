@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+import json
 import logging
 
 import numpy as np
@@ -37,6 +38,7 @@ from algaecast.models import v2 as V2
 log = logging.getLogger(__name__)
 EVAL = ROOT / "reports" / "eval"
 OUT = EVAL / "tbl_holdout_2025_v2.md"
+OUT_JSON = EVAL / "tbl_holdout_2025_v2.json"  # 전체 정밀도 값(화면·문서 숫자는 이 값에서 한 번만 반올림)
 OOF_V1 = DATA_DIR / "processed" / "oof_predictions.parquet"
 FNS = {
     "rmse_log": rmse_log,
@@ -110,12 +112,16 @@ def main() -> int:
         "B0 지속성": fin["b0"].to_numpy(dtype=float),
     }
     rows = []
+    full: dict = {"h2025": {}, "cv": {}}
+    keys = {"v2 앙상블 C(운영·제출)": "v2", "v1 앙상블(블라인드 검증)": "v1", "B0 지속성": "b0"}
     for name, p in preds.items():
         m = compute_all(obs, p)
         row = {"모델": name, "n": m["n"]}
+        fk = full["h2025"].setdefault(keys[name], {"n": int(m["n"])})
         for k, fn in FNS.items():
             ci = bootstrap_ci(obs, p, fn, n=1000, seed=42)
             row[k] = f"{m[k]:.3f} [{ci['lo']:.3f}, {ci['hi']:.3f}]"
+            fk[k] = {"value": float(m[k]), "ci_low": float(ci["lo"]), "ci_high": float(ci["hi"])}
         rows.append(row)
     shared = compute_all(
         obs, preds["v2 앙상블 C(운영·제출)"], q10=q10c, q90=q90c, p10k=fin["clf_a"].to_numpy()
@@ -133,6 +139,12 @@ def main() -> int:
         per = pd.DataFrame(per)
         pooled = d[(d["year"] >= 2020) & (d["year"] <= 2024)]
         pm = compute_all(pooled["obs"].to_numpy(dtype=float), pooled[col].to_numpy(dtype=float))
+        full["cv"][keys[name]] = {
+            **{f"{k}_fold_mean": float(per[k].mean()) for k in CV_KEYS},
+            **{f"{k}_fold_sd": float(per[k].std()) for k in CV_KEYS},
+            **{f"{k}_pooled": float(pm[k]) for k in CV_KEYS},
+            "n_pooled": int(pm["n"]),
+        }
         cv_rows.append(
             {
                 "모델": name,
@@ -159,6 +171,9 @@ def main() -> int:
         encoding="utf-8",
         newline="\n",
     )
+    full["shared_2025"] = {k: float(shared[k]) for k in ("picp80", "mpiw80_log", "brier_10k")}
+    full["weights_v2"] = {k: float(v) for k, v in weights.items()}
+    OUT_JSON.write_text(json.dumps(full, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(pd.DataFrame(rows).to_string(index=False))
     print(pd.DataFrame(cv_rows).to_string(index=False))
     return 0
