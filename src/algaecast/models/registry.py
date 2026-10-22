@@ -190,18 +190,34 @@ def copy_version(name: str, version: str, dst_dir: Path, src_dir: Path | None = 
     return entry
 
 
-def explain_member(reg: dict) -> dict:
-    """SHAP 설명용 C1(log 회귀) 구성원 — model·cols·cats·categories 를 담은 dict.
+LN10 = 2.302585092994046  # ln(10): 자연로그 공간 SHAP → log10 공간
 
-    v1 ensemble 은 '회귀 C1(smearing)', ensemble_v2 는 'c1'(열·범주는 회귀 객체 공통값),
-    단일 모델은 객체 자체.
+
+def explain_member(reg: dict) -> dict:
+    """SHAP 설명용 단일 LightGBM 구성원 — model·cols·cats·categories(+member·shap_scale)를 담은 dict.
+
+    - v1 ensemble: '회귀 C1(smearing)'(log10 공간).
+    - ensemble_v2: 결합 가중치가 가장 큰 단일 모델 구성원(c1 log 회귀 또는 c2 tweedie). c3 hurdle·cg 속별은
+      모델이 둘 이상이라 제외한다. v2 동결 가중치는 c1 0 · c2 0.373 이라 c2 를 설명한다.
+      tweedie 의 SHAP 은 자연로그(링크) 공간이므로 shap_scale = 1/ln(10) 을 곱해 log10 공간으로 맞춘다.
+    - 단일 모델: 객체 자체.
     """
     kind = reg.get("kind")
     if kind == "ensemble":
         return reg["members"]["회귀 C1(smearing)"]
     if kind == "ensemble_v2":
-        m = reg["members"]["c1"]
-        return {**m, "cols": reg["cols"], "cats": m.get("cats", reg["cats"])}
+        w = reg.get("weights", {})
+        single = [k for k, m in reg["members"].items() if isinstance(m, dict) and "model" in m]
+        name = max(single, key=lambda k: (float(w.get(k, 0.0)), k == "c1"))
+        m = reg["members"][name]
+        scale = 1.0 / LN10 if m.get("kind") == "tweedie" else 1.0
+        return {
+            **m,
+            "cols": reg["cols"],
+            "cats": m.get("cats", reg["cats"]),
+            "member": name,
+            "shap_scale": scale,
+        }
     return reg
 
 

@@ -409,16 +409,17 @@ def shap_and_reco_rows(
 
     reg, _ = load_current("regression", reg_dir=reg_dir)
     clf, _ = load_current("classifier", reg_dir=reg_dir)
-    if reg.get("kind") == "ensemble_v2":  # v2: C1 구성원 입력에 상류 피처가 포함된다
+    if reg.get("kind") == "ensemble_v2":  # v2: 설명 구성원 입력에 상류 피처가 포함된다
         from algaecast.models.v2 import V2Model
 
         latest = V2Model.from_registry(reg).features(latest, algae)
-    c1 = explain_member(reg)
-    cols, cats = c1["cols"], c1["cats"]
+    ex = explain_member(reg)  # v1: C1, v2: 가중치 최대 단일 구성원(c2 tweedie, log10 환산)
+    cols, cats = ex["cols"], ex["cats"]
     X = latest[cols].copy()
     for c in cats:
-        X[c] = pd.Categorical(X[c].astype(str), categories=c1["categories"][c])
-    sv = pd.DataFrame(shap.TreeExplainer(c1["model"]).shap_values(X), columns=cols, index=latest.index)
+        X[c] = pd.Categorical(X[c].astype(str), categories=ex["categories"][c])
+    sv = pd.DataFrame(shap.TreeExplainer(ex["model"]).shap_values(X), columns=cols, index=latest.index)
+    sv = sv * float(ex.get("shap_scale", 1.0))
     pr = predict_registry(latest, reg_dir=reg_dir, algae=algae)
     shap_rows, reco = [], []
     for i, r in latest.iterrows():

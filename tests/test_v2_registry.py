@@ -223,7 +223,10 @@ def v2_registry(tmp_path_factory: pytest.TempPathFactory) -> Path:
     _need_data()
     reg_dir = tmp_path_factory.mktemp("v2reg") / "models"
     cur = R.current_versions()
-    v1_obj, v1_entry = R.load_current("regression")
+    with R.model_path("regression", V1_REG).open(
+        "rb"
+    ) as f:  # 동결 후 current 는 v2 → v1 회귀를 버전으로 읽는다
+        v1_obj = pickle.load(f)
     for name in ("classifier", "quantile"):
         R.copy_version(name, cur[name], reg_dir)
         R.set_current(name, cur[name], reg_dir)
@@ -328,3 +331,25 @@ def test_freeze_v2_dry_run_isolated(tmp_path: Path, monkeypatch: pytest.MonkeyPa
     assert s["submission"]["rows"] == 124 and s["submission"]["bom"] and s["train"]["n_rows"] > 2000
     assert R.current_kind("regression", out / "models") == "ensemble_v2"
     assert _script("verify_frozen").main(["--models-dir", str(out / "models")]) == 0
+
+
+def test_explain_member_picks_max_weight_single_model() -> None:
+    """v2 SHAP 설명 구성원 = 가중치 최대 단일 LightGBM 구성원(가중치 0 인 c1 이 아님), tweedie 는 log10 환산."""
+    reg = {
+        "kind": "ensemble_v2",
+        "weights": {"c1": 0.0, "c3": 0.266, "c2": 0.373, "cg": 0.361},
+        "members": {
+            "c1": {"kind": "log_w", "model": "m1", "cats": []},
+            "c3": {"kind": "hurdle", "clf": "a", "hi": "b", "lo": "c", "cats": []},
+            "c2": {"kind": "tweedie", "model": "m2", "cats": []},
+            "cg": {"kind": "genus", "layout": "G2", "parts": {}},
+        },
+        "cols": ["x1", "x2"],
+        "cats": [],
+    }
+    ex = R.explain_member(reg)
+    assert ex["member"] == "c2" and ex["model"] == "m2" and ex["cols"] == ["x1", "x2"]
+    assert ex["shap_scale"] == pytest.approx(1 / np.log(10))
+    reg["weights"] = {"c1": 0.5, "c3": 0.2, "c2": 0.3, "cg": 0.0}
+    ex1 = R.explain_member(reg)
+    assert ex1["member"] == "c1" and ex1["shap_scale"] == 1.0
