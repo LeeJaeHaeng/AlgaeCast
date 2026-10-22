@@ -1,0 +1,1234 @@
+# EXP-008 전국 조류경보 지점 메타(통합 학습용, 우리 5지점 제외). config/sites.yaml 에 넣을 때는 별도 키
+# (예: national_alert_sites) 로 두고 v1 sites 목록과 섞지 않는다. 좌표는 근사(coord_method 참조).
+national_alert_sites:
+- site_code: 1003G20
+  name: 충주호 청풍교
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 36.98533
+  lon: 128.08243
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1003A74,1003A75,1003B10,1003B20,1003B30,1003B40
+  asos_primary: 127
+  asos_name: 충주
+  asos_distance_km: 11.7
+  hydro: {}
+  samples_le_2025: 551
+  samples_over_10k: 1
+- site_code: 1003G40
+  name: 충주호 댐앞
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 36.98533
+  lon: 128.08243
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1003A74,1003A75,1003B10,1003B20,1003B30,1003B40
+  asos_primary: 127
+  asos_name: 충주
+  asos_distance_km: 11.7
+  hydro: {}
+  samples_le_2025: 668
+  samples_over_10k: 0
+- site_code: 1006G30
+  name: 횡성호 취수탑
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.54769
+  lon: 128.06247
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1006B10,1006B20,1006B30
+  asos_primary: 212
+  asos_name: 홍천
+  asos_distance_km: 22.0
+  hydro: {}
+  samples_le_2025: 560
+  samples_over_10k: 1
+- site_code: 1007A20
+  name: 강천보 강천
+  river_lake: 하천
+  basin: 한강
+  facility_type: 보
+  lat: 37.27253
+  lon: 127.68692
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 1007A20
+  asos_primary: 203
+  asos_name: 이천
+  asos_distance_km: 18.0
+  hydro: {}
+  samples_le_2025: 568
+  samples_over_10k: 0
+- site_code: 1007A27
+  name: 여주보 대신
+  river_lake: 하천
+  basin: 한강
+  facility_type: 보
+  lat: 37.32244
+  lon: 127.61325
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 1007A27
+  asos_primary: 203
+  asos_name: 이천
+  asos_distance_km: 13.1
+  hydro: {}
+  samples_le_2025: 582
+  samples_over_10k: 0
+- site_code: 1007A60
+  name: 이포보 이포
+  river_lake: 하천
+  basin: 한강
+  facility_type: 보
+  lat: 37.40161
+  lon: 127.53969
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 1007A60
+  asos_primary: 202
+  asos_name: 양평
+  asos_distance_km: 10.5
+  hydro: {}
+  samples_le_2025: 586
+  samples_over_10k: 0
+- site_code: 1007G20
+  name: 한강 이천
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.32533
+  lon: 127.54479
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1007*(39)
+  asos_primary: 203
+  asos_name: 이천
+  asos_distance_km: 8.7
+  hydro: {}
+  samples_le_2025: 372
+  samples_over_10k: 0
+- site_code: 1010G50
+  name: 춘천호 용산취수장
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.96928
+  lon: 127.67544
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1010A35,1010A40,1010A50,1010B40,1010B50,1010B60
+  asos_primary: 101
+  asos_name: 춘천
+  asos_distance_km: 9.1
+  hydro: {}
+  samples_le_2025: 647
+  samples_over_10k: 0
+- site_code: 1010G60
+  name: 춘천호 춘성교 교각
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.96928
+  lon: 127.67544
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1010A35,1010A40,1010A50,1010B40,1010B50,1010B60
+  asos_primary: 101
+  asos_name: 춘천
+  asos_distance_km: 9.1
+  hydro: {}
+  samples_le_2025: 533
+  samples_over_10k: 0
+- site_code: 1011G50
+  name: 의암호 신연교
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.96928
+  lon: 127.67544
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: 1010G60
+  asos_primary: 101
+  asos_name: 춘천
+  asos_distance_km: 9.1
+  hydro: {}
+  samples_le_2025: 466
+  samples_over_10k: 0
+- site_code: 1017G20
+  name: 팔당호 댐앞
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.52104
+  lon: 127.28528
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1017A10,1017B10
+  asos_primary: 202
+  asos_name: 양평
+  asos_distance_km: 18.8
+  hydro: {}
+  samples_le_2025: 612
+  samples_over_10k: 1
+- site_code: 1017G21
+  name: 팔당호 부용사앞
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.52104
+  lon: 127.28528
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1017A10,1017B10
+  asos_primary: 202
+  asos_name: 양평
+  asos_distance_km: 18.8
+  hydro: {}
+  samples_le_2025: 606
+  samples_over_10k: 0
+- site_code: 1017G22
+  name: 팔당호 삼봉
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.52104
+  lon: 127.28528
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1017A10,1017B10
+  asos_primary: 202
+  asos_name: 양평
+  asos_distance_km: 18.8
+  hydro: {}
+  samples_le_2025: 616
+  samples_over_10k: 2
+- site_code: 1018G01
+  name: 한강 미사대교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 594
+  samples_over_10k: 0
+- site_code: 1018G02
+  name: 한강 강동대교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 598
+  samples_over_10k: 0
+- site_code: 1018G03
+  name: 한강 구의
+  river_lake: 호소
+  basin: 한강
+  facility_type: 댐
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 138
+  samples_over_10k: 0
+- site_code: 1018G04
+  name: 한강 잠실철교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 598
+  samples_over_10k: 0
+- site_code: 1018G05
+  name: 한강 광진교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 598
+  samples_over_10k: 0
+- site_code: 1018G06
+  name: 한강 성수대교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 547
+  samples_over_10k: 5
+- site_code: 1018G07
+  name: 한강 한남대교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 547
+  samples_over_10k: 4
+- site_code: 1018G08
+  name: 한강 한강대교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 547
+  samples_over_10k: 5
+- site_code: 1018G09
+  name: 한강 마포대교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 547
+  samples_over_10k: 5
+- site_code: 1018G10
+  name: 한강 성산대교
+  river_lake: 하천
+  basin: 한강
+  facility_type: 하천
+  lat: 37.49831
+  lon: 127.00323
+  coord_method: 중권역 측정소 평균
+  coord_ref: 1018*(43)
+  asos_primary: 108
+  asos_name: 서울
+  asos_distance_km: 8.8
+  hydro: {}
+  samples_le_2025: 547
+  samples_over_10k: 12
+- site_code: 1101G10
+  name: 광교지 취수탑
+  river_lake: 호소
+  basin: 안성천
+  facility_type: 댐
+  lat: 37.3072
+  lon: 127.02599
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 1101B05,1101B10
+  asos_primary: 119
+  asos_name: 수원
+  asos_distance_km: 5.4
+  hydro: {}
+  samples_le_2025: 648
+  samples_over_10k: 0
+- site_code: 2007A25
+  name: 상주보 도남
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 36.4334
+  lon: 128.2542
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 2007A25
+  asos_primary: 137
+  asos_name: 상주
+  asos_distance_km: 9.1
+  hydro:
+    kw: '2007601'
+    dams:
+    - '2001110'
+    - '2002110'
+    - '2002111'
+    - '2004101'
+  samples_le_2025: 671
+  samples_over_10k: 18
+- site_code: 2009A05
+  name: 낙단보 낙단
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 36.36117
+  lon: 128.30789
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 2009A05
+  asos_primary: 137
+  asos_name: 상주
+  asos_distance_km: 14.5
+  hydro:
+    kw: '2009601'
+    dams:
+    - '2001110'
+    - '2002110'
+    - '2002111'
+    - '2004101'
+    - '2008110'
+  samples_le_2025: 681
+  samples_over_10k: 48
+- site_code: 2009A30
+  name: 구미보 선산
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 36.23881
+  lon: 128.34392
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 2009A30
+  asos_primary: 279
+  asos_name: 구미
+  asos_distance_km: 12.2
+  hydro:
+    kw: '2009602'
+    dams:
+    - '2001110'
+    - '2002110'
+    - '2002111'
+    - '2004101'
+    - '2008110'
+  samples_le_2025: 699
+  samples_over_10k: 53
+- site_code: 2011A25
+  name: 칠곡보 칠곡
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 36.01856
+  lon: 128.39781
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 2011A25
+  asos_primary: 279
+  asos_name: 구미
+  asos_distance_km: 14.3
+  hydro:
+    kw: '2011601'
+    ref: HP
+  samples_le_2025: 709
+  samples_over_10k: 59
+- site_code: 2011A26
+  name: 칠곡보 구미광역취수장
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 36.1695
+  lon: 128.3873
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: HP
+  asos_primary: 279
+  asos_name: 구미
+  asos_distance_km: 7.4
+  hydro:
+    kw: '2011601'
+    ref: HP
+  samples_le_2025: 151
+  samples_over_10k: 7
+- site_code: 2011A55
+  name: 강정고령보 다사
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.843
+  lon: 128.453
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: GJGR
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 18.4
+  hydro:
+    kw: '2011602'
+    ref: GJGR
+  samples_le_2025: 746
+  samples_over_10k: 106
+- site_code: 2011A56
+  name: 강정고령보 고령광역취수장
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.843
+  lon: 128.453
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: GJGR
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 18.4
+  hydro:
+    kw: '2011602'
+    ref: GJGR
+  samples_le_2025: 155
+  samples_over_10k: 28
+- site_code: 2012G20
+  name: 영천호 취수탑
+  river_lake: 호소
+  basin: 낙동강
+  facility_type: 댐
+  lat: 36.07512
+  lon: 129.03702
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2012B10,2012B20
+  asos_primary: 281
+  asos_name: 영천
+  asos_distance_km: 13.3
+  hydro: {}
+  samples_le_2025: 703
+  samples_over_10k: 5
+- site_code: 2012G55
+  name: 공산지 중앙부
+  river_lake: 호소
+  basin: 낙동강
+  facility_type: 댐
+  lat: 35.94536
+  lon: 128.76219
+  coord_method: 중권역 측정소 평균
+  coord_ref: 2012*(25)
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 12.4
+  hydro: {}
+  samples_le_2025: 436
+  samples_over_10k: 27
+- site_code: 2012G56
+  name: 공산지 취수탑
+  river_lake: 호소
+  basin: 낙동강
+  facility_type: 댐
+  lat: 35.94536
+  lon: 128.76219
+  coord_method: 중권역 측정소 평균
+  coord_ref: 2012*(25)
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 12.4
+  hydro: {}
+  samples_le_2025: 605
+  samples_over_10k: 30
+- site_code: 2014A25
+  name: 달성보 논공
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.73581
+  lon: 128.414
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 2014A25
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 26.7
+  hydro:
+    kw: '2014601'
+    dams_ref: GJGR
+  samples_le_2025: 811
+  samples_over_10k: 150
+- site_code: 2014A70
+  name: 합천창녕보 덕곡
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.59336
+  lon: 128.3555
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 2014A70
+  asos_primary: 285
+  asos_name: 합천
+  asos_distance_km: 17.1
+  hydro:
+    kw: '2014602'
+    dams_ref: GJGR
+  samples_le_2025: 816
+  samples_over_10k: 183
+- site_code: 2018G20
+  name: 진양호 내동
+  river_lake: 호소
+  basin: 낙동강
+  facility_type: 댐
+  lat: 35.17653
+  lon: 127.99883
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2018B10,2018B20,2018B30
+  asos_primary: 192
+  asos_name: 진주
+  asos_distance_km: 4.0
+  hydro:
+    dam: '2018110'
+  samples_le_2025: 695
+  samples_over_10k: 11
+- site_code: 2018G30
+  name: 진양호 판문
+  river_lake: 호소
+  basin: 낙동강
+  facility_type: 댐
+  lat: 35.17653
+  lon: 127.99883
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2018B10,2018B20,2018B30
+  asos_primary: 192
+  asos_name: 진주
+  asos_distance_km: 4.0
+  hydro:
+    dam: '2018110'
+  samples_le_2025: 696
+  samples_over_10k: 12
+- site_code: 2020A32
+  name: 창녕함안보 함안
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.37
+  lon: 128.48
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: CS
+  asos_primary: 263
+  asos_name: 의령군
+  asos_distance_km: 18.2
+  hydro:
+    kw: '2017601'
+    ref: CS
+  samples_le_2025: 769
+  samples_over_10k: 160
+- site_code: 2020A33
+  name: 창녕함안보 창원칠서취수장
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.37
+  lon: 128.48
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: CS
+  asos_primary: 263
+  asos_name: 의령군
+  asos_distance_km: 18.2
+  hydro:
+    kw: '2017601'
+    ref: CS
+  samples_le_2025: 172
+  samples_over_10k: 37
+- site_code: 2021G10
+  name: 운문호 취수탑2
+  river_lake: 호소
+  basin: 낙동강
+  facility_type: 댐
+  lat: 35.72544
+  lon: 128.6511
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2021B10,2021B20
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 17.0
+  hydro: {}
+  samples_le_2025: 699
+  samples_over_10k: 0
+- site_code: 2021G20
+  name: 운문호 댐앞
+  river_lake: 호소
+  basin: 낙동강
+  facility_type: 댐
+  lat: 35.72544
+  lon: 128.6511
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2021B10,2021B20
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 17.0
+  hydro: {}
+  samples_le_2025: 699
+  samples_over_10k: 0
+- site_code: 2101G30
+  name: 안계호 취수탑
+  river_lake: 호소
+  basin: 형산강
+  facility_type: 댐
+  lat: 36.01022
+  lon: 129.26774
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2101B30
+  asos_primary: 138
+  asos_name: 포항
+  asos_distance_km: 10.4
+  hydro: {}
+  samples_le_2025: 707
+  samples_over_10k: 0
+- site_code: 2101G31
+  name: 덕동호 댐앞
+  river_lake: 호소
+  basin: 형산강
+  facility_type: 댐
+  lat: 35.93805
+  lon: 129.28964
+  coord_method: 중권역 측정소 평균
+  coord_ref: 2101*(13)
+  asos_primary: 138
+  asos_name: 포항
+  asos_distance_km: 13.2
+  hydro: {}
+  samples_le_2025: 674
+  samples_over_10k: 0
+- site_code: 2101G70
+  name: 진전지 상류
+  river_lake: 호소
+  basin: 형산강
+  facility_type: 댐
+  lat: 35.93805
+  lon: 129.28964
+  coord_method: 중권역 측정소 평균
+  coord_ref: 2101*(13)
+  asos_primary: 138
+  asos_name: 포항
+  asos_distance_km: 13.2
+  hydro: {}
+  samples_le_2025: 654
+  samples_over_10k: 0
+- site_code: 2101G71
+  name: 진전지 하류
+  river_lake: 호소
+  basin: 형산강
+  facility_type: 댐
+  lat: 35.93805
+  lon: 129.28964
+  coord_method: 중권역 측정소 평균
+  coord_ref: 2101*(13)
+  asos_primary: 138
+  asos_name: 포항
+  asos_distance_km: 13.2
+  hydro: {}
+  samples_le_2025: 654
+  samples_over_10k: 0
+- site_code: 2201G30
+  name: 사연호 반연리
+  river_lake: 호소
+  basin: 태화강
+  facility_type: 댐
+  lat: 35.58362
+  lon: 129.19199
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2201B30,2201B40
+  asos_primary: 152
+  asos_name: 울산
+  asos_distance_km: 12.9
+  hydro: {}
+  samples_le_2025: 688
+  samples_over_10k: 0
+- site_code: 2201G40
+  name: 사연호 취수탑
+  river_lake: 호소
+  basin: 태화강
+  facility_type: 댐
+  lat: 35.58362
+  lon: 129.19199
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2201B30,2201B40
+  asos_primary: 152
+  asos_name: 울산
+  asos_distance_km: 12.9
+  hydro: {}
+  samples_le_2025: 690
+  samples_over_10k: 1
+- site_code: 2301G10
+  name: 회야호 여수로
+  river_lake: 호소
+  basin: 회야수영
+  facility_type: 댐
+  lat: 35.45058
+  lon: 129.2541
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2301A20,2301A30,2301A40,2301B10,2301B20
+  asos_primary: 152
+  asos_name: 울산
+  asos_distance_km: 16.4
+  hydro: {}
+  samples_le_2025: 701
+  samples_over_10k: 0
+- site_code: 2301G20
+  name: 회야호 취수탑
+  river_lake: 호소
+  basin: 회야수영
+  facility_type: 댐
+  lat: 35.45058
+  lon: 129.2541
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 2301A20,2301A30,2301A40,2301B10,2301B20
+  asos_primary: 152
+  asos_name: 울산
+  asos_distance_km: 16.4
+  hydro: {}
+  samples_le_2025: 701
+  samples_over_10k: 2
+- site_code: 3001G20
+  name: 용담호 취수탑
+  river_lake: 호소
+  basin: 금강
+  facility_type: 댐
+  lat: 35.91202
+  lon: 127.51493
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 3001B10,3001B20,3001B30,3001B40
+  asos_primary: 238
+  asos_name: 금산
+  asos_distance_km: 21.7
+  hydro:
+    dam: '3001110'
+  samples_le_2025: 696
+  samples_over_10k: 2
+- site_code: 3001G40
+  name: 용담호 댐앞
+  river_lake: 호소
+  basin: 금강
+  facility_type: 댐
+  lat: 35.91202
+  lon: 127.51493
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 3001B10,3001B20,3001B30,3001B40
+  asos_primary: 238
+  asos_name: 금산
+  asos_distance_km: 21.7
+  hydro:
+    dam: '3001110'
+  samples_le_2025: 694
+  samples_over_10k: 1
+- site_code: 3008G40
+  name: 대청호 추동
+  river_lake: 호소
+  basin: 금강
+  facility_type: 댐
+  lat: 36.42507
+  lon: 127.52298
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 3008A40,3008A52,3008B10,3008B20,3008B30,3008B40,3008B50,3008B60
+  asos_primary: 133
+  asos_name: 대전
+  asos_distance_km: 14.7
+  hydro:
+    dam: '3008110'
+    ref: DCHN
+  samples_le_2025: 721
+  samples_over_10k: 31
+- site_code: 3008G50
+  name: 대청호 문의
+  river_lake: 호소
+  basin: 금강
+  facility_type: 댐
+  lat: 36.42507
+  lon: 127.52298
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 3008A40,3008A52,3008B10,3008B20,3008B30,3008B40,3008B50,3008B60
+  asos_primary: 133
+  asos_name: 대전
+  asos_distance_km: 14.7
+  hydro:
+    dam: '3008110'
+    ref: DCHN
+  samples_le_2025: 726
+  samples_over_10k: 43
+- site_code: 3012A07
+  name: 세종보 연기
+  river_lake: 하천
+  basin: 금강
+  facility_type: 보
+  lat: 36.47797
+  lon: 127.27094
+  coord_method: 중권역 측정소명=상세지점명
+  coord_ref: 3012A05
+  asos_primary: 133
+  asos_name: 대전
+  asos_distance_km: 14.9
+  hydro:
+    dams:
+    - '3001110'
+    - '3008110'
+  samples_le_2025: 769
+  samples_over_10k: 2
+- site_code: 3012A32
+  name: 공주보 금강
+  river_lake: 하천
+  basin: 금강
+  facility_type: 보
+  lat: 36.46464
+  lon: 127.10003
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 3012A32
+  asos_primary: 133
+  asos_name: 대전
+  asos_distance_km: 26.4
+  hydro:
+    dams:
+    - '3001110'
+    - '3008110'
+  samples_le_2025: 773
+  samples_over_10k: 12
+- site_code: 3012A42
+  name: 백제보 부여
+  river_lake: 하천
+  basin: 금강
+  facility_type: 보
+  lat: 36.32208
+  lon: 126.94442
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 3012A42
+  asos_primary: 236
+  asos_name: 부여
+  asos_distance_km: 5.9
+  hydro:
+    dams:
+    - '3001110'
+    - '3008110'
+  samples_le_2025: 726
+  samples_over_10k: 44
+- site_code: 3203G20
+  name: 보령호 취수탑
+  river_lake: 호소
+  basin: 금강서해
+  facility_type: 댐
+  lat: 36.24596
+  lon: 126.66631
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 3203B10,3203B20,3203B30
+  asos_primary: 235
+  asos_name: 보령
+  asos_distance_km: 13.3
+  hydro: {}
+  samples_le_2025: 694
+  samples_over_10k: 10
+- site_code: 4002G10
+  name: 옥정호 칠보취수구
+  river_lake: 호소
+  basin: 섬진강
+  facility_type: 댐
+  lat: 35.48135
+  lon: 127.15384
+  coord_method: 중권역 측정소 평균
+  coord_ref: 4002*(3)
+  asos_primary: 254
+  asos_name: 순창군
+  asos_distance_km: 12.4
+  hydro: {}
+  samples_le_2025: 693
+  samples_over_10k: 0
+- site_code: 4007G40
+  name: 주암호 신평교
+  river_lake: 호소
+  basin: 섬진강
+  facility_type: 댐
+  lat: 35.01831
+  lon: 127.22353
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 4007A40,4007B30,4007B40,4007B70
+  asos_primary: 174
+  asos_name: 순천
+  asos_distance_km: 13.3
+  hydro: {}
+  samples_le_2025: 700
+  samples_over_10k: 0
+- site_code: 4007G50
+  name: 동복호 중류
+  river_lake: 호소
+  basin: 섬진강
+  facility_type: 댐
+  lat: 35.07868
+  lon: 127.10566
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 4007A20,4007A30,4007A35,4007B50,4007B60
+  asos_primary: 156
+  asos_name: 광주
+  asos_distance_km: 22.1
+  hydro: {}
+  samples_le_2025: 699
+  samples_over_10k: 3
+- site_code: 4007G60
+  name: 동복호 취수탑
+  river_lake: 호소
+  basin: 섬진강
+  facility_type: 댐
+  lat: 35.07868
+  lon: 127.10566
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 4007A20,4007A30,4007A35,4007B50,4007B60
+  asos_primary: 156
+  asos_name: 광주
+  asos_distance_km: 22.1
+  hydro: {}
+  samples_le_2025: 699
+  samples_over_10k: 3
+- site_code: 4007G70
+  name: 주암호 댐앞
+  river_lake: 호소
+  basin: 섬진강
+  facility_type: 댐
+  lat: 35.01831
+  lon: 127.22353
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 4007A40,4007B30,4007B40,4007B70
+  asos_primary: 174
+  asos_name: 순천
+  asos_distance_km: 13.3
+  hydro: {}
+  samples_le_2025: 700
+  samples_over_10k: 0
+- site_code: 5004A10
+  name: 승촌보 광산
+  river_lake: 하천
+  basin: 영산강
+  facility_type: 보
+  lat: 35.07053
+  lon: 126.77614
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 5004A10
+  asos_primary: 156
+  asos_name: 광주
+  asos_distance_km: 15.5
+  hydro: {}
+  samples_le_2025: 765
+  samples_over_10k: 7
+- site_code: 5004A35
+  name: 죽산보 죽산
+  river_lake: 하천
+  basin: 영산강
+  facility_type: 보
+  lat: 34.97667
+  lon: 126.63278
+  coord_method: 수질측정망 동일 코드
+  coord_ref: 5004A35
+  asos_primary: 165
+  asos_name: 목포
+  asos_distance_km: 29.0
+  hydro: {}
+  samples_le_2025: 775
+  samples_over_10k: 49
+- site_code: 5101G35
+  name: 탐진호 댐앞
+  river_lake: 호소
+  basin: 탐진강
+  facility_type: 댐
+  lat: 34.73689
+  lon: 126.87167
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 5101A05,5101A10,5101A35,5101A40,5101A55
+  asos_primary: 260
+  asos_name: 장흥
+  asos_distance_km: 6.9
+  hydro: {}
+  samples_le_2025: 694
+  samples_over_10k: 0
+- site_code: 5101G40
+  name: 탐진호 유치천 합류
+  river_lake: 호소
+  basin: 탐진강
+  facility_type: 댐
+  lat: 34.73689
+  lon: 126.87167
+  coord_method: 중권역 측정소명⊃수계명 앞 2글자
+  coord_ref: 5101A05,5101A10,5101A35,5101A40,5101A55
+  asos_primary: 260
+  asos_name: 장흥
+  asos_distance_km: 6.9
+  hydro: {}
+  samples_le_2025: 696
+  samples_over_10k: 0
+- site_code: 5555A44
+  name: 금강_시범 서화천
+  river_lake: 하천
+  basin: 금강
+  facility_type: 하천
+  lat: 36.4
+  lon: 127.6
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: DCHN
+  asos_primary: 226
+  asos_name: 보은
+  asos_distance_km: 15.5
+  hydro:
+    dams_ref: DCHN
+  samples_le_2025: 18
+  samples_over_10k: 6
+- site_code: 5555A55
+  name: 금강_시범 웅포대교
+  river_lake: 하천
+  basin: 금강
+  facility_type: 하천
+  lat: 36.32208
+  lon: 126.94442
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: 3012A42
+  asos_primary: 236
+  asos_name: 부여
+  asos_distance_km: 5.9
+  hydro:
+    dams:
+    - '3001110'
+    - '3008110'
+  samples_le_2025: 32
+  samples_over_10k: 6
+- site_code: 6666A55
+  name: 낙동강_시범 구미낙동강레포츠체험센터
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 36.1695
+  lon: 128.3873
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: HP
+  asos_primary: 279
+  asos_name: 구미
+  asos_distance_km: 7.4
+  hydro:
+    kw: '2009602'
+    dams:
+    - '2001110'
+    - '2002110'
+    - '2002111'
+    - '2004101'
+    - '2008110'
+  samples_le_2025: 18
+  samples_over_10k: 0
+- site_code: 6666A66
+  name: 낙동강_시범 레포츠밸리
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 하천
+  lat: 35.843
+  lon: 128.453
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: GJGR
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 18.4
+  hydro: {}
+  samples_le_2025: 36
+  samples_over_10k: 11
+- site_code: 6666A77
+  name: 낙동강_시범 본포수변생태공원
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.37
+  lon: 128.48
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: CS
+  asos_primary: 263
+  asos_name: 의령군
+  asos_distance_km: 18.2
+  hydro:
+    kw: '2017601'
+    dams_ref: CS
+  samples_le_2025: 18
+  samples_over_10k: 1
+- site_code: 6666A88
+  name: 낙동강_시범 화명수상레포츠타운
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 하굿둑 상류
+  lat: 35.31
+  lon: 128.99
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: MGMR
+  asos_primary: 257
+  asos_name: 양산시
+  asos_distance_km: 2.7
+  hydro:
+    kw: '2022510'
+    dams_ref: MGMR
+  samples_le_2025: 18
+  samples_over_10k: 0
+- site_code: 7777A76
+  name: 낙동강_시범 매리 지점 혼합
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 하굿둑 상류
+  lat: 35.31
+  lon: 128.99
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: MGMR
+  asos_primary: 257
+  asos_name: 양산시
+  asos_distance_km: 2.7
+  hydro:
+    kw: '2022510'
+    ref: MGMR
+  samples_le_2025: 37
+  samples_over_10k: 10
+- site_code: 7777A77
+  name: 낙동강_시범 매리 지점 표층
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 하굿둑 상류
+  lat: 35.31
+  lon: 128.99
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: MGMR
+  asos_primary: 257
+  asos_name: 양산시
+  asos_distance_km: 2.7
+  hydro:
+    kw: '2022510'
+    ref: MGMR
+  samples_le_2025: 37
+  samples_over_10k: 9
+- site_code: 9999A98
+  name: 낙동강_시범 고령 지점 혼합
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.843
+  lon: 128.453
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: GJGR
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 18.4
+  hydro:
+    kw: '2011602'
+    ref: GJGR
+  samples_le_2025: 37
+  samples_over_10k: 5
+- site_code: 9999A99
+  name: 낙동강_시범 고령 지점 표층
+  river_lake: 하천
+  basin: 낙동강
+  facility_type: 보
+  lat: 35.843
+  lon: 128.453
+  coord_method: 기준 지점 좌표(COORD_REF)
+  coord_ref: GJGR
+  asos_primary: 143
+  asos_name: 대구
+  asos_distance_km: 18.4
+  hydro:
+    kw: '2011602'
+    ref: GJGR
+  samples_le_2025: 37
+  samples_over_10k: 7
