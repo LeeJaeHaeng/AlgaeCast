@@ -106,6 +106,12 @@ export default async function SitePage({ params, searchParams }: { params: Promi
             <div className="text-[44px] font-bold leading-none" style={{ color: c.color }}>
               {fmt(st?.q50)} <span className="text-base font-normal text-dim">{BOARD.unit.cells}</span>
             </div>
+            {st?.pred_cell_count != null && (
+              <div className="mt-1 text-sm text-dim" title={BOARD.tile.v2pointTip} data-v2point>
+                {BOARD.tile.v2point} <span className="font-semibold text-text">{fmt(st.pred_cell_count)}</span> {BOARD.unit.cells}
+                <Info text={BOARD.tile.v2pointTip} />
+              </div>
+            )}
           </div>
           <div>
             <div className="flex items-center text-sm text-dim">

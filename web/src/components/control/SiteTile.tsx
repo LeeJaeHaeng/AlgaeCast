@@ -98,6 +98,11 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
         <div className="min-w-0 flex-1">
           <RangeBar q10={s.q10_cqr} q50={s.q50} q90={s.q90_cqr} color={c.color} />
         </div>
+        {s.pred_cell_count != null && (
+          <span className="shrink-0 whitespace-nowrap pt-0.5 text-[11px] text-dim" title={BOARD.tile.v2pointTip} data-v2point>
+            {BOARD.tile.v2point} <span className="font-semibold text-text">{fmt(s.pred_cell_count)}</span>
+          </span>
+        )}
       </div>
       {/* 4행: 1만 넘을 가능성 */}
       <div className="flex items-center gap-2 text-xs text-dim">
