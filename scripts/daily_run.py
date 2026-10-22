@@ -9,7 +9,10 @@
   워크플로가 내려받는다.
 - 회귀 current 가 ensemble_v2(v2 운영 모델)이면 as-of 피처 행에 상류 피처 5열을 붙여 예측한다
   (추가 수집 없음 — 이번에 모은 5지점 조류 자료를 행의 기준일까지 잘라 계산). v1 이면 동작이 이전과 같다.
-사용: python scripts/daily_run.py [--days 120] [--today YYYY-MM-DD] [--dry-run] [--skip-collect]
+- --force-predict: 새 측정이 없어도(최신 base_date 가 이미 predictions 에 있어도) 지점별 최신 base_date 를
+  현재 동결 모델로 다시 예측해 새 run 으로 기록한다
+  (동결 모델 교체 직후 운영 화면을 새 모델로 바꿀 때만 수동 실행).
+사용: python scripts/daily_run.py [--days 120] [--today YYYY-MM-DD] [--dry-run] [--force-predict]
 """
 
 from __future__ import annotations
@@ -80,7 +83,11 @@ def record_failed(exc: BaseException, dry: bool) -> None:
 
 
 def upload_predictions(
-    feat: pd.DataFrame, cfg_sites: dict, dry: bool, algae: pd.DataFrame | None = None
+    feat: pd.DataFrame,
+    cfg_sites: dict,
+    dry: bool,
+    algae: pd.DataFrame | None = None,
+    forced: bool = False,
 ) -> tuple[str, int]:
     """as-of 피처 행 예측 → Supabase.
 
@@ -106,7 +113,7 @@ def upload_predictions(
             }
         ),
         "status": "success",
-        "notes": "daily as-of: "
+        "notes": ("daily as-of(재예측 --force-predict): " if forced else "daily as-of: ")
         + ", ".join(f"{r.station_id}@{r.base_date.date()}" for r in feat.itertuples()),
     }
     if dry:
@@ -206,6 +213,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--today", type=date.fromisoformat, default=date.today())
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument(
+        "--force-predict",
+        action="store_true",
+        help="새 측정이 없어도 지점별 최신 base_date 를 현재 동결 모델로 다시 예측(새 run)",
+    )
     args = ap.parse_args(argv)
     LOG_DIR.mkdir(exist_ok=True)
     logging.basicConfig(
@@ -213,7 +225,7 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(message)s",
         handlers=[logging.StreamHandler(), logging.FileHandler(LOG_DIR / "daily_run.log", encoding="utf-8")],
     )
-    summary: dict[str, object] = {"today": str(args.today), "steps": {}}
+    summary: dict[str, object] = {"today": str(args.today), "force_predict": args.force_predict, "steps": {}}
     try:
         verify_frozen()
         summary["steps"]["verify_frozen"] = "ok"
@@ -225,7 +237,7 @@ def main(argv: list[str] | None = None) -> int:
         bases = latest_base_dates(daily, args.today)
         summary["bases"] = {k: str(v) for k, v in bases.items()}
         # 새 측정 여부: 최신 base_date 가 이미 predictions 에 있으면 건너뜀
-        if not args.dry_run and bases:
+        if not args.dry_run and bases and not args.force_predict:
             sb = _sb()
             have = pd.DataFrame(
                 sb.table("predictions")
@@ -244,7 +256,9 @@ def main(argv: list[str] | None = None) -> int:
             feat = feature_rows(daily, sites_cfg, bases)
             # v2(ensemble_v2) 이면 상류 피처 5열을 같은 조류 자료로 붙인다(v1 이면 그대로)
             feat = attach_model_features(feat, src.get("algae"))
-            run_id, n = upload_predictions(feat, sites_cfg, args.dry_run, algae=src.get("algae"))
+            run_id, n = upload_predictions(
+                feat, sites_cfg, args.dry_run, algae=src.get("algae"), forced=args.force_predict
+            )
             summary["steps"]["predict"] = {"run_id": run_id, "n": n}
         else:
             summary["steps"]["predict"] = "skipped (새 측정 없음)"

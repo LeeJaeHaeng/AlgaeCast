@@ -12,6 +12,9 @@ on:
       dry_run:
         description: "예측만 출력하고 Supabase 에 쓰지 않음"
         default: "false"
+      force_predict:
+        description: "새 측정이 없어도 지점별 최신 base_date 를 현재 동결 모델로 다시 예측(새 run). 모델 교체 직후 수동 실행용"
+        default: "false"
       frozen_tag:
         description: "동결 모델 Release 태그(비우면 아래 env 의 기본 태그). 새 태그 검증용 수동 실행에만 쓴다"
         default: ""
@@ -73,10 +76,12 @@ jobs:
           DASHBOARD_URL: https://algaecast-7.vercel.app
         run: |
           mkdir -p logs
+          EXTRA=""
+          if [ "${{ github.event.inputs.force_predict }}" = "true" ]; then EXTRA="--force-predict"; fi
           if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            python scripts/daily_run.py --dry-run 2>&1 | tee logs/daily_stdout.log
+            python scripts/daily_run.py --dry-run $EXTRA 2>&1 | tee logs/daily_stdout.log
           else
-            python scripts/daily_run.py 2>&1 | tee logs/daily_stdout.log
+            python scripts/daily_run.py $EXTRA 2>&1 | tee logs/daily_stdout.log
           fi
 
       - name: Commit live benchmark (if changed)
