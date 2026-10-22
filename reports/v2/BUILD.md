@@ -1,6 +1,8 @@
 # 운영 모델 v2 빌드 보고 — 최종 모델 C 운영 경로 이식 (2026-10-22)
 
-상태: **운영 코드·동등성 검증·dry-run 완료, 실제 동결 전**. `models/`·`submission/`·`dist/` 는 바꾸지 않았다
+> **갱신(2026-10-22 16:27 KST) — 동결 완료.** `scripts/freeze_v2.py --freeze` 결과를 커밋 `9dca86c` 로 동결했다(회귀 20261022_162747, model.pkl sha256 `d696f693…` = dry-run 과 동일, submission.csv `0c77ac8e…`). Release 는 사용자 지시 이름 `model-frozen-v2-9dca86c`(자산 `models-frozen-v2-9dca86c.tar.gz`)로 만들었다. 아래 6절의 `model-v2-<커밋7>` 표기는 이 이름으로 바뀌었다. `daily.yml` FROZEN_TAG 기본값은 같은 push 에서 교체했다. 동결 전 EXP-005 2차 P3(단기예보 격자)를 마지막으로 시도했으나 미통과여서 C 를 그대로 동결했다.
+
+상태(동결 전 기록): **운영 코드·동등성 검증·dry-run 완료, 실제 동결 전**. `models/`·`submission/`·`dist/` 는 바꾸지 않았다
 (dry-run 산출물은 `data/processed/exp/v2_dryrun/`, git 제외). 근거: 사전등록 확인 실험 EXP-confirm 채택
 (`reports/experiments/EXP-confirm/RESULT.md`), 계획 `reports/experiments/EXP-confirm/V2_PLAN.md`.
 

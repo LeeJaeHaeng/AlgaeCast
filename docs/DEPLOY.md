@@ -37,7 +37,7 @@ npx vercel --prod --yes --token "$VERCEL_TOKEN"
 
 ## 일일 자동화 (T8, `.github/workflows/daily.yml`)
 - 스케줄 cron `0 20 * * *`(UTC) = KST 05:00, `workflow_dispatch`(입력 dry_run). 물모아 스냅샷은 `mulmoa_snapshot.yml` 이 KST 06/09/18시에 별도 수행(단계 중복 없음).
-- 단계: Release `model-frozen-13ac483` 다운로드 → `scripts/verify_frozen.py`(sha256 불일치 시 중단) → `scripts/daily_run.py`
+- 단계: Release `model-frozen-v2-9dca86c`(2026-10-22 v2 동결 뒤; 그 전은 v1 `model-frozen-13ac483`, Release 유지) 다운로드 → `scripts/verify_frozen.py`(FROZEN.md·FROZEN_v2.md sha256 불일치 시 중단) → `scripts/daily_run.py`
   (공공 API 최근 120일 증분 수집 → S1 달력 → as-of 피처 → 동결 모델 예측 q50·CQR q10/q90·p_alert·tier → Supabase model_runs/predictions/shap/recommendations
   → 관측 증분 upsert → backfill_obs → live_benchmark.csv 에 pred_level·p_alert 결합 → `POST /api/revalidate`) → 로그 artifact(30일).
 - as-of base_date = 오늘 이전 가장 최근 조류 측정일(지점별). 이미 predictions 에 있는 base_date 면 예측을 건너뛰고 backfill·revalidate 만 수행.
@@ -55,13 +55,17 @@ npx vercel --prod --yes --token "$VERCEL_TOKEN"
   확인 방법: `workflow_dispatch` 로 dry_run=true 를 한 번 실행한 뒤 Actions 탭 → 해당 run → "..." → 알림 설정에서 수신 이메일 확인. 저장소 Watch 가 "Participating and @mentions" 이상이어야 한다.
 - Windows 작업 스케줄러 백업은 두지 않는다(PC 의존 불필요).
 
-## 제출 후 운영 모델 v2 전환 절차 (실행은 2026-11-07 이후 지시로)
+## 운영 모델 v2 동결(2026-10-22 완료)
+- 최종 모델 C 를 v2 로 동결했다: 커밋 `9dca86c`, `models/FROZEN_v2.md`, Release `model-frozen-v2-9dca86c`(자산 `models-frozen-v2-9dca86c.tar.gz` — registry.json·FROZEN.md·FROZEN_v2.md, v1 회귀·v2 회귀·v1 분류기·v1 분위). `daily.yml` FROZEN_TAG 기본값을 같은 push 에서 교체했다. 절차·검증은 `reports/v2/BUILD.md`.
+- 아래 절차는 제출 뒤 2026 자료까지 넣어 다시 학습하는 경우(v3)에 쓴다.
+
+## 제출 후 재학습(v3) 절차 (실행은 2026-11-07 이후 지시로)
 1. `git tag submission-2026-11-06` 로 제출 시점 고정, `models/FROZEN.md` 는 보존.
 2. 데이터 갱신: `make collect align features` (2026 전 측정 포함; test 격리 로직은 그대로 두되 2026 행을 train 으로 쓰려면 `features/run.py` 의 분할 연도를 `splits.train_max_year=2026` 로 올리고 2027 을 valid 로 둠).
 3. `make select` 재실행 여부 결정(피처 세트는 기본 유지), `python -m algaecast.models.tune --variant log_w --objective composite --trials 300` → `python -m algaecast.models.experiments` → `python -m algaecast.models.alert` (운영점·CQR 재산정, 조기 시즌 4~6월 가중치 실험 포함).
-4. `models/registry.json` current 갱신 → `models/FROZEN_v2.md` 작성 → tarball 을 Release `model-v2-<commit>` 에 첨부 → `daily.yml` 의 `FROZEN_TAG` 변경.
-5. `python scripts/verify_frozen.py` 가 v2 파일을 가리키도록 FROZEN.md 경로 인자화(또는 FROZEN_v2.md 로 교체) 후 workflow_dispatch 로 검증.
-6. 대시보드 소개·성능 페이지에 "v2(≤2026 학습)" 표기와 2025·2026 재평가 표 추가.
+4. `models/registry.json` current 갱신 → `models/FROZEN_v3.md` 작성 → tarball 을 Release `model-frozen-v3-<commit>` 에 첨부 → `daily.yml` 의 `FROZEN_TAG` 변경(동결 커밋과 같은 push).
+5. `scripts/verify_frozen.py` 에 FROZEN_v3.md 를 추가한 뒤 workflow_dispatch 로 검증.
+6. 대시보드 소개·성능 페이지에 "v3(≤2026 학습)" 표기와 2025·2026 재평가 표 추가.
 
 ### 첫 실행 기록 (2026-10-21, run 39530775993)
 - 전 단계 성공(모델 다운로드·sha256 검증 → 수집 → 예측 판단 → 관측 135행 upsert → backfill → revalidate 200). 최신 base_date(10/12~10/15)가 이미 predictions 에 있어 새 run 은 만들지 않음(설계대로 건너뜀).
