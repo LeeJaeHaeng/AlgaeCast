@@ -71,8 +71,9 @@ def predict_2026() -> pd.DataFrame:
 
 
 def leadtime_2026(
-    pred: pd.DataFrame, level: float = T10K, lookback_days: int = 28
+    pred: pd.DataFrame, level: float = T10K, lookback_days: int = 28, point: bool = False
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """point=True 면 점예측(pred_cell_count≥임계) 규칙을 더한다(v2 사후 비교용; 기본은 v1 표와 같음)."""
     ev = official_events(level, start_year=2026)
     meas = pd.read_parquet(DATA_DIR / "raw" / "nier_algae" / "nier_algae_2012_2026.parquet")
     meas["obs_date"] = pd.to_datetime(meas["obs_date"])
@@ -84,6 +85,8 @@ def leadtime_2026(
         "경보(p_alert≥운영점)": pred["alert_flag"].to_numpy().astype(bool),
         "q50≥임계": pred["q50"].to_numpy() >= level,
     }
+    if point:
+        rules["점예측≥임계"] = pred["pred_cell_count"].to_numpy() >= level
     rows, detail = [], []
     for name, al in rules.items():
         al_s = pd.Series(al, index=pred.index)
@@ -133,7 +136,7 @@ def leadtime_2026(
     return pd.DataFrame(rows), pd.DataFrame(detail)
 
 
-def transitions_2026(pred: pd.DataFrame, level: float) -> pd.DataFrame:
+def transitions_2026(pred: pd.DataFrame, level: float, point: bool = False) -> pd.DataFrame:
     t = pred[pred["target_cells"].notna()].copy()
     s0 = (np.clip(10 ** t["cell_log_t0"].fillna(0).to_numpy() - 1, 0, None) >= level).astype(int)
     s1 = (t["target_cells"].to_numpy() >= level).astype(int)
@@ -144,6 +147,8 @@ def transitions_2026(pred: pd.DataFrame, level: float) -> pd.DataFrame:
         "경보(p_alert≥운영점)": t["alert_flag"].to_numpy().astype(bool),
         "q50≥임계": t["q50"].to_numpy() >= level,
     }
+    if point:
+        rules["점예측≥임계"] = t["pred_cell_count"].to_numpy() >= level
     rows = []
     for name, al in rules.items():
         a = al.astype(int)
