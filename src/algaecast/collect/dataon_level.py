@@ -8,7 +8,8 @@
 - matrix: 2020 — '관측소 정보' 시트(일련번호·댐명·관측소명)
   + 관측소별 시트(일 × 월 행렬, 헤더에 WAMIS 수위관측소 코드).
 출력 long: station_code(WAMIS 수위코드), station_name, dam_name, obs_date, wl(m), source.
-저장: ``data/raw/dataon/dataon_level_daily_long.parquet`` (원 배포처 약관상 제3자 제공 금지 → git 제외).
+저장: ``data/raw/dataon/dataon_level_daily_long.parquet`` (원자료 비커밋 원칙 → git 제외).
+라이선스 CC BY-NC-SA(DataON 표기, DOI 10.20925/KSRD.74670854.v5) — 가공물도 같은 조건으로만 재배포.
 파일이 없으면 스키마만 두고 건너뛴다.
 """
 

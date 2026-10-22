@@ -1,7 +1,7 @@
 # 02. 데이터 명세서
 
 ## 1. 원칙
-- 대회 제공 데이터가 1차 소스. 외부 데이터는 **보강** 목적이며, 모두 공공누리 또는 "이용허락범위 제한 없음" 라이선스.
+- 대회 제공 데이터가 1차 소스. 외부 데이터는 **보강** 목적이다. 공공데이터포털 자료는 공공누리 제1유형 또는 "이용허락범위 제한 없음", DataON 수위 자료(HY-05·HY-05b)는 CC BY-NC-SA(저작자표시-비영리-동일조건변경허락)다. DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포한다. 출처별 확인 결과는 `data/raw/MANIFEST.md` '라이선스 확인' 절(2026-10-22).
 - 모든 외부 수집은 `data/raw/MANIFEST.md`에 (데이터명, 기관, URL/ API 엔드포인트, 수집 일시, 기간, 라이선스, 파일 해시) 기록.
 - 수집기는 `src/algaecast/collect/<source>.py`, 함수 시그니처 `fetch(site_code: str, start: date, end: date) -> pd.DataFrame`.
 - 공통 출력 컬럼 규약: `site_code, obs_date(date), <variable columns>, source, fetched_at`.

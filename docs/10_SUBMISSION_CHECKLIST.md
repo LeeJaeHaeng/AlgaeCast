@@ -13,7 +13,7 @@
 - [ ] 코드 내 실측치 룩업·하드코딩 없음 (grep "sample_submission" 이외 정답 파일 참조 없음)
 - [ ] 깨끗한 venv에서 `make reproduce` → `submission.csv` diff 0
 - [ ] 시드 고정, requirements 버전 고정, Python 버전 명시
-- [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재, 공공누리/이용제한 없음만 사용
+- [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재(공공데이터포털 자료는 공공누리/이용허락범위 제한 없음, DataON 수위 자료는 CC BY-NC-SA — 패키지의 DataON 유래 파일에 LICENSE_DataON.txt)
 - [ ] 대회 제공 데이터는 저장소에 커밋하지 않음(규정: 대회 후 폐기, 제3자 제공 금지)
 
 ## C. 우수성 증빙 (방법 설명서에 포함)

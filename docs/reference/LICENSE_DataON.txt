@@ -1,0 +1,28 @@
+DataON 유래 데이터 라이선스 안내 — AlgaeCast-7 제출 패키지
+=====================================================
+
+원 자료
+- 자료명: 댐유역 하천 일평균수위 (국가참조표준)
+- 생산자: 한국수자원공사 오재우·이영창·이재용
+- 발행: 국가참조표준센터 / DataON(KISTI) 등재
+- DOI: 10.20925/KSRD.74670854.v5  (https://doi.org/10.20925/KSRD.74670854.v5), 제·개정 2025-12-16
+- 라이선스: CC BY-NC-SA (저작자표시-비영리-동일조건변경허락)
+  DataON 상세 페이지 표기 "BY-NC-SA :저작자표시-비영리-동일조건변경허락" (버전 번호는 표기되지 않음)
+
+이 패키지에서 위 자료를 담거나 가공한 파일
+- data/raw/dataon/level_continuous_long.parquet
+    DataON 일평균수위(2010~2024) 원값에 WAMIS 일수위(2025~, 기준면 오프셋 보정)를 이은 연속 시계열
+- src/config/level_cont_stats.json
+    위 연속 시계열의 관측소별 집계 통계
+- 노트북 실행으로 생기는 data/interim/daily_*_S1.parquet, data/processed/features_*.parquet 의 level_cont_* 열
+
+이용 조건
+- DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다.
+  저작자·출처(위 DOI)를 표시하고, 비영리 목적으로만 이용하며, 변경·가공한 결과물도 같은 조건(CC BY-NC-SA)으로 배포한다.
+- 이 패키지의 다른 자료(공공데이터포털 자료 등)의 이용 조건은 data/raw/MANIFEST.md 의 '라이선스 확인' 절을 따른다.
+
+License notice (English)
+- Source: 댐유역 하천 일평균수위 (National Reference Standard Data), producer K-water (오재우·이영창·이재용),
+  publisher 국가참조표준센터, registered in DataON (KISTI), DOI 10.20925/KSRD.74670854.v5, revised 2025-12-16.
+- License: CC BY-NC-SA (Attribution-NonCommercial-ShareAlike). DataON-derived data in this package and any
+  adaptations of it may be redistributed only under CC BY-NC-SA, with attribution to the source above.
