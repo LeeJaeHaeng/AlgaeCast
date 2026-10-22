@@ -1,0 +1,32 @@
+# config/sites.yaml 추가안(EXP-007): 각 site 항목에 wq_station(대표)·wq_station_candidates(후보, 거리 km)
+# 거리는 sites.yaml 근사 좌표 ↔ 수질 DB API 측정소 좌표(도분초→십진) haversine. relation 은 하천 흐름 기준.
+wq_station_source: 국립환경과학원 수질 DB getWaterMeasuringList (2026-10-21)
+sites:
+  HP:
+    wq_station: { pt_no: "2011A10", name: "강정", addr: "경상북도 구미시 고아읍 봉한리 숭선교", lat: 36.195, lon: 128.365278, distance_km: 3.46 }
+    wq_station_candidates:
+      - { pt_no: "2011A10", name: "강정", relation: primary, distance_km: 3.46, dates_per_year: 32.8 }
+      - { pt_no: "2009A30", name: "선산", relation: upstream, distance_km: 8.64, dates_per_year: 51.4 }
+      - { pt_no: "2011A20", name: "구미", relation: downstream, distance_km: 11.07, dates_per_year: 38.4 }
+  GJGR:
+    wq_station: { pt_no: "2011A55", name: "다사", addr: "대구광역시 달성군 다사읍 죽곡리 강정고령보상류500m", lat: 35.842778, lon: 128.456944, distance_km: 0.36 }
+    wq_station_candidates:
+      - { pt_no: "2011A55", name: "다사", relation: primary, distance_km: 0.36, dates_per_year: 51.5 }
+      - { pt_no: "2011A60", name: "달성", relation: same_reach, distance_km: 0.83, dates_per_year: 48.1 }
+      - { pt_no: "2011A40", name: "성주", relation: upstream, distance_km: 7.2, dates_per_year: 48.1 }
+  CS:
+    wq_station: { pt_no: "2020A10", name: "남지", addr: "경상남도 함안군 칠서면 계내리 남지교", lat: 35.380833, lon: 128.473611, distance_km: 1.34 }
+    wq_station_candidates:
+      - { pt_no: "2020A10", name: "남지", relation: primary, distance_km: 1.34, dates_per_year: 48.3 }
+      - { pt_no: "2020A32", name: "함안", relation: downstream, distance_km: 6.36, dates_per_year: 51.4 }
+  MGMR:
+    wq_station: { pt_no: "2022A10", name: "물금", addr: "경상남도 양산시 물금읍 물금리 물금 취수장 취수탑", lat: 35.315278, lon: 128.972222, distance_km: 1.72 }
+    wq_station_candidates:
+      - { pt_no: "2022A10", name: "물금", relation: primary, distance_km: 1.72, dates_per_year: 48.2 }
+      - { pt_no: "2020A60", name: "삼랑진2", relation: upstream, distance_km: 17.18, dates_per_year: 48.2 }
+  DCHN:
+    wq_station: { pt_no: "3008B30", name: "대청댐5(대청호)", addr: "충청북도 보은군 회남면 어성리 회남교", lat: 36.433056, lon: 127.5525, distance_km: 5.62 }
+    wq_station_candidates:
+      - { pt_no: "3008B30", name: "대청댐5(대청호)", relation: primary, distance_km: 5.62, dates_per_year: 12.1 }
+      - { pt_no: "3008B20", name: "대청댐6", relation: downstream, distance_km: 4.06, dates_per_year: 12.0 }
+      - { pt_no: "3008B10", name: "대청댐4", relation: upstream, distance_km: 4.46, dates_per_year: 11.9 }
