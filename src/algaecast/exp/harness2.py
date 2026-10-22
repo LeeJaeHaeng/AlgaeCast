@@ -46,8 +46,10 @@ Builder = Callable[[pd.DataFrame, int], dict[str, np.ndarray]]
 def scope_masks(df: pd.DataFrame) -> dict[str, np.ndarray]:
     """CV(기준일 2020~2024)·2025(기준일 2025) 전체·목표일 1~8월·목표일 9~10월."""
     cv, fin = H.masks(df)
-    tm = pd.to_datetime(df["target_date"]).dt.month.to_numpy()
-    return {"cv": cv, "y25": fin, "y25a": fin & (tm <= 8), "y25b": fin & np.isin(tm, (9, 10))}
+    td = pd.to_datetime(df["target_date"])
+    tm, in25 = td.dt.month.to_numpy(), (td.dt.year == 2025).to_numpy()
+    # 1~8월·9~10월은 목표일이 2025 년인 행만(기준일 2025-12 → 목표일 2026-01 인 행은 '2025 전체'에만 포함)
+    return {"cv": cv, "y25": fin, "y25a": fin & in25 & (tm <= 8), "y25b": fin & in25 & np.isin(tm, (9, 10))}
 
 
 def v1_q90() -> np.ndarray:
@@ -128,11 +130,15 @@ def run_cached(df: pd.DataFrame, name: str, seed: int, build: Builder) -> dict[s
             and (o["base_date"].astype(str).to_numpy() == df["base_date"].astype(str).to_numpy()).all()
         )
         if same:
-            return {
+            got = {
                 k: o[k].to_numpy(dtype=float)
                 for k in o.columns
                 if k not in ("station_id", "base_date", "target_date", "target_cells", "year")
             }
+            # 분위를 바꾸지 않는 구성은 q90 을 NaN 으로 저장했다 → None(= v1 동결 q90 사용)으로 되돌린다
+            if "q90" in got and not np.isfinite(got["q90"]).any():
+                got["q90"] = None
+            return got
     out = build(df, seed)
     save = {
         k: (np.full(len(df), np.nan) if v is None else np.asarray(v, dtype=float)) for k, v in out.items()
