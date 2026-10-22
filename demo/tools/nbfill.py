@@ -10,8 +10,10 @@
    - 채우는 범위는 알림 자체(그림자 포함)만: y956~, x1583~ — 바로 위 글자(제목 '비교' 등)는 건드리지 않는다.
 3) 빨리감기 배지(▶▶, Malgun Gothic 에 있는 글리프), 90% 축소 + 하단 108px 자막 띠, 정확히 round(target*30) 프레임.
 사용: python nbfill.py <src.webm> <start> <dur> <target_sec> <out.mp4> <fast:0|1>
+환경변수 NBFILL_NOPOPUP=1 이면 2)를 건너뛴다(2026-10-22 v2 재녹화는 JupyterLab 뉴스 알림을 설정으로 꺼서 알림 창이 없다).
 """
 
+import os
 import subprocess
 import sys
 
@@ -26,6 +28,7 @@ src, start, dur, target, out, fast = (
     sys.argv[6] == "1",
 )
 W, H = 1920, 1080
+NOPOPUP = os.environ.get("NBFILL_NOPOPUP") == "1"
 N = int(round(target * 30))
 FONTB = "C\\:/Windows/Fonts/malgunbd.ttf"
 FRAME = "scale=1728:972:flags=lanczos,pad=1920:1080:96:0:black"
@@ -203,7 +206,7 @@ for k, a in enumerate(decode()):
     if k in replace and last is not None:
         a = last
     else:
-        a = fill(a)
+        a = a if NOPOPUP else fill(a)
         last = a
     enc.stdin.write(a.tobytes())
     written += 1
