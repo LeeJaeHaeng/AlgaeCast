@@ -82,6 +82,69 @@ def record_failed(exc: BaseException, dry: bool) -> None:
         log.error("failed 기록 실패: %s", e2)
 
 
+PRED_KEY = ("site_id", "base_date", "target_date")
+
+
+def carry_rows(prev_rows: list[dict], new_keys: set[tuple[str, str, str]], run_id: str) -> list[dict]:
+    """직전 run 의 예측 중 이번 run 에 없는 (지점, 기준일, 목표일) 행을 새 run_id 로 복사(id 제외).
+
+    대시보드는 최신 run 의 예측만 읽으므로(v_site_status·지점 상세 차트), 새 run 이 최신 as-of 몇 행만 가지면
+    지난 예측(2025 홀드아웃·2026 조합)이 화면에서 사라진다. 같은 회귀 버전일 때만 이어 붙인다(모델 섞임 방지).
+    """
+    out = []
+    for r in prev_rows:
+        key = tuple(str(r[k])[:10] for k in PRED_KEY)
+        if key in new_keys:
+            continue
+        out.append({k: v for k, v in r.items() if k != "id"} | {"run_id": run_id})
+    return out
+
+
+def previous_run(sb: Any) -> dict | None:
+    data = (
+        sb.table("model_runs")
+        .select("run_id,model_version")
+        .eq("status", "success")
+        .order("run_at", desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
+    return data[0] if data else None
+
+
+def carry_forward(sb: Any, prev: dict | None, run_id: str, new_rows: pd.DataFrame, version: str) -> int:
+    """prev run 이 같은 회귀 버전이면 그 이력 예측을 새 run 으로 복사한다. 복사한 행 수를 돌려준다."""
+    from algaecast.db.upload import upsert
+
+    if not prev or prev.get("model_version") != version:
+        log.info(
+            "이력 이어 붙이기 생략: 직전 run 버전 %s ≠ 현재 %s", prev and prev.get("model_version"), version
+        )
+        return 0
+    rows, start = [], 0
+    while True:
+        chunk = (
+            sb.table("predictions")
+            .select("*")
+            .eq("run_id", prev["run_id"])
+            .range(start, start + 999)
+            .execute()
+            .data
+        )
+        rows += chunk
+        if len(chunk) < 1000:
+            break
+        start += 1000
+    new_keys = {
+        (str(s), str(b)[:10], str(t)[:10])
+        for s, b, t in zip(new_rows["site_id"], new_rows["base_date"], new_rows["target_date"], strict=True)
+    }
+    carried = carry_rows(rows, new_keys, run_id)
+    upsert(sb, "predictions", carried, "run_id,site_id,base_date,target_date", False)
+    return len(carried)
+
+
 def upload_predictions(
     feat: pd.DataFrame,
     cfg_sites: dict,
@@ -124,6 +187,7 @@ def upload_predictions(
         )
         return "dry-run", len(feat)
     sb = _sb()
+    prev = previous_run(sb)
     run_id = sb.table("model_runs").insert(run).execute().data[0]["run_id"]
     rows = pd.DataFrame(
         {
@@ -140,6 +204,8 @@ def upload_predictions(
     rows["p_over_10k"] = None
     rows["obs_cell_count"] = None
     n = upsert(sb, "predictions", _clean(rows), "run_id,site_id,base_date,target_date", False)
+    n_carry = carry_forward(sb, prev, run_id, rows, run["model_version"])
+    log.info("예측 %d행 + 이력 이어 붙임 %d행(직전 run %s)", n, n_carry, prev and prev.get("run_id"))
     shap_rows, reco_rows = shap_and_reco_rows(run_id, cfg_sites, feat, algae=algae)
     upsert(sb, "shap_contributions", shap_rows, None, False)
     upsert(sb, "recommendations", reco_rows, None, False)
