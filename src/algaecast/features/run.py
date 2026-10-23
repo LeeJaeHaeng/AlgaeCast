@@ -25,6 +25,7 @@ from scipy import stats
 
 from algaecast.collect import competition as comp
 from algaecast.config import CONFIG_DIR, DATA_DIR, REPORTS_DIR
+from algaecast.features import offset as OFF
 from algaecast.features.ar import make_ar_features
 from algaecast.features.forecast import make_forecast_features
 from algaecast.features.hydro import make_hydro_features
@@ -89,8 +90,10 @@ def build_samples(daily: pd.DataFrame, site: dict, cfg: dict) -> pd.DataFrame:
         tgt = match_target(base, obs_dates, h, tol)
         y = float(cells.get(tgt, np.nan)) if tgt is not None else np.nan
         feats: dict = {}
-        for fn in GROUPS.values():
-            feats.update(fn(daily, base.date(), site["site_code"]))
+        # 자료 피처의 as_of = 기준일 − as_of_offset_days(기본 0, S 모델 1). 달력·지점 피처는 기준일 그대로.
+        as_of = OFF.data_as_of(base.date())
+        for name, fn in GROUPS.items():
+            feats.update(fn(daily, base.date() if name == "time_site" else as_of, site["site_code"]))
         feats.update(
             {
                 "station_id": sid,
@@ -255,10 +258,11 @@ def apply_level_cont_derived(feats: pd.DataFrame, strategy: str) -> pd.DataFrame
 
 def export_level_cont(strategy: str = "S1") -> Path:
     """원자료로 만든 features_<S>.parquet 에서 수위 피처 2열만 내보낸다(DataON 가공물, CC BY-NC-SA)."""
+    OFF.require_zero("가공 수위 피처 내보내기")
     if level_cont_mode(strategy) != "raw":
         raise SystemExit("중단: DataON 원자료가 없어 원자료 기준 수위 피처를 내보낼 수 없다.")
     f = pd.read_parquet(
-        PROCESSED / f"features_{strategy}.parquet", columns=["station_id", "base_date", *LEVEL_FEATURES]
+        OFF.features_file(strategy, PROCESSED), columns=["station_id", "base_date", *LEVEL_FEATURES]
     )
     f["station_id"] = f["station_id"].astype(str)
     f["base_date"] = pd.to_datetime(f["base_date"]).dt.strftime("%Y-%m-%d")
@@ -304,10 +308,11 @@ def hydro_feature_names(strategy: str = "S1") -> list[str]:
 
 def export_wamis_hydro(strategy: str = "S1") -> Path:
     """원자료로 만든 features_<S>.parquet 에서 수문 피처 열만 내보낸다(WAMIS·K-water 가공물)."""
+    OFF.require_zero("가공 수문 피처 내보내기")
     if wamis_mode(strategy) != "raw":
         raise SystemExit("중단: WAMIS 원자료가 없어 원자료 기준 수문 피처를 내보낼 수 없다.")
     cols = hydro_feature_names(strategy)
-    f = pd.read_parquet(PROCESSED / f"features_{strategy}.parquet")
+    f = pd.read_parquet(OFF.features_file(strategy, PROCESSED))
     f = f[["station_id", "base_date", *[c for c in cols if c in f.columns]]].copy()
     f["station_id"] = f["station_id"].astype(str)
     f["base_date"] = pd.to_datetime(f["base_date"]).dt.strftime("%Y-%m-%d")
@@ -398,6 +403,8 @@ def main(argv: list[str] | None = None) -> int:
             )
         feats = pd.concat(frames, ignore_index=True)
         mode = level_cont_mode(s)
+        if mode == "derived" or wamis_mode(s) == "derived":
+            OFF.require_zero("가공 피처 파일 모드(원자료 없는 패키지)")
         if mode == "derived":
             feats = apply_level_cont_derived(feats, s)
         elif mode == "missing":
@@ -408,20 +415,24 @@ def main(argv: list[str] | None = None) -> int:
         elif wmode == "missing":
             log.warning("%s: WAMIS 원자료·가공 수문 피처 파일이 모두 없어 수문 피처가 원자료 없이 계산됨", s)
         feats = assign_split(feats, cfg, submission)
-        feats = quarantine_test_targets(feats)
+        sfx = OFF.file_suffix()  # as_of 오프셋 ≠ 0(S 모델)이면 피처·격리·분할 키를 따로 둔다
+        tt_path = TEST_TARGETS_PATH
+        if sfx:
+            tt_path = TEST_TARGETS_PATH.with_name(f"test_targets{sfx}_DO_NOT_USE.parquet")
+        feats = quarantine_test_targets(feats, tt_path)
         feature_cols = [c for c in feats.columns if c not in META_COLS] + ["horizon_days"]
         feature_cols = list(dict.fromkeys(feature_cols))
         for c in CAT_COLS:
             if c in feats:
                 feats[c] = feats[c].astype("category")
-        out = PROCESSED / f"features_{s}.parquet"
+        out = OFF.features_file(s, PROCESSED)
         feats.to_parquet(out, index=False)
         n_test_found = int((feats["split"] == "test").sum())
         if n_test_found != len(submission):
             log.warning(
                 "%s: sample_submission %d 조합 중 %d 만 샘플에 존재", s, len(submission), n_test_found
             )
-        splits[s] = {
+        splits[f"{s}{sfx}"] = {
             sp: [
                 [r.station_id, str(r.base_date), str(r.target_date)]
                 for r in feats[feats["split"] == sp].itertuples()
@@ -429,7 +440,7 @@ def main(argv: list[str] | None = None) -> int:
             for sp in ("train", "valid", "test")
         }
         cat = catalog(feats, feature_cols)
-        if s == "S1":
+        if s == "S1" and not sfx:
             rep = REPORTS_DIR / "features" / "feature_catalog.md"
             rep.parent.mkdir(parents=True, exist_ok=True)
             by_year = (

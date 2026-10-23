@@ -372,7 +372,7 @@ def predictions_rows(
     f_rows["pred_alert_level"] = f_rows["pred_alert_level"].astype(int)
     rows += _clean(f_rows)
     # (2) 2026 test 조합 + (3) 최신 as-of (각 지점 마지막 base_date) — 레지스트리 모델
-    feat = pd.read_parquet(D.PROCESSED / "features_S1.parquet")
+    feat = pd.read_parquet(D._features_path("S1"))
     feat["base_date"] = pd.to_datetime(feat["base_date"])
     feat["target_date"] = pd.to_datetime(feat["target_date"])
     test = feat[feat["split"] == "test"]

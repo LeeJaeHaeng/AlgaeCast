@@ -24,6 +24,7 @@ from algaecast.config import DATA_DIR, MODELS_DIR, ROOT
 from algaecast.eval import posthoc as PH
 from algaecast.eval.metrics import compute_all
 from algaecast.eval.transitions import T1K, T10K, official_events
+from algaecast.models import data as D
 from algaecast.models import registry as R
 
 EVAL = ROOT / "reports" / "eval"
@@ -152,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit("중단: current 회귀가 v2.1(ensemble_v2)이 아니다 — 동결 뒤 실행.")
     commit = frozen_commit()
     v21 = PH.predict_2026()
-    feat = pd.read_parquet(DATA_DIR / "processed" / "features_S1.parquet")
+    feat = pd.read_parquet(D._features_path("S1"))
     feat["base_date"] = pd.to_datetime(feat["base_date"])
     f26 = feat[feat["base_date"].dt.year == 2026].reset_index(drop=True)
     if not f26["station_id"].astype(str).equals(v21["station_id"]) or not f26["base_date"].equals(

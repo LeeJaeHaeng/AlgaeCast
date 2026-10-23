@@ -288,7 +288,7 @@ def validate_against_bundle(days: int = 400, n_base: int = 30, cols: list[str] |
     from algaecast.models import data as D
     from algaecast.models.train import feature_sets
 
-    feat = pd.read_parquet(D.PROCESSED / "features_S1.parquet")
+    feat = pd.read_parquet(D._features_path("S1"))
     feat["base_date"] = pd.to_datetime(feat["base_date"])
     cols = cols or feature_sets()["perc75"]
     recent = feat.sort_values("base_date").groupby("station_id", observed=True).tail(n_base // 5 + 1)

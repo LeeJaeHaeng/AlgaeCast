@@ -28,7 +28,16 @@ FORBIDDEN_SPLITS = ("test",)
 
 
 def _features_path(strategy: str) -> Path:
-    return PROCESSED / f"features_{strategy}.parquet"
+    """features_<전략>.parquet — as_of 오프셋(S 모델)이 0 이 아니면 이름에 오프셋이 붙는다."""
+    from algaecast.features.offset import features_file
+
+    return features_file(strategy, PROCESSED)
+
+
+def _split_key(strategy: str) -> str:
+    from algaecast.features.offset import file_suffix
+
+    return f"{strategy}{file_suffix()}"
 
 
 def _read(strategy: str) -> pd.DataFrame:
@@ -45,7 +54,7 @@ def load_splits() -> dict:
 def load_train_valid(strategy: str = "S1", *, drop_missing_target: bool = True) -> pd.DataFrame:
     """train(≤2024)·valid(2025) 샘플만. test 행은 어떤 경우에도 포함하지 않는다."""
     df = _read(strategy)
-    sp = load_splits().get(strategy, {})
+    sp = load_splits().get(_split_key(strategy), {})
     keys = {(s, b) for part in ("train", "valid") for s, b, _ in sp.get(part, [])}
     key = list(zip(df["station_id"], df["base_date"].astype(str), strict=True))
     out = df[[k in keys for k in key] if keys else df["split"].isin(["train", "valid"])].copy()

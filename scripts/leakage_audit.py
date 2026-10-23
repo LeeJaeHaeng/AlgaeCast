@@ -100,7 +100,9 @@ def main(argv: list[str] | None = None) -> int:
         s["station_id"]: s
         for s in yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))["sites"]
     }
-    feats = pd.read_parquet(PROCESSED / f"features_{args.strategy}.parquet")
+    from algaecast.features.offset import features_file
+
+    feats = pd.read_parquet(features_file(args.strategy, PROCESSED))
     feats["base_date"] = pd.to_datetime(feats["base_date"]).dt.date
     feats["target_date"] = pd.to_datetime(feats["target_date"]).dt.date
     lines = [f"# 누수 감사 — 전략 {args.strategy} ({date.today()})", ""]

@@ -53,7 +53,7 @@ def _md(t: pd.DataFrame, nd: int = 3) -> str:
 
 
 def predict_2026() -> pd.DataFrame:
-    feat = pd.read_parquet(D.PROCESSED / "features_S1.parquet")
+    feat = pd.read_parquet(D._features_path("S1"))
     feat["base_date"] = pd.to_datetime(feat["base_date"])
     feat["target_date"] = pd.to_datetime(feat["target_date"])
     f26 = feat[feat["base_date"].dt.year == 2026].reset_index(drop=True)

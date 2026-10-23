@@ -344,7 +344,7 @@ def main(argv: list[str] | None = None) -> int:
     reg = json_load_registry()
     c1 = reg["members"]["회귀 C1(smearing)"] if reg.get("kind") == "ensemble" else reg
     model, cats = c1["model"], c1["cats"]
-    feat = pd.read_parquet(D.PROCESSED / "features_S1.parquet")
+    feat = pd.read_parquet(D._features_path("S1"))
     feat["base_date"] = pd.to_datetime(feat["base_date"])
     fv = feat[feat["split"] == "valid"].reset_index(drop=True)
     X = fv[cols].copy()

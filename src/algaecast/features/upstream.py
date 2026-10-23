@@ -28,6 +28,7 @@ import pandas as pd
 
 from algaecast.config import RAW_DIR
 from algaecast.features.base import cut_as_of, slope
+from algaecast.features.offset import data_as_of
 
 ALGAE_PARQUET: Path = RAW_DIR / "nier_algae" / "nier_algae_2012_2026.parquet"
 
@@ -122,6 +123,7 @@ def build_upstream(df: pd.DataFrame, algae: pd.DataFrame | None = None) -> pd.Da
     """표본 프레임(station_id·base_date·cell_log_t0) 각 행의 상류 피처 5열(같은 인덱스).
 
     행마다 그 행의 base_date 를 as_of 로 make_upstream_features 를 부른다(원자료는 기준일까지만 사용).
+    as_of_offset_days(features.offset, S 모델) 가 0 이 아니면 as_of = base_date − 오프셋.
     algae 가 None 이면 data/raw/nier_algae parquet 을 읽는다.
     일일 as-of 에서는 수집한 5지점 조류 자료를 넘긴다.
     """
@@ -138,5 +140,5 @@ def build_upstream(df: pd.DataFrame, algae: pd.DataFrame | None = None) -> pd.Da
     ):
         up = UPSTREAM_OF.get(sid)
         sub = by_up.get(up, empty) if up is not None else empty
-        recs.append(make_upstream_features(sub, bd, sid, oc))
+        recs.append(make_upstream_features(sub, data_as_of(bd), sid, oc))
     return pd.DataFrame(recs, index=df.index, columns=UPSTREAM_COLS).astype(float)
