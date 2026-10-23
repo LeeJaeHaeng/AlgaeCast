@@ -33,6 +33,7 @@ ALLOWED = {
     "data/processed/test_targets_DO_NOT_USE.parquet",
     "data/processed/posthoc_2026.parquet",
     "data/processed/posthoc_2026_v2.parquet",
+    "data/processed/posthoc_2026_v21.parquet",  # v2.1 동결 뒤 1회 사후 계산(eval.posthoc_v21)
 }
 TABLE_SUFFIX = (".parquet", ".csv", ".json")
 

@@ -4,7 +4,7 @@
 패키지 루트(공지 #564): README.md, data/, model/, src/, notebooks/, scripts/, demo/, figures/
   + 루트 파일: submission.csv(제출본), 방법설명서.pdf, requirements.txt(pip freeze), pyproject.toml(설치용)
 - data/   : 대회 번들 + 외부 수집 원천 parquet + MANIFEST.md (git 미포함, 패키지 전용)
-- model/  : 동결 모델(registry current + FROZEN.md·FROZEN_v2.md 표에 적힌 버전) + registry.json + 동결 문서(sha256)
+- model/  : 동결 모델(registry current + FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md 표에 적힌 버전) + registry.json + 동결 문서(sha256)
 - src/    : 파이썬 패키지 algaecast(재현에 필요한 코드만) + src/config/(설정) + src/docs/(설계 문서)
 - scripts/: verify_frozen.py, leakage_audit.py, verify_package.py
 - demo/   : 저장소 루트 demo/ 에서 복사(AlgaeCast_demo.mp4·.srt·script.md·README_DEMO.md·captures/). raw/·tools/·.gitignore·*.webm 제외.
@@ -48,7 +48,7 @@ LEVEL_FEATURE_FILE = "level_cont_features_S1.parquet"
 # wamis_dam/ 는 통째로, hydro_daily_long 은 WAMIS 출처 행만 뺀 사본을 넣고 가공 수문 피처 파일로 재현한다.
 WAMIS_SOURCES = ("wamis_mn_dtdata", "wamis_wl_dtdata")
 WAMIS_FEATURE_FILE = "wamis_hydro_features_S1.parquet"
-DEMO_SHA_PREFIX = "0a1fb2f4"  # 2026-10-23 v4(예상값 하나로 통일한 화면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a → dist/backup_demo_2026102*
+DEMO_SHA_PREFIX = "87b6d928"  # 2026-10-23 v5(제출 모델 v2.1 — 1부·2부 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4 → dist/backup_demo_2026102*
 # DataON 유래 파일이 있는(또는 노트북 실행으로 생기는) 폴더 — LICENSE_DataON.txt 를 붙인다
 DATAON_DIRS = ("data/raw/dataon", "data/interim", "data/processed", "src/config")
 DEMO_FILES = ["AlgaeCast_demo.mp4", "AlgaeCast_demo.srt", "script.md", "README_DEMO.md"]
@@ -66,9 +66,15 @@ CONFIG_FILES = [
     "seed.yaml",
     "dam_codes.json",
     "level_cont_stats.json",
+    "derived_constants.json",  # 데이터 유래 상수(연도별 수온 임계·선택 결정) — 계산 자료 메타데이터 포함
 ]
 SRC_SKIP = {"db", "predict"}  # 대시보드 업로드·일일 운영 코드는 재현에 불필요
-SRC_SKIP_FILES = {"live.py", "posthoc.py"}  # test 타깃 로더·사후 검증(전용) — 패키지에서 제외
+SRC_SKIP_FILES = {
+    "live.py",
+    "posthoc.py",
+    "posthoc_v2.py",
+    "posthoc_v21.py",
+}  # test 타깃 로더·사후 검증(전용) — 패키지에서 제외
 SCRIPTS = ["verify_frozen.py", "leakage_audit.py", "verify_package.py"]
 SECRET_PATTERNS = [
     r"serviceKey" "=",
@@ -275,7 +281,7 @@ def checklist(out: Path, verify: dict | None) -> str:
 
 
 def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: str) -> str:
-    """제출 패키지 README. frozen = 동결 커밋 앞 7자 {"v1": FROZEN.md, "v2": FROZEN_v2.md}."""
+    """제출 패키지 README. frozen = 동결 커밋 앞 7자 {"v1": FROZEN.md, "v2": FROZEN_v2.md, "v2.1": FROZEN_v2.1.md}."""
     return f"""# AlgaeCast-7 — 수질·수문·기상 융합 기반 댐·하천 유해남조류 7일 예측 (제출 패키지)
 
 2026 DATA·AI 분석 경진대회(KISTI) 문제해결 부문 · 참가자 이재행 · 생성일 {date.today()}
@@ -284,23 +290,23 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 | 위치 | 내용 | 크기 |
 |---|---|---|
 | `README.md` | 이 문서(구성·데이터·모델·실행환경·설치·실행·AI 활용·제출 전 확인사항) | |
-| `submission.csv` | 제출본 = 제출·운영 모델 v2 예측(124행, `station_id,base_date,target_date,pred_cells`, UTF-8 BOM, 예시와 같은 행 순서). v1 제출본은 저장소 태그 `v1-submission` 에 보존 | |
+| `submission.csv` | 제출본 = 제출·운영 모델 v2.1 예측(124행, `station_id,base_date,target_date,pred_cells`, UTF-8 BOM, 예시와 같은 행 순서). 수정 전 제출본은 저장소에 보존(v1 태그 `v1-submission`, v2 동결 커밋 `{frozen['v2']}`) | |
 | `방법설명서.pdf` | 방법 설명서(배경·데이터·통계분석·피처·모델·평가·설명가능성·시스템·재현·한계, 10장) | {sizes.get('pdf', '-')} |
 | `requirements.txt` · `pyproject.toml` | 라이브러리 정확한 버전(pip freeze) · 패키지 설치 정보 | |
-| `data/` | 대회 번들(`data/raw/competition/`, 심사용 — 공개 시 제외·대회 종료 후 폐기, `README_심사용_공개시제외.txt`) + 외부 공공 데이터 스냅샷(parquet) + DataON 가공 수위 피처(`data/processed/level_cont_features_S1.parquet`; DataON 원값은 미포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
-| `model/` | 동결 모델: 회귀 v2(제출·운영)·회귀 v1(블라인드 검증, 보존)·경보 분류기·분위 회귀(분류기·분위는 v1·v2 공통) + `registry.json`(current = v2) + `FROZEN_v2.md`(v2 sha256, 동결 커밋 `{frozen['v2']}`) · `FROZEN.md`(v1 sha256, 동결 커밋 `{frozen['v1']}`) | {sizes.get('model', '-')} |
-| `src/` | 파이썬 패키지 `algaecast`(정렬·피처·모델·평가, 재현에 필요한 코드만) + `src/config/`(지점·피처·모델·시드 설정, `seed.yaml`=42) + `src/docs/`(설계 문서) | {sizes.get('src', '-')} |
-| `notebooks/01_train_eval.ipynb` | 동결 모델 검증(v1·v2) → 데이터 로드·전처리 → 피처(+ v2 상류 피처) → 학습(동결 파라미터, v1·v2) → 2025 검증 지표(v1·v2 나란히) → `submission.csv`(v2) 생성 → 그림. 실행 결과(출력) 포함 | |
-| `scripts/` | `verify_frozen.py`(동결 모델 해시 검증), `leakage_audit.py`(누수 감사), `verify_package.py`(새 venv 재현 검증), `security_scan.txt` | |
+| `data/` | 대회 번들(`data/raw/competition/`, 심사용 — 공개 시 제외·대회 종료 후 폐기, `README_심사용_공개시제외.txt`) + 외부 공공 데이터 스냅샷(parquet; WAMIS 원값 제외 — `data/raw/hydro/hydro_daily_long.parquet` 는 WAMIS 출처 행을 뺀 사본) + DataON 가공 수위 피처(`data/processed/level_cont_features_S1.parquet`; DataON 원값은 미포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`) + WAMIS 가공 수문 피처(`data/processed/wamis_hydro_features_S1.parquet`, 33열; WAMIS 원값은 미포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
+| `model/` | 동결 모델: **v2.1**(제출·운영, 데이터 유래 상수 누수 수정판 — 회귀·경보 분류기·분위 회귀) + `registry.json`(current = v2.1) + `FROZEN_v2.1.md`(v2.1 sha256, 동결 커밋 `{frozen['v2.1']}`). 이력(수정 전): v1 회귀·분류기·분위(`FROZEN.md`, 동결 커밋 `{frozen['v1']}`), v2 회귀(`FROZEN_v2.md`, 동결 커밋 `{frozen['v2']}`), v1-fix 회귀(v1 구성 + 수정 피처, 민감도용, `FROZEN_v2.1.md` 표) | {sizes.get('model', '-')} |
+| `src/` | 파이썬 패키지 `algaecast`(정렬·피처·모델·평가, 재현에 필요한 코드만) + `src/config/`(지점·피처·모델·시드 설정, `seed.yaml`=42, `derived_constants.json` — 데이터 유래 상수와 계산 자료 메타데이터) + `src/docs/`(설계 문서) | {sizes.get('src', '-')} |
+| `notebooks/01_train_eval.ipynb` | 동결 모델 검증(`FROZEN.md`·`FROZEN_v2.md`·`FROZEN_v2.1.md`) → 데이터 로드·전처리 → 피처(+ 상류 피처) → 학습(동결 파라미터, v2.1·비교용 v1-fix) → 2025 검증 지표(v2.1·v1-fix 나란히) → `submission.csv`(v2.1) 생성 → 그림. 실행 결과(출력) 포함 | |
+| `scripts/` | `verify_frozen.py`(세 동결 문서 해시 검증), `leakage_audit.py`(누수 감사, 원자료부터 재계산 포함), `verify_package.py`(새 venv 재현 검증), `security_scan.txt` | |
 | `demo/` | 데모 영상 `AlgaeCast_demo.mp4`(2분 28초, 1080p H.264, 한국어 자막) · `AlgaeCast_demo.srt` · `script.md`(콘티) · `README_DEMO.md`(구성·편집 내역) · `captures/`(장면 캡처 6장). {RAW_NOTE} | {sizes.get('demo', '-')} |
 | `figures/` | 방법설명서·발표용 핵심 그림, 대시보드 스크린샷(`dashboard_*.png`), `figures/reports/`(평가·통계 표 원본 — 방법설명서 각주의 출처) | {sizes.get('figures', '-')} |
 
 ## 2. 데이터·모델 요약
 - 타깃: 조류경보제 5지점(해평·강정고령·칠서·물금매리·회남) 유해남조류 세포수(cells/mL), 기준일(base_date)+7일(±3일 매칭) 예측.
-- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — DataON 원값은 기본 패키지에 넣지 않고 수위 피처 2열 가공 파일만 포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
-- 모델: **제출·운영 모델 v2**(2026-10-22 동결, 커밋 `{frozen['v2']}`) = LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.000 · c3 0.266 · c2 0.373 · cg 0.361) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률) + 분위 회귀 q10/50/90(CQR 보정, 감시 규칙). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점은 v1 동결본 그대로라 감시·경보 결과는 v1 과 같다. **블라인드 검증 모델 v1**(2026-10-21 09:44 KST 봉인, 커밋 `{frozen['v1']}`) = 같은 3종 NNLS 앙상블, 피처 30개.
-- 검증: 연도 expanding-window CV(2020~2024) → 2025 홀드아웃 → **v1 동결** → 2026 블라인드 사후 검증(모델 선택·튜닝에 미사용) → v2 는 사전등록 확인 실험(EXP-confirm)으로 채택·동결 → 2026 사후 계산(모델 선택에 2026 미사용. 단 팀은 v1의 2026 결과를 이미 본 뒤 v2를 선택함, 블라인드 아님). 누수 감사: 전 샘플 재계산 불일치 0.
-- 핵심 결과: 2025 홀드아웃(같은 252행) v2 log R² 0.779 · 경계 F1 0.705 · 원단위 R² 0.176, v1 0.780 · 0.682 · 0.164(지속성 F1 0.727, 봉우리 1건이 분산의 43%). **2020~2026년 경계 사건 28건 중 25건(89%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 감시 단계로 포착(지속성 3건)**, v1 봉인 후 처음 보는 **2026년 8건 중 7건을 중앙 21일 앞서** 포착(지속성 2건, 감시·경보는 v2 도 같음). 2026 test 124조합: v1(블라인드) log R² 0.488 · 원단위 R² −0.054 · F1@10k 0.705, v2(블라인드 아님) 0.521 · −0.010 · 0.824(지속성 F1 0.841). 2026 사후 성능 저하와 한계는 방법설명서 6.11절·10장.
+- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS — WAMIS 원값은 기본 패키지에 넣지 않고 수문 피처 33열 가공 파일만 포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — DataON 원값은 기본 패키지에 넣지 않고 수위 피처 2열 가공 파일만 포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
+- 모델: **제출·운영 모델 v2.1**(2026-10-23 동결, 커밋 `{frozen['v2.1']}`, 데이터 유래 상수 누수 수정판) = LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.055 · c3 0.280 · c2 0.267 · cg 0.398) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률, 운영점 p ≥ 0.46 = 놓침:헛경보 비용비 r=3) + 분위 회귀 q10/50/90(CQR 보정 q̂ 0.165, 감시 규칙 q90 ≥ 10,000). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점도 수정 피처로 다시 적합했다. 데이터로 계산한 상수는 기준일까지(as-of) 또는 학습기간 자료로만 쓴다: 수위 편차 = 관측소별 직전 365일 평균 대비, 지점별 수온 임계 = 학습기간 측정만(폴드마다, 최종 ≤2025, `src/config/derived_constants.json`). 이력(수정 전): v1(2026-10-21 봉인, 커밋 `{frozen['v1']}`, 같은 3종 NNLS 앙상블·피처 30개), v2(2026-10-22 동결, 커밋 `{frozen['v2']}`, v2.1 과 같은 구성), v1-fix(v1 구성 + 수정 피처, 민감도용).
+- 검증: 연도 expanding-window CV(2020~2024) → 2025 홀드아웃(목표일 ≤2025-12-31 인 252행) → v1 동결(2026-10-21) → v2 사전등록 확인 실험(EXP-confirm)으로 채택·동결(2026-10-22) → 2026-10-23 데이터 유래 상수 전수 점검에서 누수 발견 → 사전등록(FIX-v2.1) 규칙대로 고친 v2.1 을 결과와 무관하게 채택·동결 → 2026 사후 계산(v2.1 동결 뒤 1회. 모델 선택·수정 규칙에 2026 미사용, 단 팀은 v1·v2 의 2026 결과를 이미 봤으므로 블라인드 아님). 누수 감사: 기준일까지 잘라낸 달력 재계산 표본 300·원자료부터 재계산 표본 60 불일치 0, 예전 방식 음성 대조 5/5 검출, 데이터 유래 상수 테스트 15개.
+- 핵심 결과: 2025 홀드아웃(같은 252행) v2.1 rmse_log 0.712 · log R² 0.778 · 원단위 R² 0.175 · 경계 F1 0.705(지속성 F1 0.727, 봉우리 1건이 분산의 43%). **2025년까지 자료로만 만든 모델(v2.1)로 2026년 경계 사건 8건 중 7건을 중앙 21일 앞서 감시 단계로 포착(지속성 2건)**, **2020~2026년 합계 28건 중 24건(86%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 포착(지속성 3건)**. 2026 test 124조합: v2.1 log R² 0.520 · 원단위 R² 0.001 · F1@10k 0.826(지속성 F1 0.841). 누수 수정: 수정 전 v1·v2 가 일부 데이터 유래 상수(수위 편차 관측소 평균·지점별 수온 임계·ASOS 관측소 선정)를 2026 자료까지 포함해 계산했음을 2026-10-23 사후 발견해 사전등록 규칙대로 고쳤고(2020~2025 포착 18 → 17건, 합계 25/28 → 24/28, 2026 은 7/8 로 같음), v1 봉인본의 2026 7/8 은 이력으로만 남긴다. 2026 사후 성능 저하와 한계는 방법설명서 5.11절·6.11절·10장.
 
 ## 3. 실행 환경
 - OS {info['os']}, Python {info['python']}, lightgbm {info['lightgbm']}, scikit-learn {info['scikit-learn']}, pandas {info['pandas']}, numpy {info['numpy']}, jupyterlab {info['jupyterlab']}. **GPU 미사용(CPU 전용)**.
@@ -314,12 +320,13 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 ```
 - 화면에서 셀 단위로 실행해 보려면: `.venv/Scripts/jupyter lab notebooks/01_train_eval.ipynb` (위 2줄 설치 후).
 - 재현 소요 시간: 약 20분(대부분 피처 생성, 8코어 CPU 기준). 결과 `submission.csv` 는 제출본과 바이트 동일(`scripts/verify_package.py` 로 새 가상환경에서 확인).
-- **DataON 원자료는 재현에 필요 없다.** 수위 피처 2열(`level_cont_t0`·`level_cont_diff7`)은 `data/processed/level_cont_features_S1.parquet` 에서 채운다(원자료가 있든 없든 `features_S1` 완전 일치·`submission.csv` 바이트 동일, 2026-10-23 확인). 원자료부터 다시 만드는 경로는 `data/raw/dataon/README_GET_DATAON.md`.
+- **DataON 원자료는 재현에 필요 없다.** 수위 피처 2열(`level_cont_t0`·`level_cont_diff7`)은 `data/processed/level_cont_features_S1.parquet` 에서 채운다(패키지를 만들 때 이 파일이 원자료로 계산한 `features_S1` 의 두 열과 완전히 같은지 검사). 원자료부터 다시 만드는 경로는 `data/raw/dataon/README_GET_DATAON.md`.
+- **WAMIS 원자료도 재현에 필요 없다.** 수문 피처 33열은 `data/processed/wamis_hydro_features_S1.parquet` 에서 채운다. `data/raw/hydro/hydro_daily_long.parquet` 는 WAMIS 출처 행을 뺀 사본(K-water delist·다목적댐·대회 번들 행)이다. 원자료부터 다시 만드는 경로와 같은 값을 받는 공식 경로(공공데이터포털 #3068550·#3040409)는 `data/raw/hydro/README_GET_WAMIS.md`.
 - **외부 API는 재현에 필요 없다.** `data/` 스냅샷만 사용한다. 공공 API 키(.env)는 대시보드 일일 운영(GitHub Actions)에만 쓰이며 패키지에 포함되지 않는다.
 - 대시보드(운영 데모): https://algaecast-7.vercel.app · 저장소: https://github.com/LeeJaeHaeng/AlgaeCast (private)
 
 ## 5. AI 활용범위 및 주요 검토 과정 [검토 필요 — 참가자 직접 검토·수정 예정]
-- **활용 도구**: 기획·검토 — Claude 채팅(claude.ai) [검토 필요: 실제 사용 모델 확인]; 구현 — Claude Code(CLI). 구현 모델은 Claude Fable 5.1(수집·분석·모델·평가·DB·대시보드·데모 영상), 최종 패키징 일부는 Claude Opus 5.5.
+- **활용 도구**: 기획·검토 — Claude 채팅(claude.ai) [검토 필요: 실제 사용 모델 확인]; 구현 — Claude Code(CLI). 구현 모델은 Claude Fable 5.1(수집·분석·모델·평가·DB·대시보드·데모 영상), 데이터 유래 상수 누수 점검·수정(FIX-v2.1)과 최종 패키징 일부는 Claude Opus 5.5.
 - **활용 단계**: 데이터 조사·수집기(T1), 통계분석 노트북(T2), 피처·누수 테스트(T3), 모델 튜닝·실험 러너(T4), 평가 보고서(T5), DB·대시보드·자동화(T6~T8), 제출 패키지·방법설명서 초안·데모 영상(T9).
 - **주요 활용 내용**: 공공 API 수집기(캐시·재시도), 피처 함수와 누수 감사, Optuna 튜닝 파이프라인, 통계 검정·그림, Next.js 관제 대시보드, GitHub Actions 일일 자동화, 데모 영상 녹화·편집 스크립트, 방법설명서 초안(모든 수치는 `figures/reports/` 표에서 인용).
 
@@ -329,15 +336,16 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 |---|---|---|
 | 입력 데이터 | 대회 번들에 공공 API 다수 추가(AIDA 격자 포함) | DataON 국가참조표준 수위와 보 운영자료를 1차 입력으로 확정. AIDA 격자는 미사용(ASOS 대체) |
 | 원단위 R²·NSE 미달 | 6개 변형 × 3개 보정(smearing·isotonic·CQR) 실험, 결과가 좋은 조합 채택 | 채택 절차(CV 기준)를 고정하고 2025 결과를 보고 규칙을 바꾸지 않음. 원단위 지표는 표 첫 줄에 그대로 보고하고 민감도(봉우리 1건 = 분산 43%) 병기 |
-| 경보 체계 | 분류기(a)·(b)·스태킹·q90 규칙 비교 | 2단계로 확정: 감시 = CQR 보정 q90 ≥ 10,000, 경보 = 분류기(b) p ≥ 0.52(놓침:헛경보 비용비 r=3) |
-| 2026 평가 | 평가 타깃 격리 로더·사후 검증 스크립트 | v1 동결(커밋 {frozen['v1']}) 후 사후 검증만 수행(블라인드). 성능 저하도 그대로 기록. v2 의 2026 은 v2 동결 뒤 1회 계산했고, v1 결과를 본 뒤 v2 를 골랐으므로 모든 표에 '블라인드 아님'을 명기 |
+| 경보 체계 | 분류기(a)·(b)·스태킹·q90 규칙 비교 | 2단계로 확정: 감시 = CQR 보정 q90 ≥ 10,000, 경보 = 분류기(b) p ≥ 운영점(놓침:헛경보 비용비 r=3 규칙, v1·v2 0.52 → v2.1 재적합 0.46) |
+| 2026 평가 | 평가 타깃 격리 로더·사후 검증 스크립트 | v1 동결(커밋 {frozen['v1']}) 후 사후 검증만 수행. 성능 저하도 그대로 기록. 뒤에 v1 봉인 당시 일부 상수가 2026 자료를 포함해 계산된 사실을 발견해 v1 의 2026 결과는 이력으로만 표기. v2·v2.1 의 2026 은 각 동결 뒤 1회 계산했고, 앞선 2026 결과를 본 뒤 만든 모델이므로 모든 표에 '블라인드 아님'을 명기 |
 | 우선순위 | 취수용량 가중 우선순위 | 공식 출처가 없는 가중치는 쓰지 않음. 단계 → 경계 확률 순 |
-| 성과 표현 | 2020~2025 경계 사건 20건 중 18건 | 2026 포함 28건 중 25건(89%)·중앙 14일, 2026년 8건 중 7건·중앙 21일로 통일하고 지속성(3건) 병기 |
+| 성과 표현 | 2020~2025 경계 사건 20건 중 18건 | 2026 포함 합계와 2026년을 함께 쓰고 지속성(3건) 병기. v2.1 기준 '2025년까지 자료로만 만든 모델로 2026년 8건 중 7건·중앙 21일, 2020~2026년 28건 중 24건(86%)·중앙 14일'(수정 전 25건(89%)), 수정본은 블라인드라고 부르지 않음 |
+| 데이터 유래 상수 누수 | 참가자 지시로 전수 점검(15개 항목) → 수위 평균·수온 임계·ASOS 선정·보현산댐 문제 발견 → 사전등록 수정 규칙 제안 | 사전등록 승인, v2.1 을 결과와 무관하게 채택, 2026 사후 1회, v1 7/8 은 이력으로 |
 | 대시보드 | 위험 단계 3색 표시 | 공식 발령 × AI 예상 조합 5단계 라벨(경계 진입 예상·지켜보기·경계 계속될 듯·나아질 가능성·안전), 쉽게 보기 기본 |
 | 영상 자료 | CCTV·위성 지수 연계 조사 | 예측 입력에는 쓰지 않음(아래 요약). 향후 과제로 분리 |
 | 원단위 고도화(동결 뒤) | 문헌 기반 7종(R1~R7) 실험과 누적 결합, 규칙상 후보 B(전국 통합 학습 + C1 단독 점예측) | B 기각(2025 원단위 R² 0.166 → −0.220). 견고성 대안 C 는 실행 전 등록한 확인 실험 1회로만 판정하도록 정함(조건 충족·채택 → 아래 사전등록 판정 절차를 거쳐 v2 로 동결) |
 
-**사전등록 판정 절차(제출 모델 v1 → v2) — AI 제안 → 참가자 결정**
+**사전등록 판정 절차(제출 모델 v1 → v2 → v2.1) — AI 제안 → 참가자 결정**
 
 | 단계 | AI 제안 | 참가자 결정 |
 |---|---|---|
@@ -346,22 +354,24 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 | 판정 | 실행·독립 검증: Δ +0.116(하한 +0.053), 대조군 대비 +0.084, 2025 r2_raw 0.166 · rmse_log 0.713 · F1 0.687 · 리드 18/20, 누수 테스트 67개 통과 → 조건 충족 | 채택. 2025 원단위 R² 는 v1 과 같아 개선이 CV 에서만 확인됐다는 점을 그대로 기록 |
 | 2차 고도화(EXP-005) | C 기준 6개 계열(P0~P6)과 종합 기준 (a)~(d) 사전등록, 최선 후보 C + 칼만 구성원 판정 | 기준 미충족(CV +0.040 < +0.08, 2025 rmse_log 0.7227 > 0.7217)으로 기각. P3(단기예보)만 마지막으로 1회 시도해 통과하면 C+P3, 아니면 C 로 사전 결정 |
 | P3 재시도 | 승인 API 표본 호출(중기·특보는 자료 403 → 제외), 단기예보 격자 수집·사전등록·판정 | 미통과(a1 −0.0023 등) → 최종 모델 C 를 v2 로 동결(커밋 {frozen['v2']}), 제출본을 v2 로 교체, v1 제출본은 태그 `v1-submission` 에 보존 |
-| 2026 표기 | v2 의 2026 사후 계산을 v1 과 나란히 보고 | 블라인드 검증 서사는 v1 의 '2026 경계 사건 8건 중 7건'으로 유지. v2 의 2026 수치가 담긴 모든 표에 "모델 선택에 2026 미사용. 단 팀은 v1의 2026 결과를 이미 본 뒤 v2를 선택함(블라인드 아님)" 명기 |
+| 2026 표기 | v2 의 2026 사후 계산을 v1 과 나란히 보고 | 당시에는 블라인드 검증 서사를 v1 의 '2026 경계 사건 8건 중 7건'으로 유지하고, v2 의 2026 수치가 담긴 모든 표에 "모델 선택에 2026 미사용. 단 팀은 v1의 2026 결과를 이미 본 뒤 v2를 선택함(블라인드 아님)" 명기. 이 서사는 아래 누수 수정 뒤 철회 |
+| 누수 수정(FIX-v2.1) | 데이터 유래 상수 15개 항목 점검표와 수정 규칙 R1~R7(수위 편차 as-of, 학습기간 수온 임계, 선택 결정 ≤2024 재계산, 구성 고정, 데이터 적합 부분 재적합, 선별 재실행은 참고만)을 결과 계산 전에 커밋. 영향은 같은 252행·CV 에서 나란히 보고 | 사전등록 승인. 규칙 위반 수정이므로 v2.1 을 결과와 무관하게 채택·동결(커밋 {frozen['v2.1']}), 제출본을 v2.1 로 교체. 2026 은 동결 뒤 1회만 계산하고 결과로 판정을 바꾸지 않음. 헤드라인은 v2.1 로 쓰고 수정본은 블라인드라 부르지 않으며, v1 의 2026 7/8 은 이력으로만 표기 |
 
-- **검토한 대안·실패 사례**: 원단위 R² 개선 6개 변형×3개 보정 — 어떤 조합도 0.2를 넘지 못함(isotonic 은 악화); 경보 분류기·스태킹·q90 규칙 — 2025 전체 F1 에서 지속성(0.727)을 넘지 못함(진입 구간 재현율·PR-AUC·리드타임에서만 우위); hurdle·tweedie 단일 모델 — CV 에서 C1 과 차이 미미; 물모아 공식 예측 벤치마크 — 단계만 제공돼 분류 비교로 전환(누적 중); 외부 유역강수 CSV — 미수령으로 보류. 동결 뒤 원단위 R² 고도화 7종(EXP-004~010: 분산 반영 원단위 복원, 상류 지점 피처, 속별 모델, 영양염, 전국 82개 경보지점 통합 학습, 수질자동측정망, 희소 사건 재표본·가중) — CV 채택 기준(r2_raw +0.10·rmse_log 악화 0.01 이내·리드 유지)을 넘은 3종도 2025 확인에서 원단위 R² 가 v1(0.166)보다 좋아지지 않음(−0.66~0.16); CV 원단위 R² 는 시드만 바꿔도 ±0.02~0.04, 난수 열을 더해도 +0.04 움직이는 잡음이 있음; 원단위 이득 대부분은 새 정보가 아니라 점예측 방식(로그 공간 앙상블 → 원단위 맞춤 단일 모델)에서 나오고 2025 에서 유지되지 않음; 누적 결합 후보 B(낙동강·금강 통합 학습 + C1 단독, CV +0.150)는 2025 −0.220 으로 기각; 새 정보 계열(영양염·자동측정망·전국 통합)은 2025 에서 효과 없음; 견고성 대안 C(v1 + 상류 피처 + 속별 구성원)는 사전등록 확인 실험에서 CV +0.116(대조군 대비 +0.084)·2025 비열등으로 채택 조건 충족(2025 원단위 R² 0.166 으로 v1 과 같음) → v2 로 동결; 2차 고도화(EXP-005: 채수 위치 변경 진단, 변화량 타깃·성장 기작, 과거 단기예보, 칼만 상태공간, 국면·아날로그, 상류 댐 부하) — 사전등록 기준을 넘은 구성 없음(최선 C + 칼만 CV +0.040, P3 단기예보 미통과), 측정 잡음만 있는 완벽한 모형 가정의 추정 상한: 로그 R² 0.91~0.94, 2025 원단위 R² 0.36~0.47; Sentinel-2 위성 지표는 기대 이득 대비 비용이 커 보류(상세 figures/reports/experiments/EXP-summary.md·EXP-005/EXP-summary2.md, 방법설명서 5.8~5.10절).
+- **검토한 대안·실패 사례**: 원단위 R² 개선 6개 변형×3개 보정 — 어떤 조합도 0.2를 넘지 못함(isotonic 은 악화, 수정 전 계산); 경보 분류기·스태킹 — 2025 전체 F1 에서 지속성(0.727)을 넘지 못함(진입 구간 재현율·PR-AUC·리드타임에서 우위, v2.1 재적합에서는 q90 규칙만 0.773 으로 지속성을 넘음); hurdle·tweedie 단일 모델 — CV 에서 C1 과 차이 미미; 물모아 공식 예측 벤치마크 — 단계만 제공돼 분류 비교로 전환(누적 중); 외부 유역강수 CSV — 미수령으로 보류. 동결 뒤 원단위 R² 고도화 7종(EXP-004~010: 분산 반영 원단위 복원, 상류 지점 피처, 속별 모델, 영양염, 전국 82개 경보지점 통합 학습, 수질자동측정망, 희소 사건 재표본·가중) — CV 채택 기준(r2_raw +0.10·rmse_log 악화 0.01 이내·리드 유지)을 넘은 3종도 2025 확인에서 원단위 R² 가 v1(0.166)보다 좋아지지 않음(−0.66~0.16); CV 원단위 R² 는 시드만 바꿔도 ±0.02~0.04, 난수 열을 더해도 +0.04 움직이는 잡음이 있음; 원단위 이득 대부분은 새 정보가 아니라 점예측 방식(로그 공간 앙상블 → 원단위 맞춤 단일 모델)에서 나오고 2025 에서 유지되지 않음; 누적 결합 후보 B(낙동강·금강 통합 학습 + C1 단독, CV +0.150)는 2025 −0.220 으로 기각; 새 정보 계열(영양염·자동측정망·전국 통합)은 2025 에서 효과 없음; 견고성 대안 C(v1 + 상류 피처 + 속별 구성원)는 사전등록 확인 실험에서 CV +0.116(대조군 대비 +0.084)·2025 비열등으로 채택 조건 충족(2025 원단위 R² 0.166 으로 v1 과 같음) → v2 로 동결 → 2026-10-23 데이터 유래 상수 누수 수정으로 같은 구성을 수정 피처로 다시 적합한 v2.1 로 대체(같은 252행 2025 원단위 R² 0.175, v2 0.176; 이 실험들은 모두 수정 전 피처로 계산); 수정 피처로 다시 돌린 선별(참고) — `ss_sum7`·`residence_proxy_ma14` 추가, `outflow_t0`·`ws_mean7` 제외로 목록이 달라졌으나 사전등록대로 채택하지 않음; 2차 고도화(EXP-005: 채수 위치 변경 진단, 변화량 타깃·성장 기작, 과거 단기예보, 칼만 상태공간, 국면·아날로그, 상류 댐 부하) — 사전등록 기준을 넘은 구성 없음(최선 C + 칼만 CV +0.040, P3 단기예보 미통과), 측정 잡음만 있는 완벽한 모형 가정의 추정 상한: 로그 R² 0.91~0.94, 2025 원단위 R² 0.36~0.47; Sentinel-2 위성 지표는 기대 이득 대비 비용이 커 보류(상세 figures/reports/experiments/EXP-summary.md·EXP-005/EXP-summary2.md, 방법설명서 5.8~5.10절).
 - **CCTV·위성 영상 연계 검토(미채택) 요약** (상세: `src/docs/13_CCTV_FEASIBILITY.md`, 방법설명서 10장):
   - 5지점 반경 5 km 안에서 수면이 보이는 공개 CCTV는 강정·고령(낙동강홍수통제소 사문진교 3.9 km), 칠서(계내리 1.5 km, 1080p), 물금·매리(월촌리 2.3 km) 3곳뿐이고, 해평(최근접 6.6 km)과 회남(10 km 안에 없음)은 불가로 판정했다.
   - 대시보드에 영상을 직접 붙이는 것은 불가하다. 낙동강 뷰어는 외부 iframe 을 막고(`X-Frame-Options: sameorigin`), 영상 페이지에 공공누리 표시가 없어 기관과 사전 협의가 필요하며, K-water CCTV 는 30초 재생 제한·공공누리 제4유형(변경 금지)이다.
   - 3지점에 한해 정지영상 주기 캡처로 "영상 녹조 색 지수"(녹색 색도·초과녹색·녹색 면적 비율, 야간·역광·강우·카메라 이동 제외 규칙)를 설계했으나, 이 지수는 **예측 모델 입력에 쓰지 않으며** 실측과의 상관은 한 시즌 이상 자료가 쌓인 뒤 평가한다.
   - 비교용 Sentinel-2 NDCI 는 B5(705 nm) 때문에 실효 해상도가 20 m 이며, 2017~2025년 5지점 구축에 약 7~9 반나절이 든다고 추정했다.
-- **최종 선택 이유**: CV 복합점수 기준 채택 절차를 고정해 홀드아웃 과적합을 막았고, 제출 모델 교체(v1 → v2)도 실행 전에 등록한 조건으로만 판정했다. 운영 목적(발령 선행 판단)에 맞는 지표(log R²·경보 F1·리드타임)로 평가했으며, 재현 가능한 동결 모델과 공개 데이터 스냅샷으로 전 과정을 패키지화했다.
+- **최종 선택 이유**: CV 복합점수 기준 채택 절차를 고정해 홀드아웃 과적합을 막았고, 제출 모델 교체(v1 → v2)도 실행 전에 등록한 조건으로만 판정했다. 데이터 유래 상수 누수는 규칙 위반이므로 결과 계산 전에 등록한 규칙대로 고친 v2.1 을 결과와 무관하게 제출·운영 모델로 정했다. 운영 목적(발령 선행 판단)에 맞는 지표(log R²·경보 F1·리드타임)로 평가했으며, 재현 가능한 동결 모델과 공개 데이터 스냅샷으로 전 과정을 패키지화했다.
 
 ## 6. 라이선스·출처
-`data/raw/MANIFEST.md` 참조(첫 표 라이선스 칸과 '라이선스 확인' 절 — 2026-10-22~23 각 출처 페이지에서 다시 확인). 외부 데이터는 출처별 라이선스를 MANIFEST 에 기록하고 그 조건을 지킨다. 공공데이터포털 자료는 공공누리 제1유형(출처표시) 또는 이용허락범위 제한 없음이고, WAMIS 자료는 공공데이터포털 #3068550(한강홍수통제소_수자원 정보, 이용허락범위 제한 없음) 등록분을 근거로 하며, DataON 수위 자료는 CC BY-NC-SA(저작자표시-비영리-동일조건변경허락)다. 라이선스를 확인하지 못한 물환경정보시스템 수질자동측정소 목록·좌표는 실험(EXP-009) 전용이며 제출 모델에 쓰지 않았고 이 패키지에 넣지 않았다.
+`data/raw/MANIFEST.md` 참조(첫 표 라이선스 칸과 '라이선스 확인' 절 — 2026-10-22~23 각 출처 페이지에서 다시 확인). 외부 데이터는 출처별 라이선스를 MANIFEST 에 기록하고 그 조건을 지킨다. 공공데이터포털 자료는 공공누리 제1유형(출처표시) 또는 이용허락범위 제한 없음이다. WAMIS 자료는 개방 API 의 인증키 없는 엔드포인트로 수집했고(회원가입 안 함, 저장소의 `WAMIS_KEY` 는 실제로는 한강홍수통제소 OpenAPI 키이며 수집에 쓰지 않음), 같은 값이 공공데이터포털 #3068550(한강홍수통제소_수자원 정보)·#3040409(한강홍수통제소_표준수문DB)에 이용허락범위 제한 없음으로 등록돼 있다. DataON 수위 자료는 CC BY-NC-SA(저작자표시-비영리-동일조건변경허락)다. 라이선스를 확인하지 못한 물환경정보시스템 수질자동측정소 목록·좌표는 실험(EXP-009) 전용이며 제출 모델에 쓰지 않았고 이 패키지에 넣지 않았다.
 
+- **WAMIS 원값은 이 패키지에 넣지 않았다.** WAMIS OPEN API 회원약관 제15조④(회원은 서비스를 이용해 얻은 정보를 사전 승낙 없이 복제·제공할 수 없음)가 회원이 아닌 이용자에게도 적용되는지 약관만으로 분명하지 않기 때문이다. 빠진 파일은 `data/raw/wamis_dam/` 과 `data/raw/hydro/hydro_daily_long.parquet` 의 WAMIS 출처 행이다. 대신 가공 수문 피처 `data/processed/wamis_hydro_features_S1.parquet`(33열)를 넣었고, 원값을 받는 공식 경로·라이선스·재생성 명령은 `data/raw/hydro/README_GET_WAMIS.md` 에 적었다. 출처 표시: 한강홍수통제소 국가수자원관리종합정보시스템(WAMIS).
 - **대회 제공 데이터**(`data/raw/competition/`): 참가신청서 경진대회 규정 3항(승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 발생 시 출처 명시)에 따라 **심사용으로만** 넣었다. 공개할 때는 이 폴더를 빼고, 대회가 끝나면 폐기한다(`README_심사용_공개시제외.txt`).
 - **DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다.** 원 자료: 「댐유역 하천 일평균수위」(국가참조표준), 생산 한국수자원공사 오재우·이영창·이재용, 발행 국가참조표준센터, DOI 10.20925/KSRD.74670854.v5, 제·개정 2025-12-16.
-- 이 패키지(기본 zip 2종)의 DataON 유래 파일: `data/processed/level_cont_features_S1.parquet`(수위 피처 2열 가공값, 2,979행), `src/config/level_cont_stats.json`(집계 통계, 일일 운영용), 노트북 실행으로 생기는 `data/processed/features_*.parquet` 의 `level_cont_*` 열. 해당 폴더마다 `LICENSE_DataON.txt` 를 붙였다. **DataON 원값(연속 수위 시계열·원 배포 xlsx)은 넣지 않았다**(받는 법: `data/raw/dataon/README_GET_DATAON.md`).
+- 이 패키지(기본 zip 2종)의 DataON 유래 파일: `data/processed/level_cont_features_S1.parquet`(수위 피처 2열 가공값, 2,979행), `src/config/level_cont_stats.json`(기준면 오프셋·관측소 목록, 일일 운영용), 노트북 실행으로 생기는 `data/processed/features_*.parquet` 의 `level_cont_*` 열. 해당 폴더마다 `LICENSE_DataON.txt` 를 붙였다. **DataON 원값(연속 수위 시계열·원 배포 xlsx)은 넣지 않았다**(받는 법: `data/raw/dataon/README_GET_DATAON.md`).
 - DataON 원값(연속 수위 시계열 스냅샷)이 든 대체 zip `{ZIP_DATAON}` 은 기본 제출본이 아니며, 운영사무국이 허용한 경우에만 쓴다.
 
 ## 7. 제출 전 확인사항 (공지 #564)
@@ -438,9 +448,9 @@ def scan_secrets(root: Path) -> list[str]:
 
 
 def frozen_commits(model_dir: Path) -> dict[str, str]:
-    """동결 문서(v1 FROZEN.md, v2 FROZEN_v2.md)의 동결 커밋 앞 7자. 문서가 없거나 형식이 다르면 '?'."""
+    """동결 문서(v1 FROZEN.md, v2 FROZEN_v2.md, v2.1 FROZEN_v2.1.md)의 동결 커밋 앞 7자. 문서가 없거나 형식이 다르면 '?'."""
     out = {}
-    for key, doc in (("v1", "FROZEN.md"), ("v2", "FROZEN_v2.md")):
+    for key, doc in (("v1", "FROZEN.md"), ("v2", "FROZEN_v2.md"), ("v2.1", "FROZEN_v2.1.md")):
         p = model_dir / doc
         m = re.search(r"동결 커밋: `([0-9a-f]+)`", p.read_text(encoding="utf-8")) if p.exists() else None
         out[key] = m.group(1)[:7] if m else "?"
