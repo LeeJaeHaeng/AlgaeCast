@@ -37,13 +37,13 @@ npx vercel --prod --yes --token "$VERCEL_TOKEN"
 
 ## 일일 자동화 (T8, `.github/workflows/daily.yml`)
 - 스케줄 cron `0 20 * * *`(UTC) = KST 05:00, `workflow_dispatch`(입력 dry_run). 물모아 스냅샷은 `mulmoa_snapshot.yml` 이 KST 06/09/18시에 별도 수행(단계 중복 없음).
-- 단계: Release `model-frozen-v2-9dca86c`(2026-10-22 v2 동결 뒤; 그 전은 v1 `model-frozen-13ac483`, Release 유지) 다운로드 → `scripts/verify_frozen.py`(FROZEN.md·FROZEN_v2.md sha256 불일치 시 중단) → `scripts/daily_run.py`
+- 단계: Release `model-frozen-v2.1-217260e`(2026-10-23 v2.1 동결 뒤; 이전 v2 `model-frozen-v2-9dca86c`·v1 `model-frozen-13ac483` Release 유지) 다운로드 → `scripts/verify_frozen.py`(FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md sha256 불일치 시 중단) → `scripts/daily_run.py`
   (공공 API 최근 120일 증분 수집 → S1 달력 → as-of 피처 → 동결 모델 예측 q50·CQR q10/q90·p_alert·tier → Supabase model_runs/predictions/shap/recommendations
   → 관측 증분 upsert → backfill_obs → live_benchmark.csv 에 pred_level·p_alert 결합 → `POST /api/revalidate`) → 로그 artifact(30일).
 - as-of base_date = 오늘 이전 가장 최근 조류 측정일(지점별). 이미 predictions 에 있는 base_date 면 예측을 건너뛰고 backfill·revalidate 만 수행.
 - 실패 시 `model_runs.status='failed'` 행이 기록되고 대시보드 홈 상단에 빨간 배너가 뜬다(마지막 성공 run 의 예측은 유지).
 - 러너에는 대회 번들·모델 pickle 이 없다(대회 데이터는 저장소에 올리지 않음). as-of 피처 재현 검증: `reports/eval/tbl_asof_reproduction.md`
-  (최근 12 base_date × 5지점 × 30피처 = 1,050값, 허용오차 |상대차| ≤1% 일치 94.6%, 완전 일치 81.9%; 불일치는 120일 창 밖 이력이 필요한 consecutive_over_1k·연속 수위 편차).
+  (2026-10-23 v2.1 피처 재계산: 최근 base_date × 5지점 × 30피처 = 1,050값, 허용오차 |상대차| ≤1% 일치 96.2%, 완전 일치 86.0%; horizon_days 를 빼면 98.7%, 나머지 불일치는 수집 창 시작 직후 기준일의 연속 수위 편차·수집 시점 차이).
 - 재학습 금지(제출 2026-11-06 전). 필요한 시크릿: DATA_GO_KR_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, REVALIDATE_SECRET (등록 완료).
 
 ### Supabase 무료 플랜 일시정지 방지

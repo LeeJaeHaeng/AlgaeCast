@@ -217,7 +217,7 @@
 | `low_light` | ROI 평균 V < 0.15 | 저조도 노이즈 |
 | `glare` | ROI 중 V > 0.95 픽셀 비율 > 10% | 태양 반사·역광 |
 | `backlit` | 하늘 영역 평균 밝기 / ROI 평균 밝기 > 3 | 역광 |
-| `rain` | ASOS 해당 시각 강수량 > 0 mm 또는 전 1시간 누적 > 0.5 mm. 관측소는 `sites.yaml` 의 asos_primary(GJGR 279, CS 288, MGMR 257) | 빗방울·렌즈 물방울·수면 교란 |
+| `rain` | ASOS 해당 시각 강수량 > 0 mm 또는 전 1시간 누적 > 0.5 mm. 관측소는 `sites.yaml` 의 asos_primary(GJGR 279, CS 288, MGMR 288) | 빗방울·렌즈 물방울·수면 교란 |
 | `fog_haze` | 프레임 전체 라플라시안 분산이 카메라별 기준의 30% 미만 | 안개·렌즈 오염·흐림 |
 | `camera_moved` | 4.1 기준 프레임 유사도 미달 | ROI 불일치 |
 | `stream_fail` | 뷰어 요청 후 HLS 404·시간 초과 | 실측에서 일부 카메라가 처음 요청 시 404 |
