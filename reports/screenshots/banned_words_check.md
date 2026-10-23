@@ -1,4 +1,4 @@
-# 쉽게 보기 금지어 검사 — 2026-10-23T06:37
+# 쉽게 보기 금지어 검사 — 2026-10-23T09:38
 
 기준: https://algaecast-7.vercel.app, 금지어 33개
 
@@ -12,5 +12,6 @@
 - /performance: 0건
 - /insights: 0건
 - /log: 0건
+- /sites/2011G56?kiosk=1: 0건
 
 합계 0건
