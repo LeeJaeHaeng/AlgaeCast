@@ -5,6 +5,7 @@
 1) submission.csv(패키지 루트)가 제출본(저장소 submission/submission.csv)과 바이트 동일(diff 0)
 2) 노트북 재실행 오류 0 (실행본 ipynb 의 error 출력·Traceback 0)
 3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(5363e22a…, 2026-10-22 v3)으로 시작
+4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(기본 패키지는 없음 → 가공 수위 피처로 재현)
 결과: reports/eval/package_verify.log(실행 기록), reports/eval/package_verify.json(체크리스트용 요약)
 
 사용: python scripts/verify_package.py [--dir submission_package | --zip dist/...zip] [--update-package] [--keep]
@@ -104,6 +105,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         pkg = tmp / "pkg"
         shutil.copytree(args.dir, pkg)
+    dataon_raw = (pkg / "data" / "raw" / "dataon" / "level_continuous_long.parquet").exists()
+    level_file = (pkg / "data" / "processed" / "level_cont_features_S1.parquet").exists()
     # 복사본의 제출 파일을 지워, 노트북이 실제로 다시 만든 파일만 비교한다.
     (pkg / "submission.csv").unlink(missing_ok=True)
     py = sys.executable  # 같은 인터프리터(3.11)로 새 venv
@@ -120,7 +123,13 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{'OK ' if rc == 0 else 'FAIL'} {' '.join(cmd[-3:])}")
         if rc != 0:
             break
-    res: dict = {"when": time.strftime("%Y-%m-%d %H:%M"), "returncode": rc}
+    res: dict = {
+        "when": time.strftime("%Y-%m-%d %H:%M"),
+        "returncode": rc,
+        "source": src_desc,
+        "dataon_raw_present": dataon_raw,
+        "level_cont_mode": "raw" if dataon_raw else ("derived" if level_file else "missing"),
+    }
     if rc == 0:
         out_csv = pkg / "submission.csv"
         a = out_csv.read_bytes() if out_csv.exists() else b""
@@ -142,7 +151,8 @@ def main(argv: list[str] | None = None) -> int:
     msg = (
         f"submission.csv diff: {'0 (바이트 동일)' if res.get('submission_identical') else '불일치/미실행'} · "
         f"노트북 오류 {res.get('notebook_errors', '미실행')}건(경고 줄 {res.get('notebook_stderr_warnings', '-')}, 절대경로 {res.get('notebook_abs_paths', '-')}) · "
-        f"데모 sha256 {str(res['demo_sha256'])[:16]}… {'일치' if res['demo_sha_ok'] else '불일치'} · 소요 {res['minutes']} 분"
+        f"데모 sha256 {str(res['demo_sha256'])[:16]}… {'일치' if res['demo_sha_ok'] else '불일치'} · "
+        f"DataON 원값 {'있음' if dataon_raw else '없음'}(수위 피처 {res['level_cont_mode']}) · 소요 {res['minutes']} 분"
     )
     print(msg)
     with log.open("a", encoding="utf-8") as f:

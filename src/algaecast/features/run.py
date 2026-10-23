@@ -35,6 +35,11 @@ from algaecast.features.weather import make_weather_features
 log = logging.getLogger(__name__)
 INTERIM = DATA_DIR / "interim"
 PROCESSED = DATA_DIR / "processed"
+# DataON 연속 수위: 원자료(CC BY-NC-SA)가 없으면 가공 피처 파일(지점·기준일별 수위 피처 2열)로 두 열을 채운다.
+# 원자료가 있으면 원자료부터 다시 계산한다(align.run → features.run).
+# 가공 파일은 export_level_cont() 로 만든다.
+DATAON_RAW = DATA_DIR / "raw" / "dataon" / "level_continuous_long.parquet"
+LEVEL_FEATURES = ("level_cont_t0", "level_cont_diff7")
 GROUPS: dict[str, Callable[[pd.DataFrame, date, str], dict]] = {
     "ar": make_ar_features,
     "water": make_water_features,
@@ -211,6 +216,54 @@ TARGET_COLS = ["target_cells", "target_log"]
 QUARANTINE_TARGET_FROM = date(2026, 1, 1)  # 정답이 2026 측정인 행은 split 과 무관하게 격리한다
 
 
+def level_cont_path(strategy: str) -> Path:
+    return PROCESSED / f"level_cont_features_{strategy}.parquet"
+
+
+def level_cont_mode(strategy: str) -> str:
+    """'raw'(DataON 원자료로 계산) · 'derived'(가공 피처 파일로 채움) · 'missing'(둘 다 없음 → 결측)."""
+    if DATAON_RAW.exists():
+        return "raw"
+    return "derived" if level_cont_path(strategy).exists() else "missing"
+
+
+def apply_level_cont_derived(feats: pd.DataFrame, strategy: str) -> pd.DataFrame:
+    """가공 피처 파일의 level_cont_t0·level_cont_diff7 로 두 열을 채운다.
+
+    키는 station_id·base_date, 열 순서는 그대로 둔다.
+    """
+    d = pd.read_parquet(level_cont_path(strategy))
+    key = feats["station_id"].astype(str) + "|" + pd.to_datetime(feats["base_date"]).dt.strftime("%Y-%m-%d")
+    dk = d["station_id"].astype(str) + "|" + pd.to_datetime(d["base_date"]).dt.strftime("%Y-%m-%d")
+    d = d.set_axis(dk.to_numpy())
+    out = feats.copy()
+    for c in LEVEL_FEATURES:
+        out[c] = d[c].reindex(key.to_numpy()).to_numpy(dtype=float)
+    miss = int(out[list(LEVEL_FEATURES)].isna().all(axis=1).sum())
+    log.info(
+        "DataON 원자료 없음 → 가공 수위 피처 %s 로 %s 채움(키 없음 %d행)",
+        level_cont_path(strategy).name,
+        LEVEL_FEATURES,
+        miss,
+    )
+    return out
+
+
+def export_level_cont(strategy: str = "S1") -> Path:
+    """원자료로 만든 features_<S>.parquet 에서 수위 피처 2열만 내보낸다(DataON 가공물, CC BY-NC-SA)."""
+    if level_cont_mode(strategy) != "raw":
+        raise SystemExit("중단: DataON 원자료가 없어 원자료 기준 수위 피처를 내보낼 수 없다.")
+    f = pd.read_parquet(
+        PROCESSED / f"features_{strategy}.parquet", columns=["station_id", "base_date", *LEVEL_FEATURES]
+    )
+    f["station_id"] = f["station_id"].astype(str)
+    f["base_date"] = pd.to_datetime(f["base_date"]).dt.strftime("%Y-%m-%d")
+    out = level_cont_path(strategy)
+    f.to_parquet(out, index=False)
+    log.info("가공 수위 피처 %d행 → %s", len(f), out)
+    return out
+
+
 def quarantine_test_targets(feats: pd.DataFrame, path: Path = TEST_TARGETS_PATH) -> pd.DataFrame:
     """test split 과 '목표일이 2026 이상인 행'(예: 기준일 2025-12-29 → 목표일 2026-01-05)의 타깃을
     별도 파일로 분리 저장하고 피처 프레임에서는 NaN 으로 비운다.
@@ -251,8 +304,15 @@ def _md(t: pd.DataFrame) -> str:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--strategy", default="S1,S2,S3")
+    ap.add_argument(
+        "--export-level-cont", action="store_true", help="수위 피처 2열을 가공 파일로 내보내기(원자료 필요)"
+    )
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    if args.export_level_cont:
+        for s in [x.strip().upper() for x in args.strategy.split(",") if x.strip()]:
+            export_level_cont(s)
+        return 0
     cfg = yaml.safe_load((CONFIG_DIR / "features.yaml").read_text(encoding="utf-8"))
     sites = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))["sites"]
     submission = comp.load_sample_submission()
@@ -278,6 +338,11 @@ def main(argv: list[str] | None = None) -> int:
                 int(df["target_log"].notna().sum()),
             )
         feats = pd.concat(frames, ignore_index=True)
+        mode = level_cont_mode(s)
+        if mode == "derived":
+            feats = apply_level_cont_derived(feats, s)
+        elif mode == "missing":
+            log.warning("%s: DataON 원자료·가공 수위 피처 파일이 모두 없어 %s 가 결측", s, LEVEL_FEATURES)
         feats = assign_split(feats, cfg, submission)
         feats = quarantine_test_targets(feats)
         feature_cols = [c for c in feats.columns if c not in META_COLS] + ["horizon_days"]

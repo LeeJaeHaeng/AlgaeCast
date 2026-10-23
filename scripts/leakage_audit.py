@@ -24,7 +24,7 @@ import yaml
 from algaecast.collect import competition as comp
 from algaecast.config import CONFIG_DIR, DATA_DIR, ROOT
 from algaecast.features.base import cut_as_of
-from algaecast.features.run import GROUPS, META_COLS
+from algaecast.features.run import GROUPS, LEVEL_FEATURES, META_COLS, level_cont_mode
 
 INTERIM = DATA_DIR / "interim"
 PROCESSED = DATA_DIR / "processed"
@@ -87,6 +87,10 @@ def main(argv: list[str] | None = None) -> int:
 
     # 2. 재계산 불변성
     feature_cols = [c for c in feats.columns if c not in META_COLS]
+    # DataON 원자료가 없으면 수위 2열은 가공 피처 파일 값이라 달력으로 재계산할 수 없다
+    # (그 값은 원자료 환경에서 이 검사를 통과한 값이다)
+    level_mode = level_cont_mode(args.strategy)
+    check_cols = [c for c in feature_cols if level_mode == "raw" or c not in LEVEL_FEATURES]
     rows = feats if args.sample == 0 else feats.sample(min(args.sample, len(feats)), random_state=42)
     mism: list[tuple] = []
     checked = 0
@@ -100,7 +104,7 @@ def main(argv: list[str] | None = None) -> int:
         rec: dict = {}
         for fn in GROUPS.values():
             rec.update(fn(trunc, r.base_date, sites[r.station_id]["site_code"]))
-        for c in feature_cols:
+        for c in check_cols:
             if c in rec and not _same(
                 rec[c],
                 (
@@ -115,6 +119,11 @@ def main(argv: list[str] | None = None) -> int:
         "## 2. 재계산 불변성 (base_date 까지 잘라낸 달력으로 재계산 = 저장된 피처)",
         f"- 검사 샘플 {checked:,}, 불일치 {len(mism)}",
     ]
+    if level_mode != "raw":
+        lines.append(
+            f"- DataON 원자료 없음({level_mode}) → {', '.join(LEVEL_FEATURES)} 는 재계산 검사에서 제외"
+            " (가공 피처 파일 값, 원자료 환경에서 검사됨)"
+        )
     if mism:
         issues.append("재계산 불일치")
         lines += ["", "| 지점 | base_date | 피처 | 재계산 | 저장 |", "|---|---|---|---|---|"] + [

@@ -325,20 +325,28 @@ def _md(t: pd.DataFrame) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--root", type=Path, default=DATAON_DIR)
-    ap.parse_args(argv)
+    ap.add_argument("--root", type=Path, default=DATAON_DIR, help="xlsx 를 찾을 폴더(하위 폴더 포함)")
+    ap.add_argument(
+        "--end",
+        type=date.fromisoformat,
+        default=date.today(),
+        help="WAMIS 연장 마지막 날(YYYY-MM-DD). 제출 스냅샷과 같게 만들려면 2026-10-20",
+    )
+    ap.add_argument("--out-dir", type=Path, default=DATAON_DIR, help="parquet 출력 폴더")
+    args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    long = load_all()
+    long = load_all(args.root)
     if long is None:
         print("DataON 일평균수위 파일 없음 — data/raw/dataon/ 에 xlsx 를 두면 반영")
         return 0
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    long.to_parquet(OUT_PATH, index=False)
+    out_path, cont_path = args.out_dir / OUT_PATH.name, args.out_dir / CONT_PATH.name
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    long.to_parquet(out_path, index=False)
     sites_cfg = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))
     cov = coverage_table(long, sites_cfg)
     cmp_t = compare_with_wamis(long)
     codes = site_station_codes(sites_cfg)
-    wamis = fetch_wamis_levels(codes, date(2020, 1, 1), date.today())
+    wamis = fetch_wamis_levels(codes, date(2020, 1, 1), args.end)
     offsets = offset_table(long[long["station_code"].isin(codes)], wamis)
     bad = {
         str(e["code"])
@@ -349,18 +357,20 @@ def main(argv: list[str] | None = None) -> int:
     cont = continuous_series(
         long[long["station_code"].isin(codes)], wamis[~wamis["station_code"].isin(bad)], offsets, CUTOVER
     )
-    cont.to_parquet(CONT_PATH, index=False)
+    cont.to_parquet(cont_path, index=False)
     n_w = int((cont["source"] == "wamis_wl_dtdata").sum())
     print(
         f"연속 시계열 {len(cont):,}행 (WAMIS {CUTOVER}~ {n_w:,}행, 최근 {cont['obs_date'].max()}) "
-        f"→ {CONT_PATH.name}"
+        f"→ {cont_path}"
     )
     print(offsets.to_string(index=False))
     print(
         f"{len(long):,}행, 관측소 {long['station_code'].nunique()}개, "
-        f"{long['obs_date'].min()}~{long['obs_date'].max()} → {OUT_PATH.name}"
+        f"{long['obs_date'].min()}~{long['obs_date'].max()} → {out_path}"
     )
     print(cov.to_string(index=False))
+    if args.out_dir.resolve() != DATAON_DIR.resolve():
+        return 0  # 다른 폴더로 다시 만든 경우(검증용)는 커버리지 보고서를 덮어쓰지 않는다
     rep = ROOT / "reports" / "eda" / "dataon_level_coverage.md"
     rep.parent.mkdir(parents=True, exist_ok=True)
     rep.write_text(

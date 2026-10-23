@@ -14,7 +14,8 @@
 사용(3단계):
   1) python scripts/build_submission_package.py             # 패키지 생성(+민감정보 검사)
   2) python scripts/verify_package.py --update-package      # 새 venv 재현(diff 0·노트북 오류 0·데모 sha256) → 실행본 ipynb 를 패키지에 반영
-  3) python scripts/build_submission_package.py --zip-only  # README 체크리스트를 검증 결과로 갱신 → 민감정보 재검사 → zip 2개
+  3) python scripts/build_submission_package.py --zip-only  # README 체크리스트를 검증 결과로 갱신 → 민감정보 재검사 → zip 3개
+     (기본 2개 = 영상 포함·영상 제외, DataON 원값 미포함 / 대체 1개 = _with_dataon, 운영사무국 허용 시에만)
 """
 
 from __future__ import annotations
@@ -36,6 +37,13 @@ from algaecast.config import ROOT
 PKG_NAME = "AlgaeCast_녹조7일예측_이재행"
 ZIP_NAME = f"{PKG_NAME}.zip"
 ZIP_NOVIDEO = f"{PKG_NAME}_영상제외.zip"
+ZIP_DATAON = (
+    f"{PKG_NAME}_with_dataon.zip"  # DataON 원값 포함 대체본 — 기본 제출본 아님(운영사무국 허용 시에만)
+)
+# DataON 원값(CC BY-NC-SA)이 든 연속 수위 시계열 — 기본 패키지에서 빼고 _with_dataon zip 에만 넣는다
+DATAON_RAW_FILE = "dataon/level_continuous_long.parquet"
+# DataON 가공 수위 피처(level_cont_t0·level_cont_diff7) — 원자료 없이 같은 submission.csv 를 만드는 데 쓴다
+LEVEL_FEATURE_FILE = "level_cont_features_S1.parquet"
 DEMO_SHA_PREFIX = "5363e22a"  # 2026-10-22 v3(운영 화면 v2 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc → dist/backup_demo_20261022_*
 # DataON 유래 파일이 있는(또는 노트북 실행으로 생기는) 폴더 — LICENSE_DataON.txt 를 붙인다
 DATAON_DIRS = ("data/raw/dataon", "data/interim", "data/processed", "src/config")
@@ -47,7 +55,6 @@ RAW_FILES = [
     "kwater_sluice/kwater_sluice_daily.parquet",
     "wamis_dam/wamis_dam_daily.parquet",
     "kwater_damapi/kwater_damapi_recent.parquet",
-    "dataon/level_continuous_long.parquet",
     "MANIFEST.md",
 ]
 CONFIG_FILES = [
@@ -278,7 +285,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 | `submission.csv` | 제출본 = 제출·운영 모델 v2 예측(124행, `station_id,base_date,target_date,pred_cells`, UTF-8 BOM, 예시와 같은 행 순서). v1 제출본은 저장소 태그 `v1-submission` 에 보존 | |
 | `방법설명서.pdf` | 방법 설명서(배경·데이터·통계분석·피처·모델·평가·설명가능성·시스템·재현·한계, 10장) | {sizes.get('pdf', '-')} |
 | `requirements.txt` · `pyproject.toml` | 라이브러리 정확한 버전(pip freeze) · 패키지 설치 정보 | |
-| `data/` | 대회 번들(`data/raw/competition/`) + 외부 공공 데이터 스냅샷(parquet) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
+| `data/` | 대회 번들(`data/raw/competition/`, 심사용 — 공개 시 제외·대회 종료 후 폐기, `README_심사용_공개시제외.txt`) + 외부 공공 데이터 스냅샷(parquet) + DataON 가공 수위 피처(`data/processed/level_cont_features_S1.parquet`; DataON 원값은 미포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
 | `model/` | 동결 모델: 회귀 v2(제출·운영)·회귀 v1(블라인드 검증, 보존)·경보 분류기·분위 회귀(분류기·분위는 v1·v2 공통) + `registry.json`(current = v2) + `FROZEN_v2.md`(v2 sha256, 동결 커밋 `{frozen['v2']}`) · `FROZEN.md`(v1 sha256, 동결 커밋 `{frozen['v1']}`) | {sizes.get('model', '-')} |
 | `src/` | 파이썬 패키지 `algaecast`(정렬·피처·모델·평가, 재현에 필요한 코드만) + `src/config/`(지점·피처·모델·시드 설정, `seed.yaml`=42) + `src/docs/`(설계 문서) | {sizes.get('src', '-')} |
 | `notebooks/01_train_eval.ipynb` | 동결 모델 검증(v1·v2) → 데이터 로드·전처리 → 피처(+ v2 상류 피처) → 학습(동결 파라미터, v1·v2) → 2025 검증 지표(v1·v2 나란히) → `submission.csv`(v2) 생성 → 그림. 실행 결과(출력) 포함 | |
@@ -288,7 +295,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 
 ## 2. 데이터·모델 요약
 - 타깃: 조류경보제 5지점(해평·강정고령·칠서·물금매리·회남) 유해남조류 세포수(cells/mL), 기준일(base_date)+7일(±3일 매칭) 예측.
-- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — 원 배포 파일(연도별 xlsx)은 미포함, 피처 계산용 연속 수위 파일만 포함, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
+- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — DataON 원값은 기본 패키지에 넣지 않고 수위 피처 2열 가공 파일만 포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
 - 모델: **제출·운영 모델 v2**(2026-10-22 동결, 커밋 `{frozen['v2']}`) = LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.000 · c3 0.266 · c2 0.373 · cg 0.361) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률) + 분위 회귀 q10/50/90(CQR 보정, 감시 규칙). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점은 v1 동결본 그대로라 감시·경보 결과는 v1 과 같다. **블라인드 검증 모델 v1**(2026-10-21 09:44 KST 봉인, 커밋 `{frozen['v1']}`) = 같은 3종 NNLS 앙상블, 피처 30개.
 - 검증: 연도 expanding-window CV(2020~2024) → 2025 홀드아웃 → **v1 동결** → 2026 블라인드 사후 검증(모델 선택·튜닝에 미사용) → v2 는 사전등록 확인 실험(EXP-confirm)으로 채택·동결 → 2026 사후 계산(모델 선택에 2026 미사용. 단 팀은 v1의 2026 결과를 이미 본 뒤 v2를 선택함, 블라인드 아님). 누수 감사: 전 샘플 재계산 불일치 0.
 - 핵심 결과: 2025 홀드아웃(같은 252행) v2 log R² 0.779 · 경계 F1 0.705 · 원단위 R² 0.176, v1 0.780 · 0.682 · 0.164(지속성 F1 0.727, 봉우리 1건이 분산의 43%). **2020~2026년 경계 사건 28건 중 25건(89%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 감시 단계로 포착(지속성 3건)**, v1 봉인 후 처음 보는 **2026년 8건 중 7건을 중앙 21일 앞서** 포착(지속성 2건, 감시·경보는 v2 도 같음). 2026 test 124조합: v1(블라인드) log R² 0.488 · 원단위 R² −0.054 · F1@10k 0.705, v2(블라인드 아님) 0.521 · −0.010 · 0.824(지속성 F1 0.841). 2026 사후 성능 저하와 한계는 방법설명서 6.11절·10장.
@@ -305,6 +312,7 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 ```
 - 화면에서 셀 단위로 실행해 보려면: `.venv/Scripts/jupyter lab notebooks/01_train_eval.ipynb` (위 2줄 설치 후).
 - 재현 소요 시간: 약 20분(대부분 피처 생성, 8코어 CPU 기준). 결과 `submission.csv` 는 제출본과 바이트 동일(`scripts/verify_package.py` 로 새 가상환경에서 확인).
+- **DataON 원자료는 재현에 필요 없다.** 수위 피처 2열(`level_cont_t0`·`level_cont_diff7`)은 `data/processed/level_cont_features_S1.parquet` 에서 채운다(원자료가 있든 없든 `features_S1` 완전 일치·`submission.csv` 바이트 동일, 2026-10-23 확인). 원자료부터 다시 만드는 경로는 `data/raw/dataon/README_GET_DATAON.md`.
 - **외부 API는 재현에 필요 없다.** `data/` 스냅샷만 사용한다. 공공 API 키(.env)는 대시보드 일일 운영(GitHub Actions)에만 쓰이며 패키지에 포함되지 않는다.
 - 대시보드(운영 데모): https://algaecast-7.vercel.app · 저장소: https://github.com/LeeJaeHaeng/AlgaeCast (private)
 
@@ -347,11 +355,12 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 - **최종 선택 이유**: CV 복합점수 기준 채택 절차를 고정해 홀드아웃 과적합을 막았고, 제출 모델 교체(v1 → v2)도 실행 전에 등록한 조건으로만 판정했다. 운영 목적(발령 선행 판단)에 맞는 지표(log R²·경보 F1·리드타임)로 평가했으며, 재현 가능한 동결 모델과 공개 데이터 스냅샷으로 전 과정을 패키지화했다.
 
 ## 6. 라이선스·출처
-`data/raw/MANIFEST.md` 참조(첫 표 라이선스 칸과 '라이선스 확인' 절 — 2026-10-22 각 출처 페이지에서 다시 확인). 공공데이터포털 자료는 공공누리 제1유형(출처표시) 또는 이용허락범위 제한 없음이고, DataON 수위 자료는 CC BY-NC-SA(저작자표시-비영리-동일조건변경허락)다. 출처 페이지에서 라이선스를 확인하지 못한 자료(WAMIS, 대회 자료 규정 원문, 물환경정보시스템 측정소 목록)는 MANIFEST 에 '미확인'으로 적었다.
+`data/raw/MANIFEST.md` 참조(첫 표 라이선스 칸과 '라이선스 확인' 절 — 2026-10-22~23 각 출처 페이지에서 다시 확인). 외부 데이터는 출처별 라이선스를 MANIFEST 에 기록하고 그 조건을 지킨다. 공공데이터포털 자료는 공공누리 제1유형(출처표시) 또는 이용허락범위 제한 없음이고, WAMIS 자료는 공공데이터포털 #3068550(한강홍수통제소_수자원 정보, 이용허락범위 제한 없음) 등록분을 근거로 하며, DataON 수위 자료는 CC BY-NC-SA(저작자표시-비영리-동일조건변경허락)다. 라이선스를 확인하지 못한 물환경정보시스템 수질자동측정소 목록·좌표는 실험(EXP-009) 전용이며 제출 모델에 쓰지 않았고 이 패키지에 넣지 않았다.
 
+- **대회 제공 데이터**(`data/raw/competition/`): 참가신청서 경진대회 규정 3항(승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 발생 시 출처 명시)에 따라 **심사용으로만** 넣었다. 공개할 때는 이 폴더를 빼고, 대회가 끝나면 폐기한다(`README_심사용_공개시제외.txt`).
 - **DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다.** 원 자료: 「댐유역 하천 일평균수위」(국가참조표준), 생산 한국수자원공사 오재우·이영창·이재용, 발행 국가참조표준센터, DOI 10.20925/KSRD.74670854.v5, 제·개정 2025-12-16.
-- 이 패키지의 DataON 유래 파일: `data/raw/dataon/level_continuous_long.parquet`(24개 관측소, 144,068행 — DataON 일평균수위(2010~2024) 128,279행에 WAMIS 일수위(2025년 이후, 기준면 오프셋 보정) 15,789행을 이은 연속 시계열), `src/config/level_cont_stats.json`(집계 통계), 노트북 실행으로 생기는 `data/interim`·`data/processed` 의 `level_cont_*` 열. 해당 폴더마다 `LICENSE_DataON.txt` 를 붙였다. 원 배포 파일(연도별 xlsx)은 넣지 않았다.
-- 대회 제공 데이터는 평가 목적으로만 포함했다.
+- 이 패키지(기본 zip 2종)의 DataON 유래 파일: `data/processed/level_cont_features_S1.parquet`(수위 피처 2열 가공값, 2,979행), `src/config/level_cont_stats.json`(집계 통계, 일일 운영용), 노트북 실행으로 생기는 `data/processed/features_*.parquet` 의 `level_cont_*` 열. 해당 폴더마다 `LICENSE_DataON.txt` 를 붙였다. **DataON 원값(연속 수위 시계열·원 배포 xlsx)은 넣지 않았다**(받는 법: `data/raw/dataon/README_GET_DATAON.md`).
+- DataON 원값(연속 수위 시계열 스냅샷)이 든 대체 zip `{ZIP_DATAON}` 은 기본 제출본이 아니며, 운영사무국이 허용한 경우에만 쓴다.
 
 ## 7. 제출 전 확인사항 (공지 #564)
 {check_md}
@@ -377,8 +386,25 @@ def notebook_text(raw: str) -> str:
     return "\n".join(strings(nb.get("cells", [])))
 
 
+def env_secret_prefixes() -> dict[str, str]:
+    """로컬 .env 의 키·토큰 값 앞 8자(값 일부라도 패키지에 들어갔는지 검사용). 값은 출력하지 않는다."""
+    env = ROOT / ".env"
+    out: dict[str, str] = {}
+    if not env.exists():
+        return out
+    for ln in env.read_text(encoding="utf-8").splitlines():
+        if "=" not in ln or ln.lstrip().startswith("#"):
+            continue
+        k, v = ln.split("=", 1)
+        v = v.strip().strip("'\"")
+        if len(v) >= 12 and re.search(r"KEY|TOKEN|SECRET|PASS", k) and not v.startswith("eyJ"):
+            out[k.strip()] = v[:8]
+    return out
+
+
 def scan_secrets(root: Path) -> list[str]:
     hits = []
+    prefixes = env_secret_prefixes()
     for p in root.rglob("*"):
         if not p.is_file() or p.suffix.lower() in SCAN_SKIP_SUFFIX:
             continue
@@ -391,6 +417,9 @@ def scan_secrets(root: Path) -> list[str]:
             continue
         if p.suffix.lower() == ".ipynb":
             text = notebook_text(text)
+        for name, pre in prefixes.items():
+            if pre in text:
+                hits.append(f"{p.relative_to(root)}: .env {name} 값의 앞부분 포함")
         for pat in SECRET_PATTERNS:
             for m in re.finditer(pat, text):
                 ctx = text[max(0, m.start() - 20) : m.start() + 20].replace("\n", " ")
@@ -441,6 +470,27 @@ def security(out: Path) -> list[str]:
     return hits
 
 
+def level_feature_file() -> Path:
+    """가공 수위 피처 파일이 지금 features_S1 의 두 열과 같은지 확인하고 경로를 돌려준다."""
+    import pandas as pd
+
+    from algaecast.features import run as feat_run
+
+    lvl = ROOT / "data" / "processed" / LEVEL_FEATURE_FILE
+    if not lvl.exists():
+        raise SystemExit(
+            f"빌드 중단: {lvl} 가 없다(원자료 환경에서 python -m algaecast.features.run --strategy S1 --export-level-cont)."
+        )
+    f = ROOT / "data" / "processed" / "features_S1.parquet"
+    if f.exists():
+        feats = pd.read_parquet(f)
+        blank = feats.copy()
+        blank[list(feat_run.LEVEL_FEATURES)] = float("nan")
+        filled = feat_run.apply_level_cont_derived(blank, "S1")
+        pd.testing.assert_frame_equal(filled, feats, check_exact=True)
+    return lvl
+
+
 def build(out: Path) -> int:
     demo_src = demo_sources()  # 먼저 확인 — 영상이 없으면 아무것도 지우지 않고 중단
     pdf_src = ROOT / "reports" / "방법설명서.pdf"
@@ -456,6 +506,17 @@ def build(out: Path) -> int:
         if src.exists():
             copy(src, out / "data" / "raw" / f)
     copy(ROOT / "data" / "raw" / "kma_forecast", out / "data" / "raw" / "kma_forecast")
+    # 대회 자료: 참가신청서 규정 3항 — 심사용, 공개 시 제외, 대회 종료 후 폐기
+    copy(
+        ROOT / "docs" / "reference" / "README_COMPETITION_DATA.txt",
+        out / "data" / "raw" / "competition" / "README_심사용_공개시제외.txt",
+    )
+    # DataON: 원값(연속 시계열)은 빼고 수위 피처 2열 가공 파일 + 받는 법 안내만 넣는다
+    copy(level_feature_file(), out / "data" / "processed" / LEVEL_FEATURE_FILE)
+    copy(
+        ROOT / "docs" / "reference" / "README_GET_DATAON.md",
+        out / "data" / "raw" / "dataon" / "README_GET_DATAON.md",
+    )
     for sub in ("interim", "processed"):
         (out / "data" / sub).mkdir(parents=True, exist_ok=True)
         (out / "data" / sub / ".gitkeep").write_text("", encoding="utf-8")
@@ -534,6 +595,9 @@ def build(out: Path) -> int:
     security(out)
     write_readme(out)  # 검사 결과를 README 에 반영한 뒤, README 를 포함해 다시 검사
     hits = security(out)
+    leaked = out / "data" / "raw" / DATAON_RAW_FILE
+    if leaked.exists():
+        raise SystemExit(f"빌드 중단: 기본 패키지에 DataON 원값 파일이 있다: {leaked}")
     print(f"패키지 {out} 총 {dir_size(out)}")
     print("루트:", sorted(p.name for p in out.iterdir()))
     return 1 if hits else 0
@@ -551,7 +615,16 @@ def make_zips(out: Path) -> int:
     dist = ROOT / "dist"
     dist.mkdir(exist_ok=True)
     files = sorted(p for p in out.rglob("*") if p.is_file())
-    for name, keep in ((ZIP_NAME, lambda p: True), (ZIP_NOVIDEO, lambda p: p != mp4)):
+    raw = ROOT / "data" / "raw" / DATAON_RAW_FILE
+    if not raw.exists():
+        raise SystemExit(f"zip 중단: {raw} 가 없어 {ZIP_DATAON} 을 만들 수 없다.")
+    if any(p.name == Path(DATAON_RAW_FILE).name for p in files):
+        raise SystemExit("zip 중단: 기본 패키지 폴더에 DataON 원값 파일이 있다.")
+    for name, keep in (
+        (ZIP_NAME, lambda p: True),
+        (ZIP_NOVIDEO, lambda p: p != mp4),
+        (ZIP_DATAON, lambda p: True),
+    ):
         zpath = dist / name
         with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as z:
             for p in files:
@@ -563,6 +636,16 @@ def make_zips(out: Path) -> int:
                     f"데모 영상 AlgaeCast_demo.mp4(2분 28초, {mp4.stat().st_size / 1e6:.1f} MB, sha256 {sha256(mp4)})는 "
                     f"용량 제한에 대비해 이 zip 에서 제외했다. 영상 포함본: {ZIP_NAME}\n",
                 )
+            if name == ZIP_DATAON:
+                z.write(raw, Path(PKG_NAME) / "data" / "raw" / DATAON_RAW_FILE)
+                z.writestr(
+                    f"{PKG_NAME}/data/raw/dataon/WITH_DATAON_안내.txt",
+                    f"이 zip 은 DataON 원값(연속 수위 시계열 스냅샷 {Path(DATAON_RAW_FILE).name}, sha256 {sha256(raw)})을 "
+                    f"포함한 대체본이다. 기본 제출본은 {ZIP_NAME}(영상 포함)·{ZIP_NOVIDEO}(영상 제외)이며 DataON 원값이 없다. "
+                    "이 zip 은 운영사무국이 허용한 경우에만 쓴다.\n"
+                    "DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다(LICENSE_DataON.txt). "
+                    "원자료가 있으면 노트북은 원자료로 수위 피처를 계산하고, 결과(submission.csv)는 기본 패키지와 같다.\n",
+                )
         print(f"zip {zpath.name} {zpath.stat().st_size / 1e6:.1f} MB sha256 {sha256(zpath)}")
     return 0
 
@@ -571,7 +654,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", type=Path, default=ROOT / "submission_package")
     ap.add_argument(
-        "--zip-only", action="store_true", help="기존 패키지에서 README 갱신·민감정보 재검사·zip 2개만"
+        "--zip-only", action="store_true", help="기존 패키지에서 README 갱신·민감정보 재검사·zip 3개만"
     )
     args = ap.parse_args(argv)
     if args.zip_only:

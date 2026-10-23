@@ -9,12 +9,17 @@ DataON 유래 데이터 라이선스 안내 — AlgaeCast-7 제출 패키지
 - 라이선스: CC BY-NC-SA (저작자표시-비영리-동일조건변경허락)
   DataON 상세 페이지 표기 "BY-NC-SA :저작자표시-비영리-동일조건변경허락" (버전 번호는 표기되지 않음)
 
-이 패키지에서 위 자료를 담거나 가공한 파일
+이 패키지에서 위 자료를 가공한 파일 (기본 zip 2종 — DataON 원값은 넣지 않음)
+- data/processed/level_cont_features_S1.parquet
+    수위 피처 2열(level_cont_t0, level_cont_diff7) 가공값 2,979행 — 관측소 평균을 뺀 수위 편차와 7일 변화.
+    DataON 원자료 없이 노트북·make reproduce 가 같은 submission.csv 를 만들 때 쓴다.
+- src/config/level_cont_stats.json
+    연속 수위 시계열의 관측소별 집계 통계(대시보드 일일 운영용)
+- 노트북 실행으로 생기는 data/processed/features_*.parquet 의 level_cont_* 열
+DataON 원값이 든 파일 (대체 zip _with_dataon 에만, 운영사무국 허용 시)
 - data/raw/dataon/level_continuous_long.parquet
     DataON 일평균수위(2010~2024) 원값에 WAMIS 일수위(2025~, 기준면 오프셋 보정)를 이은 연속 시계열
-- src/config/level_cont_stats.json
-    위 연속 시계열의 관측소별 집계 통계
-- 노트북 실행으로 생기는 data/interim/daily_*_S1.parquet, data/processed/features_*.parquet 의 level_cont_* 열
+원 배포 파일(연도별 xlsx)을 받는 법: data/raw/dataon/README_GET_DATAON.md
 
 이용 조건
 - DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다.

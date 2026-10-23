@@ -205,9 +205,10 @@ def daily_rows(cfg: dict, days: int) -> tuple[list[dict], list[dict]]:
                     "outflow_cms": d["fac_outflow"],
                     "storage_mcm": d["fac_storage"],
                     "storage_rate": d["fac_storage_rate"],
-                    "water_level": d["level_cont_anom"],
+                    # 연속 수위 편차(level_cont_anom)는 DataON(CC BY-NC-SA) 유래라 공개 DB에 올리지 않는다
+                    "water_level": None,
                     "weir_level": d["fac_level"],
-                    "source": "K-water delist/WAMIS/DataON (S1 보간)",
+                    "source": "K-water delist/WAMIS (S1 보간)",
                 }
             )
         )

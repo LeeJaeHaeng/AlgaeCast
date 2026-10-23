@@ -14,7 +14,7 @@
 - `sample_submission.csv`의 `(지점, base_date, target_date)` 조합을 그대로 사용한다. target_date를 임의로 바꾸지 않는다.
 - 분할: 학습 ≤2024 / 검증 2025 / 평가 2026. 랜덤 KFold 금지, 연도 단위 expanding-window만 허용.
 - 모든 난수 시드는 `config/seed.yaml`의 값(기본 42)을 사용한다.
-- 외부 데이터는 `docs/02_DATA_SPEC.md`에 등재된 공공 데이터(공공누리/이용제한 없음)만 사용한다. 출처 URL과 수집 일시를 `data/raw/MANIFEST.md`에 기록한다.
+- 외부 데이터는 출처별 라이선스를 `data/raw/MANIFEST.md`에 기록하고 조건을 지킨다(공공데이터포털: 공공누리/이용허락범위 제한 없음, DataON: CC BY-NC-SA 등). 출처 URL과 수집 일시도 MANIFEST에 기록한다.
 
 ## 기술 스택
 - ML: Python 3.11, pandas, numpy, scikit-learn, lightgbm, catboost, optuna, shap, statsmodels
