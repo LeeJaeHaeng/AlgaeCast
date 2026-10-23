@@ -172,6 +172,11 @@ def main(argv: list[str] | None = None) -> int:
         for f in ("fig_2025_pred_vs_obs.png", "fig_leadtime_summary.png"):
             if (pkg / "figures" / f).exists():
                 shutil.copy2(pkg / "figures" / f, args.dir / "figures" / f)
+        # 이 검증 기록도 패키지의 figures/reports/eval 에 넣는다(빌드 때 복사된 이전 기록을 덮어씀)
+        for f in ("package_verify.log", "package_verify.json"):
+            dst = args.dir / "figures" / "reports" / "eval" / f
+            if dst.parent.is_dir():
+                shutil.copy2(rep / f, dst)
         print("실행본 노트북·그림을 패키지에 반영:", args.dir / "notebooks" / "01_train_eval.ipynb")
     if not args.keep:
         shutil.rmtree(tmp, ignore_errors=True)

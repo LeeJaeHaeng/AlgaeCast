@@ -1,5 +1,5 @@
 {
- "when": "2026-10-23 10:33",
+ "when": "2026-10-23 10:52",
  "returncode": 0,
  "source": "dist\\AlgaeCast_녹조7일예측_이재행.zip",
  "dataon_raw_present": false,
@@ -12,5 +12,5 @@
  "notebook_abs_paths": 0,
  "demo_sha256": "0a1fb2f4d8fd72132df80759893805866d7181a43ad3eadb59b3823c43d337c6",
  "demo_sha_ok": true,
- "minutes": 8.7
+ "minutes": 7.6
 }
