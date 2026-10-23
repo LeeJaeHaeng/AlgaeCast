@@ -21,7 +21,7 @@ for (const d of srcDirs) {
   }
 }
 // 동결 문서: v1(블라인드 검증, FROZEN.md) · v2(제출·운영, FROZEN_v2.md)
-for (const f of ["FROZEN.md", "FROZEN_v2.md"]) {
+for (const f of ["FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md"]) {
   const p = path.join(root, "models", f);
   if (fs.existsSync(p)) md[f] = fs.readFileSync(p, "utf8");
 }

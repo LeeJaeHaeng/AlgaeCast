@@ -6,6 +6,7 @@ import { BigChart, EnvChart } from "@/components/site/SiteCharts";
 import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, SITE, TERMS, TIER, TIER_EXPERT, UPSTREAM_PREFIX, comboOf, explainForecast, levelOfCells, outOfRange, outOfRangeTip, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
 import { ALERT_LEVEL_LABEL, addDays, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
 import { getBloomEvents, getHydro, getLatestRun, getObservations, getPredictions, getShap, getSiteStatus, getSites, getWeather } from "@/lib/queries";
+import { OP_PCT } from "@/lib/numbers";
 
 export const revalidate = 300;
 
@@ -138,11 +139,11 @@ export default async function SitePage({ params, searchParams }: { params: Promi
             <div className="flex items-center gap-3">
               <div className="relative h-3 flex-1 rounded-full bg-[var(--panel-border)]" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={p} aria-label={TERMS.pAlert.label}>
                 <div className="h-full rounded-full" style={{ width: `${p}%`, background: c.color }} />
-                <div className="absolute -top-1 h-5 w-0.5 bg-text/70" style={{ left: "52%" }} title={BOARD.basis.chance} aria-hidden />
+                <div className="absolute -top-1 h-5 w-0.5 bg-text/70" style={{ left: `${OP_PCT}%` }} title={BOARD.basis.chance} aria-hidden />
               </div>
               <span className="text-4xl font-bold">{p}%</span>
             </div>
-            {expert && <div className="text-xs text-dim">p_alert {(st?.p_alert ?? 0).toFixed(3)} · 운영점 0.52 · CQR q10 {fmtCells(st?.q10_cqr)} / q90 {fmtCells(st?.q90_cqr)}</div>}
+            {expert && <div className="text-xs text-dim">p_alert {(st?.p_alert ?? 0).toFixed(3)} · 운영점 {(OP_PCT / 100).toFixed(2)} · CQR q10 {fmtCells(st?.q10_cqr)} / q90 {fmtCells(st?.q90_cqr)}</div>}
           </div>
           <p className="text-base leading-relaxed">{plain}</p>
           <p className="text-sm leading-relaxed text-dim">

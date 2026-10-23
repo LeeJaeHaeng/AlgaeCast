@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Info } from "@/components/Info";
 import { BOARD, COMBO, COMBO_ORDER, banner as bannerText, comboOf } from "@/lib/copy";
 import { fmtDate, tierOf } from "@/lib/format";
-import { NUMBERS, V2CMP } from "@/lib/numbers";
+import { CMP, NUMBERS } from "@/lib/numbers";
 import type { ForecastLite, SiteStatus } from "@/lib/queries";
 
 /** 상황 배너(48px): 색 = 가장 높은 조합, 문구 = §8.3 템플릿(조합별 "지점, 지점 라벨" 을 · 로 연결), 우측 = 조합별 개수 */
@@ -96,7 +96,7 @@ export function ScoreStrip({ expert }: { expert: boolean }) {
         </span>
       </span>
       {expert && (
-        <span className="text-dim">{BOARD.score.expert(f2(V2CMP.h25v2.f1_10k), f2(V2CMP.h25v1.f1_10k), f2(V2CMP.p26v2.f1_10k), f2(V2CMP.p26v1.f1_10k))}</span>
+        <span className="text-dim">{BOARD.score.expert(f2(CMP.h25v21.f1_10k), f2(CMP.h25b0.f1_10k), f2(CMP.p26v21.f1_10k), f2(CMP.p26b0.f1_10k))}</span>
       )}
       <span className="ml-auto flex items-center gap-3 text-dim">
         <span>

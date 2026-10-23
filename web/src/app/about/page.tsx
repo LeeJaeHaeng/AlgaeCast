@@ -9,7 +9,7 @@ export const revalidate = 86400;
 export default async function AboutPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const expert = sp.view === "expert";
-  const frozenV2 = parseTables(readReport("FROZEN_v2.md") ?? "")[0];
+  const frozenV2 = parseTables(readReport("FROZEN_v2.1.md") ?? "")[0];
   return (
     <PageFrame title={ABOUT.title} lead={ABOUT.lead} expert={expert}>
       <section className="panel p-4">
@@ -44,10 +44,11 @@ export default async function AboutPage({ searchParams }: { searchParams: Promis
         </p>
       </section>
 
-      {/* 모델 두 가지: v1 블라인드 검증 · v2 제출·운영 */}
+      {/* 제출·운영 모델 v2.1 · 이력 v2·v1 */}
       <section className="panel p-4" style={{ borderColor: "var(--accent)" }}>
         <h2 className="text-xl font-semibold">{ABOUT.models.title}</h2>
         <p className="mt-1 text-sm leading-relaxed text-dim">{ABOUT.models.lead}</p>
+        <p className="mt-1 text-sm leading-relaxed">{ABOUT.models.leak}</p>
         <div className="mt-2 overflow-x-auto">
           <table className="tbl">
             <thead>
@@ -61,8 +62,11 @@ export default async function AboutPage({ searchParams }: { searchParams: Promis
               {ABOUT.models.rows.map((r) => (
                 <tr key={r[0]}>
                   <td className="font-semibold">{r[0]}</td>
-                  <td>{r[1]}</td>
-                  <td>{r[2]}</td>
+                  <td className="font-semibold" style={{ color: "var(--accent)" }}>
+                    {r[1]}
+                  </td>
+                  <td className="text-dim">{r[2]}</td>
+                  <td className="text-dim">{r[3]}</td>
                 </tr>
               ))}
             </tbody>

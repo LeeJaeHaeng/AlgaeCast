@@ -3,6 +3,7 @@ import { Info } from "@/components/Info";
 import { BOARD, COMBO, OFFICIAL_LEVEL, TERMS, TIER, comboOf, outOfRange, outOfRangeTip, targetLabel } from "@/lib/copy";
 import { fmtCells, fmtCellsKo, fmtDateKo, pctInt, tierOf, trendArrow } from "@/lib/format";
 import type { SiteStatus } from "@/lib/queries";
+import { OP_PCT } from "@/lib/numbers";
 
 /** 고정 로그 축 100 ~ 1,000,000 (1천 = 25%, 1만 = 50%) */
 const AX_LO = 2;
@@ -120,7 +121,7 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
         </span>
         <div className="relative h-2 min-w-0 flex-1 rounded-full bg-[var(--panel-border)]" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={p} aria-label={BOARD.tile.chance}>
           <div className="h-full rounded-full" style={{ width: `${p}%`, background: c.color }} />
-          <div className="absolute -top-0.5 h-3 w-0.5 bg-text/70" style={{ left: "52%" }} title={BOARD.basis.chance} aria-hidden />
+          <div className="absolute -top-0.5 h-3 w-0.5 bg-text/70" style={{ left: `${OP_PCT}%` }} title={BOARD.basis.chance} aria-hidden />
         </div>
         <span className="w-10 shrink-0 text-right text-lg font-bold text-text">{p}%</span>
       </div>
