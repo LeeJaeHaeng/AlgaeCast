@@ -24,7 +24,7 @@ from sklearn.isotonic import IsotonicRegression
 from algaecast.config import CONFIG_DIR
 from algaecast.eval.metrics import compute_all
 from algaecast.models import data as D
-from algaecast.models.cv import REPORT_METRICS, Fold, year_folds
+from algaecast.models.cv import REPORT_METRICS, Fold, fold_frames, year_folds
 
 log = logging.getLogger(__name__)
 SEED = int(yaml.safe_load((CONFIG_DIR / "seed.yaml").read_text(encoding="utf-8"))["seed"])
@@ -214,7 +214,7 @@ def run_cv(
     oof_by_bias = {b: np.full(n, np.nan) for b in bias_methods}
     final_iso = None
     for fo in folds:
-        tr, va = df.iloc[fo.train_idx], df.iloc[fo.valid_idx]
+        tr, va = fold_frames(df, fo)
         fits = [fit_predict(tr, va, cols, spec, seed=s) for s in seeds]
         raw = np.mean([f.raw for f in fits], axis=0)
         lp = np.mean([f.log_pred for f in fits], axis=0) if fits[0].log_pred is not None else None

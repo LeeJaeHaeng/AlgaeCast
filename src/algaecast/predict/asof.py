@@ -2,7 +2,9 @@
 피처 → 동결 모델 예측.
 
 - 수집: 조류경보제(NIER), K-water delist(보·댐), WAMIS wl_dtdata(연속 수위 관측소), ASOS, 예보 CSV(저장소)
-- 연속 수위 편차는 config/level_cont_stats.json(전기간 평균·오프셋 집계값)으로 계산
+- 연속 수위 편차는 관측소별 직전 365일 평균 대비(as-of, align.run.level_anomaly_asof).
+  config/level_cont_stats.json 은
+  WAMIS 기준면 오프셋(2020~2024 겹침)·관측소 목록·본댐 대체 표만 쓴다(FIX-v2.1 R1)
 - base_date = 오늘 이전 가장 최근 조류 측정일(지점별). 새 측정 없으면 해당 지점 건너뜀
 - 회귀 current 가 ensemble_v2(v2 운영 모델)이면 ``attach_model_features`` 가 같은 조류 자료로 상류 피처 5열을
   붙인다(추가 수집 없음, 원자료는 행의 기준일까지만). v1 이면 피처 행을 그대로 쓴다.
@@ -206,11 +208,9 @@ def collect_recent(sites_cfg: dict, start: date, end: date) -> dict[str, pd.Data
 def build_daily(
     sites_cfg: dict, feat_cfg: dict, src: dict[str, pd.DataFrame], start: date, end: date
 ) -> dict[str, pd.DataFrame]:
-    stats = json.loads(LEVEL_STATS.read_text(encoding="utf-8")) if LEVEL_STATS.exists() else {}
-    means = {str(k): float(v) for k, v in stats.get("station_mean_wl_adj", {}).items()}
     out = {}
     for site in sites_cfg["sites"]:
-        base = build_site_daily(site, src, sites_cfg, feat_cfg, end, start=start, level_means=means)
+        base = build_site_daily(site, src, sites_cfg, feat_cfg, end, start=start)
         d = apply_strategy(base, "S1", feat_cfg)
         d["obs_date"] = pd.to_datetime(d["obs_date"])
         out[site["station_id"]] = d

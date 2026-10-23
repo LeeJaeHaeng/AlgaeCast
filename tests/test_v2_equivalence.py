@@ -94,9 +94,10 @@ def test_members_oof(ctx: dict) -> None:
 
 
 def test_a_fold_mode(ctx: dict, small_specs: dict) -> None:
+    from algaecast.features.constants import apply_site_thresholds
     from algaecast.models import v2 as V2
 
-    frame = ctx["frame"]
+    frame = apply_site_thresholds(ctx["frame"], 2024)  # 학습 ≤2024 → 2025: 임계도 ≤2024 측정으로(FIX-v2.1 R3)
     yrs = V2.years_of(frame)
     model = V2.fit_final(frame[yrs <= 2024].reset_index(drop=True), weights=ctx["w_v2"], specs=small_specs)
     pred = model.predict(frame[yrs == 2025].reset_index(drop=True))

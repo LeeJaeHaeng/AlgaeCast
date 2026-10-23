@@ -1,0 +1,403 @@
+{
+ "_about": "데이터로 계산한 상수와 계산 자료·기간(FIX-v2.1 PREREG R3·R4). 사용 규칙: CV 폴드(검증 V) → site_caution_wtemp[V−1], 2025 홀드아웃 → [2024], 최종 모델·2026 예측·일일 운영 → [2025]. 테스트(tests/test_derived_constants.py)가 사용 시점보다 늦은 자료를 막는다.",
+ "computed_at": "2026-10-23T11:46:49",
+ "site_caution_wtemp": {
+  "2019": {
+   "values": {
+    "HP": 29.4,
+    "GJGR": 24.1,
+    "CS": 23.8,
+    "MGMR": null,
+    "DCHN": 19.3
+   },
+   "n": {
+    "HP": 182,
+    "GJGR": 195,
+    "CS": 222,
+    "MGMR": 0,
+    "DCHN": 199
+   },
+   "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+   "data_max_year": 2019,
+   "data_last_date": "2019-12-30",
+   "data_last_date_by_site": {
+    "HP": "2019-12-30",
+    "GJGR": "2019-12-30",
+    "CS": "2019-12-30",
+    "MGMR": null,
+    "DCHN": "2019-12-30"
+   },
+   "method": "T2 S6: statsmodels lowess(log10(cells+1) ~ wtemp, frac=0.4), 값 ≥ 3.0 인 최소 수온(0.1℃)"
+  },
+  "2020": {
+   "values": {
+    "HP": 29.2,
+    "GJGR": 24.1,
+    "CS": 23.6,
+    "MGMR": 26.3,
+    "DCHN": 19.6
+   },
+   "n": {
+    "HP": 230,
+    "GJGR": 244,
+    "CS": 273,
+    "MGMR": 31,
+    "DCHN": 251
+   },
+   "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+   "data_max_year": 2020,
+   "data_last_date": "2020-12-28",
+   "data_last_date_by_site": {
+    "HP": "2020-12-14",
+    "GJGR": "2020-12-28",
+    "CS": "2020-12-28",
+    "MGMR": "2020-12-28",
+    "DCHN": "2020-12-28"
+   },
+   "method": "T2 S6: statsmodels lowess(log10(cells+1) ~ wtemp, frac=0.4), 값 ≥ 3.0 인 최소 수온(0.1℃)"
+  },
+  "2021": {
+   "values": {
+    "HP": 28.9,
+    "GJGR": 23.9,
+    "CS": 23.6,
+    "MGMR": 24.4,
+    "DCHN": 20.0
+   },
+   "n": {
+    "HP": 276,
+    "GJGR": 293,
+    "CS": 323,
+    "MGMR": 84,
+    "DCHN": 301
+   },
+   "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+   "data_max_year": 2021,
+   "data_last_date": "2021-12-28",
+   "data_last_date_by_site": {
+    "HP": "2021-12-20",
+    "GJGR": "2021-12-27",
+    "CS": "2021-12-27",
+    "MGMR": "2021-12-28",
+    "DCHN": "2021-12-27"
+   },
+   "method": "T2 S6: statsmodels lowess(log10(cells+1) ~ wtemp, frac=0.4), 값 ≥ 3.0 인 최소 수온(0.1℃)"
+  },
+  "2022": {
+   "values": {
+    "HP": 26.0,
+    "GJGR": 23.9,
+    "CS": 23.6,
+    "MGMR": 23.2,
+    "DCHN": 20.0
+   },
+   "n": {
+    "HP": 324,
+    "GJGR": 345,
+    "CS": 382,
+    "MGMR": 145,
+    "DCHN": 353
+   },
+   "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+   "data_max_year": 2022,
+   "data_last_date": "2022-12-26",
+   "data_last_date_by_site": {
+    "HP": "2022-12-12",
+    "GJGR": "2022-12-19",
+    "CS": "2022-12-26",
+    "MGMR": "2022-12-26",
+    "DCHN": "2022-12-26"
+   },
+   "method": "T2 S6: statsmodels lowess(log10(cells+1) ~ wtemp, frac=0.4), 값 ≥ 3.0 인 최소 수온(0.1℃)"
+  },
+  "2023": {
+   "values": {
+    "HP": 26.3,
+    "GJGR": 24.1,
+    "CS": 23.6,
+    "MGMR": 23.4,
+    "DCHN": 20.4
+   },
+   "n": {
+    "HP": 370,
+    "GJGR": 392,
+    "CS": 435,
+    "MGMR": 194,
+    "DCHN": 404
+   },
+   "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+   "data_max_year": 2023,
+   "data_last_date": "2023-12-26",
+   "data_last_date_by_site": {
+    "HP": "2023-12-26",
+    "GJGR": "2023-12-26",
+    "CS": "2023-12-26",
+    "MGMR": "2023-12-26",
+    "DCHN": "2023-12-26"
+   },
+   "method": "T2 S6: statsmodels lowess(log10(cells+1) ~ wtemp, frac=0.4), 값 ≥ 3.0 인 최소 수온(0.1℃)"
+  },
+  "2024": {
+   "values": {
+    "HP": 26.0,
+    "GJGR": 24.2,
+    "CS": 23.6,
+    "MGMR": 23.4,
+    "DCHN": 20.8
+   },
+   "n": {
+    "HP": 422,
+    "GJGR": 449,
+    "CS": 493,
+    "MGMR": 252,
+    "DCHN": 462
+   },
+   "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+   "data_max_year": 2024,
+   "data_last_date": "2024-12-30",
+   "data_last_date_by_site": {
+    "HP": "2024-12-30",
+    "GJGR": "2024-12-30",
+    "CS": "2024-12-30",
+    "MGMR": "2024-12-30",
+    "DCHN": "2024-12-30"
+   },
+   "method": "T2 S6: statsmodels lowess(log10(cells+1) ~ wtemp, frac=0.4), 값 ≥ 3.0 인 최소 수온(0.1℃)"
+  },
+  "2025": {
+   "values": {
+    "HP": 25.8,
+    "GJGR": 24.0,
+    "CS": 23.3,
+    "MGMR": 22.8,
+    "DCHN": 20.7
+   },
+   "n": {
+    "HP": 469,
+    "GJGR": 506,
+    "CS": 545,
+    "MGMR": 301,
+    "DCHN": 520
+   },
+   "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+   "data_max_year": 2025,
+   "data_last_date": "2025-12-29",
+   "data_last_date_by_site": {
+    "HP": "2025-12-29",
+    "GJGR": "2025-12-29",
+    "CS": "2025-12-29",
+    "MGMR": "2025-12-29",
+    "DCHN": "2025-12-29"
+   },
+   "method": "T2 S6: statsmodels lowess(log10(cells+1) ~ wtemp, frac=0.4), 값 ≥ 3.0 인 최소 수온(0.1℃)"
+  }
+ },
+ "decisions": {
+  "asos": {
+   "data_max_year": 2024,
+   "data_last_date": "2024-12-31",
+   "rule": "D1: 후보 중 spearman(7일 평균기온, 번들 측정 수온) 최대 / D2: 일사 보유율 >95% 중 최근접, 없으면 보유율 최대",
+   "sites": {
+    "HP": {
+     "asos_primary": 279,
+     "asos_primary_current": 279,
+     "si": 143,
+     "si_current": 143,
+     "table": [
+      {
+       "stn_id": 279,
+       "stn_nm": "구미",
+       "거리 km": 7.4,
+       "n": 422,
+       "spearman 7일평균기온": 0.976,
+       "일사 보유율 %": 0.0
+      },
+      {
+       "stn_id": 143,
+       "stn_nm": "대구",
+       "거리 km": 40.3,
+       "n": 422,
+       "spearman 7일평균기온": 0.9754,
+       "일사 보유율 %": 99.9
+      },
+      {
+       "stn_id": 136,
+       "stn_nm": "안동",
+       "거리 km": 53.2,
+       "n": 422,
+       "spearman 7일평균기온": 0.9752,
+       "일사 보유율 %": 99.8
+      }
+     ]
+    },
+    "GJGR": {
+     "asos_primary": 279,
+     "asos_primary_current": 279,
+     "si": 143,
+     "si_current": 143,
+     "table": [
+      {
+       "stn_id": 279,
+       "stn_nm": "구미",
+       "거리 km": 34.1,
+       "n": 449,
+       "spearman 7일평균기온": 0.9785,
+       "일사 보유율 %": 0.0
+      },
+      {
+       "stn_id": 143,
+       "stn_nm": "대구",
+       "거리 km": 18.4,
+       "n": 449,
+       "spearman 7일평균기온": 0.9781,
+       "일사 보유율 %": 99.9
+      },
+      {
+       "stn_id": 136,
+       "stn_nm": "안동",
+       "거리 km": 84.3,
+       "n": 449,
+       "spearman 7일평균기온": 0.9774,
+       "일사 보유율 %": 99.8
+      }
+     ]
+    },
+    "CS": {
+     "asos_primary": 288,
+     "asos_primary_current": 288,
+     "si": 155,
+     "si_current": 155,
+     "table": [
+      {
+       "stn_id": 288,
+       "stn_nm": "밀양",
+       "거리 km": 27.5,
+       "n": 492,
+       "spearman 7일평균기온": 0.9801,
+       "일사 보유율 %": 0.0
+      },
+      {
+       "stn_id": 155,
+       "stn_nm": "창원",
+       "거리 km": 23.8,
+       "n": 493,
+       "spearman 7일평균기온": 0.9785,
+       "일사 보유율 %": 70.7
+      },
+      {
+       "stn_id": 285,
+       "stn_nm": "합천",
+       "거리 km": 35.5,
+       "n": 492,
+       "spearman 7일평균기온": 0.9798,
+       "일사 보유율 %": 0.0
+      }
+     ]
+    },
+    "MGMR": {
+     "asos_primary": 288,
+     "asos_primary_current": 257,
+     "si": 257,
+     "si_current": 257,
+     "table": [
+      {
+       "stn_id": 159,
+       "stn_nm": "부산",
+       "거리 km": 23.1,
+       "n": 252,
+       "spearman 7일평균기온": 0.977,
+       "일사 보유율 %": 98.1
+      },
+      {
+       "stn_id": 257,
+       "stn_nm": "양산시",
+       "거리 km": 2.7,
+       "n": 252,
+       "spearman 7일평균기온": 0.9816,
+       "일사 보유율 %": 99.6
+      },
+      {
+       "stn_id": 288,
+       "stn_nm": "밀양",
+       "거리 km": 30.1,
+       "n": 251,
+       "spearman 7일평균기온": 0.9817,
+       "일사 보유율 %": 0.0
+      }
+     ]
+    },
+    "DCHN": {
+     "asos_primary": 131,
+     "asos_primary_current": 131,
+     "si": 133,
+     "si_current": 133,
+     "table": [
+      {
+       "stn_id": 133,
+       "stn_nm": "대전",
+       "거리 km": 20.6,
+       "n": 462,
+       "spearman 7일평균기온": 0.7635,
+       "일사 보유율 %": 99.6
+      },
+      {
+       "stn_id": 226,
+       "stn_nm": "보은",
+       "거리 km": 15.5,
+       "n": 462,
+       "spearman 7일평균기온": 0.756,
+       "일사 보유율 %": 0.0
+      },
+      {
+       "stn_id": 131,
+       "stn_nm": "청주",
+       "거리 km": 30.2,
+       "n": 461,
+       "spearman 7일평균기온": 0.7665,
+       "일사 보유율 %": 99.9
+      }
+     ]
+    }
+   }
+  },
+  "hydro_primary": {
+   "data_max_year": 2024,
+   "rule": "8개 |r| 모두 < 0.1 이면 T2 결정(본댐 합산 ≈0 → 보 자체 1차)과 같음",
+   "sites": {
+    "HP": {
+     "inflow": -0.0087,
+     "n_inflow": 432,
+     "discharge": 0.0175,
+     "n_discharge": 432
+    },
+    "GJGR": {
+     "inflow": -0.0525,
+     "n_inflow": 459,
+     "discharge": 0.0615,
+     "n_discharge": 459
+    },
+    "CS": {
+     "inflow": -0.0449,
+     "n_inflow": 504,
+     "discharge": 0.0424,
+     "n_discharge": 504
+    },
+    "MGMR": {
+     "inflow": -0.0255,
+     "n_inflow": 252,
+     "discharge": -0.0457,
+     "n_discharge": 252
+    }
+   },
+   "max_abs_r": 0.0615,
+   "same_decision": true
+  },
+  "hurdle_candidate": {
+   "data_max_year": 2024,
+   "zero_ratio": 0.272,
+   "n": 2320,
+   "rule": "0값 비율 ≥ 10% 이면 hurdle 후보 결정과 같음",
+   "same_decision": true
+  }
+ }
+}

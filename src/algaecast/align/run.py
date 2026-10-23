@@ -157,6 +157,25 @@ def forecast_daily(fc: pd.DataFrame, site_code: str, cfg: dict) -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------- 지점 달력 조립
+LEVEL_BASE_DAYS = 365  # 수위 편차 기준 평균 창(직전 365일, 기준일 미포함)
+LEVEL_MIN_DAYS = 180  # 창 안 유효값이 이보다 적으면 그 관측소 편차는 결측
+LEVEL_WAMIS_CUTOVER = pd.Timestamp("2025-01-01")  # 이 날부터 WAMIS 연장분 — wamis_ok:false 관측소는 결측(R2)
+
+
+def level_anomaly_asof(c: pd.DataFrame, days: pd.DatetimeIndex) -> tuple[pd.Series, pd.Series]:
+    """관측소별 wl_adj − (직전 365일 평균, 유효 ≥180일)의 지점 평균과 유효 관측소 수(FIX-v2.1 R1).
+
+    날짜 d 의 값은 d 이전(d 포함) 자료만 쓴다. 뒤에 자료가 붙어도 바뀌지 않는다.
+    """
+    w = c.pivot_table(index="obs_date", columns="station_code", values="wl_adj")
+    w.index = pd.to_datetime(w.index)
+    full = pd.date_range(min(w.index.min(), days.min()), max(w.index.max(), days.max()))
+    w = w.reindex(full)
+    base = w.shift(1).rolling(LEVEL_BASE_DAYS, min_periods=LEVEL_MIN_DAYS).mean()
+    anom = w - base
+    return anom.mean(axis=1).reindex(days), anom.notna().sum(axis=1).reindex(days).fillna(0)
+
+
 def build_site_daily(
     site: dict,
     src: dict[str, pd.DataFrame],
@@ -165,11 +184,11 @@ def build_site_daily(
     end: date,
     *,
     start: date | None = None,
-    level_means: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """지점 일 달력 조립.
 
-    ``start``(기본 calendar.start)·``level_means``(관측소별 wl_adj 전기간 평균, 증분 모드) 선택.
+    ``start``(기본 calendar.start) 선택. 수위 편차는 기준 평균을 직전 365일로 잡으므로 start 이전 이력이
+    src 에 있으면 그대로 쓴다(일일 러너는 400일 이상 받는다).
     """
     sid = site["station_id"]
     days = pd.date_range(start or feat_cfg["calendar"]["start"], pd.Timestamp(end))
@@ -214,23 +233,21 @@ def build_site_daily(
         for dst in DAM_VARS.values():
             df[dst] = np.nan
     df["dam_n"] = len(parts)
-    # 연속 수위 (DataON+WAMIS, use:true): 관측소별 평균 제거 후 지점 평균 편차
+    # 연속 수위(DataON+WAMIS, use:true): 관측소별 직전 365일 평균 대비 편차(as-of)의 지점 평균(FIX-v2.1 R1·R2)
     if "level_cont" in src:
-        codes = [
-            str(e["code"])
-            for e in site.get("dataon_stations", [])
-            if isinstance(e, dict) and e.get("use", True)
-        ]
-        c = src["level_cont"][src["level_cont"]["station_code"].isin(codes)]
-        if len(c):
-            w = c.pivot_table(index="obs_date", columns="station_code", values="wl_adj")
-            means = (
-                pd.Series({k: level_means.get(str(k), w[k].mean()) for k in w.columns})
-                if level_means
-                else w.mean()
+        ents = [e for e in site.get("dataon_stations", []) if isinstance(e, dict) and e.get("use", True)]
+        codes = [str(e["code"]) for e in ents]
+        bad = {str(e["code"]) for e in ents if e.get("wamis_ok") is False}
+        lc = src["level_cont"]
+        c = lc[lc["station_code"].astype(str).isin(codes)]
+        c = c[
+            ~(
+                c["station_code"].astype(str).isin(bad)
+                & (pd.to_datetime(c["obs_date"]) >= LEVEL_WAMIS_CUTOVER)
             )
-            df["level_cont_anom"] = (w - means).mean(axis=1).reindex(days)
-            df["level_cont_n"] = w.notna().sum(axis=1).reindex(days).fillna(0)
+        ]
+        if len(c):
+            df["level_cont_anom"], df["level_cont_n"] = level_anomaly_asof(c, days)
     if "level_cont_anom" not in df:
         df["level_cont_anom"] = np.nan
         df["level_cont_n"] = 0

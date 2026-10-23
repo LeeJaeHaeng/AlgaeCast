@@ -45,6 +45,7 @@ from algaecast.config import RAW_DIR, ROOT
 from algaecast.eval.metrics import compute_all
 from algaecast.exp import harness as H
 from algaecast.features.base import cut_as_of
+from algaecast.features.constants import WTEMP_LAST, apply_site_thresholds, threshold_year_for_valid
 from algaecast.models import data as D
 from algaecast.models.cv import year_folds
 from algaecast.models.train import SEED, VariantSpec, _lgb_params, _prep, fit_predict, to_cells
@@ -286,6 +287,9 @@ def fit_component(
     for fo in year_folds(df, include_final=True):
         tr = _fold_train(df, y, fo.train_idx)
         va = df.iloc[fo.valid_idx]
+        if WTEMP_LAST in df.columns:  # 폴드 학습기간 수온 임계(FIX-v2.1 R3, models.cv.fold_frames 와 같음)
+            ty = threshold_year_for_valid(fo.valid_year)
+            tr, va = apply_site_thresholds(tr, ty), apply_site_thresholds(va, ty)
         if mode == "log":
             f = fit_predict(tr, va, cols, spec, seed)
             none, smear = f.raw, f.raw * f.smear

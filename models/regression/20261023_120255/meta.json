@@ -1,0 +1,58 @@
+{
+ "name": "regression",
+ "version": "20261023_120255",
+ "created": "2026-10-23T12:02:55",
+ "features": [
+  "cell_log_t0",
+  "cell_max_4w",
+  "cell_log_lag1w",
+  "wtemp_minus_site_thresh",
+  "ta_degree_days20",
+  "wtemp_ma14",
+  "rn_sum30",
+  "consecutive_over_1k",
+  "season_day",
+  "inflow_t0",
+  "cell_slope_3",
+  "weir_outflow_t0",
+  "outflow_change7",
+  "level_cont_diff7",
+  "level_cont_t0",
+  "wtemp_diff7",
+  "weir_storage_rate_t0",
+  "hm_mean7",
+  "weir_outflow_ma7",
+  "chla_lag1w",
+  "cell_log_lag3w",
+  "ph_t0",
+  "storage_rate_t0",
+  "outflow_t0",
+  "weir_residence_proxy",
+  "ws_mean7",
+  "horizon_days",
+  "dominant_genus",
+  "facility_type",
+  "basin"
+ ],
+ "features_hash": "5bdc74f7c30d",
+ "metrics_holdout": {
+  "rmse_log": 0.708,
+  "r2_log": 0.7808,
+  "r2_raw": 0.1731,
+  "r2_pearson_raw": 0.1986,
+  "nse_raw": 0.1731,
+  "f1_10k": 0.6747
+ },
+ "meta": {
+  "train_through": 2025,
+  "study": "log_w_composite_perc75_S1",
+  "purpose": "submission cells",
+  "kind": "ensemble",
+  "ensemble_weights": {
+   "회귀 C1(smearing)": 0.16884653677260708,
+   "회귀 C3 hurdle": 0.44558720282980235,
+   "회귀 C2 tweedie": 0.38556626039759045
+  }
+ },
+ "path": "models/regression/20261023_120255/model.pkl"
+}

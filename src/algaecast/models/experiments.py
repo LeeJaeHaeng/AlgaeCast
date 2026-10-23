@@ -22,7 +22,7 @@ from algaecast.config import CONFIG_DIR, ROOT
 from algaecast.eval.metrics import compute_all
 from algaecast.models import data as D
 from algaecast.models.baselines import b0_persistence
-from algaecast.models.cv import year_folds
+from algaecast.models.cv import fold_frames, year_folds
 from algaecast.models.train import (
     BIAS_METHODS,
     CVResult,
@@ -160,8 +160,8 @@ def main(argv: list[str] | None = None) -> int:
     # 베이스라인 B0 (2025) 비교 행
     folds = year_folds(df1, include_final=True)
     fin = [f for f in folds if f.name == "Final"][0]
-    va = df1.iloc[fin.valid_idx]
-    b0 = compute_all(va["target_cells"].to_numpy(dtype=float), b0_persistence(df1.iloc[fin.train_idx], va))
+    tr1, va = fold_frames(df1, fin)
+    b0 = compute_all(va["target_cells"].to_numpy(dtype=float), b0_persistence(tr1, va))
 
     # 채택: 2025 Final 이 아닌 **CV** 기준 — 복합 점수 J 최소 (bias 포함)
     variants["J_cv"] = 0.5 * variants["cv_rmse_log"] / 0.83 + 0.5 * (1 - variants["cv_r2_raw"].clip(-1, 1))

@@ -41,7 +41,7 @@ from algaecast.config import CONFIG_DIR
 from algaecast.features.upstream import UPSTREAM_COLS, build_upstream
 from algaecast.models import data as D
 from algaecast.models import genus as G
-from algaecast.models.cv import FINAL_VALID_YEAR, FOLD_YEARS, year_folds
+from algaecast.models.cv import FINAL_VALID_YEAR, FOLD_YEARS, fold_frames, year_folds
 from algaecast.models.ensemble import combine, nnls_weights
 from algaecast.models.train import (
     HURDLE_THRESHOLD,
@@ -352,7 +352,7 @@ def cv_members(
     cols = cfg.cols
     out = {m.name: np.full(len(df), np.nan) for m in cfg.members}
     for fo in year_folds(df, include_final=True):
-        tr, va = df.iloc[fo.train_idx], df.iloc[fo.valid_idx]
+        tr, va = fold_frames(df, fo)
         for m in cfg.members:
             obj = fit_member(m, tr, cols, specs, seed, galgae)
             out[m.name][fo.valid_idx] = predict_member(obj, va, cols)

@@ -49,6 +49,20 @@ def year_folds(df: pd.DataFrame, *, include_final: bool = False) -> list[Fold]:
     return [f for f in folds if len(f.valid_idx) and len(f.train_idx)]
 
 
+def fold_frames(df: pd.DataFrame, fo: Fold, strategy: str = "S1") -> tuple[pd.DataFrame, pd.DataFrame]:
+    """폴드의 (학습, 검증) 프레임. 데이터 유래 상수(지점별 수온 임계)는 그 폴드 학습기간(≤ 검증 연도−1)
+    자료로 계산한 값으로 다시 적용한다(FIX-v2.1 R3). 임계 메타 열이 없는 프레임은 그대로 둔다."""
+    from algaecast.features.constants import WTEMP_LAST, apply_site_thresholds, threshold_year_for_valid
+
+    tr, va = df.iloc[fo.train_idx], df.iloc[fo.valid_idx]
+    if WTEMP_LAST not in df.columns:
+        if "wtemp_minus_site_thresh" in df.columns:
+            raise KeyError(f"{WTEMP_LAST} 없이 임계 피처를 폴드에 쓸 수 없다 — 피처를 다시 만든다")
+        return tr, va
+    y = threshold_year_for_valid(fo.valid_year)
+    return apply_site_thresholds(tr, y, strategy), apply_site_thresholds(va, y, strategy)
+
+
 FitPredict = Callable[[pd.DataFrame, pd.DataFrame], np.ndarray]
 """(train_df, valid_df) → valid 예측 (cells/mL 원단위, ≥0)."""
 
@@ -59,7 +73,7 @@ def cv_evaluate(df: pd.DataFrame, fit_predict: FitPredict, *, include_final: boo
     oof = pd.Series(np.nan, index=df.index, dtype=float)
     rows, site_rows = [], []
     for fo in folds:
-        tr, va = df.iloc[fo.train_idx], df.iloc[fo.valid_idx]
+        tr, va = fold_frames(df, fo)
         pred = np.asarray(fit_predict(tr, va), dtype=float)
         pred = np.clip(np.nan_to_num(pred, nan=0.0), 0, None)
         oof.iloc[fo.valid_idx] = pred

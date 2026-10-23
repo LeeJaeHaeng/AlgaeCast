@@ -31,15 +31,15 @@
 | cell_log_lag1w | ar | 0.2 | 0.764 |  |
 | wtemp_ma14 | water | 8.4 | 0.735 |  |
 | wtemp_ma7 | water | 8.4 | 0.735 |  |
-| wtemp_minus_site_thresh | water | 8.4 | 0.731 |  |
+| wtemp_minus_site_thresh | water | 8.4 | 0.732 |  |
 | wtemp_t0 | water | 8.4 | 0.726 |  |
 | wtemp_ma30 | water | 8.4 | 0.725 |  |
 | cell_log_lag2w | ar | 0.3 | 0.698 |  |
 | wtemp_degree_days20 | water | 8.4 | 0.694 |  |
-| ta_degree_days20 | weather | 0.0 | 0.692 |  |
-| ta_mean_ma14 | weather | 0.0 | 0.687 |  |
+| ta_degree_days20 | weather | 0.0 | 0.688 |  |
+| ta_mean_ma14 | weather | 0.0 | 0.684 |  |
 | consecutive_over_1k | ar | 0.0 | 0.674 |  |
-| ta_min_ma7 | weather | 0.0 | 0.667 |  |
+| ta_mean_ma7 | weather | 0.0 | 0.663 |  |
 
 ## 전체
 | 피처 | 그룹 | 결측률 % | 타깃 Spearman | 비고 |
@@ -70,8 +70,8 @@
 | wtemp_diff7 | water | 8.6 | -0.063 |  |
 | wtemp_days_over25 | water | 8.4 | 0.556 |  |
 | wtemp_degree_days20 | water | 8.4 | 0.694 |  |
-| wtemp_over_site_thresh_days | water | 8.4 | 0.651 |  |
-| wtemp_minus_site_thresh | water | 8.4 | 0.731 |  |
+| wtemp_over_site_thresh_days | water | 8.4 | 0.643 |  |
+| wtemp_minus_site_thresh | water | 8.4 | 0.732 |  |
 | wtemp_missing_days30 | water | 0.0 | -0.098 |  |
 | weir_inflow_t0 | hydro | 0.0 | 0.387 |  |
 | weir_outflow_t0 | hydro | 0.0 | 0.377 |  |
@@ -102,28 +102,28 @@
 | residence_proxy | hydro | 0.0 | -0.343 |  |
 | residence_proxy_ma14 | hydro | 0.0 | -0.344 |  |
 | outflow_change7 | hydro | 0.0 | -0.041 |  |
-| level_cont_t0 | hydro | 0.0 | -0.032 |  |
-| level_cont_diff7 | hydro | 0.0 | -0.032 |  |
+| level_cont_t0 | hydro | 0.0 | -0.123 |  |
+| level_cont_diff7 | hydro | 0.0 | 0.016 |  |
 | weir_inflow_missing7 | hydro | 0.0 |  |  |
 | weir_outflow_missing7 | hydro | 0.0 |  |  |
 | inflow_missing7 | hydro | 0.0 |  |  |
 | hydro_fac_available | hydro | 0.0 |  |  |
-| ta_mean_t0 | weather | 0.0 | 0.644 |  |
-| ta_mean_ma7 | weather | 0.0 | 0.666 |  |
-| ta_mean_ma14 | weather | 0.0 | 0.687 |  |
-| ta_max_ma7 | weather | 0.0 | 0.663 |  |
-| ta_min_ma7 | weather | 0.0 | 0.667 |  |
-| ta_degree_days20 | weather | 0.0 | 0.692 |  |
-| rn_sum7 | weather | 0.0 | 0.183 |  |
-| rn_sum14 | weather | 0.0 | 0.282 |  |
-| rn_sum30 | weather | 0.0 | 0.457 |  |
-| dry_days | weather | 0.0 | -0.213 |  |
-| ss_sum7 | weather | 0.0 | -0.047 |  |
+| ta_mean_t0 | weather | 0.0 | 0.64 |  |
+| ta_mean_ma7 | weather | 0.0 | 0.663 |  |
+| ta_mean_ma14 | weather | 0.0 | 0.684 |  |
+| ta_max_ma7 | weather | 0.0 | 0.661 |  |
+| ta_min_ma7 | weather | 0.0 | 0.662 |  |
+| ta_degree_days20 | weather | 0.0 | 0.688 |  |
+| rn_sum7 | weather | 0.0 | 0.188 |  |
+| rn_sum14 | weather | 0.0 | 0.288 |  |
+| rn_sum30 | weather | 0.0 | 0.458 |  |
+| dry_days | weather | 0.0 | -0.221 |  |
+| ss_sum7 | weather | 0.0 | -0.021 |  |
 | si_sum7 | weather | 0.0 | 0.254 |  |
-| ws_mean7 | weather | 0.0 | -0.049 |  |
-| ws_max7 | weather | 0.0 | -0.142 |  |
-| hm_mean7 | weather | 0.0 | 0.437 |  |
-| rn_missing7 | weather | 0.0 | 0.018 |  |
+| ws_mean7 | weather | 0.0 | -0.141 |  |
+| ws_max7 | weather | 0.0 | -0.204 |  |
+| hm_mean7 | weather | 0.0 | 0.423 |  |
+| rn_missing7 | weather | 0.0 | 0.03 |  |
 | si_missing7 | weather | 0.0 | -0.044 |  |
 | fc_ta_mean_d1_7 | forecast | 100.0 |  |  |
 | fc_ta_max_d1_7 | forecast | 100.0 |  |  |

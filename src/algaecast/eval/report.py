@@ -37,7 +37,7 @@ from algaecast.eval.transitions import OOF_PATH, T10K
 from algaecast.models import classifier as C
 from algaecast.models import data as D
 from algaecast.models.baselines import b4_elasticnet
-from algaecast.models.cv import year_folds
+from algaecast.models.cv import fold_frames, year_folds
 from algaecast.models.train import feature_sets, run_cv
 from algaecast.models.tune import spec_from_params
 
@@ -111,8 +111,9 @@ def main(argv: list[str] | None = None) -> int:
     df = D.load_train_valid("S1")
     folds = year_folds(df, include_final=True)
     ffold = [f for f in folds if f.name == "Final"][0]
-    b4 = b4_elasticnet(df.iloc[ffold.train_idx], df.iloc[ffold.valid_idx])
-    va = df.iloc[ffold.valid_idx][["station_id", "base_date"]].copy()
+    tr_f, va_f = fold_frames(df, ffold)
+    b4 = b4_elasticnet(tr_f, va_f)
+    va = va_f[["station_id", "base_date"]].copy()
     va["base_date"] = pd.to_datetime(va["base_date"])
     va["b4"] = b4
     fin = fin.merge(

@@ -132,7 +132,7 @@ alert:
       lambda_l2: 0.007303957566056158
       spw_mult: 0.6042945981812022
       bagging_freq: 1
-    thr: 0.6399999999999999
+    thr: 0.58
     cv_pr_auc: .nan
   over_window:
     params:
@@ -147,7 +147,7 @@ alert:
       lambda_l2: 8.121069466255122
       spw_mult: 1.313164950330675
       bagging_freq: 1
-    thr: 0.83
+    thr: 0.8699999999999999
     cv_pr_auc: .nan
 alert_rule:
   adopted: (iii) 분류기+회귀 스태킹(로지스틱)
@@ -156,28 +156,28 @@ alert_rule:
   b0_final_2025_f1: 0.7272727272727273
 ensemble:
   weights:
-    회귀 C1(smearing): 0.14584582361965182
-    회귀 C3 hurdle: 0.3807592344903002
-    회귀 C2 tweedie: 0.47339494189004805
+    회귀 C1(smearing): 0.16884653677260708
+    회귀 C3 hurdle: 0.44558720282980235
+    회귀 C2 tweedie: 0.38556626039759045
   adopted: true
-  cv_rmse_log_c1: 0.8180313030427953
-  cv_rmse_log_ens: 0.8045559304865254
+  cv_rmse_log_c1: 0.8145705906740073
+  cv_rmse_log_ens: 0.8027378377930702
 registry_current:
-  regression: '20261021_091108'
-  classifier: '20261021_091109'
-  quantile: '20261021_091110'
+  regression: '20261023_120255'
+  classifier: '20261023_120255'
+  quantile: '20261023_120257'
 thresholds:
-  clf_a: 0.6399999999999999
-  clf_b: 0.83
-  stack_a: 0.8999999999999999
-  stack_b: 0.8999999999999999
+  clf_a: 0.58
+  clf_b: 0.8699999999999999
+  stack_a: 0.8799999999999999
+  stack_b: 0.8699999999999999
 operating_point:
   prob_source: clf_b
   cost_ratio: 3
-  threshold: 0.52
+  threshold: 0.46
 cqr:
   alpha: 0.2
-  qhat_log10: 0.1574868459595269
+  qhat_log10: 0.1645788180704682
   n_calib: 531
   calib_years:
   - 2023

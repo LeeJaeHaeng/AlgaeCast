@@ -9,8 +9,10 @@ reports/features/tbl_feature_select.md 에 기록한다.
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 from collections.abc import Callable
+from pathlib import Path
 
 import lightgbm as lgb
 import numpy as np
@@ -19,6 +21,7 @@ import yaml
 from scipy import stats
 
 from algaecast.config import CONFIG_DIR, ROOT
+from algaecast.features.constants import WTEMP_LAST, apply_site_thresholds
 from algaecast.models import data as D
 from algaecast.models.cv import cv_evaluate, summarize
 
@@ -162,10 +165,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--strategy", default="S1")
     ap.add_argument("--boruta-iter", type=int, default=100)
     ap.add_argument("--boruta-perc", type=int, default=BORUTA_PERC)
+    ap.add_argument(
+        "--reference-out",
+        type=Path,
+        default=None,
+        help="참고용 재실행(FIX-v2.1 R7): config/features.yaml 을 고치지 않고 이 폴더에 결과만 쓴다",
+    )
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     df = D.load_train_valid(args.strategy)
     train = df[df["split"] == "train"].reset_index(drop=True)
+    if WTEMP_LAST in train.columns:  # 학습(≤2024) 구간의 수온 임계는 ≤2024 측정으로(FIX-v2.1 R3)
+        train = apply_site_thresholds(train, 2024, args.strategy)
     all_cols = D.feature_columns(train, selected_only=False)
     nums, cats = D.numeric_and_categorical(all_cols)
     excluded: dict[str, str] = {}
@@ -250,6 +261,26 @@ def main(argv: list[str] | None = None) -> int:
         ordered = ordered[:MAX_FEATURES]
     final = sorted(ordered, key=lambda c: -gain.get(c, 0.0))
     # 저장
+    if args.reference_out is not None:
+        out = args.reference_out
+        out.mkdir(parents=True, exist_ok=True)
+        cur = yaml.safe_load((CONFIG_DIR / "features.yaml").read_text(encoding="utf-8"))["selected"]
+        ref = {
+            "selected_rerun": final,
+            "selected_current": cur,
+            "added": [c for c in final if c not in cur],
+            "dropped": [c for c in cur if c not in final],
+            "same_set": sorted(final) == sorted(cur),
+            "excluded": excluded,
+            "train_rows": int(len(train)),
+            "weir_ablation_delta_rmse_log": round(float(delta), 4),
+        }
+        (out / "selection_rerun.json").write_text(
+            json.dumps(ref, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n"
+        )
+        (out / "selection_rerun_boruta.md").write_text(_md(bres) + "\n", encoding="utf-8", newline="\n")
+        print(json.dumps({k: ref[k] for k in ("same_set", "added", "dropped")}, ensure_ascii=False))
+        return 0
     cfg_path = CONFIG_DIR / "features.yaml"
     cfg_text = cfg_path.read_text(encoding="utf-8")
     head = cfg_text.split("\n# ---- T3-c 선별 결과", 1)[0].rstrip("\n") + "\n"  # 주석 있는 원문 보존

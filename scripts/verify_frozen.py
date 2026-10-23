@@ -1,9 +1,9 @@
-"""동결 모델 검증 — models/FROZEN.md(v1)와 models/FROZEN_v2.md(있으면)의 sha256 을 현재 파일과 대조한다.
+"""동결 모델 검증 — models/FROZEN.md(v1)·FROZEN_v2.md·FROZEN_v2.1.md(있으면)의 sha256 을 현재 파일과 대조한다.
 
 - 각 동결 문서 표의 행 `| name | version | `sha256` | ...` 마다
   <models>/<name>/<version>/model.pkl 의 sha256 을 비교한다.
-- registry.json 의 current 가 가장 최근 동결 문서(FROZEN_v2.md 가 있으면 그것,
-  없으면 FROZEN.md)의 버전과 같은지도
+- registry.json 의 current 가 가장 최근 동결 문서(FROZEN_v2.1.md → FROZEN_v2.md → FROZEN.md 순으로 있는 것)의
+  버전(이름별 첫 행)과 같은지도
   확인한다(일일 예측·제출 파일이 동결 버전으로 만들어지는지).
 - 하나라도 다르거나 파일이 없으면 종료 코드 1.
 사용: python scripts/verify_frozen.py [--models-dir DIR]   (DIR 기본: models/, 제출 패키지: model/)
@@ -20,7 +20,7 @@ from pathlib import Path
 
 from algaecast.config import MODELS_DIR
 
-DOCS: tuple[str, ...] = ("FROZEN.md", "FROZEN_v2.md")  # 오래된 것 → 최근
+DOCS: tuple[str, ...] = ("FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md")  # 오래된 것 → 최근
 ROW = re.compile(r"\| (\w+) \| (\d+_\d+) \| `([0-9a-f]{64})` \|")
 
 
@@ -60,7 +60,11 @@ def check_current(models_dir: Path, doc: str) -> bool:
         return True
     cur = json.loads(reg_file.read_text(encoding="utf-8")).get("current", {})
     ok = True
+    seen: set[str] = set()
     for name, ver, _ in doc_rows(models_dir / doc):
+        if name in seen:  # 이름별 첫 행만 current(뒤 행은 보존·참고용, 예: v1-fix)
+            continue
+        seen.add(name)
         same = cur.get(name) == ver
         print(f"current {name}: {cur.get(name)} ({'OK' if same else f'MISMATCH — {doc} 는 {ver}'})")
         ok &= same

@@ -1,0 +1,71 @@
+{
+ "frozen_at_kst": "2026-10-23 12:08:19",
+ "version": "20261023_120818",
+ "weights": {
+  "c1": 0.05530932107613325,
+  "c3": 0.27986211998401955,
+  "c2": 0.26699397876434244,
+  "cg": 0.3978345801755047
+ },
+ "holdout_2025": {
+  "rmse_log": 0.7120161127243871,
+  "r2_log": 0.778298872554509,
+  "r2_raw": 0.17541751783188297,
+  "r2_pearson_raw": 0.20411796473185786,
+  "nse_raw": 0.17541751783188297,
+  "f1_10k": 0.7045454545454546
+ },
+ "files": [
+  {
+   "name": "regression",
+   "version": "20261023_120818",
+   "sha256": "d95e7a4e8dab50a59583dd8ecf8ab2482786ec05f7bfa1f256c657bec3a091f0",
+   "bytes": 20414068,
+   "features_hash": "a3076b49cfc7",
+   "note": "ensemble_v2(c1·c3·c2·cg, 피처 35) — v2.1"
+  },
+  {
+   "name": "classifier",
+   "version": "20261023_120255",
+   "sha256": "cce848b6c1b5d1608d73403d5ef089bf8e4dc04bdc358eea8afd7fcb3ae1c77d",
+   "bytes": 1653681,
+   "features_hash": "5bdc74f7c30d",
+   "note": "v2.1 재적합(분류기 b, 수정 피처)"
+  },
+  {
+   "name": "quantile",
+   "version": "20261023_120257",
+   "sha256": "9b52945aa53e2af2a0189eb8368389410eabd001a6336620684baaca07258bee",
+   "bytes": 7926563,
+   "features_hash": "5bdc74f7c30d",
+   "note": "v2.1 재적합(q10·q50·q90, 수정 피처)"
+  },
+  {
+   "name": "regression",
+   "version": "20261023_120255",
+   "sha256": "4e341732fe4d9ba48be768a570dd9836b0050d9233a29d5cc924dbe87d4dfed7",
+   "bytes": 15371621,
+   "features_hash": "5bdc74f7c30d",
+   "note": "v1-fix(c1·c3·c2, 피처 30) — 민감도 보고용, current 아님"
+  }
+ ],
+ "submission": {
+  "rows": 124,
+  "columns": true,
+  "order_same_as_sample": true,
+  "nan": 0,
+  "negative": 0,
+  "bom": true,
+  "sha256": "4741a3d37ef3ae9f",
+  "min": 6,
+  "max": 50534,
+  "median": 11413.5,
+  "sha256_full": "4741a3d37ef3ae9f71b381e083028d93e83ec378ae5d5a65beba2ed48545a8e7"
+ },
+ "vs_v2_submission": {
+  "median_abs_log10_diff": 0.05065492314744602,
+  "max_abs_log10_diff": 0.192667098127973
+ },
+ "registry_roundtrip_max_absdiff": 0.0,
+ "minutes": 0.17
+}

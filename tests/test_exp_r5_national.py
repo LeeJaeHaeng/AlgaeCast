@@ -18,7 +18,7 @@ from algaecast.collect.kma_stn_info import asos_representative, parse_station_ht
 from algaecast.collect.nier_algae_all import tidy_all
 from algaecast.exp import harness as H
 from algaecast.exp import r5_national as R
-from algaecast.features import base as fb
+from algaecast.features import constants as K
 from algaecast.features.run import GROUPS
 
 CODE = "9999T01"  # 가상의 다른 지점
@@ -181,16 +181,15 @@ def test_pseudo_sites_patch_is_scoped_and_keeps_v1_sites() -> None:
         from algaecast.features import water as fw
 
         assert fw.site_by_code(CODE)["station_id"] == CODE
-        assert fw.feature_cfg()["site_caution_wtemp"][CODE] == R.DEFAULT_WTEMP_THRESH
-        assert (
-            fw.feature_cfg()["site_caution_wtemp"]["GJGR"] == fb.feature_cfg()["site_caution_wtemp"]["GJGR"]
-        )
+        th = fw.site_thresholds(K.FINAL_THRESHOLD_YEAR)
+        assert th[CODE] == R.DEFAULT_WTEMP_THRESH
+        assert th["GJGR"] == K.site_thresholds(K.FINAL_THRESHOLD_YEAR)["GJGR"]
         assert fw.site_by_code("2011G56")["station_id"] == "GJGR"
     from algaecast.features import water as fw2
 
     with pytest.raises(KeyError):
         fw2.site_by_code(CODE)
-    assert CODE not in fb.feature_cfg()["site_caution_wtemp"]
+    assert CODE not in fw2.site_thresholds(K.FINAL_THRESHOLD_YEAR)
 
 
 def test_pseudo_site_hydro_mapping() -> None:

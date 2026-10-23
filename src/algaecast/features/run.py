@@ -40,6 +40,9 @@ PROCESSED = DATA_DIR / "processed"
 # 가공 파일은 export_level_cont() 로 만든다.
 DATAON_RAW = DATA_DIR / "raw" / "dataon" / "level_continuous_long.parquet"
 LEVEL_FEATURES = ("level_cont_t0", "level_cont_diff7")
+# WAMIS 원값(보·댐 일자료·수위): 원자료가 없으면 가공 수문 피처 파일로 수문 피처 열을 채운다(기본 패키지).
+# 원자료가 있으면 원자료부터 계산한다. 가공 파일은 export_wamis_hydro() 로 만든다.
+WAMIS_RAW = DATA_DIR / "raw" / "wamis_dam" / "wamis_dam_daily.parquet"
 GROUPS: dict[str, Callable[[pd.DataFrame, date, str], dict]] = {
     "ar": make_ar_features,
     "water": make_water_features,
@@ -57,6 +60,7 @@ META_COLS = [
     "target_cells",
     "target_log",
     "split",
+    "_wtemp_last",  # 임계 피처 폴드별 재계산용(features.constants.WTEMP_LAST), 피처 아님
 ]
 CAT_COLS = ["dominant_genus", "site_code", "station_id", "basin", "facility_type"]
 
@@ -264,6 +268,55 @@ def export_level_cont(strategy: str = "S1") -> Path:
     return out
 
 
+def wamis_hydro_path(strategy: str) -> Path:
+    return PROCESSED / f"wamis_hydro_features_{strategy}.parquet"
+
+
+def wamis_mode(strategy: str) -> str:
+    """'raw'(WAMIS 원자료로 계산) · 'derived'(가공 수문 피처 파일로 채움) · 'missing'."""
+    if WAMIS_RAW.exists():
+        return "raw"
+    return "derived" if wamis_hydro_path(strategy).exists() else "missing"
+
+
+def apply_wamis_derived(feats: pd.DataFrame, strategy: str) -> pd.DataFrame:
+    """가공 파일에 든 수문 피처 열(수위 2열 제외)을 station_id·base_date 키로 채운다. 열 순서는 그대로."""
+    d = pd.read_parquet(wamis_hydro_path(strategy))
+    key = feats["station_id"].astype(str) + "|" + pd.to_datetime(feats["base_date"]).dt.strftime("%Y-%m-%d")
+    dk = d["station_id"].astype(str) + "|" + pd.to_datetime(d["base_date"]).dt.strftime("%Y-%m-%d")
+    d = d.set_axis(dk.to_numpy())
+    cols = [c for c in d.columns if c not in ("station_id", "base_date") and c in feats.columns]
+    out = feats.copy()
+    for c in cols:
+        out[c] = d[c].reindex(key.to_numpy()).to_numpy(dtype=float)
+    log.info("WAMIS 원자료 없음 → 가공 수문 피처 %s 로 %d열 채움", wamis_hydro_path(strategy).name, len(cols))
+    return out
+
+
+def hydro_feature_names(strategy: str = "S1") -> list[str]:
+    """수문 피처 그룹(features.hydro)이 만드는 열 이름 — 수위 2열(DataON 쪽에서 다룸) 제외."""
+    site = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))["sites"][0]
+    daily = pd.read_parquet(INTERIM / f"daily_{site['station_id']}_{strategy}.parquet")
+    daily["obs_date"] = pd.to_datetime(daily["obs_date"])
+    names = make_hydro_features(daily, daily["obs_date"].max().date(), site["site_code"]).keys()
+    return [c for c in names if c not in LEVEL_FEATURES]
+
+
+def export_wamis_hydro(strategy: str = "S1") -> Path:
+    """원자료로 만든 features_<S>.parquet 에서 수문 피처 열만 내보낸다(WAMIS·K-water 가공물)."""
+    if wamis_mode(strategy) != "raw":
+        raise SystemExit("중단: WAMIS 원자료가 없어 원자료 기준 수문 피처를 내보낼 수 없다.")
+    cols = hydro_feature_names(strategy)
+    f = pd.read_parquet(PROCESSED / f"features_{strategy}.parquet")
+    f = f[["station_id", "base_date", *[c for c in cols if c in f.columns]]].copy()
+    f["station_id"] = f["station_id"].astype(str)
+    f["base_date"] = pd.to_datetime(f["base_date"]).dt.strftime("%Y-%m-%d")
+    out = wamis_hydro_path(strategy)
+    f.to_parquet(out, index=False)
+    log.info("가공 수문 피처 %d행 %d열 → %s", len(f), f.shape[1] - 2, out)
+    return out
+
+
 def quarantine_test_targets(feats: pd.DataFrame, path: Path = TEST_TARGETS_PATH) -> pd.DataFrame:
     """test split 과 '목표일이 2026 이상인 행'(예: 기준일 2025-12-29 → 목표일 2026-01-05)의 타깃을
     별도 파일로 분리 저장하고 피처 프레임에서는 NaN 으로 비운다.
@@ -307,11 +360,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--export-level-cont", action="store_true", help="수위 피처 2열을 가공 파일로 내보내기(원자료 필요)"
     )
+    ap.add_argument(
+        "--export-wamis", action="store_true", help="수문 피처 열을 가공 파일로 내보내기(원자료 필요)"
+    )
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    if args.export_level_cont:
+    if args.export_level_cont or args.export_wamis:
         for s in [x.strip().upper() for x in args.strategy.split(",") if x.strip()]:
-            export_level_cont(s)
+            if args.export_level_cont:
+                export_level_cont(s)
+            if args.export_wamis:
+                export_wamis_hydro(s)
         return 0
     cfg = yaml.safe_load((CONFIG_DIR / "features.yaml").read_text(encoding="utf-8"))
     sites = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))["sites"]
@@ -343,6 +402,11 @@ def main(argv: list[str] | None = None) -> int:
             feats = apply_level_cont_derived(feats, s)
         elif mode == "missing":
             log.warning("%s: DataON 원자료·가공 수위 피처 파일이 모두 없어 %s 가 결측", s, LEVEL_FEATURES)
+        wmode = wamis_mode(s)
+        if wmode == "derived":
+            feats = apply_wamis_derived(feats, s)
+        elif wmode == "missing":
+            log.warning("%s: WAMIS 원자료·가공 수문 피처 파일이 모두 없어 수문 피처가 원자료 없이 계산됨", s)
         feats = assign_split(feats, cfg, submission)
         feats = quarantine_test_targets(feats)
         feature_cols = [c for c in feats.columns if c not in META_COLS] + ["horizon_days"]

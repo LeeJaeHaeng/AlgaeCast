@@ -32,7 +32,6 @@
 from __future__ import annotations
 
 import argparse
-import copy
 import io
 import json
 import logging
@@ -78,7 +77,9 @@ CAL_END = date(2025, 12, 31)
 OWN_IDS = set(OWN_SITES.values())
 ASOS_MIN_COVERAGE = 0.9
 STARTED = "2026-10-21 17:53:26"  # 실험 시작(KST) — 시간 상한 12h 기준
-DEFAULT_WTEMP_THRESH = 22.9  # v1 5지점 site_caution_wtemp 중앙값
+DEFAULT_WTEMP_THRESH = (
+    22.9  # 실험 당시(2026-10-21) v1 5지점 임계 중앙값 — 실험 기록 재현용 상수(R5 는 기각, 운영 미사용)
+)
 
 BASIN2 = {
     "10": "한강", "11": "안성천", "12": "한강서해", "13": "한강동해",
@@ -419,14 +420,19 @@ def pseudo_sites(extra: dict[str, dict]) -> Iterator[None]:
     def sbc(code: str) -> dict:
         return extra[code] if code in extra else orig(code)
 
-    cfg = copy.deepcopy(fb.feature_cfg())
-    for s in extra.values():
-        cfg["site_caution_wtemp"].setdefault(s["station_id"], DEFAULT_WTEMP_THRESH)
+    base_th = fw.site_thresholds
+
+    def th(year: int) -> dict:
+        d = dict(base_th(year))
+        for s in extra.values():
+            d.setdefault(s["station_id"], DEFAULT_WTEMP_THRESH)
+        return d
+
     with (
         mock.patch.object(fw, "site_by_code", sbc),
         mock.patch.object(fh, "site_by_code", sbc),
         mock.patch.object(ft, "site_by_code", sbc),
-        mock.patch.object(fw, "feature_cfg", lambda: cfg),
+        mock.patch.object(fw, "site_thresholds", th),
     ):
         yield
 

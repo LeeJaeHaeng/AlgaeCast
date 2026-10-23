@@ -21,7 +21,7 @@ import pandas as pd
 from algaecast.config import DATA_DIR
 from algaecast.eval.metrics import compute_all
 from algaecast.models import data as D
-from algaecast.models.cv import year_folds
+from algaecast.models.cv import fold_frames, year_folds
 from algaecast.models.train import (
     SEED,
     Fitted,
@@ -111,7 +111,7 @@ def cv_score(
     oof_log = np.full(len(df), np.nan)
     rm, r2 = [], []
     for i, fo in enumerate(folds):
-        tr, va = df.iloc[fo.train_idx], df.iloc[fo.valid_idx]
+        tr, va = fold_frames(df, fo)
         f: Fitted = fit_predict(tr, va, cols, spec, seed=SEED)
         prev = ~np.isnan(oof_log)
         iso = (

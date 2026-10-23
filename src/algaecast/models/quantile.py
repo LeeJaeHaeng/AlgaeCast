@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from algaecast.models import data as D
-from algaecast.models.cv import year_folds
+from algaecast.models.cv import fold_frames, year_folds
 from algaecast.models.train import SEED, VariantSpec, _lgb_params, _prep, to_cells
 
 QUANTILES = (0.1, 0.5, 0.9)
@@ -47,8 +47,9 @@ def cv_quantiles(
 ) -> dict[str, np.ndarray]:
     out = {k: np.full(len(df), np.nan) for k in ("q10", "q50", "q90")}
     for fo in year_folds(df, include_final=include_final):
-        models = fit_quantiles(df.iloc[fo.train_idx], cols, spec)
-        pr = predict_quantiles(models, df.iloc[fo.valid_idx], cols)
+        tr, va = fold_frames(df, fo)
+        models = fit_quantiles(tr, cols, spec)
+        pr = predict_quantiles(models, va, cols)
         for k in out:
             out[k][fo.valid_idx] = pr[k]
     return out

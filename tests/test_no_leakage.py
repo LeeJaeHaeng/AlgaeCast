@@ -14,6 +14,7 @@ from algaecast.collect.base import KST
 from algaecast.features import forecast as fc
 from algaecast.features.ar import make_ar_features
 from algaecast.features.base import cut_as_of
+from algaecast.features.constants import FINAL_THRESHOLD_YEAR, site_thresholds
 from algaecast.features.forecast import make_forecast_features
 from algaecast.features.hydro import make_hydro_features
 from algaecast.features.run import GROUPS, match_target
@@ -131,9 +132,8 @@ def test_water_hydro_weather_windows() -> None:
     as_of = date(2026, 10, 22)
     w = make_water_features(df, as_of, SITE)
     assert w["wtemp_ma7"] == 1.0 and w["wtemp_degree_days20"] == 0.0 and w["wtemp_days_over25"] == 0.0
-    assert w["wtemp_over_site_thresh_days"] == 0.0 and w["wtemp_minus_site_thresh"] == pytest.approx(
-        1.0 - 23.7
-    )
+    th = site_thresholds(FINAL_THRESHOLD_YEAR)["GJGR"]  # 측정 ≤2025 임계(FIX-v2.1 R3)
+    assert w["wtemp_over_site_thresh_days"] == 0.0 and w["wtemp_minus_site_thresh"] == pytest.approx(1.0 - th)
     h = make_hydro_features(df, as_of, SITE)
     assert (
         h["weir_outflow_sum7"] == 7.0

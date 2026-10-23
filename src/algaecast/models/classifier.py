@@ -21,7 +21,7 @@ from sklearn.metrics import average_precision_score, brier_score_loss, f1_score,
 
 from algaecast.config import DATA_DIR
 from algaecast.models import data as D
-from algaecast.models.cv import Fold, year_folds
+from algaecast.models.cv import Fold, fold_frames, year_folds
 from algaecast.models.train import SEED, _lgb_params, _prep
 
 log = logging.getLogger(__name__)
@@ -85,8 +85,9 @@ def cv_proba(
     folds = year_folds(df, include_final=include_final)
     oof = np.full(len(df), np.nan)
     for fo in folds:
-        m = fit_clf(df.iloc[fo.train_idx], cols, target, params, seed)
-        oof[fo.valid_idx] = predict_proba(m, df.iloc[fo.valid_idx], cols)
+        tr, va = fold_frames(df, fo)
+        m = fit_clf(tr, cols, target, params, seed)
+        oof[fo.valid_idx] = predict_proba(m, va, cols)
     return oof, folds
 
 
@@ -141,8 +142,9 @@ def tune_clf(
         params = suggest_clf_params(trial)
         aps = []
         for i, fo in enumerate(folds):
-            m = fit_clf(df.iloc[fo.train_idx], cols, target, params)
-            p = predict_proba(m, df.iloc[fo.valid_idx], cols)
+            tr, va = fold_frames(df, fo)
+            m = fit_clf(tr, cols, target, params)
+            p = predict_proba(m, va, cols)
             yv = y_all[fo.valid_idx]
             aps.append(average_precision_score(yv, p) if yv.sum() else 0.0)
             trial.report(float(np.mean(aps)), step=i)

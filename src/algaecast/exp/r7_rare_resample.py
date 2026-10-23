@@ -40,7 +40,7 @@ from scipy.stats import gaussian_kde
 
 from algaecast.exp import harness as H
 from algaecast.models import data as D
-from algaecast.models.cv import year_folds
+from algaecast.models.cv import fold_frames, year_folds
 from algaecast.models.quantile import cv_quantiles
 from algaecast.models.train import SEED, VariantSpec, _lgb_params, _prep, to_cells
 
@@ -356,7 +356,7 @@ def cv_member(
     for fo in year_folds(df, include_final=True):
         if years[fo.train_idx].max() >= fo.valid_year:
             raise RuntimeError("학습 구간에 검증 연도 이상 행이 섞임")
-        tr, va = df.iloc[fo.train_idx], df.iloc[fo.valid_idx]
+        tr, va = fold_frames(df, fo)  # 폴드 학습기간 수온 임계(FIX-v2.1 R3)
         rng = np.random.default_rng([rs_seed, fo.valid_year])
         aug, is_orig, info = resample_train(tr, cols, treat, rng)
         w = sample_weights(aug["target_log"].to_numpy(dtype=float), treat, spec, member)
