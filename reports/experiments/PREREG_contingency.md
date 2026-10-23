@@ -42,10 +42,129 @@
 
 (S 모델 학습·동결·2026 사후 계산 뒤 이 절에 덧붙인다.)
 
-## 6. 피처 출처 표(분석 뒤 덧붙임)
+## 6. 피처 출처 표(분석 결과, 2026-10-23)
 
-(v2.1·v1-fix 각각 '번들 외 조류경보 자료(다른 지점 세포수 등)'를 쓰는 피처 목록을 덧붙인다.)
+### 6.0 원천 비교 — 번들 `algae_measure.csv` 와 API `nier_algae_2012_2026.parquet`
 
-## 부록 A. 2026 실측 사후 분석이 들어간 위치(분석 뒤 덧붙임)
+| 항목 | 번들 algae_measure.csv | API parquet(물환경정보시스템 조류경보 API, 수집 2026-10-20 17:31) |
+|---|---|---|
+| 행 수 | 2,939 | 2,979 |
+| 지점·조사지점코드 | 5지점(HP 2011G26·GJGR 2011G56·CS 2020G33·MGMR 2022G05·DCHN 3008G30) | 같음 |
+| 기간 | 2012-04-02~2026-09-10(HP·GJGR 09-07) | 2012-04-02~2026-10-15(HP·GJGR 10-12) |
+| 한쪽에만 있는 행 | 0 | 40행(2026-09-14~10-15: CS·DCHN·MGMR 각 10, GJGR·HP 각 5) |
+| 겹치는 2,939행 값 | 세포수·4속·수온·pH·DO·투명도·탁도·dominant_genus 차이 0 | 차이는 2026-09-10 하루뿐: 번들의 '분석중'이 API 에서는 값(클로로필a 3행, 지오스민 2, 2-MIB 3, MC-LR 2) |
+| 열 | 측정열 + over_caution(파생)·메타 | 같은 측정열 + cells_sum4·cells_consistent·alert_level_single·alert_level_2consec·alert_name_2consec(수집기가 세포수로 계산한 파생열) |
 
-(파일·절·화면·영상 장면 목록을 덧붙인다.)
+- 정렬(`align/run.py` L94), 수온 임계(`features/constants.py` L31), 상류 피처(`features/upstream.py` L32), 속별 타깃(`models/genus.py` L32)은 모두 **API parquet** 을 읽는다. 번들 CSV(`collect/competition.load_algae`)는 ASOS 관측소 선정(D1, `constants.py` L96)에만 쓴다.
+- 학습 행은 목표일 ≤2025-12-31, 제출 test 124행은 기준일 2026-05-04~2026-09-03·목표일 ≤2026-09-10 이다. 피처는 기준일까지만 자르므로 위 차이(2026-09-10 값, 09-14 이후 행)는 들어가지 않는다.
+- **번들 대체 검증(읽기 전용)**: 정렬·피처를 조류 원천만 번들 CSV 로 바꿔 다시 계산했다(수문·기상·수위는 그대로). 저장된 `features_S1.parquet` 와 비교하면 train 2,310·valid 256·test 124 = 2,690행에서 선별 30개 피처 불일치 0, target_date 불일치 0, 학습 타깃(2,562행) 불일치 0, 상류 5열 불일치 0. 지점별 수온 임계(Y=2019~2025)도 번들로 다시 계산해 `config/derived_constants.json` 과 값·n 이 모두 같았다.
+
+### 6.1 피처별 출처(1~30 = v1-fix·v2.1 공통 선별 30개, 31~35 = v2.1 상류 5열)
+
+[API] = `data/raw/nier_algae/nier_algae_2012_2026.parquet`. [HYD] = `data/raw/hydro/hydro_daily_long.parquet`(출처 우선순위 `align/run.py` L47: bundle_wamis(= 번들 dam_daily, ~2026-09-11) > kwater_sluice_delist > wamis_mn_dtdata > kwater_damapi). [ASOS] = `data/raw/kma_asos/kma_asos_daily_2012_2026.parquet`(기상청 API). [LVL] = `data/raw/dataon/level_continuous_long.parquet`(DataON ≤2024 + WAMIS 2025~, 원자료가 없으면 가공 파일). '아니오(값 동일)' = 코드는 API parquet 을 읽지만 학습·제출 행에 들어가는 값은 번들과 같다(6.0 검증).
+
+| # | 피처 | 그룹 | 원천 파일·열 | 번들 외 조류경보 자료 사용 | 근거(코드) |
+|---|---|---|---|---|---|
+| 1 | cell_log_t0 | ar | [API] iem_bgalage_cell_co | 아니오(값 동일) | align/run.py L94·L199·L318, features/ar.py L30·L35 |
+| 2 | cell_max_4w | ar | [API] iem_bgalage_cell_co | 아니오(값 동일) | features/ar.py L44-46 |
+| 3 | cell_log_lag1w | ar | [API] iem_bgalage_cell_co | 아니오(값 동일) | features/ar.py L36-37 |
+| 4 | wtemp_minus_site_thresh | water | [API] iem_wtrtp − 지점 임계([API] ≤2025 LOESS, 폴드는 ≤V−1) | 아니오(값 동일, 임계도 번들로 재계산 시 같음) | features/water.py L41-46, features/constants.py |
+| 5 | ta_degree_days20 | weather | [ASOS] avg_ta | 아니오(조류경보 아님) | features/weather.py L27-30 |
+| 6 | wtemp_ma14 | water | [API] iem_wtrtp | 아니오(값 동일) | features/water.py L32-33 |
+| 7 | rn_sum30 | weather | [ASOS] sum_rn | 아니오(조류경보 아님) | features/weather.py L31-32 |
+| 8 | season_day | time_site | 달력(기준일) | 아니오 | features/time_site.py L25 |
+| 9 | consecutive_over_1k | ar | [API] iem_bgalage_cell_co | 아니오(값 동일) | features/ar.py L55-61 |
+| 10 | inflow_t0 | hydro | [HYD] 상류 본댐 iqty 합 | 아니오(조류경보 아님) | features/hydro.py L82 |
+| 11 | cell_slope_3 | ar | [API] iem_bgalage_cell_co | 아니오(값 동일) | features/ar.py L38-43 |
+| 12 | weir_outflow_t0 | hydro | [HYD] 1차 시설 tdqty | 아니오(조류경보 아님) | features/hydro.py L42 |
+| 13 | outflow_change7 | hydro | [HYD] 상류 본댐 tdqty | 아니오(조류경보 아님) | features/hydro.py L101-104 |
+| 14 | level_cont_diff7 | hydro | [LVL] wl_adj | 아니오(조류경보 아님) | features/hydro.py L108 |
+| 15 | level_cont_t0 | hydro | [LVL] wl_adj | 아니오(조류경보 아님) | features/hydro.py L107 |
+| 16 | wtemp_diff7 | water | [API] iem_wtrtp | 아니오(값 동일) | features/water.py L34-36 |
+| 17 | weir_storage_rate_t0 | hydro | [HYD] rsvwtrt(K-water) | 아니오(조류경보 아님) | features/hydro.py L45 |
+| 18 | hm_mean7 | weather | [ASOS] avg_rhm | 아니오(조류경보 아님) | features/weather.py L44 |
+| 19 | weir_outflow_ma7 | hydro | [HYD] tdqty | 아니오(조류경보 아님) | features/hydro.py L49 |
+| 20 | chla_lag1w | ar | [API] iem_chla | 아니오(값 동일, 2026-09-10 차이는 test 기준일 ≤09-03 이라 안 들어감) | features/ar.py L62-64 |
+| 21 | cell_log_lag3w | ar | [API] iem_bgalage_cell_co | 아니오(값 동일) | features/ar.py L36-37 |
+| 22 | ph_t0 | water | [API] iem_ph | 아니오(값 동일) | features/water.py L28-30 |
+| 23 | storage_rate_t0 | hydro | [HYD] 상류 본댐 rsvwtrt | 아니오(조류경보 아님) | features/hydro.py L89 |
+| 24 | outflow_t0 | hydro | [HYD] 상류 본댐 tdqty | 아니오(조류경보 아님) | features/hydro.py L83 |
+| 25 | weir_residence_proxy | hydro | [HYD] rsvwtqy ÷ tdqty | 아니오(조류경보 아님) | features/hydro.py L61-70 |
+| 26 | ws_mean7 | weather | [ASOS] avg_ws | 아니오(조류경보 아님) | features/weather.py L42 |
+| 27 | horizon_days | time_site | target − base(학습 행은 [API] 측정일 ±3일 매칭, test 는 번들 sample_submission) | 아니오(값 동일, 2,690행 일치) | features/run.py L68-78 |
+| 28 | dominant_genus | ar | [API] dominant_genus | 아니오(값 동일) | align/run.py L201, features/ar.py L50-52 |
+| 29 | facility_type | time_site | config/sites.yaml | 아니오 | features/time_site.py L30 |
+| 30 | basin | time_site | config/sites.yaml | 아니오 | features/time_site.py L29 |
+| 31 | up1_cell_log(v2.1) | upstream | [API] 바로 위 지점(GJGR←HP, CS←GJGR, MGMR←CS) iem_bgalage_cell_co, 기준일까지 | 아니오(값 동일, '다른 지점'이지만 번들 안 5지점) | features/upstream.py |
+| 32 | up1_slope3(v2.1) | upstream | [API] 상류 지점 세포수·측정일 | 아니오(값 동일) | features/upstream.py L89-91 |
+| 33 | up1_wtemp(v2.1) | upstream | [API] 상류 지점 iem_wtrtp | 아니오(값 동일) | features/upstream.py L92-94 |
+| 34 | up1_days(v2.1) | upstream | [API] 상류 지점 측정일 | 아니오(값 동일) | features/upstream.py L88 |
+| 35 | up1_diff(v2.1) | upstream | up1_cell_log − cell_log_t0 | 아니오(값 동일) | features/upstream.py L115-116 |
+
+### 6.2 타깃
+
+| 대상 | 원천 | 번들 외 사용 | 근거 |
+|---|---|---|---|
+| target_cells·target_log(v1-fix·v2.1 학습 2,562행) | [API] iem_bgalage_cell_co(목표일 측정) | 아니오(값 동일, 2,562행 일치) | features/run.py |
+| 속별 구성원 cg 부분 타깃(v2.1 만) | [API] 목표일 iem_bgalage_microsts(Microcystis), anba+apzo+osrtria(나머지 3속), 목표일 ≤2025-12-31 | 아니오(값 동일, 겹치는 2,939행 4속·총합 차이 0) | models/genus.py, models/v2.py |
+
+- v1-fix 의 감시·경보는 v2.1 과 같은 분류기 b·분위 모델(`classifier/20261023_120255`, `quantile/20261023_120257`, 피처 30개 = 1~30번)을 쓴다.
+
+### 6.3 결론
+
+- **v1-fix 는 번들 외 조류경보 자료(값)를 쓰지 않는다 — 2절 전환 조건 확인.** 조류·수질 피처 12개(#1·2·3·4·6·9·11·16·20·21·22·28)·horizon_days·학습 타깃은 코드에서 API parquet 을 읽지만, 학습 행과 제출 test 124행에 들어가는 값은 번들과 같다(번들로 바꿔 다시 계산한 2,690행의 30개 피처·target_date·학습 타깃 일치, 수온 임계 2019~2025 일치). API 에만 있는 자료(2026-09-14~10-15 의 40행, 2026-09-10 '분석중' 대체값)는 어떤 학습·제출 피처에도 들어가지 않는다.
+- **같은 사실이 v2.1 에도 성립한다.** 상류 5열의 '다른 지점 세포수'는 번들 안 지점(해평·강정·고령·칠서)의 값이고, 속별 타깃도 번들 4속 열과 같다.
+- 형식까지 번들로 맞추려면 정렬·상수·상류·속별 원천 4곳을 번들 CSV 로 바꿔야 하고, 제출 패키지에 API parquet(번들 밖 40행 포함)이 들어 있다(`scripts/build_submission_package.py`). 피처가 같으므로 submission.csv 도 같을 것으로 보이나 다시 만들어 대조하지는 않았다(확인 못 함).
+- 참고: 조류경보가 아닌 번들 외 자료(보 운영 K-water·WAMIS, 댐 저수율, DataON·WAMIS 연속 수위, ASOS 288 밀양·131 청주 — 번들 asos_daily 6개소 밖)는 v1-fix·v2.1 모두 쓴다. 대시보드 일일 운영 예측은 조류경보 API 를 실시간 수집한다(제출 모델 입력이 아님). 2026 사후 관심(1천) 사건 7건 중 2건(해평 D 2026-09-14, 강정·고령 E 2026-09-21·D 09-28)과 EDA 3장 통계(2,979건, ~2026-10-15)는 번들 밖 측정을 쓴다.
+
+## 부록 A. 2026 실측 사후 분석이 들어간 위치(분석 결과, 2026-10-23)
+
+대체 원천: [LT] `reports/eval/tbl_leadtime.md`(2020~2025 경계 20건 중 17건·중앙 14일, D 기준 21일, 지속성 1/20; 관심 48건 중 43건·14일), [H25] `tbl_holdout_2025_v21.md`·`headline_metrics.json` same252_2025(v2.1 0.712·0.778·0.175·F1 0.705, 지속성 F1 0.727), [CV] `headline_metrics.json` cv_pooled_r2_raw(v2.1 0.289), [TR] `tbl_transitions.md`(2025 진입 12건), [OP] `tbl_operating_points.md`, [CQR] `tbl_cqr.md`(2025 PICP80 0.845), [SITE] `tbl_by_site.md`(2025 지점별).
+
+### A.1 2026 실측(타깃)으로 계산한 성능·포착·리드타임·지표
+
+| 위치 | 내용(2026 사후 수치) | 대체할 2020~2025 결과 |
+|---|---|---|
+| 방법설명서 머리 강조 상자 | 2026 경계 8건 중 7건·중앙 21일, 2020~2026 28건 중 24건(86%), v1 7/8 이력 | 20건 중 17건·중앙 14일, 지속성 1 [LT] |
+| 방법설명서 1.3절 끝 | 강정·고령 2026-05-18 관심 발령 사례 | 삭제 또는 관심 48건 중 43건 [LT] |
+| 방법설명서 1.5절 헤드라인 | 2026 7/8·21일(D 31일), 2026 test 124 지표, 진입 10건 경보율, v1-fix 7/8 | [LT], [H25], 2025 진입 12건 [TR]·[OP] |
+| 방법설명서 5.9절 '2026과의 관계' | v1·C 2026 사후 계산 경위(수치 없음) | 문장 정리 |
+| 방법설명서 5.11절 표 5-8·5-9, 'v1 블라인드 주장 점검', 운영 반영 | 2026 8건 행·합계 행, 2026 test 124 v2.1·v2·v1·v1-fix·B0 지표 | 2020~2025 행, 표 5-7(2025·CV) |
+| 방법설명서 5.11절 개발 이력 | 2026 F1@1k·PICP80·MPIW·점예측 리드, 강정·고령 5월 v1·v2, 관심 5/7 | 삭제(이력) |
+| 방법설명서 6.1·6.4(표 6-4 2026 행·헤드라인·관심 7건·강정·고령)·6.5(2026 PICP80 0.702)·6.10(물모아 n=6)·6.11 전체(표 6-8~6-10)·7.4·9.3·9.4·10.1~10.4, 각주 c1-6·c1-10·c1-11·c5-15·c5-20·c6-12·c6-14·c6-20·c7-6·c10-1~c10-7 | 2026 사후 수치·서술 | [LT]·[H25]·[CQR]·[SITE]·[TR]·[CV], 물모아는 대체 없음 |
+| reports/eval/tbl_holdout_2026_posthoc*.md(4개)·posthoc_2026_v21_summary.json·posthoc_2026_v21_detail.json·headline_metrics.json `posthoc2026`·live_benchmark.csv·tbl_benchmark_nier.md, data/processed/posthoc_2026*.parquet | 2026 사후 표·수치(물모아 6건) | [H25]·[SITE]·[TR]·[LT] |
+| reports/experiments/FIX-v2.1/RESULT.md(3절 리드 2026·합계 행, '2026 사후 계산' 표, 'v1 블라인드 주장 점검', 7절 2026 세부 행)·PREREG.md(규칙·헤드라인 틀)·baseline_v2/ | 2026 사후 수치 | 3절 영향표(2025·CV), 리드 2020~2025 행 |
+| README.md 핵심 결과, docs/01·04(2026 한계 수치)·07·09·11·12, docs/PROGRESS.md(이력) | 헤드라인·2026 수치 | [LT]·[H25] |
+| 패키지 README(build_submission_package.py): 검증 흐름 '→ 2026 사후 계산', 핵심 결과(2026 7/8·21일, 28건 중 24건, 2026 test 124 지표, v1 7/8), AI 활용 표 | 2026 사후 수치 | 2025 252행 지표 + [LT] |
+| 패키지 그림: figures/fig_leadtime_summary.png(노트북 §7: '2026 사후 감시' 7/8, '지속성(2020~2026)' 3/28), figures/dashboard_*.png, figures/reports/eval·experiments | 2026 사후 막대·스크린샷·표 | 2020~2025 막대(17/20, 지속성 1/20) |
+| 대시보드 numbers.ts(events 28/24, y2026, r2log·f1·r2raw·nseraw·picp80 의 y2026, CMP p26*), copy.ts(V21_NOTICE, 성적표, 지점 이력 '사후 계산', PERF 각 문구, ABOUT 한계·모델 표) | 2026 사후 수치·문구 | prior(20/17/14/1), h25*, cvR2raw, priorWatch |
+| 메인 상황판 하단 성적표 띠 | '28건 중 24건(2020~2026)', '2026년 8건 중 7건(중앙 21일)' | 20건 중 17건(중앙 14일) |
+| 얼마나 잘 맞혔나: 큰 숫자 4개, 비교표(2026 사후), 비교 막대(86% 대 11%), 28건 시간표(2026 사건 8개), 원래 목표 지표(2026 0.00), 전문가 표(posthoc md) | 2026 사후 수치 | 17/20, 2025 지표, 85% 대 5%, 20건 시간표, 2025 0.18·CV 0.29 |
+| 지점 상세 '지난 녹조 발생 기록과 미리 알림'(2026 사건 행·'n건 중 m건'), '지난 예상은 맞았나'·차트 '지난 예상값'(2026 실측 대조) | 2026 사건·적중 | 2020~2025 사건(강정·고령 5건 중 5건) |
+| 이 시스템은: 모델 표(2026 감시 7/8·점예측 5/8), 한계 문구(2026 로그 R² 0.52·PICP80 0.70·원단위 0.00, 강정·고령 5월) | 2026 사후 수치 | 2025 지표 |
+| /api/metrics, check_numbers.mjs·check_deployed_numbers.mjs | 2026 사후 행·대조 규칙 | 같이 수정 |
+| Supabase(run 7071a612): model_metrics `posthoc2026_v21`, bloom_events 2026 8건, transition_metrics `posthoc2026`, predictions 의 2026 obs_cell_count | 2026 사후 행 | bloom_events 2020~2025 20건, holdout2025_v21·cv_v21 |
+| 데모 영상 0:51~1:39(성적표 띠 '28건 중 24건·2026년 8건 중 7건'), 1:23~1:47(자막 14 '7건 중 7건', 이력 표 2026 2건, '최근 10번 중 6번'), 1:47~1:55(자막 15, 큰 숫자·2026 비교표), 1:55~2:03(자막 16, 86%·11%·28건 시간표), 2:03~2:07(자막 17, 2026 0.00), 2:12~2:21(자막 19, 헤드라인) | 2026 사후 수치 | 화면 문구 교체 뒤 재녹화(17/20, 5건 중 5건, 85%·5%, 2025 0.18, 20건 중 17건) |
+| demo/README_DEMO.md 구성표·자막 목록, demo/script.md | 영상 수치 | 영상과 같이 |
+
+### A.2 2026 기준일 운영 예측(사후 분석 아님, 표시만)
+
+| 위치 | 내용 |
+|---|---|
+| 대시보드 메인 타일·배너·지도·오늘의 조치, 지점 상세 '앞으로 7일'·권고 | 최신 기준일(10.19~10.22) 예측. 실시간 API 수집 |
+| 메인 지점 모니터(MiniChart) '→ 실제 ✓/✗' | 운영 예측의 실측 대조 |
+| 데모 0:59~1:31(자막 9~13) | 강정·고령 예상값 1.9만·92%·범위 1,300~3.5만, 배너 |
+| submission.csv(2026 test 124 예측), 방법설명서 8.3절(as-of 재현, 타깃 미사용) | 예측·피처 대조 |
+
+### A.3 2026 실측을 쓴 서술·통계(모델 성능 아님, 판단 필요)
+
+| 위치 | 내용 |
+|---|---|
+| 방법설명서 1.2절 | '2020~2026 경계 사건 28건 중 26건에서 발령이 7일 늦음', 강정·고령 2026-08 세포수 증가 |
+| 방법설명서 1.3절·10.2절 | 2026 강정·고령 첫 관심 5/18(DOY 138), 2026 첫 경계 DOY |
+| 방법설명서 3장 | EDA 2,979건(~2026-10-15), Kruskal-Wallis·그림 3-2 2012~2026 |
+| reports/eval/tbl_leadtime.md 사건 목록 | 2026 사건 8건의 E·D 날짜(지표는 2020~2025) |
+| 대시보드 '녹조 이야기' | 2026 조기 발령, Mann-Kendall 2016~2026, Kruskal-Wallis 2012~2026 |
+| docs/11_PRESENTATION_PLAN.md | 2026 조기 발령 서술 |
+
+확인 못 함: 원천만 번들로 바꾼 경로로 submission.csv 를 다시 만들어 대조하지 않았다. Supabase 에 실제로 남은 행(이전 run 의 2026 사후 행 포함)은 조회하지 않았다. 데모 영상은 캡처 4장과 자막·구성표로만 확인했다.
