@@ -378,7 +378,7 @@ export const ABOUT = {
   notOfficial: "이 시스템의 예상은 운영 참고용입니다. 국립환경과학원 조류경보제의 공식 발령을 대체하지 않으며, 화면에는 항상 공식 발령과 예상을 나란히 둡니다.",
   reproTitle: "다시 만들어 보려면",
   repro: ["저장소를 받아 Python 3.11 가상환경에 설치합니다(make setup).", "대회 자료를 data/raw/competition 에 두고 외부 자료를 받습니다(make collect).", "일 달력 정렬 → 특징 → 학습 → 평가(make align features train eval). 고정 모델 해시는 models/FROZEN_v2.1.md(제출·운영)와 이력 FROZEN.md·FROZEN_v2.md 와 대조합니다(scripts/verify_frozen.py).", "제출용 예측은 python -m algaecast.models.predict 로 다시 만들어지며, 새 환경에서 바이트 단위로 같은 파일이 나오는지 확인했습니다."],
-  reproExpert: "GitHub: LeeJaeHaeng/AlgaeCast (비공개). 분할 학습 ≤2024 / 검증 2025 / 평가 2026, 연 단위 확장 창 교차검증, 시드 42, 누수 테스트 tests/test_no_leakage.py.",
+  reproExpert: "코드 저장소: 비공개 저장소 — 요청 시 열람 권한 제공. 분할 학습 ≤2024 / 검증 2025 / 평가 2026, 연 단위 확장 창 교차검증, 시드 42, 누수 테스트 tests/test_no_leakage.py.",
   frozenLine: `제출·운영 모델 v2.1 고정: ${V21_FROZEN}(한국 시간), 커밋 ${MODELS.v21meta.commit}. 고정 뒤에는 제출 전까지 다시 학습하지 않습니다. 이력: v1 ${V1_SEALED} 봉인(커밋 ${MODELS.v1meta.commit}) · v2 ${V2_FROZEN} 고정(커밋 ${MODELS.v2meta.commit}).`,
   limitsFootnote: `※ 2026년 v2.1 값: ${V21_NOTICE}`,
   models: {

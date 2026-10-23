@@ -66,7 +66,8 @@ export default async function SitePage({ params, searchParams }: { params: Promi
   const wxData = weather.map((w) => ({ date: w.obs_date, ta: w.ta_mean, rn: w.rn_sum }));
 
   return (
-    <PageFrame title="" expert={expert} back={{ href: "/", label: SITE.back }}>
+    // 글꼴 폴백 크기 보정(globals.css .fit-fallback-font): Pretendard 교체 때 아래 묶음이 밀리던 CLS 방지
+    <PageFrame title="" expert={expert} back={{ href: "/", label: SITE.back }} className="fit-fallback-font">
       {/* 머리: 지점 · 조합 라벨 · 공식/AI · 날짜 */}
       <header className="panel flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3" style={combo === "enter" ? { boxShadow: `inset 0 0 0 1px ${c.color}` } : undefined}>
         <h1 className="text-3xl font-bold">{site.name}</h1>

@@ -56,6 +56,44 @@ body {
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
+/* 글꼴 폴백 크기 보정(CLS): Pretendard(CDN 동적 서브셋, font-display: swap)가 늦게·조각조각 들어와도 줄바꿈·높이가 바뀌지 않게
+   폴백(맑은 고딕)의 글자 폭·세로 지표를 Pretendard 에 맞춘다(next/font adjustFontFallback 과 같은 방식).
+   size-adjust = 굵기(400·600·700)별 Pretendard÷맑은 고딕 글자 폭(한글·숫자·공백·점류는 글자마다 같은 비율, 나머지 ASCII 는 화면 글자 빈도 가중,
+   라벨 기호 ◆ / ▲▼ / ●①②③ / –— / ℃ 는 글자별). ascent/descent 는 Pretendard(1950/494, upm 2048) ÷ size-adjust.
+   Pretendard 가 이 범위를 모두 덮으므로 로딩 뒤 화면은 같다. local() face 는 첫 레이아웃 비용이 있어 지점 상세(PageFrame className)에만 쓴다. */
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+AC00-D7A3; size-adjust: 86.43%; ascent-override: 110.16%; descent-override: 27.91%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+0030-0039; size-adjust: 111.53%; ascent-override: 85.37%; descent-override: 21.63%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+0020; size-adjust: 71.39%; ascent-override: 133.37%; descent-override: 33.79%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+002C, U+002E, U+003A-003B, U+00B7; size-adjust: 116.07%; ascent-override: 82.03%; descent-override: 20.78%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+0021-002B, U+002D, U+002F, U+003C-007E; size-adjust: 101.01%; ascent-override: 94.26%; descent-override: 23.88%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+AC00-D7A3; size-adjust: 86.43%; ascent-override: 110.16%; descent-override: 27.91%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+0030-0039; size-adjust: 110.62%; ascent-override: 86.07%; descent-override: 21.81%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+0020; size-adjust: 67.64%; ascent-override: 140.77%; descent-override: 35.66%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+002C, U+002E, U+003A-003B, U+00B7; size-adjust: 104.11%; ascent-override: 91.46%; descent-override: 23.17%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+0021-002B, U+002D, U+002F, U+003C-007E; size-adjust: 100.18%; ascent-override: 95.04%; descent-override: 24.08%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+AC00-D7A3; size-adjust: 86.43%; ascent-override: 110.16%; descent-override: 27.91%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+0030-0039; size-adjust: 112.98%; ascent-override: 84.28%; descent-override: 21.35%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+0020; size-adjust: 65.70%; ascent-override: 144.92%; descent-override: 36.71%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+002C, U+002E, U+003A-003B, U+00B7; size-adjust: 107.84%; ascent-override: 88.29%; descent-override: 22.37%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+0021-002B, U+002D, U+002F, U+003C-007E; size-adjust: 107.87%; ascent-override: 88.27%; descent-override: 22.36%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+25C6; size-adjust: 100.68%; ascent-override: 94.57%; descent-override: 23.96%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+25B2, U+25BC; size-adjust: 96.68%; ascent-override: 98.48%; descent-override: 24.95%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+25CF, U+2460-2462; size-adjust: 87.11%; ascent-override: 109.30%; descent-override: 27.69%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+2013-2014; size-adjust: 93.29%; ascent-override: 102.06%; descent-override: 25.86%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic"), local("MalgunGothic"); font-weight: 1 549; unicode-range: U+2103; size-adjust: 116.75%; ascent-override: 81.55%; descent-override: 20.66%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+25C6; size-adjust: 101.90%; ascent-override: 93.44%; descent-override: 23.67%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+25B2, U+25BC; size-adjust: 99.61%; ascent-override: 95.59%; descent-override: 24.22%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+25CF, U+2460-2462; size-adjust: 88.67%; ascent-override: 107.38%; descent-override: 27.20%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+2013-2014; size-adjust: 93.86%; ascent-override: 101.44%; descent-override: 25.70%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 550 649; unicode-range: U+2103; size-adjust: 119.37%; ascent-override: 79.76%; descent-override: 20.21%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+25C6; size-adjust: 102.49%; ascent-override: 92.90%; descent-override: 23.54%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+25B2, U+25BC; size-adjust: 101.03%; ascent-override: 94.24%; descent-override: 23.88%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+25CF, U+2460-2462; size-adjust: 89.50%; ascent-override: 106.39%; descent-override: 26.95%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+2013-2014; size-adjust: 94.15%; ascent-override: 101.13%; descent-override: 25.62%; line-gap-override: 0%; }
+@font-face { font-family: "Pretendard Fallback"; src: local("Malgun Gothic Bold"), local("MalgunGothicBold"); font-weight: 650 1000; unicode-range: U+2103; size-adjust: 120.66%; ascent-override: 78.91%; descent-override: 19.99%; line-gap-override: 0%; }
+.fit-fallback-font {
+  font-family: "Pretendard Variable", Pretendard, "Pretendard Fallback", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+}
 a {
   color: inherit;
 }

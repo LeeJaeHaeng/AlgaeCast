@@ -2,10 +2,10 @@ import Link from "next/link";
 import { APP, BOARD } from "@/lib/copy";
 
 /** 메인 상황판 외 페이지의 공통 틀: 상단 바(제목·메뉴·보기 전환) + 본문 + 바닥 출처 */
-export function PageFrame({ title, lead, expert, children, back }: { title: string; lead?: string; expert: boolean; children: React.ReactNode; back?: { href: string; label: string } }) {
+export function PageFrame({ title, lead, expert, children, back, className }: { title: string; lead?: string; expert: boolean; children: React.ReactNode; back?: { href: string; label: string }; className?: string }) {
   const q = expert ? "?view=expert" : "";
   return (
-    <div className="min-h-dvh">
+    <div className={className ? `min-h-dvh ${className}` : "min-h-dvh"}>
       <header className="sticky top-0 z-40 flex h-14 items-center gap-4 border-b border-border bg-panel/95 px-4 backdrop-blur">
         <Link href={`/${q}`} className="text-lg font-bold tracking-tight">
           {APP.title}
