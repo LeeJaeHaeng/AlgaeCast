@@ -176,6 +176,17 @@ const NOTICE = "수정본(v2.1·v1-fix)의 2026 은 블라인드가 아니다: �
   checks.push(["운영점 threshold = config/model.yaml", num(src.match(/OPERATING_POINT = \{[^}]*threshold:\s*([\d.]+)/)?.[1]), op]);
   checks.push(["운영점 비용비 = config/model.yaml", num(src.match(/OPERATING_POINT = \{[^}]*costRatio:\s*(\d+)/)?.[1]), num(myaml.match(/operating_point:[\s\S]*?cost_ratio:\s*(\d+)/)?.[1])]);
 }
+// 녹조 이야기 ② 지점별 수온 기준 = config/derived_constants.json 최종(≤2025) 임계 — 모델 피처와 같은 값
+{
+  const dc = JSON.parse(readFileSync(resolve(root, "config", "derived_constants.json"), "utf-8"));
+  const fin = dc.site_caution_wtemp["2025"].values;
+  const copy = readFileSync(resolve(process.cwd(), "src/lib/copy.ts"), "utf-8");
+  const rows = copy.match(/rows: (\[\["회남"[^\n]*?\]\]) as \[string, number\]\[\]/)?.[1] ?? "[]";
+  const got = Object.fromEntries(JSON.parse(rows));
+  for (const [name, sid] of [["회남", "DCHN"], ["물금·매리", "MGMR"], ["칠서", "CS"], ["강정·고령", "GJGR"], ["해평", "HP"]]) {
+    checks.push([`녹조 이야기 수온 기준 ${name}(≤2025)`, got[name] ?? NaN, fin[sid]]);
+  }
+}
 
 let bad = 0;
 for (const [name, ours, theirs] of checks) {

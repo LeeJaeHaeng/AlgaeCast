@@ -37,7 +37,7 @@ export function firstParagraphs(md: string, n = 6): string[] {
     .map((l) => l.replace(/^- /, "").replace(/\*\*/g, ""));
 }
 
-/** models/FROZEN.md(v1 블라인드 검증) 또는 FROZEN_v2.md(v2 제출·운영) 의 동결 커밋 7자리 (reports.json 사본) */
+/** models/FROZEN.md(v1, 수정 전 이력)·FROZEN_v2.md(v2, 수정 전 이력) 의 동결 커밋 7자리 (reports.json 사본) — v2.1 커밋은 numbers.ts MODELS */
 export function frozenCommit(file: "FROZEN.md" | "FROZEN_v2.md" = "FROZEN.md"): string {
   const md = readReport(file) ?? "";
   const m = md.match(/동결 커밋: `([0-9a-f]+)`/);
