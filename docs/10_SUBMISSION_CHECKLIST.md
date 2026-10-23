@@ -10,11 +10,14 @@
 ## B. 실격 방지 (전부 통과해야 제출)
 - [ ] `tests/test_no_leakage.py` 통과 로그 첨부
 - [ ] 2026 평가 조합 전체에 대해 피처 계산에 사용된 최대 obs_date ≤ base_date 임을 출력하는 스크립트 실행, 로그 첨부 (`reports/eval/leakage_audit.md`)
+- [ ] 원자료부터 다시 계산하는 누수 감사(`scripts/leakage_audit.py --raw-sample 60`: 원천을 기준일로 잘라 정렬·피처를 다시 만들어 대조) 불일치 0, 음성 대조(전 기간 평균으로 되돌리면 검출) 통과
+- [ ] 데이터로 계산한 상수는 as-of 또는 학습기간 자료로만: `config/derived_constants.json` 계산 자료 메타데이터 + `tests/test_derived_constants.py` 통과(FIX-v2.1, 2026-10-23)
 - [ ] 코드 내 실측치 룩업·하드코딩 없음 (grep "sample_submission" 이외 정답 파일 참조 없음)
 - [ ] 깨끗한 venv에서 `make reproduce` → `submission.csv` diff 0
 - [ ] 시드 고정, requirements 버전 고정, Python 버전 명시
-- [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재(공공데이터포털 자료는 공공누리/이용허락범위 제한 없음, WAMIS 는 포털 #3068550 등록분 기준, DataON 수위 자료는 CC BY-NC-SA — 패키지의 DataON 유래 파일에 LICENSE_DataON.txt)
+- [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재(공공데이터포털 자료는 공공누리/이용허락범위 제한 없음, WAMIS 는 같은 값의 포털 #3068550·#3040409 등록분 기준(수집은 키 없는 개방 API, 회원약관 제15조④ 비회원 적용 불분명), DataON 수위 자료는 CC BY-NC-SA — 패키지의 DataON 유래 파일에 LICENSE_DataON.txt)
 - [ ] DataON 원값은 기본 zip 2종(영상 포함·제외)에 넣지 않음: 수위 피처 2열 가공 파일(`data/processed/level_cont_features_S1.parquet`)로 원자료 없이 submission.csv diff 0, 받는 법은 `data/raw/dataon/README_GET_DATAON.md`. 원값 포함 대체 zip(`_with_dataon`)은 운영사무국 허용 시에만
+- [ ] WAMIS 원값도 기본 zip 에 넣지 않음: 수문 피처 33열 가공 파일(`data/processed/wamis_hydro_features_S1.parquet`)로 원자료 없이 submission.csv diff 0, 받는 법은 `data/raw/hydro/README_GET_WAMIS.md`(#3068550·#3040409)
 - [ ] 대회 제공 데이터는 저장소에 커밋하지 않음(참가신청서 규정 3항: 승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 출처 명시). 패키지에는 심사용으로만(`data/raw/competition/README_심사용_공개시제외.txt`)
 
 ## C. 우수성 증빙 (방법 설명서에 포함)
