@@ -44,6 +44,10 @@ ZIP_DATAON = (
 DATAON_RAW_FILE = "dataon/level_continuous_long.parquet"
 # DataON 가공 수위 피처(level_cont_t0·level_cont_diff7) — 원자료 없이 같은 submission.csv 를 만드는 데 쓴다
 LEVEL_FEATURE_FILE = "level_cont_features_S1.parquet"
+# WAMIS 원값 — 기본 패키지에서 뺀다(회원약관 제15조④ 적용 여부가 분명하지 않아 원값 재배포 안 함).
+# wamis_dam/ 는 통째로, hydro_daily_long 은 WAMIS 출처 행만 뺀 사본을 넣고 가공 수문 피처 파일로 재현한다.
+WAMIS_SOURCES = ("wamis_mn_dtdata", "wamis_wl_dtdata")
+WAMIS_FEATURE_FILE = "wamis_hydro_features_S1.parquet"
 DEMO_SHA_PREFIX = "0a1fb2f4"  # 2026-10-23 v4(예상값 하나로 통일한 화면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a → dist/backup_demo_2026102*
 # DataON 유래 파일이 있는(또는 노트북 실행으로 생기는) 폴더 — LICENSE_DataON.txt 를 붙인다
 DATAON_DIRS = ("data/raw/dataon", "data/interim", "data/processed", "src/config")
@@ -51,9 +55,7 @@ DEMO_FILES = ["AlgaeCast_demo.mp4", "AlgaeCast_demo.srt", "script.md", "README_D
 RAW_FILES = [
     "nier_algae/nier_algae_2012_2026.parquet",
     "kma_asos/kma_asos_daily_2012_2026.parquet",
-    "hydro/hydro_daily_long.parquet",
     "kwater_sluice/kwater_sluice_daily.parquet",
-    "wamis_dam/wamis_dam_daily.parquet",
     "kwater_damapi/kwater_damapi_recent.parquet",
     "MANIFEST.md",
 ]
@@ -513,6 +515,18 @@ def build(out: Path) -> int:
     )
     # DataON: 원값(연속 시계열)은 빼고 수위 피처 2열 가공 파일 + 받는 법 안내만 넣는다
     copy(level_feature_file(), out / "data" / "processed" / LEVEL_FEATURE_FILE)
+    # WAMIS: 원값(wamis_dam/·hydro 의 WAMIS 행)은 빼고 가공 수문 피처 + 받는 법 안내
+    import pandas as pd
+
+    hy = pd.read_parquet(ROOT / "data" / "raw" / "hydro" / "hydro_daily_long.parquet")
+    hy = hy[~hy["source"].isin(WAMIS_SOURCES)]
+    (out / "data" / "raw" / "hydro").mkdir(parents=True, exist_ok=True)
+    hy.to_parquet(out / "data" / "raw" / "hydro" / "hydro_daily_long.parquet", index=False)
+    copy(ROOT / "data" / "processed" / WAMIS_FEATURE_FILE, out / "data" / "processed" / WAMIS_FEATURE_FILE)
+    copy(
+        ROOT / "docs" / "reference" / "README_GET_WAMIS.md",
+        out / "data" / "raw" / "hydro" / "README_GET_WAMIS.md",
+    )
     copy(
         ROOT / "docs" / "reference" / "README_GET_DATAON.md",
         out / "data" / "raw" / "dataon" / "README_GET_DATAON.md",
@@ -523,7 +537,11 @@ def build(out: Path) -> int:
     # model/ (동결 모델 — 코드가 model/ 을 읽도록 algaecast.config 가 패키지 구조를 감지)
     reg = json.loads((ROOT / "models" / "registry.json").read_text(encoding="utf-8"))
     versions = set(reg["current"].items())
-    for doc in ("FROZEN.md", "FROZEN_v2.md"):  # v2 동결 후: verify_frozen 이 두 문서의 파일을 모두 검증한다
+    for doc in (
+        "FROZEN.md",
+        "FROZEN_v2.md",
+        "FROZEN_v2.1.md",
+    ):  # verify_frozen 이 모든 동결 문서의 파일을 검증한다
         if (ROOT / "models" / doc).exists():
             text = (ROOT / "models" / doc).read_text(encoding="utf-8")
             versions |= set(re.findall(r"\| (\w+) \| (\d+_\d+) \| `[0-9a-f]{64}` \|", text))
@@ -598,6 +616,8 @@ def build(out: Path) -> int:
     leaked = out / "data" / "raw" / DATAON_RAW_FILE
     if leaked.exists():
         raise SystemExit(f"빌드 중단: 기본 패키지에 DataON 원값 파일이 있다: {leaked}")
+    if (out / "data" / "raw" / "wamis_dam").exists():
+        raise SystemExit("빌드 중단: 기본 패키지에 WAMIS 원값 폴더(wamis_dam/)가 있다")
     print(f"패키지 {out} 총 {dir_size(out)}")
     print("루트:", sorted(p.name for p in out.iterdir()))
     return 1 if hits else 0

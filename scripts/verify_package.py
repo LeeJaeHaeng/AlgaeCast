@@ -107,6 +107,8 @@ def main(argv: list[str] | None = None) -> int:
         shutil.copytree(args.dir, pkg)
     dataon_raw = (pkg / "data" / "raw" / "dataon" / "level_continuous_long.parquet").exists()
     level_file = (pkg / "data" / "processed" / "level_cont_features_S1.parquet").exists()
+    wamis_raw = (pkg / "data" / "raw" / "wamis_dam" / "wamis_dam_daily.parquet").exists()
+    wamis_file = (pkg / "data" / "processed" / "wamis_hydro_features_S1.parquet").exists()
     # 복사본의 제출 파일을 지워, 노트북이 실제로 다시 만든 파일만 비교한다.
     (pkg / "submission.csv").unlink(missing_ok=True)
     py = sys.executable  # 같은 인터프리터(3.11)로 새 venv
@@ -129,6 +131,8 @@ def main(argv: list[str] | None = None) -> int:
         "source": src_desc,
         "dataon_raw_present": dataon_raw,
         "level_cont_mode": "raw" if dataon_raw else ("derived" if level_file else "missing"),
+        "wamis_raw_present": wamis_raw,
+        "wamis_mode": "raw" if wamis_raw else ("derived" if wamis_file else "missing"),
     }
     if rc == 0:
         out_csv = pkg / "submission.csv"
@@ -152,7 +156,8 @@ def main(argv: list[str] | None = None) -> int:
         f"submission.csv diff: {'0 (바이트 동일)' if res.get('submission_identical') else '불일치/미실행'} · "
         f"노트북 오류 {res.get('notebook_errors', '미실행')}건(경고 줄 {res.get('notebook_stderr_warnings', '-')}, 절대경로 {res.get('notebook_abs_paths', '-')}) · "
         f"데모 sha256 {str(res['demo_sha256'])[:16]}… {'일치' if res['demo_sha_ok'] else '불일치'} · "
-        f"DataON 원값 {'있음' if dataon_raw else '없음'}(수위 피처 {res['level_cont_mode']}) · 소요 {res['minutes']} 분"
+        f"DataON 원값 {'있음' if dataon_raw else '없음'}(수위 피처 {res['level_cont_mode']}) · "
+        f"WAMIS 원값 {'있음' if wamis_raw else '없음'}(수문 피처 {res['wamis_mode']}) · 소요 {res['minutes']} 분"
     )
     print(msg)
     with log.open("a", encoding="utf-8") as f:
