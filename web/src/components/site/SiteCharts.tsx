@@ -4,7 +4,7 @@ import { Area, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveCont
 import { SITE } from "@/lib/copy";
 import { fmtCells, fmtDate } from "@/lib/format";
 
-export type SeriesPoint = { date: string; obs?: number | null; q50?: number | null; lo?: number | null; hi?: number | null; past_pred?: number | null; actual?: number | null };
+export type SeriesPoint = { date: string; obs?: number | null; pred?: number | null; lo?: number | null; hi?: number | null; past_pred?: number | null; actual?: number | null };
 
 const C = { obs: "#E6EDF7", pred: "#38BDF8", past: "#8A9BB8", grid: "#1E2A44", l1: "#FACC15", l2: "#F97316", l3: "#EF4444", text: "#8A9BB8" };
 const LOG_LABEL: Record<number, string> = { 0: "0", 2: "100", 3: "1천", 4: "1만", 5: "10만", 6: "100만" };
@@ -17,13 +17,13 @@ export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; heig
   const LOW_Y = 1.6; // 100 미만·미검출 표시 높이(축 아래)
   const clampLow = (v: number | null) => (v == null ? null : v < FLOOR ? null : v);
   const data = points.map((p) => {
-    const q = toLog(p.q50);
+    const q = toLog(p.pred);
     const lo = toLog(p.lo);
     const hi = toLog(p.hi);
     const o = toLog(p.obs);
-    return { date: p.date, obs: clampLow(o), low: o != null && o < FLOOR ? LOW_Y : null, q50: q, band: lo != null && hi != null ? [Math.max(lo, FLOOR), hi] : null, past_pred: clampLow(toLog(p.past_pred)) };
+    return { date: p.date, obs: clampLow(o), low: o != null && o < FLOOR ? LOW_Y : null, pred: q, band: lo != null && hi != null ? [Math.max(lo, FLOOR), hi] : null, past_pred: clampLow(toLog(p.past_pred)) };
   });
-  const maxLv = Math.max(4.5, ...data.flatMap((d) => [d.obs ?? 0, d.q50 ?? 0, d.past_pred ?? 0, (d.band?.[1] as number) ?? 0])) + 0.3;
+  const maxLv = Math.max(4.5, ...data.flatMap((d) => [d.obs ?? 0, d.pred ?? 0, d.past_pred ?? 0, (d.band?.[1] as number) ?? 0])) + 0.3;
   const ticks = [LOW_Y, 2, 3, 4, 5, 6].filter((t) => t <= maxLv);
   const label = (v: number) => (v === LOW_Y ? "100 미만" : LOG_LABEL[v] ?? "");
   return (
@@ -52,7 +52,7 @@ export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; heig
         <Scatter dataKey="past_pred" name={SITE.chart.pastPred} fill={C.past} shape="circle" isAnimationActive={false} />
         <Line dataKey="obs" name={SITE.chart.obs} stroke={C.obs} strokeWidth={1.6} dot={{ r: 2.5, fill: C.obs }} connectNulls={false} isAnimationActive={false} />
         <Area dataKey="band" name={SITE.chart.band} stroke={C.pred} strokeWidth={1} fill={C.pred} fillOpacity={0.3} connectNulls={false} isAnimationActive={false} />
-        <Scatter dataKey="q50" name={SITE.chart.next} fill={C.pred} shape="circle" isAnimationActive={false} />
+        <Scatter dataKey="pred" name={SITE.chart.next} fill={C.pred} shape="circle" isAnimationActive={false} />
       </ComposedChart>
     </ResponsiveContainer>
     </div>

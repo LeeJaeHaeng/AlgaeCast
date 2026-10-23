@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { BOARD, COMBO, COMBO_ORDER } from "@/lib/copy";
 
-export type MapSite = { site_id: string; name: string; lat: number; lon: number; tier: string | null; q50: number | null; p_alert: number | null; latest_alert_level: number | null; latest_cell_count: number | null };
+export type MapSite = { site_id: string; name: string; lat: number; lon: number; tier: string | null; point: number | null; p_alert: number | null; latest_alert_level: number | null; latest_cell_count: number | null };
 
 const MapInner = dynamic(() => import("./MapInner"), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-panel" aria-hidden /> });
 

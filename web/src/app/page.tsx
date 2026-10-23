@@ -58,7 +58,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const logItems = toLogItems(events);
   const mapSites = sites.map((s) => {
     const st = status.find((x) => x.site_id === s.site_id);
-    return { site_id: s.site_id, name: s.name, lat: s.lat, lon: s.lon, tier: st?.tier ?? null, q50: st?.q50 ?? null, p_alert: st?.p_alert ?? null, latest_alert_level: st?.latest_alert_level ?? null, latest_cell_count: st?.latest_cell_count ?? null };
+    return { site_id: s.site_id, name: s.name, lat: s.lat, lon: s.lon, tier: st?.tier ?? null, point: st?.pred_cell_count ?? null, p_alert: st?.p_alert ?? null, latest_alert_level: st?.latest_alert_level ?? null, latest_cell_count: st?.latest_cell_count ?? null };
   });
   const tiers = Object.fromEntries(status.map((s) => [s.site_id, tierOf(s.tier)]));
   const rotation = ["/", ...ranked.map((s) => `/sites/${s.site_id}`)];

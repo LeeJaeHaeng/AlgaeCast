@@ -67,7 +67,7 @@ export default function MapInner({ sites, expert, light }: { sites: MapSite[]; e
                   {BOARD.tile.now} {fmtCellsKo(s.latest_cell_count)} {BOARD.unit.cells} · {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].label} · {BOARD.tile.ai} {TIER[t].label}
                 </div>
                 <div>
-                  {BOARD.tile.next} {fmtCellsKo(s.q50)} {BOARD.unit.cells} · {BOARD.tile.chance} {pctInt(s.p_alert)}%
+                  {BOARD.tile.next} {fmtCellsKo(s.point)} {BOARD.unit.cells} · {BOARD.tile.chance} {pctInt(s.p_alert)}%
                 </div>
                 <a className="underline" style={{ color: "var(--accent)" }} href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`}>
                   지점 상세 보기

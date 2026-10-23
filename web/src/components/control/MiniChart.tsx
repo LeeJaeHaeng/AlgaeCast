@@ -28,7 +28,8 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
   const path = pts.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
   const fmt = expert ? fmtCells : fmtCellsKo;
   const tx = s.target_date ? xp(s.target_date) : null;
-  const q50 = yp(s.q50);
+  const point = s.pred_cell_count; // 예상값 = v2 한 값 예측
+  const py = yp(point);
   const lo = yp(s.q10_cqr);
   const hi = yp(s.q90_cqr);
   const last = pts.at(-1);
@@ -37,8 +38,8 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
     { lv: 4, label: BOARD.tile.axis.k10, color: "var(--alert)" },
     { lv: 5, label: BOARD.tile.axis.k100, color: "var(--severe)" },
   ].filter((k) => k.lv > yLo && k.lv < yHi);
-  const tl = targetLabel(s.target_date, today, s.q50, s.obs_cell_count, fmt, { withValues: false });
-  const title = `${s.name}: ${BOARD.monitorLegend.obs} 최근 ${days}일, ${BOARD.monitorLegend.pred} ${fmt(s.q50)} ${BOARD.unit.cells}`;
+  const tl = targetLabel(s.target_date, today, point, s.obs_cell_count, fmt, { withValues: false });
+  const title = `${s.name}: ${BOARD.monitorLegend.obs} 최근 ${days}일, ${BOARD.monitorLegend.pred} ${fmt(point)} ${BOARD.unit.cells}`;
   return (
     <Link href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`} className="panel flex min-h-[240px] flex-col p-2 hover:border-[var(--accent)] 2xl:min-h-0" aria-label={title}>
       <div className="flex items-center justify-between px-1 text-sm">
@@ -64,8 +65,8 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
               <path key={i} d={`M${p.x.toFixed(2)},${p.y.toFixed(2)}h0`} stroke="var(--line-obs)" strokeWidth={5} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
             ))}
             {tx != null && lo != null && hi != null && <line x1={tx} x2={tx} y1={hi} y2={lo} stroke="var(--accent)" strokeWidth={8} strokeLinecap="round" opacity={0.35} vectorEffect="non-scaling-stroke" />}
-            {last && tx != null && q50 != null && <line x1={last.x} y1={last.y} x2={tx} y2={q50} stroke="var(--accent)" strokeDasharray="3 4" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />}
-            {tx != null && q50 != null && <path d={`M${tx.toFixed(2)},${q50.toFixed(2)}h0`} stroke="var(--accent)" strokeWidth={11} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
+            {last && tx != null && py != null && <line x1={last.x} y1={last.y} x2={tx} y2={py} stroke="var(--accent)" strokeDasharray="3 4" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />}
+            {tx != null && py != null && <path d={`M${tx.toFixed(2)},${py.toFixed(2)}h0`} stroke="var(--accent)" strokeWidth={11} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
             {tx != null && s.obs_cell_count != null && <path d={`M${tx.toFixed(2)},${yp(s.obs_cell_count)!.toFixed(2)}h0`} stroke="var(--line-obs)" strokeWidth={7} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
           </svg>
           <span className="absolute -bottom-5 left-0 text-xs text-dim">{fmtDate(start)}</span>
@@ -81,7 +82,7 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
           {BOARD.monitorLegend.obs} {fmt(s.latest_cell_count)} ({fmtDate(s.latest_obs_date)})
         </span>
         <span className="truncate" style={{ color: "var(--accent)" }} title={BOARD.tile.next}>
-          {BOARD.monitorLegend.predShort} {fmt(s.q50)} {BOARD.unit.cells}
+          {BOARD.monitorLegend.predShort} {fmt(point)} {BOARD.unit.cells}
           {tl.state === "verified" && ` → 실제 ${fmt(s.obs_cell_count)} ${tl.hit ? "✓" : "✗"}`}
         </span>
       </div>

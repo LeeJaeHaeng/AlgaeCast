@@ -3,7 +3,7 @@ import { Info } from "@/components/Info";
 import { PageFrame } from "@/components/PageFrame";
 import { RangeBar } from "@/components/control/SiteTile";
 import { BigChart, EnvChart } from "@/components/site/SiteCharts";
-import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, SITE, TERMS, TIER, TIER_EXPERT, UPSTREAM_PREFIX, comboOf, levelOfCells, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
+import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, SITE, TERMS, TIER, TIER_EXPERT, UPSTREAM_PREFIX, comboOf, explainForecast, levelOfCells, outOfRange, outOfRangeTip, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
 import { ALERT_LEVEL_LABEL, addDays, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
 import { getBloomEvents, getHydro, getLatestRun, getObservations, getPredictions, getShap, getSiteStatus, getSites, getWeather } from "@/lib/queries";
 
@@ -30,12 +30,15 @@ export default async function SitePage({ params, searchParams }: { params: Promi
   const c = COMBO[combo];
   const lvl = st?.latest_alert_level ?? 0;
   const p = pctInt(st?.p_alert);
-  const tl = targetLabel(st?.target_date, today, st?.q50, st?.obs_cell_count, fmt);
+  // 예상값 = v2 한 값 예측(pred_cell_count). q50(v1 공유 분위 중앙값)은 전문가 보기에만
+  const point = st?.pred_cell_count ?? null;
+  const tl = targetLabel(st?.target_date, today, point, st?.obs_cell_count, fmt);
+  const oor = outOfRange(point, st?.q10_cqr, st?.q90_cqr);
 
-  // 큰 차트: 1년 측정 + 지난 예상(회색) + 이번 예상(파란 점·띠)
+  // 큰 차트: 1년 측정 + 지난 예상값(회색) + 이번 예상값(파란 점·띠)
   const latest = preds.at(-1);
-  const pastByTarget = new Map(preds.filter((x) => x.target_date !== latest?.target_date).map((x) => [x.target_date, x.q50]));
-  const pts = [...obs.map((o) => ({ date: o.obs_date, obs: o.cell_count, past_pred: pastByTarget.get(o.obs_date) ?? null })), ...(latest ? [-2, 0, 2].map((d) => ({ date: addDays(latest.target_date, d).toISOString().slice(0, 10), obs: null, q50: d === 0 ? latest.q50 : null, lo: latest.q10_cqr, hi: latest.q90_cqr })) : [])].sort((a, b) => a.date.localeCompare(b.date));
+  const pastByTarget = new Map(preds.filter((x) => x.target_date !== latest?.target_date).map((x) => [x.target_date, x.pred_cell_count]));
+  const pts = [...obs.map((o) => ({ date: o.obs_date, obs: o.cell_count, past_pred: pastByTarget.get(o.obs_date) ?? null })), ...(latest ? [-2, 0, 2].map((d) => ({ date: addDays(latest.target_date, d).toISOString().slice(0, 10), obs: null, pred: d === 0 ? latest.pred_cell_count : null, lo: latest.q10_cqr, hi: latest.q90_cqr })) : [])].sort((a, b) => a.date.localeCompare(b.date));
 
   // 왜 이렇게 예상했나: 그룹별 기여 합 → 상위 3개 → §8.1 템플릿
   const byGroup = new Map<FeatureGroup, number>();
@@ -53,11 +56,9 @@ export default async function SitePage({ params, searchParams }: { params: Promi
 
   // 지난 예상은 맞았나 (실측이 온 최근 10건)
   const verified = preds.filter((x) => x.obs_cell_count != null).slice(-10).reverse();
-  const hits = verified.filter((x) => levelOfCells(x.q50) === levelOfCells(x.obs_cell_count)).length;
+  const hits = verified.filter((x) => levelOfCells(x.pred_cell_count) === levelOfCells(x.obs_cell_count)).length;
 
-  const q50Over = (st?.q50 ?? 0) >= 10_000;
-  const hiOver = (st?.q90_cqr ?? 0) >= 10_000;
-  const plain = q50Over ? SITE.plain.whyOver(fmt(st?.q50), p) : hiOver ? SITE.plain.whyHighChance(fmt(st?.q50), p) : SITE.plain.whyLowChance(fmt(st?.q50), p);
+  const plain = explainForecast(point, st?.q90_cqr, p, fmt);
 
   const wtData = obs.filter((o) => o.obs_date >= new Date(Date.now() - 180 * 86_400_000).toISOString().slice(0, 10)).map((o) => ({ date: o.obs_date, wt: o.water_temp }));
   const hydroData = hydro.map((h) => ({ date: h.obs_date, inflow: h.inflow_cms, outflow: h.outflow_cms, rain: h.rainfall_mm }));
@@ -99,17 +100,23 @@ export default async function SitePage({ params, searchParams }: { params: Promi
           <h2 className="text-lg font-semibold">{SITE.forecastBox}</h2>
           <div>
             <div className="flex items-center text-sm text-dim">
-              {TERMS.q50.label}
-              <Info term="q50" />
+              {TERMS.point.label}
+              <Info term="point" />
               <span className={`ml-2 ${tl.state === "verified" ? (tl.hit ? "text-[var(--safe)]" : "text-[var(--severe)]") : ""}`}>{tl.text}</span>
             </div>
-            <div className="text-[44px] font-bold leading-none" style={{ color: c.color }}>
-              {fmt(st?.q50)} <span className="text-base font-normal text-dim">{BOARD.unit.cells}</span>
+            <div className="text-[44px] font-bold leading-none" style={{ color: c.color }} data-point>
+              {fmt(point)} <span className="text-base font-normal text-dim">{BOARD.unit.cells}</span>
+              {oor && (
+                <span className="ml-1 align-middle text-sm font-normal text-dim" data-out-of-range={oor}>
+                  {BOARD.tile.outOfRange}
+                  <Info text={outOfRangeTip(oor, fmt(st?.q10_cqr), fmt(st?.q90_cqr))} />
+                </span>
+              )}
             </div>
-            {st?.pred_cell_count != null && (
-              <div className="mt-1 text-sm text-dim" title={BOARD.tile.v2pointTip} data-v2point>
-                {BOARD.tile.v2point} <span className="font-semibold text-text">{fmt(st.pred_cell_count)}</span> {BOARD.unit.cells}
-                <Info text={BOARD.tile.v2pointTip} />
+            {expert && st?.q50 != null && (
+              <div className="mt-1 text-sm text-dim" data-q50>
+                {TERMS.q50.label} <span className="font-semibold text-text">{fmtCells(st.q50)}</span> {BOARD.unit.cells}
+                <Info term="q50" />
               </div>
             )}
           </div>
@@ -121,7 +128,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
                 {fmt(st?.q10_cqr)} ~ {fmt(st?.q90_cqr)} {BOARD.unit.cells}
               </span>
             </div>
-            <RangeBar q10={st?.q10_cqr ?? null} q50={st?.q50 ?? null} q90={st?.q90_cqr ?? null} color={c.color} height={14} />
+            <RangeBar q10={st?.q10_cqr ?? null} point={point} q90={st?.q90_cqr ?? null} color={c.color} height={14} />
           </div>
           <div>
             <div className="flex items-center text-sm text-dim">
@@ -139,9 +146,10 @@ export default async function SitePage({ params, searchParams }: { params: Promi
           </div>
           <p className="text-base leading-relaxed">{plain}</p>
           <p className="text-sm leading-relaxed text-dim">
-            {TERMS.frozen.label}
-            <Info term="frozen" /> — {SITE.plain.frozen}
+            {SITE.plain.frozen}
+            <Info term="frozen" />
           </p>
+          {expert && <p className="text-xs leading-relaxed text-dim">{SITE.plain.frozenExpert}</p>}
         </section>
       </div>
 
@@ -250,9 +258,9 @@ export default async function SitePage({ params, searchParams }: { params: Promi
                   <tr key={`${v.base_date}-${v.target_date}`}>
                     <td>{fmtDate(v.base_date)}</td>
                     <td>{fmtDate(v.target_date)}</td>
-                    <td className="text-right">{fmtCells(v.q50)}</td>
+                    <td className="text-right">{fmtCells(v.pred_cell_count)}</td>
                     <td className="text-right">{fmtCells(v.obs_cell_count)}</td>
-                    <td>{levelOfCells(v.q50) === levelOfCells(v.obs_cell_count) ? "✓" : "✗"}</td>
+                    <td>{levelOfCells(v.pred_cell_count) === levelOfCells(v.obs_cell_count) ? "✓" : "✗"}</td>
                   </tr>
                 ))}
               </tbody>

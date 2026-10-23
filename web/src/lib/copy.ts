@@ -30,7 +30,7 @@ export const MODEL = {
   v2: "v2 제출·운영 모델",
   v1Short: "v1(블라인드 검증)",
   v2Short: "v2(제출·운영)",
-  note: `제출·운영 모델은 v2(${V2_FROZEN} 고정, 커밋 ${MODELS.v2meta.commit})입니다. '올해 처음 보는 사건' 성적은 ${V1_SEALED}에 봉인한 v1이 봉인 뒤 처음 계산한 블라인드 검증입니다. 미리 알림·넘을 가능성·예상 범위는 v2도 v1 봉인본을 그대로 써서 결과가 같고, v2에서 바뀐 것은 한 값 예측(대회 제출값)뿐입니다.`,
+  note: `제출·운영 모델은 v2(${V2_FROZEN} 고정, 커밋 ${MODELS.v2meta.commit})입니다. 화면의 큰 숫자 '예상값'은 v2의 한 값 예측(대회 제출값)입니다. '올해 처음 보는 사건' 성적은 ${V1_SEALED}에 봉인한 v1이 봉인 뒤 처음 계산한 블라인드 검증입니다. 미리 알림·넘을 가능성·예상 범위는 v2도 v1 봉인본을 그대로 써서 결과가 같고, v2에서 바뀐 것은 한 값 예측(예상값)뿐입니다.`,
 } as const;
 
 /** 서비스 이름·내비게이션 (§5 페이지 이름) */
@@ -60,16 +60,17 @@ export const TERMS = {
   tierSafe: { label: "안전", tip: "1주일 안에 경계 수준(10,000개/mL)을 넘을 가능성이 낮습니다." },
   tierWatch: { label: "주의 관찰", tip: "예상 범위의 위쪽 끝이 경계 수준(10,000개/mL)에 닿습니다. 채수를 늘리고 자주 확인해야 합니다." },
   tierAlert: { label: "대응 필요", tip: "1주일 안에 경계 수준을 넘을 가능성이 높습니다(가능성 52% 이상). 녹조제거설비 배치를 미리 준비해야 합니다." },
-  q50: { label: "가장 가능성 높은 값", tip: "7일 뒤 녹조 농도로 가장 가능성이 높은 한 값입니다. 실제 값은 이보다 높거나 낮을 수 있습니다." },
+  point: { label: "예상값", tip: "7일 뒤 녹조 농도 예상값입니다. 대회에 제출한 모델(v2)이 낸 한 값이며, 실제 값은 이보다 높거나 낮을 수 있습니다. 그 폭은 예상 범위로 함께 보여 줍니다." },
+  q50: { label: "q50(v1 공유 분위 중앙값)", tip: "범위·경보용 고정 모델(v1 봉인본, v1·v2 공통)의 분위 회귀 중앙값입니다. 쉽게 보기의 예상값(v2 한 값 예측)과 다를 수 있습니다." },
   range: { label: "예상 범위", tip: "7일 뒤 녹조 농도가 10번 중 8번은 이 범위 안에 들어오도록 맞춘 구간입니다(2023~2024년 자료로 보정)." },
-  pAlert: { label: "다음 주(4~10일 뒤) 측정에서 1만을 넘을 가능성", tip: "다음 주(4~10일 뒤) 측정 중 한 번이라도 녹조 농도가 1만 개/mL 이상일 가능성입니다. 가장 가능성 높은 값이 1만 아래여도 예상 범위 위쪽이 1만을 넘으면 넘을 가능성이 높게 나올 수 있습니다." },
+  pAlert: { label: "다음 주(4~10일 뒤) 측정에서 1만을 넘을 가능성", tip: "다음 주(4~10일 뒤) 측정 중 한 번이라도 녹조 농도가 1만 개/mL 이상일 가능성입니다. 예상값이 1만 아래여도 예상 범위 위쪽이 1만을 넘으면 넘을 가능성이 높게 나올 수 있습니다." },
   baseDate: { label: "기준일", tip: "예상을 만들 때 마지막으로 사용한 측정일입니다. 이 날 이후의 자료는 쓰지 않았습니다." },
   targetDate: { label: "7일 뒤", tip: "기준일로부터 7일 뒤, 예상의 대상이 되는 날입니다." },
   leadTime: { label: "미리 알린 기간", tip: "실제로 경계 수준을 처음 넘은 날보다 며칠 앞서 '주의 관찰' 이상으로 바뀌었는지입니다." },
   persistence: { label: "지난주 값 그대로 쓰는 방법", tip: "'다음 주도 이번 주와 같을 것'이라고 보는 가장 단순한 비교 기준입니다." },
   why: { label: "왜 이렇게 예상했나", tip: "예상값을 올리거나 내린 요인을 기여도가 큰 순서로 보여 줍니다." },
-  frozen: { label: "고정된 모델", tip: `제출·운영 모델 v2는 ${V2_FROZEN}(한국 시간)에 고정했고 제출 전까지 다시 학습하지 않습니다. 2026년을 처음 보는 블라인드 검증은 ${V1_SEALED}에 봉인한 v1으로 했습니다. 예상 범위·넘을 가능성·단계는 v1·v2가 같습니다.` },
-  trend: { label: "추세", tip: "가장 가능성 높은 값이 현재 측정값보다 높으면 ↑, 낮으면 ↓, 비슷하면 → 입니다(±20% 기준)." },
+  frozen: { label: "고정된 모델", tip: `예상값은 제출·운영 모델 v2(${V2_FROZEN}, 한국 시간 고정)가 냅니다. 예상 범위·넘을 가능성·단계는 ${V1_SEALED}에 봉인한 v1 부분을 v1·v2가 함께 씁니다. 고정한 뒤에는 제출 전까지 다시 학습하지 않으며, 2026년 블라인드 검증은 v1으로 했습니다. 자세한 내용은 '얼마나 잘 맞혔나'·'이 시스템은' 페이지에 있습니다.` },
+  trend: { label: "추세", tip: "예상값이 현재 측정값보다 높으면 ↑, 낮으면 ↓, 비슷하면 → 입니다(±20% 기준)." },
 } as const;
 
 /** 단계(2단계 운영 체계) 표시 — §6 색·아이콘 */
@@ -190,9 +191,10 @@ export const BOARD = {
   btn: { fullscreen: "전체화면", exitFullscreen: "전체화면 끝내기", present: "발표모드", presentOff: "관제모드", kiosk: "순환", kioskOff: "순환 끝내기", easy: "쉽게 보기", expert: "전문가 보기" },
   counts: { alert: "대응 필요", watch: "주의 관찰", safe: "안전" },
   panels: { sites: "지점 현황", map: "지점 지도", actions: "오늘의 조치", log: "실시간 상황 기록", monitors: "지점 모니터 (최근 60일)", weather: "향후 7일 날씨", score: "성적표" },
-  tile: { now: "현재 측정", next: "가장 가능성 높은 값", nextSub: "7일 뒤", range: "예상 범위", chance: "다음 주(4~10일 뒤) 측정에서 1만을 넘을 가능성", official: "공식 발령", ai: "AI 예상", measuredOn: "측정일", baseOn: "기준일", axis: { k1: "1천", k10: "1만", k100: "10만" },
-    v2point: "제출 모델(v2) 한 값",
-    v2pointTip: "대회에 제출한 v2 모델(최종 모델 C)이 낸 7일 뒤 한 값 예측입니다. 위의 가장 가능성 높은 값·예상 범위·1만을 넘을 가능성은 v1과 v2가 함께 쓰는 고정 모델(범위·경보용)이 낸 값입니다." },
+  tile: { now: "현재 측정", next: "예상값", nextSub: "7일 뒤", range: "예상 범위", chance: "다음 주(4~10일 뒤) 측정에서 1만을 넘을 가능성", official: "공식 발령", ai: "AI 예상", measuredOn: "측정일", baseOn: "기준일", axis: { k1: "1천", k10: "1만", k100: "10만" },
+    outOfRange: "범위 밖",
+    /** 전문가 보기 전용 — v1 공유 분위 중앙값 */
+    q50Expert: "q50(v1 분위 중앙)" },
   mapLegend: "마커 색 = 상태 라벨 · 테두리 = 공식 발령 · 물길 = 낙동강·금강 본류",
   mapPulse: "경계 진입 예상 지점은 깜빡입니다",
   mapRivers: "물길 © OpenStreetMap contributors",
@@ -208,7 +210,7 @@ export const BOARD = {
     runFail: "예측 갱신 실패 — 마지막 성공 결과를 표시 중",
     empty: "최근 30일 기록이 없습니다.",
   },
-  monitorLegend: { obs: "측정", pred: "가장 가능성 높은 값", predShort: "예상", band: "예상 범위", l1: "관심 1,000", l2: "경계 10,000" },
+  monitorLegend: { obs: "측정", pred: "예상값", predShort: "예상값", band: "예상 범위", l1: "관심 1,000", l2: "경계 10,000" },
   weather: { temp: "7일 평균 기온", rain: "7일 비 합계", basis: "기상청 단기·중기예보, 기준일 발표분", none: "예보 자료 없음" },
   score: {
     caught: (hit: number, total: number) => `경계 사건 ${total}건 중 ${hit}건을 미리 알림`,
@@ -236,22 +238,25 @@ export const SITE = {
   envBox: "물·날씨 상황 (최근 6개월)",
   verifyBox: "지난 예상은 맞았나",
   tabs: { water: "물 온도", flow: "물 흐름(댐·보 방류)", weather: "날씨(기온·비·바람)" },
-  chart: { title: "최근 1년 녹조 농도와 7일 뒤 예상", obs: "측정값", pastPred: "지난 예상값", band: "예상 범위", next: "가장 가능성 높은 값", legend: "흰 선·점 = 측정값 · 회색 점 = 그때그때의 예상값 · 파란 점·띠 = 이번 예상과 범위" },
+  chart: { title: "최근 1년 녹조 농도와 7일 뒤 예상", obs: "측정값", pastPred: "지난 예상값", band: "예상 범위", next: "예상값", legend: "흰 선·점 = 측정값 · 회색 점 = 그때그때의 예상값 · 파란 점·띠 = 이번 예상값과 예상 범위" },
   history: { none: "기록된 경계 사건이 없습니다.", caught: (d: number) => `${d}일 앞서 알림`, missed: "미리 알리지 못함", posthoc: "올해(모델이 처음 보는 자료)", cols: { first: "처음 1만을 넘은 날", official: "공식 발령일", watch: "주의 관찰로 바뀐 날", lead: "미리 알린 기간" } },
   facility: (name: string) => `관련 시설: ${name}`,
   measuredBasis: "측정: 국립환경과학원 조류경보제",
   /** 메인에서 ⓘ 에 의존하던 두 가지를 큰 글자로 푸는 문장 */
   plain: {
-    whyHighChance: (q50: string, p: number) => `가장 가능성 높은 값은 ${q50} 개/mL로 1만 아래지만, 예상 범위의 위쪽이 1만을 넘기 때문에 다음 주 측정에서 1만을 넘을 가능성이 ${p}%로 나왔습니다.`,
-    whyLowChance: (q50: string, p: number) => `가장 가능성 높은 값은 ${q50} 개/mL이고, 예상 범위의 위쪽도 1만에 닿지 않아 다음 주 측정에서 1만을 넘을 가능성은 ${p}%로 낮습니다.`,
-    whyOver: (q50: string, p: number) => `가장 가능성 높은 값 ${q50} 개/mL 자체가 1만을 넘고, 다음 주 측정에서도 1만 이상일 가능성이 ${p}%입니다.`,
-    frozen: `이 화면의 가장 가능성 높은 값·예상 범위·넘을 가능성은 2025년까지 자료로 만든 뒤 ${V1_SEALED}(한국 시간)에 봉인한 v1 부분을 그대로 씁니다. 제출·운영 모델 v2(${V2_FROZEN} 고정)도 이 값들은 같고, v2에서 바뀐 것은 대회 제출용 한 값 예측뿐입니다. '올해 처음 보는 자료' 성적은 v1이 봉인 뒤 처음 계산한 것입니다.`,
+    whyOver: (v: string, p: number) => `예상값은 ${v} 개/mL입니다. 예상값이 경계(1만)를 넘을 것으로 보입니다(가능성 ${p}%).`,
+    whyHighChance: (v: string, p: number) => `예상값은 ${v} 개/mL로 1만 아래지만, 예상 범위의 위쪽이 1만을 넘기 때문에 다음 주 측정에서 1만을 넘을 가능성이 ${p}%로 나왔습니다.`,
+    whyHighOnly: (v: string, p: number) => `예상값은 ${v} 개/mL로 1만 아래지만, 다음 주 측정에서 1만을 넘을 가능성은 ${p}%로 높게 나왔습니다.`,
+    whyLowChance: (v: string, p: number) => `예상값은 ${v} 개/mL이고, 예상 범위의 위쪽도 1만에 닿지 않아 다음 주 측정에서 1만을 넘을 가능성은 ${p}%로 낮습니다.`,
+    frozen: "2025년까지의 자료로 만든 뒤 고정한 모델이 낸 예상입니다.",
+    /** 전문가 보기 전용 세부(봉인 시각·모델 구분) */
+    frozenExpert: `예상값 = v2 pred_cell_count(${V2_FROZEN} 고정, 커밋 ${MODELS.v2meta.commit}). q50·CQR q10/q90·p_alert·단계 = v1 봉인본(${V1_SEALED}, 커밋 ${MODELS.v1meta.commit}, v1·v2 공통). 2026 블라인드 검증은 v1.`,
   },
   reasonsIntro: "예상값을 올리거나 내린 요인을 기여도가 큰 순서로 세 가지만 골랐습니다.",
   verifySummary: (hit: number, n: number) => `공식 경보 단계 기준으로 최근 ${n}번의 예상 중 ${hit}번이 실제와 같은 단계였습니다.`,
   eventSummary: (n: number, m: number) => `이 지점 경계 사건 ${n}건 중 ${m}건 미리 알림`,
   chartLow: "100 미만·미검출",
-  verifyCols: { base: "기준일", target: "목표일", pred: "가장 가능성 높은 값", actual: "실제", same: "같은 단계" },
+  verifyCols: { base: "기준일", target: "목표일", pred: "예상값", actual: "실제", same: "같은 단계" },
   envNote: { water: "물 온도 25℃ 이상이면 녹조가 빨리 늡니다.", flow: "방류가 늘면 물이 흘러 녹조가 씻겨 내려갑니다.", weather: "덥고 비가 적은 날이 이어지면 녹조가 늡니다." },
 } as const;
 
@@ -345,7 +350,7 @@ export const ABOUT = {
   steps: [
     { n: "①", title: "자료 모으기", body: "매일 새벽 5시에 조류경보제 측정값, 댐·보 운영 자료, 하천 수위, 기상 관측과 예보를 받아 옵니다." },
     { n: "②", title: "특징 만들기", body: `기준일까지의 자료만으로 특징을 계산합니다(최근 녹조 흐름, 물 온도, 방류와 수위, 기온·비·바람, 계절·지점 ${MODELS.v1meta.features}가지, v2 한 값 예측은 바로 위(상류) 지점의 최근 측정 ${MODELS.v2meta.upstreamFeatures}가지를 더해 ${MODELS.v2meta.features}가지). 기준일 뒤의 자료는 절대 쓰지 않습니다.` },
-    { n: "③", title: "예상하기", body: "2025년까지 자료로 학습해 고정한 모델이 가장 가능성 높은 값, 예상 범위, 다음 주 1만을 넘을 가능성(이상 v1 봉인본)과 대회 제출용 한 값 예측(v2)을 냅니다." },
+    { n: "③", title: "예상하기", body: "2025년까지 자료로 학습해 고정한 모델이 7일 뒤 예상값(대회 제출 모델 v2의 한 값)과 예상 범위, 다음 주 1만을 넘을 가능성(이 둘은 v1 봉인본)을 냅니다." },
     { n: "④", title: "단계 판정", body: "예상 범위 위쪽이 1만에 닿으면 주의 관찰, 넘을 가능성이 52% 이상이면 대응 필요. 공식 발령과 함께 보여 '경계 진입 예상 / 계속될 듯 / 나아질 가능성'으로 정리합니다." },
   ],
   dataTitle: "쓰는 자료와 출처",
@@ -353,11 +358,11 @@ export const ABOUT = {
   data: [
     ["조류경보제 측정값(유해남조류 세포수·수온 등)", "국립환경과학원 (물환경정보시스템)", "예상의 목표값과 최근 녹조 흐름", "공공누리 1유형(출처표시) · 공공데이터포털"],
     ["다목적댐·보 운영(유입·방류·저수율·수위)", "한국수자원공사 (K-water)", "물 흐름 특징", "이용허락범위 제한 없음 · 공공데이터포털"],
-    ["보·하천 수위(실시간·일 자료)", "국가수자원관리종합정보시스템 (WAMIS)", "물 흐름 특징, 2025년 이후 수위 연결", "미확인(누리집에 이용 조건 표기 없음, 대회 자료 안내는 공공누리)"],
+    ["보·하천 수위(실시간·일 자료)", "국가수자원관리종합정보시스템 (WAMIS)", "물 흐름 특징, 2025년 이후 수위 연결", "이용허락범위 제한 없음 · 공공데이터포털(한강홍수통제소 수자원 정보, WAMIS 등록분) · 출처 표시: 한강홍수통제소 WAMIS"],
     ["댐유역 하천 일평균수위 (국가참조표준)", "K-water 생산 · DataON(KISTI) 등재", "2010~2024년 연속 수위 특징(DataON 활용)", "CC BY-NC-SA(저작자표시-비영리-동일조건변경허락) · 생산 한국수자원공사(오재우·이영창·이재용) · DOI 10.20925/KSRD.74670854.v5 · 이를 가공한 자료도 같은 조건으로만 재배포"],
     ["지상 기상 관측(기온·강수·바람·일조)", "기상청 (ASOS)", "날씨 특징", "공공누리 1유형(출처표시) · 공공데이터포털"],
     ["단기·중기 예보", "기상청", "앞으로 7일 날씨 특징·화면 표시", "공공누리 1유형(출처표시) · 공공데이터포털"],
-    ["대회 제공 자료(지점·일자 조합, 댐 일자료)", "KISTI 2026 DATA·AI 분석 경진대회", "학습·평가 기준", "대회 규정(원문 미확인) · 저장소에 올리지 않음"],
+    ["대회 제공 자료(지점·일자 조합, 댐 일자료)", "KISTI 2026 DATA·AI 분석 경진대회", "학습·평가 기준", "참가신청서 대회 규정 3항(승인 목적 외 이용·제3자 제공 금지, 대회 후 폐기, 성과물 출처 명시) · 저장소와 이 화면에 원자료를 올리지 않음"],
   ],
   aida: "AIDA(KISTI 인공지능 데이터)의 정규격자 기상·레이더 자료는 계획(docs/02 §6)에 올렸으나 이번 제출 모델에는 쓰지 않았습니다. 관측소 1곳 의존을 줄이는 다음 단계 과제입니다.",
   limitsTitle: "아직 못 하는 것 (솔직한 한계)",
@@ -379,8 +384,8 @@ export const ABOUT = {
     cols: ["", "v1 블라인드 검증 모델", "v2 제출·운영 모델"],
     rows: [
       ["고정 시각", `${V1_SEALED} (커밋 ${MODELS.v1meta.commit})`, `${V2_FROZEN} (커밋 ${MODELS.v2meta.commit})`],
-      ["한 값 예측 (대회 제출값)", `세 가지 예측의 가중 평균 · 특징 ${MODELS.v1meta.features}가지`, `v1의 세 가지 예측 + 녹조 종류별 예측(마이크로시스티스와 나머지 3속을 따로 예측해 합침)의 가중 평균 · 특징 ${MODELS.v2meta.features}가지(바로 위 지점의 최근 측정 ${MODELS.v2meta.upstreamFeatures}가지 추가) · 가중치: 세 가지 예측 ${MODELS.v2weights.c1.toFixed(3)} · ${MODELS.v2weights.c3.toFixed(3)} · ${MODELS.v2weights.c2.toFixed(3)}, 녹조 종류별 ${MODELS.v2weights.cg.toFixed(3)}`],
-      ["가장 가능성 높은 값 · 예상 범위 · 넘을 가능성 · 단계", "v1 봉인본", "v1 봉인본 그대로 (결과 같음)"],
+      ["예상값 = 한 값 예측 (화면의 큰 숫자 · 대회 제출값)", `세 가지 예측의 가중 평균 · 특징 ${MODELS.v1meta.features}가지`, `v1의 세 가지 예측 + 녹조 종류별 예측(마이크로시스티스와 나머지 3속을 따로 예측해 합침)의 가중 평균 · 특징 ${MODELS.v2meta.features}가지(바로 위 지점의 최근 측정 ${MODELS.v2meta.upstreamFeatures}가지 추가) · 가중치: 세 가지 예측 ${MODELS.v2weights.c1.toFixed(3)} · ${MODELS.v2weights.c3.toFixed(3)} · ${MODELS.v2weights.c2.toFixed(3)}, 녹조 종류별 ${MODELS.v2weights.cg.toFixed(3)}`],
+      ["예상 범위 · 넘을 가능성 · 단계", "v1 봉인본", "v1 봉인본 그대로 (결과 같음)"],
       ["2026년 성적의 성격", "봉인 뒤 처음 계산 — 블라인드 검증", V2_NOTICE],
       ["2026년 한 값 예측이 1만 넘는 사건을 미리 잡은 수", `${V2CMP.p26point.total}건 중 ${V2CMP.p26point.v1}건`, `${V2CMP.p26point.total}건 중 ${V2CMP.p26point.v2}건 (블라인드 아님)`],
       ["채택 근거", "–", "미리 등록한 확인 실험을 통과해 채택. 그 뒤 추가 고도화 실험과 단기예보 재시도는 기준을 넘지 못해 그대로 고정"],
@@ -397,18 +402,38 @@ export const levelOfCells = (v: number | null | undefined): number => (v == null
  * 예측 목표일 표시 규칙 (오늘 KST 기준). 지난 날짜에는 "7일 뒤" 를 쓰지 않는다.
  * - 목표일 > 오늘: "MM.DD 예상 (내일 / n일 뒤)"
  * - 목표일 ≤ 오늘, 실측 없음: "MM.DD 예상 · 측정 결과 대기 중"
- * - 실측 있음: "MM.DD 예상 7,400 → 실제 8,100 ✓/✗" (✓ = 예상값과 실측이 같은 공식 단계)
+ * - 실측 있음: "MM.DD 예상 7,400 → 실제 8,100 ✓/✗" (✓ = 예상값(v2 한 값)과 실측이 같은 공식 단계)
  */
-export function targetLabel(targetDate: string | null | undefined, todayISO: string, q50: number | null | undefined, obs: number | null | undefined, fmt: (v: number | null | undefined) => string, opts: { withValues?: boolean } = {}): { text: string; state: "future" | "waiting" | "verified"; hit?: boolean } {
+export function targetLabel(targetDate: string | null | undefined, todayISO: string, point: number | null | undefined, obs: number | null | undefined, fmt: (v: number | null | undefined) => string, opts: { withValues?: boolean } = {}): { text: string; state: "future" | "waiting" | "verified"; hit?: boolean } {
   if (!targetDate) return { text: "–", state: "future" };
   const mmdd = `${targetDate.slice(5, 7)}.${targetDate.slice(8, 10)}`;
   const diff = Math.round((new Date(targetDate).getTime() - new Date(todayISO).getTime()) / 86_400_000);
   if (diff > 0) return { text: `${mmdd} 예상 (${diff === 1 ? "내일" : `${diff}일 뒤`})`, state: "future" };
   if (obs == null) return { text: `${mmdd} 예상 · 측정 결과 대기 중`, state: "waiting" };
-  const hit = levelOfCells(q50) === levelOfCells(obs);
-  const vals = opts.withValues === false ? "" : ` ${fmt(q50)} → 실제 ${fmt(obs)}`;
+  const hit = levelOfCells(point) === levelOfCells(obs);
+  const vals = opts.withValues === false ? "" : ` ${fmt(point)} → 실제 ${fmt(obs)}`;
   return { text: `${mmdd} 예상${vals} ${hit ? "✓" : "✗"}`, state: "verified", hit };
 }
+/**
+ * 예상값 설명 문장 규칙(쉽게 보기) — 예상값 = v2 한 값 예측, 범위 = CQR q10~q90, 가능성 = 분류기.
+ * - 예상값 ≥ 1만: "예상값이 경계(1만)를 넘을 것으로 보입니다(가능성 n%)"
+ * - 예상값 < 1만, 범위 위쪽 ≥ 1만: "예상 범위 위쪽이 1만을 넘기 때문" 문장
+ * - 예상값 < 1만, 범위 위쪽 < 1만인데 가능성 ≥ 52%(대응 필요 기준): 가능성이 높다는 문장
+ * - 그 밖: 범위 위쪽도 1만에 닿지 않아 가능성이 낮다는 문장
+ */
+export function explainForecast(point: number | null | undefined, q90: number | null | undefined, pPct: number, fmt: (v: number | null | undefined) => string): string {
+  if ((point ?? 0) >= 10_000) return SITE.plain.whyOver(fmt(point), pPct);
+  if ((q90 ?? 0) >= 10_000) return SITE.plain.whyHighChance(fmt(point), pPct);
+  if (pPct >= 52) return SITE.plain.whyHighOnly(fmt(point), pPct);
+  return SITE.plain.whyLowChance(fmt(point), pPct);
+}
+/** 예상값이 예상 범위(q10~q90) 밖인지 — 값은 바꾸지 않고 ⓘ 로만 알린다 */
+export function outOfRange(point: number | null | undefined, q10: number | null | undefined, q90: number | null | undefined): "above" | "below" | null {
+  if (point == null || q10 == null || q90 == null) return null;
+  return point > q90 ? "above" : point < q10 ? "below" : null;
+}
+export const outOfRangeTip = (side: "above" | "below", q10: string, q90: string): string =>
+  `예상값이 예상 범위(${q10} ~ ${q90} 개/mL)의 ${side === "above" ? "위" : "아래"}에 있습니다. 예상값은 대회 제출 모델(v2)이, 예상 범위는 범위·경보용 고정 모델이 따로 계산해 서로 어긋날 수 있습니다. 값은 고치지 않고 그대로 보여 줍니다.`;
 export const LOG_MORE = (n: number) => `이전 기록 ${n}건`;
 export const LOG_PAGE = { title: "상황 기록 (최근 30일)", back: "메인 상황판으로" };
 

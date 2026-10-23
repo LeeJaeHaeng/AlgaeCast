@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Info } from "@/components/Info";
-import { BOARD, COMBO, OFFICIAL_LEVEL, TERMS, TIER, comboOf, targetLabel } from "@/lib/copy";
+import { BOARD, COMBO, OFFICIAL_LEVEL, TERMS, TIER, comboOf, outOfRange, outOfRangeTip, targetLabel } from "@/lib/copy";
 import { fmtCells, fmtCellsKo, fmtDateKo, pctInt, tierOf, trendArrow } from "@/lib/format";
 import type { SiteStatus } from "@/lib/queries";
 
@@ -9,11 +9,11 @@ const AX_LO = 2;
 const AX_HI = 6;
 export const axisPct = (v: number | null | undefined) => (v == null ? null : Math.max(0, Math.min(100, ((Math.log10(Math.max(v, 1) + 1) - AX_LO) / (AX_HI - AX_LO)) * 100)));
 
-/** 예상 범위 막대: q10~q90 범위 + 가장 가능성 높은 값 점 + 1천·1만·10만 기준선(라벨 포함) */
-export function RangeBar({ q10, q50, q90, color, height = 10 }: { q10: number | null; q50: number | null; q90: number | null; color: string; height?: number }) {
+/** 예상 범위 막대: q10~q90 범위 + 예상값(v2 한 값) 점 + 1천·1만·10만 기준선(라벨 포함). 점이 범위 밖이어도 그대로 찍는다 */
+export function RangeBar({ q10, point, q90, color, height = 10 }: { q10: number | null; point: number | null; q90: number | null; color: string; height?: number }) {
   const lo = axisPct(q10);
   const hi = axisPct(q90);
-  const mid = axisPct(q50);
+  const mid = axisPct(point);
   return (
     <div className="relative w-full" style={{ height: height + 12 }} aria-hidden>
       <div className="absolute inset-x-0 h-1 rounded-full bg-[var(--panel-border)]" style={{ top: height / 2 - 2 }} />
@@ -31,16 +31,18 @@ export function RangeBar({ q10, q50, q90, color, height = 10 }: { q10: number | 
   );
 }
 
-/** 지점 현황 타일: 지점명+조합 라벨+공식 발령 칩 / 현재 측정 → 가장 가능성 높은 값(32px) / 예상 범위 막대 / 1만 넘을 가능성 */
+/** 지점 현황 타일: 지점명+조합 라벨+공식 발령 칩 / 현재 측정 → 예상값(v2 한 값, 32px) / 예상 범위 막대 / 1만 넘을 가능성. q50 은 전문가 보기에만 */
 export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: boolean; rank: number; today: string }) {
   const t = tierOf(s.tier);
   const combo = comboOf(s.latest_alert_level, t);
   const c = COMBO[combo];
   const lvl = s.latest_alert_level ?? 0;
   const p = pctInt(s.p_alert);
-  const arrow = trendArrow(s.latest_cell_count, s.q50);
+  const point = s.pred_cell_count;
+  const arrow = trendArrow(s.latest_cell_count, point);
   const fmt = expert ? fmtCells : fmtCellsKo;
-  const tl = targetLabel(s.target_date, today, s.q50, s.obs_cell_count, fmt, { withValues: false });
+  const tl = targetLabel(s.target_date, today, point, s.obs_cell_count, fmt, { withValues: false });
+  const oor = outOfRange(point, s.q10_cqr, s.q90_cqr);
   const datesTip = `${TERMS.baseDate.label} ${fmtDateKo(s.base_date)} (${TERMS.baseDate.tip}) · ${BOARD.tile.measuredOn} ${fmtDateKo(s.latest_obs_date)} · ${BOARD.tile.ai} ${TIER[t].label}`;
   return (
     <Link
@@ -62,13 +64,13 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
           {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].label}
         </span>
       </div>
-      {/* 2행: 현재 측정 → 가장 가능성 높은 값 (라벨 줄 + 숫자 줄) */}
+      {/* 2행: 현재 측정 → 예상값 (라벨 줄 + 숫자 줄) */}
       <div className="grid grid-cols-[auto_auto_minmax(0,1fr)] items-end gap-x-3">
         <div className="col-span-3 flex min-w-0 items-center text-xs leading-4 text-dim lg:whitespace-nowrap">
           {BOARD.tile.now}
           <span className="mx-2 opacity-50">→</span>
           {BOARD.tile.next}
-          <Info term="q50" />
+          <Info term="point" />
           <span className={`ml-1 min-w-0 truncate ${tl.state === "verified" ? (tl.hit ? "text-[var(--safe)]" : "text-[var(--severe)]") : ""}`}>· {tl.text}</span>
         </div>
         <div className="tile-num whitespace-nowrap">
@@ -78,9 +80,15 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
         <div className="pb-1 text-xl text-dim" aria-label={`추세 ${arrow}`}>
           {arrow}
         </div>
-        <div className="tile-num whitespace-nowrap" style={{ color: c.color }}>
-          {fmt(s.q50)}
+        <div className="tile-num whitespace-nowrap" style={{ color: c.color }} data-point>
+          {fmt(point)}
           <span className="ml-1 text-xs font-normal text-dim">{BOARD.unit.cells}</span>
+          {oor && (
+            <span className="ml-1 text-[11px] font-normal text-dim" data-out-of-range={oor}>
+              {BOARD.tile.outOfRange}
+              <Info text={outOfRangeTip(oor, fmt(s.q10_cqr), fmt(s.q90_cqr))} />
+            </span>
+          )}
           {tl.state === "verified" && s.obs_cell_count != null && (
             <span className="ml-2 text-base font-semibold text-text">
               → 실제 {fmt(s.obs_cell_count)} {tl.hit ? "✓" : "✗"}
@@ -96,11 +104,11 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
           {expert && s.q10_cqr != null && <span className="ml-1 text-[10px]">{`${fmtCells(s.q10_cqr)}~${fmtCells(s.q90_cqr)}`}</span>}
         </span>
         <div className="min-w-0 flex-1">
-          <RangeBar q10={s.q10_cqr} q50={s.q50} q90={s.q90_cqr} color={c.color} />
+          <RangeBar q10={s.q10_cqr} point={point} q90={s.q90_cqr} color={c.color} />
         </div>
-        {s.pred_cell_count != null && (
-          <span className="shrink-0 whitespace-nowrap pt-0.5 text-[11px] text-dim" title={BOARD.tile.v2pointTip} data-v2point>
-            {BOARD.tile.v2point} <span className="font-semibold text-text">{fmt(s.pred_cell_count)}</span>
+        {expert && s.q50 != null && (
+          <span className="shrink-0 whitespace-nowrap pt-0.5 text-[11px] text-dim" title={TERMS.q50.tip} data-q50>
+            {BOARD.tile.q50Expert} <span className="font-semibold text-text">{fmt(s.q50)}</span>
           </span>
         )}
       </div>
