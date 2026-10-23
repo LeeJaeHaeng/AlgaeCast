@@ -13,8 +13,9 @@
 - [ ] 코드 내 실측치 룩업·하드코딩 없음 (grep "sample_submission" 이외 정답 파일 참조 없음)
 - [ ] 깨끗한 venv에서 `make reproduce` → `submission.csv` diff 0
 - [ ] 시드 고정, requirements 버전 고정, Python 버전 명시
-- [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재(공공데이터포털 자료는 공공누리/이용허락범위 제한 없음, DataON 수위 자료는 CC BY-NC-SA — 패키지의 DataON 유래 파일에 LICENSE_DataON.txt)
-- [ ] 대회 제공 데이터는 저장소에 커밋하지 않음(규정: 대회 후 폐기, 제3자 제공 금지)
+- [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재(공공데이터포털 자료는 공공누리/이용허락범위 제한 없음, WAMIS 는 포털 #3068550 등록분 기준, DataON 수위 자료는 CC BY-NC-SA — 패키지의 DataON 유래 파일에 LICENSE_DataON.txt)
+- [ ] DataON 원값은 기본 zip 2종(영상 포함·제외)에 넣지 않음: 수위 피처 2열 가공 파일(`data/processed/level_cont_features_S1.parquet`)로 원자료 없이 submission.csv diff 0, 받는 법은 `data/raw/dataon/README_GET_DATAON.md`. 원값 포함 대체 zip(`_with_dataon`)은 운영사무국 허용 시에만
+- [ ] 대회 제공 데이터는 저장소에 커밋하지 않음(참가신청서 규정 3항: 승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 출처 명시). 패키지에는 심사용으로만(`data/raw/competition/README_심사용_공개시제외.txt`)
 
 ## C. 우수성 증빙 (방법 설명서에 포함)
 - [ ] 베이스라인 B0~B4 비교표

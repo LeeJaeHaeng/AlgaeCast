@@ -4,7 +4,7 @@
 확인 항목
 1) submission.csv(패키지 루트)가 제출본(저장소 submission/submission.csv)과 바이트 동일(diff 0)
 2) 노트북 재실행 오류 0 (실행본 ipynb 의 error 출력·Traceback 0)
-3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(5363e22a…, 2026-10-22 v3)으로 시작
+3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(0a1fb2f4…, 2026-10-23 v4)으로 시작
 4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(기본 패키지는 없음 → 가공 수위 피처로 재현)
 결과: reports/eval/package_verify.log(실행 기록), reports/eval/package_verify.json(체크리스트용 요약)
 
@@ -27,7 +27,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEMO_SHA_PREFIX = "5363e22a"  # 2026-10-22 v3(운영 화면 v2 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc → dist/backup_demo_20261022_*
+DEMO_SHA_PREFIX = "0a1fb2f4"  # 2026-10-23 v4(예상값 하나로 통일한 화면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a → dist/backup_demo_2026102*
 
 
 def run(cmd: list[str], cwd: Path, log: Path) -> int:

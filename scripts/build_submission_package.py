@@ -44,7 +44,7 @@ ZIP_DATAON = (
 DATAON_RAW_FILE = "dataon/level_continuous_long.parquet"
 # DataON 가공 수위 피처(level_cont_t0·level_cont_diff7) — 원자료 없이 같은 submission.csv 를 만드는 데 쓴다
 LEVEL_FEATURE_FILE = "level_cont_features_S1.parquet"
-DEMO_SHA_PREFIX = "5363e22a"  # 2026-10-22 v3(운영 화면 v2 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc → dist/backup_demo_20261022_*
+DEMO_SHA_PREFIX = "0a1fb2f4"  # 2026-10-23 v4(예상값 하나로 통일한 화면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a → dist/backup_demo_2026102*
 # DataON 유래 파일이 있는(또는 노트북 실행으로 생기는) 폴더 — LICENSE_DataON.txt 를 붙인다
 DATAON_DIRS = ("data/raw/dataon", "data/interim", "data/processed", "src/config")
 DEMO_FILES = ["AlgaeCast_demo.mp4", "AlgaeCast_demo.srt", "script.md", "README_DEMO.md"]
