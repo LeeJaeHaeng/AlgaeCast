@@ -4,7 +4,7 @@
 - 실제 데이터(없으면 skip): 축약 v2 모델을 임시 레지스트리(분류기·분위 = v1 파일 사본)에 등록 →
   make_submission 124행·sample 순서·정수·NaN/음수 없음·UTF-8 BOM, 분위·분류기 출력이 v1 경로와 같음,
   as-of 피처에 상류 열 부착(v2)·미부착(v1). freeze_v2 --dry-run 이 models/·submission/ 을 건드리지 않음.
-- verify_frozen: FROZEN.md + FROZEN_v2.md 해시·current 확인.
+- verify_frozen: FROZEN.md + FROZEN_v2.md 해시·current 확인, 패키지에서 뺀 이력 모델(HISTORY.md 해시) 처리.
 """
 
 from __future__ import annotations
@@ -192,6 +192,43 @@ def test_verify_frozen_v1_and_v2(tmp_path: Path, capsys: pytest.CaptureFixture) 
     (md / "registry.json").write_text(json.dumps(reg), encoding="utf-8")
     (md / "regression" / "20261021_091108" / "model.pkl").write_bytes(b"tampered")  # v1 파일 변조도 실패
     assert vf.main(["--models-dir", str(md)]) == 1
+
+
+def test_verify_frozen_package_history(
+    tmp_path: Path, capsys: pytest.CaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """제출 패키지처럼 이력 모델 파일을 빼면 HISTORY.md 의 sha256 이 동결 문서와 같을 때만 '패키지 미포함'으로 통과.
+
+    필수(최근 동결 문서의 이름별 첫 행 = current) 파일은 HISTORY.md 에 있어도 없으면 실패, 저장소 models/ 는 언제나 전부 검증.
+    """
+    vf = _script("verify_frozen")
+    md = _fake_models(tmp_path)
+    v1 = md / "regression" / "20261021_091108" / "model.pkl"
+    v1_sha = _sha(v1)
+    v1.unlink()
+    assert vf.main(["--models-dir", str(md)]) == 1  # HISTORY.md 없음
+    row = "| `regression/20261021_091108/model.pkl` | `{}` | 1 |\n"
+    (md / "HISTORY.md").write_text(row.format("0" * 64), encoding="utf-8")
+    assert vf.main(["--models-dir", str(md)]) == 1  # HISTORY.md 해시가 동결 문서와 다름
+    (md / "HISTORY.md").write_text(row.format(v1_sha), encoding="utf-8")
+    capsys.readouterr()
+    assert vf.main(["--models-dir", str(md)]) == 0
+    out = capsys.readouterr().out
+    assert f"regression/20261021_091108: {vf.NOT_PACKAGED}" in out
+    assert "regression/20261022_120000: OK" in out
+    # 저장소 models/ 로 보는 경우(strict)에는 HISTORY.md 가 있어도 파일이 없으면 실패
+    monkeypatch.setattr(vf, "MODELS_DIR", md)
+    monkeypatch.setattr(vf, "PACKAGE_LAYOUT", False)
+    assert vf.main(["--models-dir", str(md)]) == 1
+    monkeypatch.setattr(vf, "PACKAGE_LAYOUT", True)
+    assert vf.main(["--models-dir", str(md)]) == 0
+    # 필수(current) 파일이 없으면 HISTORY.md 에 같은 해시가 있어도 실패
+    cur = md / "regression" / "20261022_120000" / "model.pkl"
+    cur_row = f"| `regression/20261022_120000/model.pkl` | `{_sha(cur)}` | 1 |\n"
+    cur.unlink()
+    (md / "HISTORY.md").write_text(row.format(v1_sha) + cur_row, encoding="utf-8")
+    assert vf.main(["--models-dir", str(md)]) == 1
+    assert "필수(제출·운영) 모델" in capsys.readouterr().out
 
 
 def test_verify_frozen_repo() -> None:

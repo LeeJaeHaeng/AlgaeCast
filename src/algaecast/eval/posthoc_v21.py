@@ -66,9 +66,8 @@ def v1fix_point(feat: pd.DataFrame) -> np.ndarray:
     X = feat[reg["cols"]].copy()
     for c in reg["cats"]:
         X[c] = pd.Categorical(X[c].astype(str), categories=reg["categories"][c])
-    if (
-        "members" not in reg
-    ):  # 단일 log_w(앙상블 채택 규칙 미달) — db.upload.predict_registry 의 단일 분기와 같은 계산
+    # 단일 log_w(앙상블 채택 규칙 미달) — db.upload.predict_registry 의 단일 분기와 같은 계산
+    if "members" not in reg:
         return np.clip(10 ** np.clip(reg["model"].predict(X), 0, 7) - 1, 0, None) * reg["smear"]
     parts = {}
     for name, m in reg["members"].items():

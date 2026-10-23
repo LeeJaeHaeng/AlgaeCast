@@ -4,8 +4,10 @@
 확인 항목
 1) submission.csv(패키지 루트)가 제출본(저장소 submission/submission.csv)과 바이트 동일(diff 0)
 2) 노트북 재실행 오류 0 (실행본 ipynb 의 error 출력·Traceback 0)
-3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(0a1fb2f4…, 2026-10-23 v4)으로 시작
+3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(0907b110…, 2026-10-23 v6)으로 시작
 4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(기본 패키지는 없음 → 가공 수위 피처로 재현)
+5) model/ 의 모델 폴더가 허용 목록(PACKAGE_MODEL_DIRS)과 같고 각 폴더에 model.pkl·meta.json, model/HISTORY.md 가 있다
+   (목록 밖 폴더가 있거나 필수 파일이 없으면 새 venv 실행 전에 실패)
 결과: reports/eval/package_verify.log(실행 기록), reports/eval/package_verify.json(체크리스트용 요약)
 
 사용: python scripts/verify_package.py [--dir submission_package | --zip dist/...zip] [--update-package] [--keep]
@@ -28,6 +30,33 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEMO_SHA_PREFIX = "0907b110"  # 2026-10-23 v6(성능 페이지 3장면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4·v5 87b6d928 → dist/backup_demo_2026102*
+# 패키지 model/ 에 있어야 하는(그리고 이것만 있어야 하는) 모델 폴더 — 재현에 실제로 불러오는 제출·운영 v2.1 3개.
+# 2026-10-23 추적(make_submission·노트북): 이 3개 폴더의 model.pkl 만 모델로 로드, 이력 폴더는 verify_frozen 해시 읽기뿐.
+# scripts/build_submission_package.py 의 PACKAGE_MODEL_DIRS 와 같아야 한다(tests/test_package_config.py).
+PACKAGE_MODEL_DIRS = (
+    "regression/20261023_120818",
+    "classifier/20261023_120255",
+    "quantile/20261023_120257",
+)
+MODEL_FILES = ("model.pkl", "meta.json")
+
+
+def model_dir_problems(pkg: Path) -> list[str]:
+    """패키지 model/ 점검(빈 목록 = 통과): 목록 밖 모델 폴더, 허용 폴더의 필수 파일·HISTORY.md 누락."""
+    md = pkg / "model"
+    found = (
+        {f"{n.name}/{v.name}" for n in md.iterdir() if n.is_dir() for v in n.iterdir() if v.is_dir()}
+        if md.is_dir()
+        else set()
+    )
+    problems = [f"목록 밖 모델 폴더: model/{d}" for d in sorted(found - set(PACKAGE_MODEL_DIRS))]
+    for d in PACKAGE_MODEL_DIRS:
+        for f in MODEL_FILES:
+            if not (md / d / f).is_file():
+                problems.append(f"필수 파일 없음: model/{d}/{f}")
+    if not (md / "HISTORY.md").is_file():
+        problems.append("필수 파일 없음: model/HISTORY.md")
+    return problems
 
 
 def run(cmd: list[str], cwd: Path, log: Path) -> int:
@@ -109,6 +138,7 @@ def main(argv: list[str] | None = None) -> int:
     level_file = (pkg / "data" / "processed" / "level_cont_features_S1.parquet").exists()
     wamis_raw = (pkg / "data" / "raw" / "wamis_dam" / "wamis_dam_daily.parquet").exists()
     wamis_file = (pkg / "data" / "processed" / "wamis_hydro_features_S1.parquet").exists()
+    model_problems = model_dir_problems(pkg)
     # 복사본의 제출 파일을 지워, 노트북이 실제로 다시 만든 파일만 비교한다.
     (pkg / "submission.csv").unlink(missing_ok=True)
     py = sys.executable  # 같은 인터프리터(3.11)로 새 venv
@@ -120,7 +150,14 @@ def main(argv: list[str] | None = None) -> int:
         [vpy, "-m", "jupytext", "--to", "notebook", "--execute", "notebooks/01_train_eval.py"],
     ]
     rc = 0
-    for cmd in steps:
+    if model_problems:  # 모델 폴더 구성이 틀리면 새 venv 실행 전에 실패
+        rc = 3
+        with log.open("a", encoding="utf-8") as f:
+            f.write("model/ 점검 실패:\n" + "\n".join(model_problems) + "\n")
+        print("FAIL model/ 점검:", "; ".join(model_problems))
+    else:
+        print(f"OK  model/ 모델 폴더 {len(PACKAGE_MODEL_DIRS)}개(허용 목록과 같음)·HISTORY.md")
+    for cmd in [] if model_problems else steps:
         rc = run(cmd, pkg, log)
         print(f"{'OK ' if rc == 0 else 'FAIL'} {' '.join(cmd[-3:])}")
         if rc != 0:
@@ -129,6 +166,8 @@ def main(argv: list[str] | None = None) -> int:
         "when": time.strftime("%Y-%m-%d %H:%M"),
         "returncode": rc,
         "source": src_desc,
+        "model_dirs": list(PACKAGE_MODEL_DIRS),
+        "model_dir_problems": model_problems,
         "dataon_raw_present": dataon_raw,
         "level_cont_mode": "raw" if dataon_raw else ("derived" if level_file else "missing"),
         "wamis_raw_present": wamis_raw,
@@ -157,7 +196,8 @@ def main(argv: list[str] | None = None) -> int:
         f"노트북 오류 {res.get('notebook_errors', '미실행')}건(경고 줄 {res.get('notebook_stderr_warnings', '-')}, 절대경로 {res.get('notebook_abs_paths', '-')}) · "
         f"데모 sha256 {str(res['demo_sha256'])[:16]}… {'일치' if res['demo_sha_ok'] else '불일치'} · "
         f"DataON 원값 {'있음' if dataon_raw else '없음'}(수위 피처 {res['level_cont_mode']}) · "
-        f"WAMIS 원값 {'있음' if wamis_raw else '없음'}(수문 피처 {res['wamis_mode']}) · 소요 {res['minutes']} 분"
+        f"WAMIS 원값 {'있음' if wamis_raw else '없음'}(수문 피처 {res['wamis_mode']}) · "
+        f"model/ {'점검 실패' if model_problems else f'허용 폴더 {len(PACKAGE_MODEL_DIRS)}개만'} · 소요 {res['minutes']} 분"
     )
     print(msg)
     with log.open("a", encoding="utf-8") as f:
@@ -165,6 +205,7 @@ def main(argv: list[str] | None = None) -> int:
     (rep / "package_verify.json").write_text(json.dumps(res, ensure_ascii=False, indent=1), encoding="utf-8")
     good = (
         rc == 0
+        and not model_problems
         and res.get("submission_identical")
         and res.get("notebook_errors") == 0
         and res.get("notebook_abs_paths") == 0

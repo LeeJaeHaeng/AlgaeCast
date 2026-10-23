@@ -4,7 +4,9 @@
 패키지 루트(공지 #564): README.md, data/, model/, src/, notebooks/, scripts/, demo/, figures/
   + 루트 파일: submission.csv(제출본), 방법설명서.pdf, requirements.txt(pip freeze), pyproject.toml(설치용)
 - data/   : 대회 번들 + 외부 수집 원천 parquet + MANIFEST.md (git 미포함, 패키지 전용)
-- model/  : 동결 모델(registry current + FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md 표에 적힌 버전) + registry.json + 동결 문서(sha256)
+- model/  : 재현에 불러오는 동결 모델 폴더만(PACKAGE_MODEL_DIRS = registry current v2.1 회귀·분류기·분위)
+            + registry.json(current 그대로, 패키지에 없는 이력 항목에 "package" 표시) + 동결 문서 3종(sha256)
+            + HISTORY.md(뺀 이력 모델 폴더의 파일별 sha256·동결 커밋·재학습 명령·제공 방법)
 - src/    : 파이썬 패키지 algaecast(재현에 필요한 코드만) + src/config/(설정) + src/docs/(설계 문서)
 - scripts/: verify_frozen.py, leakage_audit.py, verify_package.py
 - demo/   : 저장소 루트 demo/ 에서 복사(AlgaeCast_demo.mp4·.srt·script.md·README_DEMO.md·captures/). raw/·tools/·.gitignore·*.webm 제외.
@@ -77,6 +79,19 @@ SRC_SKIP_FILES = {
     "posthoc_v21_detail.py",
 }  # test 타깃 로더·사후 검증(전용) — 패키지에서 제외
 SCRIPTS = ["verify_frozen.py", "leakage_audit.py", "verify_package.py"]
+# 패키지 model/ 에 넣는 모델 폴더 — 재현에 실제로 불러오는 것만(2026-10-23 추적: make_submission·노트북 모두
+# registry current 3개 폴더의 model.pkl 만 모델로 불러오고, 나머지 동결 폴더는 verify_frozen 의 sha256 읽기뿐).
+# scripts/verify_package.py 의 PACKAGE_MODEL_DIRS 와 같아야 한다(tests/test_package_config.py).
+PACKAGE_MODEL_DIRS = (
+    "regression/20261023_120818",  # v2.1 회귀(제출·운영)
+    "classifier/20261023_120255",  # v2.1 경보 분류기 b
+    "quantile/20261023_120257",  # v2.1 분위 회귀
+)
+FROZEN_DOCS = ("FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md")
+FROZEN_ROW = re.compile(r"\| (\w+) \| (\d+_\d+) \| `([0-9a-f]{64})` \|")
+HISTORY_DOC = "HISTORY.md"  # 뺀 이력 모델 목록(models/HISTORY.md → model/HISTORY.md)
+HISTORY_FILE_ROW = re.compile(r"\| `(\w+/\d+_\d+/[\w.]+)` \| `([0-9a-f]{64})` \|")
+HISTORY_MARK = "미포함(이력) — model/HISTORY.md"
 # 실험 중간 산출물(재현·근거에 쓰지 않음): 칼만 모수 추적, API 탐침, 설정 조각, 재실행 로그·설정 사본·원자료 표
 EXP_INTERMEDIATE = (
     "params_*.csv",
@@ -304,17 +319,17 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 | `방법설명서.pdf` | 방법 설명서(배경·데이터·통계분석·피처·모델·평가·설명가능성·시스템·재현·한계, 10장) | {sizes.get('pdf', '-')} |
 | `requirements.txt` · `pyproject.toml` | 라이브러리 정확한 버전(pip freeze) · 패키지 설치 정보 | |
 | `data/` | 대회 번들(`data/raw/competition/`, 심사용 — 공개 시 제외·대회 종료 후 폐기, `README_심사용_공개시제외.txt`) + 외부 공공 데이터 스냅샷(parquet; WAMIS 원값 제외 — `data/raw/hydro/hydro_daily_long.parquet` 는 WAMIS 출처 행을 뺀 사본) + DataON 가공 수위 피처(`data/processed/level_cont_features_S1.parquet`; DataON 원값은 미포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`) + WAMIS 가공 수문 피처(`data/processed/wamis_hydro_features_S1.parquet`, 33열; WAMIS 원값은 미포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
-| `model/` | 동결 모델: **v2.1**(제출·운영, 데이터 유래 상수 누수 수정판 — 회귀·경보 분류기·분위 회귀) + `registry.json`(current = v2.1) + `FROZEN_v2.1.md`(v2.1 sha256, 동결 커밋 `{frozen['v2.1']}`). 이력(수정 전): v1 회귀·분류기·분위(`FROZEN.md`, 동결 커밋 `{frozen['v1']}`), v2 회귀(`FROZEN_v2.md`, 동결 커밋 `{frozen['v2']}`), v1-fix 회귀(v1 구성 + 수정 피처, 민감도용, `FROZEN_v2.1.md` 표) | {sizes.get('model', '-')} |
+| `model/` | 동결 모델: **v2.1**(제출·운영, 데이터 유래 상수 누수 수정판 — 회귀·경보 분류기·분위 회귀 {' · '.join(f'`{d}`' for d in PACKAGE_MODEL_DIRS)}, 재현에 불러오는 모델은 이 3개뿐) + `registry.json`(current = v2.1) + `FROZEN_v2.1.md`(v2.1 sha256, 동결 커밋 `{frozen['v2.1']}`). 이력 모델 파일(수정 전 v1 회귀·분류기·분위, v2 회귀, 민감도용 v1-fix 회귀 — 5개 폴더)은 재현에 쓰지 않아 넣지 않았다: 폴더별 sha256·동결 커밋·재학습 명령·제공 방법(요청 시 제공)은 `HISTORY.md`. 동결 문서 `FROZEN.md`(v1, 동결 커밋 `{frozen['v1']}`)·`FROZEN_v2.md`(v2, 동결 커밋 `{frozen['v2']}`)는 기록으로 남김 | {sizes.get('model', '-')} |
 | `src/` | 파이썬 패키지 `algaecast`(정렬·피처·모델·평가, 재현에 필요한 코드만) + `src/config/`(지점·피처·모델·시드 설정, `seed.yaml`=42, `derived_constants.json` — 데이터 유래 상수와 계산 자료 메타데이터) + `src/docs/`(설계 문서) | {sizes.get('src', '-')} |
-| `notebooks/01_train_eval.ipynb` | 동결 모델 검증(`FROZEN.md`·`FROZEN_v2.md`·`FROZEN_v2.1.md`) → 데이터 로드·전처리 → 피처(+ 상류 피처) → 학습(동결 파라미터, v2.1·비교용 v1-fix) → 2025 검증 지표(v2.1·v1-fix 나란히) → `submission.csv`(v2.1) 생성 → 그림. 실행 결과(출력) 포함 | |
-| `scripts/` | `verify_frozen.py`(세 동결 문서 해시 검증), `leakage_audit.py`(누수 감사, 원자료부터 재계산 포함), `verify_package.py`(새 venv 재현 검증), `security_scan.txt` | |
+| `notebooks/01_train_eval.ipynb` | 동결 모델 검증(`FROZEN.md`·`FROZEN_v2.md`·`FROZEN_v2.1.md` — 제출 모델은 파일 해시, 패키지에 없는 이력 모델은 `model/HISTORY.md` 해시 대조) → 데이터 로드·전처리 → 피처(+ 상류 피처) → 학습(동결 파라미터, v2.1·비교용 v1-fix) → 2025 검증 지표(v2.1·v1-fix 나란히) → `submission.csv`(v2.1) 생성 → 그림. 실행 결과(출력) 포함 | |
+| `scripts/` | `verify_frozen.py`(세 동결 문서 해시 검증 — 제출 모델 3개는 파일이 있어야 하고, 이력 모델은 '패키지 미포함(이력, model/HISTORY.md)'으로 표시), `leakage_audit.py`(누수 감사, 원자료부터 재계산 포함), `verify_package.py`(새 venv 재현 검증, `model/` 허용 폴더 점검), `security_scan.txt` | |
 | `demo/` | 데모 영상 `AlgaeCast_demo.mp4`(2분 28초, 1080p H.264, 한국어 자막) · `AlgaeCast_demo.srt` · `script.md`(콘티) · `README_DEMO.md`(구성·편집 내역) · `captures/`(장면 캡처 6장). {RAW_NOTE} | {sizes.get('demo', '-')} |
 | `figures/` | 방법설명서·발표용 핵심 그림, 대시보드 스크린샷(`dashboard_*.png`), `figures/reports/`(평가·통계 표 원본 — 방법설명서 각주의 출처) | {sizes.get('figures', '-')} |
 
 ## 2. 데이터·모델 요약
 - 타깃: 조류경보제 5지점(해평·강정고령·칠서·물금매리·회남) 유해남조류 세포수(cells/mL), 기준일(base_date)+7일(±3일 매칭) 예측.
 - 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS — WAMIS 원값은 기본 패키지에 넣지 않고 수문 피처 33열 가공 파일만 포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — DataON 원값은 기본 패키지에 넣지 않고 수위 피처 2열 가공 파일만 포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
-- 모델: **제출·운영 모델 v2.1**(2026-10-23 동결, 커밋 `{frozen['v2.1']}`, 데이터 유래 상수 누수 수정판) = LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.055 · c3 0.280 · c2 0.267 · cg 0.398) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률, 운영점 p ≥ 0.46 = 놓침:헛경보 비용비 r=3) + 분위 회귀 q10/50/90(CQR 보정 q̂ 0.165, 감시 규칙 q90 ≥ 10,000). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점도 수정 피처로 다시 적합했다. 데이터로 계산한 상수는 기준일까지(as-of) 또는 학습기간 자료로만 쓴다: 수위 편차 = 관측소별 직전 365일 평균 대비, 지점별 수온 임계 = 학습기간 측정만(폴드마다, 최종 ≤2025, `src/config/derived_constants.json`). 이력(수정 전): v1(2026-10-21 봉인, 커밋 `{frozen['v1']}`, 같은 3종 NNLS 앙상블·피처 30개), v2(2026-10-22 동결, 커밋 `{frozen['v2']}`, v2.1 과 같은 구성), v1-fix(v1 구성 + 수정 피처, 민감도용).
+- 모델: **제출·운영 모델 v2.1**(2026-10-23 동결, 커밋 `{frozen['v2.1']}`, 데이터 유래 상수 누수 수정판) = LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.055 · c3 0.280 · c2 0.267 · cg 0.398) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률, 운영점 p ≥ 0.46 = 놓침:헛경보 비용비 r=3) + 분위 회귀 q10/50/90(CQR 보정 q̂ 0.165, 감시 규칙 q90 ≥ 10,000). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점도 수정 피처로 다시 적합했다. 데이터로 계산한 상수는 기준일까지(as-of) 또는 학습기간 자료로만 쓴다: 수위 편차 = 관측소별 직전 365일 평균 대비, 지점별 수온 임계 = 학습기간 측정만(폴드마다, 최종 ≤2025, `src/config/derived_constants.json`). 이력(수정 전): v1(2026-10-21 봉인, 커밋 `{frozen['v1']}`, 같은 3종 NNLS 앙상블·피처 30개), v2(2026-10-22 동결, 커밋 `{frozen['v2']}`, v2.1 과 같은 구성), v1-fix(v1 구성 + 수정 피처, 민감도용) — 이력 모델 파일은 재현에 쓰지 않아 패키지에 넣지 않았다(`model/HISTORY.md`: sha256·재학습 명령, 요청 시 제공).
 - 검증: 연도 expanding-window CV(2020~2024) → 2025 홀드아웃(목표일 ≤2025-12-31 인 252행) → v1 동결(2026-10-21) → v2 사전등록 확인 실험(EXP-confirm)으로 채택·동결(2026-10-22) → 2026-10-23 데이터 유래 상수 전수 점검에서 누수 발견 → 사전등록(FIX-v2.1) 규칙대로 고친 v2.1 을 결과와 무관하게 채택·동결 → 2026 사후 계산(v2.1 동결 뒤 1회. 모델 선택·수정 규칙에 2026 미사용, 단 팀은 v1·v2 의 2026 결과를 이미 봤으므로 블라인드 아님). 누수 감사: 기준일까지 잘라낸 달력 재계산 표본 300·원자료부터 재계산 표본 60 불일치 0, 예전 방식 음성 대조 5/5 검출, 데이터 유래 상수 테스트 15개.
 - 핵심 결과: 2025 홀드아웃(같은 252행) v2.1 rmse_log 0.712 · log R² 0.778 · 원단위 R² 0.175 · 경계 F1 0.705(지속성 F1 0.727, 봉우리 1건이 분산의 43%). **2025년까지 자료로만 만든 모델(v2.1)로 2026년 경계 사건 8건 중 7건을 중앙 21일 앞서 감시 단계로 포착(지속성 2건)**, **2020~2026년 합계 28건 중 24건(86%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 포착(지속성 3건)**. 2026 test 124조합: v2.1 log R² 0.520 · 원단위 R² 0.001 · F1@10k 0.826(지속성 F1 0.841). 누수 수정: 이전 모델 v1·v2 가 일부 데이터 유래 상수(수위 편차 관측소 평균·지점별 수온 임계·ASOS 관측소 선정)를 2026 자료까지 포함해 계산했음을 2026-10-23 사후 발견해 사전등록 규칙대로 고쳤다(경위와 수정 전후 비교는 방법설명서 5.11절). v1 봉인본의 2026 7/8 은 이력으로만 남긴다. 2026 사후 성능 저하와 한계는 방법설명서 5.11절·6.11절·10장.
 
@@ -518,8 +533,57 @@ def level_feature_file() -> Path:
     return lvl
 
 
+def model_dir_problems(models_dir: Path | None = None) -> list[str]:
+    """패키지 model/ 구성 점검(빈 목록 = 통과).
+
+    - PACKAGE_MODEL_DIRS = registry current(제출·운영 v2.1 3개 폴더)이고, 그 폴더에 model.pkl·meta.json 이 있어야 한다.
+    - 동결 문서 표에 있으나 패키지에서 빼는 폴더(이력)는 HISTORY.md 에 model.pkl sha256(동결 문서와 같은 값)과
+      저장소 폴더의 파일별 sha256 이 모두 적혀 있어야 한다.
+    """
+    md = models_dir or ROOT / "models"
+    problems: list[str] = []
+    reg = json.loads((md / "registry.json").read_text(encoding="utf-8"))
+    cur = {f"{n}/{v}" for n, v in reg["current"].items()}
+    keep = set(PACKAGE_MODEL_DIRS)
+    if cur != keep:
+        problems.append(f"registry current {sorted(cur)} 가 PACKAGE_MODEL_DIRS {sorted(keep)} 와 다르다")
+    for d in PACKAGE_MODEL_DIRS:
+        for f in ("model.pkl", "meta.json"):
+            if not (md / d / f).exists():
+                problems.append(f"models/{d}/{f} 없음")
+    rows: dict[str, str] = {}
+    for doc in FROZEN_DOCS:
+        if (md / doc).exists():
+            rows |= {f"{n}/{v}": h for n, v, h in FROZEN_ROW.findall((md / doc).read_text(encoding="utf-8"))}
+    hist = md / HISTORY_DOC
+    listed = dict(HISTORY_FILE_ROW.findall(hist.read_text(encoding="utf-8"))) if hist.exists() else {}
+    for d in sorted(set(rows) - keep):
+        if listed.get(f"{d}/model.pkl") != rows[d]:
+            problems.append(f"{HISTORY_DOC}: {d}/model.pkl sha256 이 없거나 동결 문서와 다르다")
+        if (md / d).is_dir():
+            for f in sorted(p for p in (md / d).iterdir() if p.is_file()):
+                if listed.get(f"{d}/{f.name}") != sha256(f):
+                    problems.append(f"{HISTORY_DOC}: {d}/{f.name} sha256 이 없거나 저장소 파일과 다르다")
+    return problems
+
+
+def package_registry(reg: dict) -> dict:
+    """패키지용 registry.json — current·항목은 그대로 두고, 패키지에 없는 이력 항목에만 "package" 표시를 더한다."""
+    out = json.loads(json.dumps(reg))
+    keep = set(PACKAGE_MODEL_DIRS)
+    for e in out["versions"]:
+        if f"{e['name']}/{e['version']}" not in keep:
+            e["package"] = HISTORY_MARK
+    if out["current"] != reg["current"] or len(out["versions"]) != len(reg["versions"]):
+        raise SystemExit("빌드 중단: 패키지 registry.json 의 current·항목 수가 저장소와 다르다")
+    return out
+
+
 def build(out: Path) -> int:
     demo_src = demo_sources()  # 먼저 확인 — 영상이 없으면 아무것도 지우지 않고 중단
+    problems = model_dir_problems()  # 모델 폴더 허용 목록·HISTORY.md 도 지우기 전에 확인
+    if problems:
+        raise SystemExit("빌드 중단: model/ 구성 문제\n" + "\n".join(problems))
     pdf_src = ROOT / "reports" / "방법설명서.pdf"
     if not pdf_src.exists():
         raise SystemExit(f"빌드 중단: {pdf_src} 가 없다(방법설명서 PDF 를 먼저 만든다).")
@@ -560,20 +624,18 @@ def build(out: Path) -> int:
         (out / "data" / sub).mkdir(parents=True, exist_ok=True)
         (out / "data" / sub / ".gitkeep").write_text("", encoding="utf-8")
     # model/ (동결 모델 — 코드가 model/ 을 읽도록 algaecast.config 가 패키지 구조를 감지)
-    reg = json.loads((ROOT / "models" / "registry.json").read_text(encoding="utf-8"))
-    versions = set(reg["current"].items())
-    for doc in (
-        "FROZEN.md",
-        "FROZEN_v2.md",
-        "FROZEN_v2.1.md",
-    ):  # verify_frozen 이 모든 동결 문서의 파일을 검증한다
+    # 재현에 불러오는 폴더(PACKAGE_MODEL_DIRS)만 넣는다. 이력 모델은 HISTORY.md(sha256·재학습 명령)로 대신하고,
+    # verify_frozen 은 패키지에 없는 이력 행을 HISTORY.md 해시로 대조한다. 동결 문서 3종은 기록으로 남긴다.
+    for doc in FROZEN_DOCS:
         if (ROOT / "models" / doc).exists():
-            text = (ROOT / "models" / doc).read_text(encoding="utf-8")
-            versions |= set(re.findall(r"\| (\w+) \| (\d+_\d+) \| `[0-9a-f]{64}` \|", text))
             copy(ROOT / "models" / doc, out / "model" / doc)
-    for name, ver in sorted(versions):
-        copy(ROOT / "models" / name / ver, out / "model" / name / ver)
-    copy(ROOT / "models" / "registry.json", out / "model" / "registry.json")
+    for d in PACKAGE_MODEL_DIRS:
+        copy(ROOT / "models" / d, out / "model" / d)
+    copy(ROOT / "models" / HISTORY_DOC, out / "model" / HISTORY_DOC)
+    reg = json.loads((ROOT / "models" / "registry.json").read_text(encoding="utf-8"))
+    (out / "model" / "registry.json").write_text(
+        json.dumps(package_registry(reg), ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n"
+    )
     # src/ (필요 모듈) + src/config/ + src/docs/
     pkg = ROOT / "src" / "algaecast"
     for p in pkg.rglob("*.py"):
