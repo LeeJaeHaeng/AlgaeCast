@@ -127,7 +127,7 @@
 |---|---|---|
 | T4-b 비교표(`tbl_model_variants`·`tbl_bias_correction`·`tbl_feature_sets`·`tbl_missing_strategy`·`tbl_sensitivity`·`tbl_seed_revalidation`) | `models.experiments`(폴드별 학습기간 임계, 2025 = 252행). `config/model.yaml`·`EXP-001.md` 는 실행 뒤 원본으로 복원(재실행본 `rerun/EXP-001_v21.md`) | 채택 변형 같음(C1 log 가중·smearing). 결측 전략 S1 유지 근거 같음. 원단위 R² 민감도 최대 0.189(< 0.2), isotonic 악화 |
 | 기준선 `tbl_baseline` | `models.baselines` | B0~B4 를 252행 Final 로 다시 계산 |
-| EXP-confirm(사전등록 판정) | `exp.confirm` 재실행(`rerun/EXP-confirm_v21.md`) | a1 +0.102, a2 하한 +0.049, a3 +0.076, b1~b3 충족. b4 리드 17/20 은 원문 문턱 18/20 기준 미충족, v1-fix(17/20) 대비 '감소 없음' 기준 충족 |
+| EXP-confirm(확인 실험, 참고용) | `exp.confirm` 재실행(`rerun/EXP-confirm_v21.md`). v2.1 채택은 PREREG '결과와 무관하게 채택'에 따르며 이 재실행은 채택 조건이 아님 | a1 +0.102, a2 하한 +0.049, a3 +0.076, b1~b3 는 원문 문턱을 넘음. b4 는 원문 문턱 18/20 미충족(17/20). 같은 누수를 고친 v1-fix 도 17/20 |
 | 2026 사후 세부(지점별·관심 1k 리드타임·강정·고령 5월) | 저장된 v2.1 사후 예측(`posthoc_2026_v21.parquet`)을 다시 집계(`eval.posthoc_v21_detail`, 예측 재실행 없음) | 관심(1k) 7건 중 7건, 중앙 14일(수정 전 v1 5/7, 6일). 강정·고령 5월 사건은 4/20 기준일 q90 1,008 로 겨우 넘은 뒤 두 주 꺼짐 |
 | as-of 재현 `tbl_asof_reproduction` | `predict.asof.validate_against_bundle` | 일치율 96.2%(완전 86.0%), 연속 수위 94.3%·82.9% |
 | 수위 원천 비교 `tbl_level_source_compare` | `scripts/asof_level_source_compare.py`(v2.1 예측) | |Δlog q50| 평균 0.00006·최대 0.0008, tier 일치 100% |

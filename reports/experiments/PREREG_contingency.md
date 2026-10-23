@@ -157,6 +157,8 @@
 | 방법설명서 5.11절 표 5-8·5-9, 'v1 블라인드 주장 점검', 운영 반영 | 2026 8건 행·합계 행, 2026 test 124 v2.1·v2·v1·v1-fix·B0 지표 | 2020~2025 행, 표 5-7(2025·CV) |
 | 방법설명서 5.11절 개발 이력 | 2026 F1@1k·PICP80·MPIW·점예측 리드, 강정·고령 5월 v1·v2, 관심 5/7 | 삭제(이력) |
 | 방법설명서 6.1·6.4(표 6-4 2026 행·헤드라인·관심 7건·강정·고령)·6.5(2026 PICP80 0.702)·6.10(물모아 n=6)·6.11 전체(표 6-8~6-10)·7.4·9.3·9.4·10.1~10.4, 각주 c1-6·c1-10·c1-11·c5-15·c5-20·c6-12·c6-14·c6-20·c7-6·c10-1~c10-7 | 2026 사후 수치·서술 | [LT]·[H25]·[CQR]·[SITE]·[TR]·[CV], 물모아는 대체 없음 |
+| 방법설명서 6.12절(표 6-11 의 2026 행·결과 문단의 2026 문장)·각주 c6-24, 부록 A 기대 결과 | S 모델 2026 사후 수치(동결 커밋 130d855 뒤) | 2025·CV·2020~2025 행만 남김 |
+| reports/experiments/contingency_S/(FROZEN_S.md '2026 사후' 절·tbl_holdout_2026_posthoc_S.md·posthoc_2026_S_summary.json), 이 문서 5절 2026 행 | S 모델 2026 사후 표·수치 | 2025·CV·2020~2025 행 |
 | reports/eval/tbl_holdout_2026_posthoc*.md(4개)·posthoc_2026_v21_summary.json·posthoc_2026_v21_detail.json·headline_metrics.json `posthoc2026`·live_benchmark.csv·tbl_benchmark_nier.md, data/processed/posthoc_2026*.parquet | 2026 사후 표·수치(물모아 6건) | [H25]·[SITE]·[TR]·[LT] |
 | reports/experiments/FIX-v2.1/RESULT.md(3절 리드 2026·합계 행, '2026 사후 계산' 표, 'v1 블라인드 주장 점검', 7절 2026 세부 행)·PREREG.md(규칙·헤드라인 틀)·baseline_v2/ | 2026 사후 수치 | 3절 영향표(2025·CV), 리드 2020~2025 행 |
 | README.md 핵심 결과, docs/01·04(2026 한계 수치)·07·09·11·12, docs/PROGRESS.md(이력) | 헤드라인·2026 수치 | [LT]·[H25] |

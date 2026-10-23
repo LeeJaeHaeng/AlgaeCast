@@ -2,7 +2,7 @@
 
 - 동결 커밋: `9dca86ccb236625e3decba6fcf49442c071d51d1` (이 커밋 이후 v2 모델·가중치·피처·운영점을 변경하지 않는다). Release `model-frozen-v2-9dca86c`(자산 models-frozen-v2-9dca86c.tar.gz)
 - 동결 시각(KST): 2026-10-22 16:27:48
-- 근거: 사전등록 확인 실험 EXP-confirm 통과(reports/experiments/EXP-confirm/RESULT.md),
+- 근거: 사전등록 확인 실험 EXP-confirm 원 판정 채택(v2.1 이전 피처 기준, reports/experiments/EXP-confirm/RESULT.md. 2026-10-23 v2.1 피처 재계산(참고용)에서는 (b4) 원문 문턱 18/20 미충족(17/20), 같은 누수를 고친 v1-fix 도 17/20),
   설계·동등성 reports/v2/BUILD.md. 원단위 고도화 2차(EXP-005) 최종 판정 기준 미충족·P3(단기예보 격자) 미통과로
   C 를 그대로 동결한다(reports/experiments/EXP-005/EXP-summary2.md, P3/RESULT.md)
 - 운영점: {"prob_source": "clf_b", "cost_ratio": 3, "threshold": 0.52}; 임계 {"clf_a": 0.6399999999999999, "clf_b": 0.83, "stack_a": 0.8999999999999999, "stack_b": 0.8999999999999999};
