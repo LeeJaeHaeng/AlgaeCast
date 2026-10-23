@@ -1,11 +1,11 @@
-# 데모 영상 콘티 — AlgaeCast-7 녹조 통합관제 상황판 (v5, 2분 28초, 1080p H.264, 한국어 하드 자막)
+# 데모 영상 콘티 — AlgaeCast-7 녹조 통합관제 상황판 (v6, 2분 28초, 1080p H.264, 한국어 하드 자막)
 
-> 현재 영상(v5, 2026-10-23, sha256 `87b6d928…`)의 장면·자막 콘티다. 제출·운영 모델은 v2.1(데이터 유래 상수 누수 수정판)이다. 자막 원본은 `AlgaeCast_demo.srt`, 구간별 원본 위치·배속·편집 내역은 `README_DEMO.md` 에 있다.
-> 이전 판(v1~v4) 콘티는 `dist/backup_demo_*/script.md` 에 보존한다(v4 판: `dist/backup_demo_20261023_v4/script.md`). 판별로 바뀐 자막은 `README_DEMO.md` 의 편집 내역 절에 있다.
+> 현재 영상(v6, 2026-10-23, sha256 `0907b110…`)의 장면·자막 콘티다. 제출·운영 모델은 v2.1(데이터 유래 상수 누수 수정판)이다. 자막 원본은 `AlgaeCast_demo.srt`, 구간별 원본 위치·배속·편집 내역은 `README_DEMO.md` 에 있다.
+> 이전 판(v1~v5) 콘티는 `dist/backup_demo_*/script.md` 에 보존한다(v4 판: `dist/backup_demo_20261023_v4/script.md`). 판별로 바뀐 자막은 `README_DEMO.md` 의 편집 내역 절에 있다.
 
-- 녹화: Playwright(Chromium, 1920×1080) — ① JupyterLab(v2.1 제출 패키지 `notebooks/01_train_eval.ipynb`, 새 가상환경), ② 프로덕션 https://algaecast-7.vercel.app(웹 커밋 387acfa). ffmpeg 로 이어 붙이고 SRT 를 하드 자막으로 입힘.
+- 녹화: Playwright(Chromium, 1920×1080) — ① JupyterLab(v2.1 제출 패키지 `notebooks/01_train_eval.ipynb`, 새 가상환경), ② 프로덕션 https://algaecast-7.vercel.app(웹 커밋 387acfa, '얼마나 잘 맞혔나' 3장면은 6a73cf1). ffmpeg 로 이어 붙이고 SRT 를 하드 자막으로 입힘.
 - 자막 규칙: 쉽게 보기 용어(영어 약어·내부 변수명 없음), 숫자에 단위·기준, 공식 발령과 AI 예상 구분. v2.1 의 2026 결과는 사후 계산이므로 '처음 보는'·'블라인드' 표현을 쓰지 않는다.
-- 화면 속 수치는 녹화 시점(2026-10-23 13시, 기준일 10.19~10.22 측정)의 실제 값이며, 다음 측정이 들어오면 운영 화면 값은 바뀐다.
+- 화면 속 수치는 녹화 시점(2026-10-23 13시·15시, 기준일 10.19~10.22 측정)의 실제 값이며, 다음 측정이 들어오면 운영 화면 값은 바뀐다.
 
 ## 1부 0:00~0:51 추론 과정 (JupyterLab, 제출 패키지 노트북을 위에서부터 실행)
 

@@ -27,7 +27,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEMO_SHA_PREFIX = "87b6d928"  # 2026-10-23 v5(제출 모델 v2.1 — 1부·2부 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4 → dist/backup_demo_2026102*
+DEMO_SHA_PREFIX = "0907b110"  # 2026-10-23 v6(성능 페이지 3장면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4·v5 87b6d928 → dist/backup_demo_2026102*
 
 
 def run(cmd: list[str], cwd: Path, log: Path) -> int:
