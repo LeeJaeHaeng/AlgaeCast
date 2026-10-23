@@ -1,0 +1,179 @@
+{
+ "measured": "2026-10-23T05:50:49.029Z",
+ "lighthouse": "12.8.2",
+ "preset": "desktop",
+ "browser": "Microsoft Edge headless(new)",
+ "url": "https://algaecast-7.vercel.app",
+ "pages": [
+  {
+   "path": "/",
+   "name": "메인 상황판",
+   "performance_runs": [
+    93,
+    96,
+    96
+   ],
+   "accessibility_runs": [
+    93,
+    93,
+    93
+   ],
+   "performance_median": 96,
+   "accessibility_median": 93,
+   "lcp_s_median": 1.21,
+   "cls_median": 0.018,
+   "tbt_ms_median": 0,
+   "top_layout_shift_elements_run1": [
+    {
+     "selector": "div.board > header.flex > div.flex > nav.flex",
+     "label": "전문가 보기\n발표모드\n전체화면\n순환",
+     "score": 0.005862414465974622
+    },
+    {
+     "selector": "div.board > main.grid > div.order-2 > section.panel",
+     "label": "실시간 상황 기록\n10.23.12:26\n예측 갱신 완료\n10.23.12:19\n예측 갱신 완료\n10.23.08:00\n예측 갱신 완료\n10.22.…",
+     "score": 0.002308087876050227
+    },
+    {
+     "selector": "div.board > header.flex > div.flex > nav.flex",
+     "label": "전문가 보기\n발표모드\n전체화면\n순환",
+     "score": 0.002019318876744734
+    }
+   ]
+  },
+  {
+   "path": "/sites/2011G56",
+   "name": "지점 상세(강정·고령)",
+   "performance_runs": [
+    86,
+    92,
+    87
+   ],
+   "accessibility_runs": [
+    100,
+    100,
+    100
+   ],
+   "performance_median": 87,
+   "accessibility_median": 100,
+   "lcp_s_median": 0.6,
+   "cls_median": 0.225,
+   "tbt_ms_median": 24,
+   "top_layout_shift_elements_run1": [
+    {
+     "selector": "body.min-h-screen > div.min-h-dvh > main.mx-auto > div.grid",
+     "label": "왜 이렇게 예상했나\ni\n예상값을 올리거나 내린 요인을 기여도가 큰 순서로 보여 줍니다.\n\n예상값을 올리거나 내린 요인을 기여도가 큰 순서로 세…",
+     "score": 0.1743148541073582
+    },
+    {
+     "selector": "div.grid > section.panel > div.flex > span.text-xs",
+     "label": "흰 선·점 = 측정값 · 회색 점 = 그때그때의 예상값 · 파란 점·띠 = 이번 예상값과 예상 범위 · 회색 작은 점 = 100 미만·미검출",
+     "score": 0.05883394119406618
+    },
+    {
+     "selector": "div.grid > section.panel > div.flex > span.text-xs",
+     "label": "흰 선·점 = 측정값 · 회색 점 = 그때그때의 예상값 · 파란 점·띠 = 이번 예상값과 예상 범위 · 회색 작은 점 = 100 미만·미검출",
+     "score": 0.001502736823428656
+    }
+   ]
+  },
+  {
+   "path": "/performance",
+   "name": "얼마나 잘 맞혔나",
+   "performance_runs": [
+    100,
+    100,
+    100
+   ],
+   "accessibility_runs": [
+    100,
+    100,
+    100
+   ],
+   "performance_median": 100,
+   "accessibility_median": 100,
+   "lcp_s_median": 0.51,
+   "cls_median": 0.008,
+   "tbt_ms_median": 0,
+   "top_layout_shift_elements_run1": [
+    {
+     "selector": "div.mt-2 > table.tbl > tbody > tr",
+     "label": "원단위 효율계수 (목표 0.5)\t0.00\t−0.01\t−0.05\t−0.30\t1에 가까울수록",
+     "score": 0.007835476393212764
+    },
+    {
+     "selector": "div.min-h-dvh > main.mx-auto > div.flex > p.text-base",
+     "label": "2020년부터 2026년까지 실제 경계 사건을 얼마나 앞서 알렸는지, 그리고 약한 부분은 무엇인지 숨기지 않고 보여 줍니다.",
+     "score": 0.0006433077280879178
+    }
+   ]
+  },
+  {
+   "path": "/insights",
+   "name": "녹조 이야기",
+   "performance_runs": [
+    99,
+    100,
+    98
+   ],
+   "accessibility_runs": [
+    100,
+    100,
+    100
+   ],
+   "performance_median": 99,
+   "accessibility_median": 100,
+   "lcp_s_median": 0.85,
+   "cls_median": 0.004,
+   "tbt_ms_median": 0,
+   "top_layout_shift_elements_run1": [
+    {
+     "selector": "main.mx-auto > section.panel > div > p.mt-2",
+     "label": "2026년 강정·고령은 5월 18일에 공식 관심 단계가 내려져 평년보다 약 두 달 빨랐습니다. 그런데 2016년부터의 첫 발령일을 지점 차이를…",
+     "score": 0.004141158046226582
+    },
+    {
+     "selector": "div.min-h-dvh > main.mx-auto > div.flex > p.text-base",
+     "label": "2012년부터 2026년까지 측정 자료에서 읽어 낸, 녹조가 언제 어디서 왜 늘어나는지에 대한 네 가지 이야기입니다.",
+     "score": 0.0001636726541321316
+    },
+    {
+     "selector": "div > ul.mt-2 > li.grid > span.text-right",
+     "label": "20.7℃",
+     "score": 9.973264354292968e-06
+    }
+   ]
+  },
+  {
+   "path": "/about",
+   "name": "이 시스템은",
+   "performance_runs": [
+    100,
+    100,
+    100
+   ],
+   "accessibility_runs": [
+    100,
+    100,
+    100
+   ],
+   "performance_median": 100,
+   "accessibility_median": 100,
+   "lcp_s_median": 0.48,
+   "cls_median": 0.015,
+   "tbt_ms_median": 0,
+   "top_layout_shift_elements_run1": [
+    {
+     "selector": "body.min-h-screen > div.min-h-dvh > main.mx-auto > section.panel",
+     "label": "제출·운영 모델 v2.1 과 이전 모델(이력)\n\n제출·운영 모델은 v2.1(2026년 10월 23일 오후 12시 8분 고정, 커밋 217260…",
+     "score": 0.00742103978621034
+    },
+    {
+     "selector": "div.min-h-dvh > main.mx-auto > section.panel > p.mt-3",
+     "label": "고정된 모델i\n예상값·예상 범위·넘을 가능성·단계는 제출·운영 모델 v2.1(2026년 10월 23일 오후 12시 8분, 한국 시간 고정)이 …",
+     "score": 0.00538806485319122
+    }
+   ]
+  }
+ ]
+}

@@ -167,7 +167,7 @@ def main() -> int:
         "v2 결합 가중치는 이 CV OOF 로 적합했으므로 CV 행의 v2 값은 가중치 선택에 쓴 자료에서 잰 값이다(v1 의 model.yaml 가중치도 같은 방식으로 정했다).\n"
     )
     OUT.write_text(
-        f"# 2025 홀드아웃·CV — v2(운영·제출) vs v1(블라인드 검증), 같은 행 비교\n\n{body}",
+        f"# 2025 홀드아웃·CV — v2 vs v1 봉인본(수정 전 이력, 2026-10-22 계산), 같은 행 비교 — 제출·운영 v2.1 은 tbl_holdout_2025_v21.md\n\n{body}",
         encoding="utf-8",
         newline="\n",
     )

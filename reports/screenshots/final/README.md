@@ -11,14 +11,15 @@
 | 05_about_1920x1080.png | 이 시스템은 | 쉽게 보기 |
 | 06_performance_expert_1920x3600.png | 얼마나 잘 맞혔나 | 전문가 보기(전체 페이지) |
 
-## Lighthouse (desktop preset, 프로덕션 주소 — 2026-10-21 측정)
+## Lighthouse (desktop preset, 프로덕션 주소 — 2026-10-23 14:50 측정, 3회 중앙값)
 | 페이지 | 성능 | 접근성 |
 |---|---|---|
 | / | 96 | 93 |
-| /sites/2011G56 | 92 | 100 |
-| /performance | 99 | 100 |
-| /insights | 97 | 100 |
+| /sites/2011G56 | 87 | 100 |
+| /performance | 100 | 100 |
+| /insights | 99 | 100 |
 | /about | 100 | 100 |
 
+- 지점 상세 성능 87 은 누적 레이아웃 이동(CLS 0.225, 차트 아래 묶음이 밀림) 때문이다. 상세: `../lighthouse.md`.
 - 금지어 검사(프로덕션 10개 경로, 2026-10-23 12:42): 0건 · 배포 숫자 대조(check_deployed_numbers): 63/63 · 빌드 전 숫자 대조(check_numbers): 178/178
 - POST /api/revalidate: 비밀 없이 401, 비밀 포함 {"ok":true} — board-data 캐시 태그 + /, /performance, /insights, /log, /sites/[id] 갱신. daily.yml 은 DASHBOARD_URL=https://algaecast-7.vercel.app 과 REVALIDATE_SECRET 으로 같은 엔드포인트를 호출한다.

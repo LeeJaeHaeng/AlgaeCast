@@ -289,8 +289,18 @@ def main(argv: list[str] | None = None) -> int:
         bundle = comp.load_asos()
         cmp_t = compare_with_bundle(asos, bundle)
         lines += ["", "## 번들 asos_daily 와 일치율 (%, |차| ≤ 0.05)", _md(cmp_t)]
-        choice = station_choice(asos, sites_cfg, comp.load_algae())
-        lines += ["", "## 후보 관측소 기온 vs 수질 수온 Spearman (측정일 기준)", _md(choice)]
+        # 관측소 선정은 선택 결정이므로 학습기간 자료(≤ DECISION_YEAR)로만 계산(FIX-v2.1 R4)
+        from algaecast.features.constants import DECISION_YEAR
+
+        algae = comp.load_algae()
+        algae = algae[pd.to_datetime(algae["obs_date"]).dt.year <= DECISION_YEAR]
+        asos_d = asos[pd.to_datetime(asos["obs_date"]).dt.year <= DECISION_YEAR]
+        choice = station_choice(asos_d, sites_cfg, algae)
+        lines += [
+            "",
+            f"## 후보 관측소 기온 vs 수질 수온 Spearman (측정일 ≤ {DECISION_YEAR}-12-31)",
+            _md(choice),
+        ]
         best = (
             choice.sort_values(["station_id", "spearman 7일평균기온"], ascending=[True, False])
             .groupby("station_id")
@@ -298,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         lines += [
             "",
-            "## 1순위(7일 평균기온 상관 최대)",
+            f"## 1순위(7일 평균기온 상관 최대, ≤{DECISION_YEAR})",
             _md(best[["station_id", "site", "stn_id", "stn_nm", "spearman 7일평균기온"]]),
         ]
         print(choice.to_string(index=False))

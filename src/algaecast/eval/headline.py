@@ -96,12 +96,12 @@ def main() -> int:
         "b0_2025_public": {
             "values": b0pub,
             "precision": 3,
-            "source": "reports/eval/tbl_holdout_2025.md B0 지속성(256행)",
+            "source": "reports/eval/tbl_holdout_2025.md B0 지속성(252행)",
         },
         "picp80_2025_public": {
             "values": {"picp80": picp_pub},
             "precision": 3,
-            "source": "reports/eval/tbl_holdout_2025.md 앙상블 PICP80(CQR)(256행, v1·v2 공통 분위)",
+            "source": "reports/eval/tbl_holdout_2025.md 앙상블(채택) PICP80(CQR)(252행, v2.1 재적합 분위·CQR)",
         },
     }
     for blk in limited.values():

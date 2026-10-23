@@ -1,0 +1,23 @@
+INFO v1 시드 101: CV r2_raw 0.1772, 2025 r2_raw 0.1831
+INFO C 시드 101: CV r2_raw 0.2801, 2025 r2_raw 0.1733
+INFO K 시드 101: CV r2_raw 0.2072, 2025 r2_raw 0.2107
+INFO v1 시드 202: CV r2_raw 0.1826, 2025 r2_raw 0.1737
+INFO C 시드 202: CV r2_raw 0.2911, 2025 r2_raw 0.1748
+INFO K 시드 202: CV r2_raw 0.2111, 2025 r2_raw 0.1893
+INFO v1 시드 303: CV r2_raw 0.1949, 2025 r2_raw 0.1708
+INFO C 시드 303: CV r2_raw 0.2988, 2025 r2_raw 0.1812
+INFO K 시드 303: CV r2_raw 0.2005, 2025 r2_raw 0.1929
+INFO v1 시드 404: CV r2_raw 0.1844, 2025 r2_raw 0.1665
+INFO C 시드 404: CV r2_raw 0.2847, 2025 r2_raw 0.1778
+INFO K 시드 404: CV r2_raw 0.2240, 2025 r2_raw 0.2008
+INFO v1 시드 505: CV r2_raw 0.1978, 2025 r2_raw 0.1698
+INFO C 시드 505: CV r2_raw 0.2931, 2025 r2_raw 0.1759
+INFO K 시드 505: CV r2_raw 0.2261, 2025 r2_raw 0.1806
+a1_mean_delta: 0.1022 (>= 0.08) → 충족
+a2_boot_lower: 0.0492 (> 0) → 충족
+a3_vs_control: 0.0758 (>= 0.04) → 충족
+b1_r2_raw_2025: 0.1766 (>= 0.145829) → 충족
+b2_rmse_log_2025: 0.7127 (<= 0.717870) → 충족
+b3_f1_2025: 0.6759 (>= 0.662353) → 충족
+b4_lead: 17.0000 (>= 18) → 미충족
+소요 4.6 분

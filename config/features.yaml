@@ -17,7 +17,7 @@ windows:
   flow_sum: [7, 14, 30]
 
 # 지점별 관심 도달 수온 임계(T2 S6 정의)는 config/derived_constants.json 의 연도별 값을 쓴다(FIX-v2.1 R3).
-# 이전 값(HP 25.5·GJGR 23.7·CS 22.9·MGMR 22.2·DCHN 20.0)은 2026 측정까지 포함한 전 기간으로 계산돼 있어 폐기했다.
+# 2026 측정까지 포함한 전 기간으로 계산했던 이전 값은 폐기했다(FIX-v2.1 R3, reports/experiments/FIX-v2.1/RESULT.md).
 
 degree_day_base_c: 20 # 적산온도 기준 (수온·기온 공통)
 wtemp_hot_c: 25 # wtemp_days_over25

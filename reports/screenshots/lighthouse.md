@@ -1,13 +1,16 @@
-# Lighthouse (desktop preset, Edge headless, 로컬 production 빌드) — 2026-10-21 T7-R
+# Lighthouse (desktop preset, Edge headless, 프로덕션 https://algaecast-7.vercel.app) — 2026-10-23 14:50 KST, v2.1 화면
+
+페이지마다 3회 측정한 중앙값(괄호는 3회 값). 요약 원자료: `lighthouse_20261023.json`.
 
 | 페이지 | 성능 | 접근성 | LCP | CLS |
 |---|---|---|---|---|
-| / 메인 상황판 | 96 | 93 | 1.3 s | 0.015 |
-| /sites/2011G56 지점 상세 | 91 | 100 | 0.6 s | 0.192 |
-| /performance 얼마나 잘 맞혔나 | 100 | 100 | 0.5 s | 0.019 |
-| /insights 녹조 이야기 | 100 | 100 | 0.5 s | 0.004 |
-| /about 이 시스템은 | 100 | 100 | 0.4 s | 0.011 |
+| / 메인 상황판 | 96 (93·96·96) | 93 | 1.2 s | 0.018 |
+| /sites/2011G56 지점 상세 | **87** (86·92·87) | 100 | 0.6 s | **0.225** |
+| /performance 얼마나 잘 맞혔나 | 100 | 100 | 0.5 s | 0.008 |
+| /insights 녹조 이야기 | 99 (99·100·98) | 100 | 0.9 s | 0.004 |
+| /about 이 시스템은 | 100 | 100 | 0.5 s | 0.015 |
 
-- 명령: `npx lighthouse@12 <url> --preset=desktop --only-categories=performance,accessibility --chrome-flags="--headless=new"` (CHROME_PATH = Edge)
-- 1차 측정에서 메인 접근성 86 → 링크의 aria-pressed 제거, 지도 마커 이름(title), 흐린 글자 대비, ⓘ 버튼 20px, 타일 aria-label 순서 수정 후 93.
-- 지점 상세 성능 89 → Pretendard CSS 비차단 로드, 차트 높이 고정 후 91 (남은 CLS 0.19 는 Recharts 초기 렌더).
+- 명령: `npx lighthouse@12 <url> --preset=desktop --only-categories=performance,accessibility --chrome-flags="--headless=new"` (CHROME_PATH = Edge, Lighthouse 12.8.2)
+- 지점 상세 성능이 90 아래다. 원인은 누적 레이아웃 이동(CLS 0.225)이며, 가장 큰 이동은 '왜 이렇게 예상했나'가 든 아래 묶음(0.174)이 위쪽 차트가 그려진 뒤 밀리는 것이다. 2026-10-21 측정(프로덕션 92, 로컬 91)보다 낮다. 언제부터 낮아졌는지는 확인하지 않았고, 아직 고치지 않았다.
+- 메인 접근성 93 은 2026-10-21 과 같다(링크 aria-pressed 제거·지도 마커 이름·대비·ⓘ 버튼 크기 수정 뒤 값).
+- 이전 측정(2026-10-21, 로컬 production 빌드): 메인 96/93, 지점 상세 91/100, 성능 100/100, 녹조 이야기 100/100, 이 시스템은 100/100.

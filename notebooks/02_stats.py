@@ -468,15 +468,18 @@ fig.tight_layout()
 fig.savefig(OUT / "fig_site_response.png", dpi=150)
 plt.close(fig)
 rows = []
+# 표(관심 도달 수온 = 모델 피처의 지점별 수온 임계)는 학습기간 측정(≤2025)으로만 계산한다(FIX-v2.1 R3).
+# 그림·Kruskal-Wallis 는 전 기간 탐색 통계로 둔다.
+algae_le2025 = algae[pd.to_datetime(algae["obs_date"]).dt.year <= 2025]
 for sid in ORDER:
-    g = algae[algae["station_id"] == sid][["iem_wtrtp", "log_cells"]].dropna()
+    g = algae_le2025[algae_le2025["station_id"] == sid][["iem_wtrtp", "log_cells"]].dropna()
     lo = sm.nonparametric.lowess(g["log_cells"], g["iem_wtrtp"], frac=0.4)
     x_at = lambda t: float(np.interp(t, lo[:, 0], lo[:, 1]))  # noqa: E731
     over = lo[lo[:, 1] >= 3]
     rows.append(
         {
             "지점": SITE_NAME[sid],
-            "n": len(g),
+            "n(≤2025)": len(g),
             "log세포수 중앙값": round(g["log_cells"].median(), 2),
             "LOESS@20℃": round(x_at(20), 2),
             "LOESS@25℃": round(x_at(25), 2),
@@ -489,6 +492,8 @@ save_table(
     "tbl_site_response.md",
     "S6 지점 이질성",
     tbl_s6,
+    "- 표는 측정일 ≤ 2025-12-31 자료로 계산했다. 관심 도달 수온은 모델 피처의 지점별 수온 임계(config/derived_constants.json 2025, 학습기간 자료만)와 같다. CV 폴드는 각 학습기간 자료로 다시 계산한 임계를 쓴다(2019~2025 연도별 값은 같은 JSON).\n"
+    "- 아래 Kruskal-Wallis 와 그림 fig_site_response.png 는 2012~2026 전 기간 탐색 통계다(모델 상수에는 쓰지 않음).\n"
     f"- Kruskal-Wallis(전 기간) H={kw.statistic:.1f}, p={kw.pvalue:.2e}; 6~9월만 H={kw_s.statistic:.1f}, p={kw_s.pvalue:.2e} → 지점 간 분포가 다르므로 지점 범주형 피처·지점별 보정 필요.",
     2,
 )
@@ -838,7 +843,7 @@ lines = [
     f"3. lag 상관(전체): 기온 ρ lag0 {lag_all.loc['기온', 0]:.2f} → lag14 {lag_all.loc['기온', 14]:.2f} → lag30 {lag_all.loc['기온', 30]:.2f}; 수온 {lag_all.loc['수온', 0]:.2f}; 방류 lag0 {lag_all.loc['댐 총방류량', 0]:.2f}, 유입 {lag_all.loc['댐 유입량', 0]:.2f} (S3) → 7/14/30일 창 모두 채택.",
     f"4. 선행연구 재현(S4): 수온 Pearson(원단위) 전체 {tbl_s4[(tbl_s4['구간'] == '전체') & (tbl_s4['변수'] == '수온')]['Pearson r(원단위)'].iloc[0]:.2f} / log {tbl_s4[(tbl_s4['구간'] == '전체') & (tbl_s4['변수'] == '수온')]['Pearson r(log)'].iloc[0]:.2f} (선행 0.63), 유입·방류는 음의 상관(선행 +0.19) — 정의·구간 차이, 표 참조.",
     f"5. 정상성(S5): ADF p<0.05 지점 {int((tbl_s5['ADF p'] < 0.05).sum())}/5, KPSS 기각 {int((tbl_s5['KPSS p'] < 0.05).sum())}/5 → 수준 모델 + 계절 피처, 차분 불필요.",
-    f"6. 지점 이질성(S6): Kruskal-Wallis H={kw.statistic:.0f}, p={kw.pvalue:.1e}; 관심(1,000) 도달 수온 {', '.join(f'{r.지점} {r._7}℃' for r in tbl_s6.itertuples()) } → 지점 범주형·지점별 보정.",
+    f"6. 지점 이질성(S6): Kruskal-Wallis H={kw.statistic:.0f}, p={kw.pvalue:.1e}; 관심(1,000) 도달 수온(≤2025 측정, 모델 피처 임계와 같음) {', '.join(f'{r.지점} {r._7}℃' for r in tbl_s6.itertuples()) } → 지점 범주형·지점별 보정.",
     f"7. 조기화(S7, 통합 잔차 2016~): 관심 Sen {s7.loc['관심', 'Sen slope (일/년)'] if '관심' in s7.index else 'NA'} 일/년 (MK p={s7.loc['관심', 'MK p'] if '관심' in s7.index else 'NA'}), 경계 {s7.loc['경계', 'Sen slope (일/년)'] if '경계' in s7.index else 'NA'} 일/년 (p={s7.loc['경계', 'MK p'] if '경계' in s7.index else 'NA'}) — 지점별 결과는 표.",
     f"8. 결측(S8): 겨울 비채수 외 하절기 세포수 결측 거의 없음; 미채수~유입량 OR {s8.get('OR 유입량(log1p 1단위)', 'NA')} (p={s8.get('p 유입량', 'NA')}), 3일강수 OR {s8.get('OR 3일강수(10 mm)', 'NA')} (p={s8.get('p 3일강수', 'NA')}) → MNAR 가설 {'지지' if isinstance(s8.get('p 유입량'), float) and s8['p 유입량'] < 0.05 and s8['OR 유입량(log1p 1단위)'] > 1 else '약함/기각'}.",
     f"9. 급증(S9): 10배 급증 사건 {len(tbl_s9)}건(≤5일 {int((tbl_s9['간격 일'] <= 5).sum())}건, ≤7일 포함) — 선행 7일 평균기온 중앙값 {tbl_s9['선행7일 평균기온'].median():.1f}℃(전체 측정일 기준 16~19℃), 강수합 {tbl_s9['선행7일 강수합 mm'].median():.0f} mm, 일조 {tbl_s9['선행7일 일조합 h'].median():.0f} h → 고온·소우·일조 선행 패턴 (tbl_bloom_events.md).",

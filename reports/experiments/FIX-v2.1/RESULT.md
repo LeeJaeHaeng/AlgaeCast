@@ -118,3 +118,20 @@
 - 일일 러너 강제 재예측 run 9269d95d(Actions 39894508590): 최신 예측 386행.
 - daily.yml FROZEN_TAG = model-frozen-v2.1-217260e.
 - submission.csv(v2.1) sha256 `4741a3d37ef3ae9f…`. 원자료(DataON·WAMIS) 없는 기본 패키지를 새 가상환경에서 실행해도 바이트가 같다(2026-10-23 13:25, 7.2분). v2 제출본은 `dist/v2/submission_v2.csv` 에 보존했다(v2 대비 |Δlog10| 중앙 0.051, 최대 0.193).
+
+## 7. 재계산 보완(2026-10-23 오후) — 남아 있던 수정 전 표를 v2.1 피처로
+
+제출 전 정리 지시에 따라 수정 전 피처로 계산돼 있던 표를 v2.1 규칙으로 다시 계산했다. 모델·구성·임계는 바꾸지 않았다(R5).
+
+| 표 | 재계산 방법 | 결과 요지 |
+|---|---|---|
+| T4-b 비교표(`tbl_model_variants`·`tbl_bias_correction`·`tbl_feature_sets`·`tbl_missing_strategy`·`tbl_sensitivity`·`tbl_seed_revalidation`) | `models.experiments`(폴드별 학습기간 임계, 2025 = 252행). `config/model.yaml`·`EXP-001.md` 는 실행 뒤 원본으로 복원(재실행본 `rerun/EXP-001_v21.md`) | 채택 변형 같음(C1 log 가중·smearing). 결측 전략 S1 유지 근거 같음. 원단위 R² 민감도 최대 0.189(< 0.2), isotonic 악화 |
+| 기준선 `tbl_baseline` | `models.baselines` | B0~B4 를 252행 Final 로 다시 계산 |
+| EXP-confirm(사전등록 판정) | `exp.confirm` 재실행(`rerun/EXP-confirm_v21.md`) | a1 +0.102, a2 하한 +0.049, a3 +0.076, b1~b3 충족. b4 리드 17/20 은 원문 문턱 18/20 기준 미충족, v1-fix(17/20) 대비 '감소 없음' 기준 충족 |
+| 2026 사후 세부(지점별·관심 1k 리드타임·강정·고령 5월) | 저장된 v2.1 사후 예측(`posthoc_2026_v21.parquet`)을 다시 집계(`eval.posthoc_v21_detail`, 예측 재실행 없음) | 관심(1k) 7건 중 7건, 중앙 14일(수정 전 v1 5/7, 6일). 강정·고령 5월 사건은 4/20 기준일 q90 1,008 로 겨우 넘은 뒤 두 주 꺼짐 |
+| as-of 재현 `tbl_asof_reproduction` | `predict.asof.validate_against_bundle` | 일치율 96.2%(완전 86.0%), 연속 수위 94.3%·82.9% |
+| 수위 원천 비교 `tbl_level_source_compare` | `scripts/asof_level_source_compare.py`(v2.1 예측) | |Δlog q50| 평균 0.00006·최대 0.0008, tier 일치 100% |
+| EDA S6 표·ASOS 선정 | ≤2025(임계)·≤2024(선정) 자료로 계산 | 임계 = 모델 피처 값(25.8/24.0/23.3/22.8/20.7), 물금·매리 주 관측소 밀양(288) |
+| Lighthouse(프로덕션 5페이지) | 3회 측정 중앙값 | 메인 96/93, 지점 상세 87/100(CLS 0.225), 성능 100/100, 녹조 이야기 99/100, 이 시스템은 100/100 |
+
+동결 뒤 탐색 실험(EXP-004~011, EXP-005)은 v2 채택 당시 기록이므로 다시 계산하지 않고, 방법설명서 5.11절 개발 이력에 둔다(참가자 결정).

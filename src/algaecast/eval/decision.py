@@ -123,13 +123,16 @@ def deployment_priority(
     토글 비활성.
     """
     cfg = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))
+    model_cfg = yaml.safe_load((CONFIG_DIR / "model.yaml").read_text(encoding="utf-8"))
+    op_thr = float(model_cfg["operating_point"]["threshold"])  # 운영점(동결 v2.1 0.46) — 하드코딩하지 않는다
     rows = []
     for s in cfg["sites"]:
         sid = s["station_id"]
         if sid not in p_over.index:
             continue
         p = float(p_over[sid])
-        t = str(tier[sid]) if tier is not None and sid in tier.index else ("alert" if p >= 0.52 else "normal")
+        fallback = "alert" if p >= op_thr else "normal"
+        t = str(tier[sid]) if tier is not None and sid in tier.index else fallback
         cap = s.get("intake_capacity_tpd")
         score = p * (float(cap) / 1_000_000 if (use_intake and cap) else 1.0)
         rows.append(

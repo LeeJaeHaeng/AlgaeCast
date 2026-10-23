@@ -167,9 +167,9 @@ def main(argv: list[str] | None = None) -> int:
     n_ev = len(official_events(T10K, start_year=2026))
     nt = notice(commit)
     md = (
-        f"# 2026 사후 계산 — v2(운영·제출 모델) vs v1(블라인드 검증 모델) (test 조합 {len(has)}건 타깃 + 2026 base_date {len(v2)}건 예측)\n\n"
+        f"# 2026 사후 계산 — v2 vs v1 봉인본(수정 전 이력, 2026-10-22 계산; 제출·운영 v2.1 은 tbl_holdout_2026_posthoc_v21.md) (test 조합 {len(has)}건 타깃 + 2026 base_date {len(v2)}건 예측)\n\n"
         f"{nt}"
-        "- v2 = 최종 모델 C(models/FROZEN_v2.md). 블라인드 검증 서사는 v1 의 것이다. v1 은 2026-10-21 09:44 KST 봉인 뒤 2026 을 처음 계산했다"
+        "- v2 = 최종 모델 C(models/FROZEN_v2.md). v1 은 2026-10-21 09:44 KST 봉인 뒤 2026 을 처음 계산했다. 두 모델 모두 일부 데이터 유래 상수가 2026 자료를 포함해 계산된 사실을 2026-10-23 사후 발견해 이력으로만 남긴다(reports/experiments/FIX-v2.1/RESULT.md)"
         "(reports/eval/tbl_holdout_2026_posthoc.md).\n"
         "- 2026 타깃은 eval/live.load_test_targets(명시 플래그)로만 읽었다. 이 계산은 v2 동결 뒤 한 번만 했고, 결과와 상관없이 모델·판정을 바꾸지 않는다.\n"
         f"- 감시(q90_cqr)·경보(p_alert)는 v2 도 v1 동결 분위·분류기를 쓴다 → 2026 base_date {len(v2)}행에서 v1 대비 q90_cqr 최대 차 {q90_diff:.3g}, 경보 불일치 {alert_mis}행. "

@@ -1,4 +1,4 @@
-"""운영 모델 v2 — 최종 모델 C = v1 로그 앙상블(C1·C3·C2) + 상류 피처 5열 + 속별 구성원 cg.
+"""모델 C 구성(v2·v2.1 공통) — v1 로그 앙상블(C1·C3·C2) + 상류 피처 5열 + 속별 구성원 cg. 제출·운영은 v2.1.
 
 EXP-confirm(사전등록 확인 실험)을 통과한 구성 C 를 운영 경로로 옮긴다. 실험 코드와의 동등성은
 scripts/check_v2_equivalence.py·tests/test_v2_equivalence.py 가 확인한다.
@@ -12,7 +12,8 @@ scripts/check_v2_equivalence.py·tests/test_v2_equivalence.py 가 확인한다.
   cg = 속별 G2 합산(models.genus, C1 설정). 학습 피처는 모든 구성원이 같은 열(35)을 쓴다.
 - 결합: log10(y+1) 공간 NNLS(합=1). 가중치는 2020~2024 연도 확장 CV OOF(시드 42)로 적합(fit_weights) —
   exp.harness.ensemble_expanding 의 2025 가중치와 같은 계산.
-- 분위 q10/q50/q90·분류기(b)·CQR·운영점은 v1 동결본을 그대로 쓴다(레지스트리 classifier·quantile = v1 버전).
+- 분위 q10/q50/q90·분류기(b)·CQR·운영점: v2 는 v1 동결본을 썼고, v2.1 은 수정 피처로 다시 적합한
+  버전을 쓴다(레지스트리 classifier·quantile = v2.1 버전, FIX-v2.1 R6).
 
 공개 함수
 - config_v2() / config_v1() : 구성 정의
