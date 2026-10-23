@@ -469,7 +469,11 @@ def main(argv: list[str] | None = None) -> int:
     note = (
         "- 임계값은 CV OOF(≤2024) F1 최대 지점으로 고정하고 2025 는 그 임계로만 평가. "
         "(iii) 스태킹의 CV 행은 in-sample 적합이라 참고용.\n"
-        f"- 분류기 튜닝: Optuna {args.trials} trial, 목적 CV PR-AUC — "
+    ) + (
+        "- 분류기 하이퍼파라미터: config/model.yaml 의 이전 튜닝값 고정(--skip-tune, Optuna 재실행 없음), "
+        "현재 피처로 재적합만 했다.\n"
+        if args.skip_tune
+        else f"- 분류기 튜닝: Optuna {args.trials} trial, 목적 CV PR-AUC — "
         f"(a) {tuned['over_target']['cv_pr_auc']:.3f} / (b) {tuned['over_window']['cv_pr_auc']:.3f}\n"
     )
     (EVAL / "tbl_alert_classification.md").write_text(
@@ -505,7 +509,12 @@ def main(argv: list[str] | None = None) -> int:
         f"# EXP-002 T4-c 경보 분류·분위·앙상블 ({date.today()})\n\n"
         "## 설정\n- features_S1, perc75 30개, 폴드 docs/04 §2, 시드 42. "
         "분류 타깃 (a) target_date ≥10k / (b) +4~+10일 창 ≥10k.\n"
-        f"- 분류기 Optuna {args.trials} trial(PR-AUC), 임계 CV OOF F1 최대. "
+        + (
+            "- 분류기 하이퍼파라미터 이전 튜닝값 고정(--skip-tune). "
+            if args.skip_tune
+            else f"- 분류기 Optuna {args.trials} trial(PR-AUC). "
+        )
+        + "임계 CV OOF F1 최대. "
         "회귀 OOF: C1 채택 파라미터, C3/C2 각 스터디 best.\n\n"
         "## 결과\n- reports/eval/tbl_alert_classification.md, tbl_quantile.md, tbl_ensemble.md\n\n"
         f"## 채택\n- 경보 규칙: {rule} (2025 F1 {fin_rule['f1']:.3f} vs B0 {b0_fin['f1']:.3f})\n"

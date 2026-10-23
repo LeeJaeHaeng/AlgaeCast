@@ -1,7 +1,7 @@
 # 경보(≥10,000) 분류 — 방식별 F1·Brier·PR-AUC (T4-c)
 
 - 임계값은 CV OOF(≤2024) F1 최대 지점으로 고정하고 2025 는 그 임계로만 평가. (iii) 스태킹의 CV 행은 in-sample 적합이라 참고용.
-- 분류기 튜닝: Optuna 150 trial, 목적 CV PR-AUC — (a) nan / (b) nan
+- 분류기 하이퍼파라미터: config/model.yaml 의 이전 튜닝값 고정(--skip-tune, Optuna 재실행 없음), 현재 피처로 재적합만 했다.
 - **채택 규칙(타깃 a, CV F1 기준)**: (iii) 분류기+회귀 스태킹(로지스틱) → 2025 F1 0.703 (B0 지속성 0.727)
 
 | 타깃 | 방식 | 구간 | n | n_pos | pr_auc | brier | f1 | precision | recall | thr |
