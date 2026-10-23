@@ -1,20 +1,20 @@
-# 패키지 재현 검증 2026-10-23 10:45
+# 패키지 재현 검증 2026-10-23 13:27
 원본: dist\AlgaeCast_녹조7일예측_이재행.zip
 
 $ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_pe_oehh9\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_tdsr4ebc\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_pe_oehh9\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_tdsr4ebc\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_pe_oehh9\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_tdsr4ebc\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_pe_oehh9\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_tdsr4ebc\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_pe_oehh9\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
-C:\Users\user\AppData\Local\Temp\algaecast_verify_pe_oehh9\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_tdsr4ebc\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
+C:\Users\user\AppData\Local\Temp\algaecast_verify_tdsr4ebc\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
   self._get_loop()
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
 [jupytext] Reading notebooks/01_train_eval.py in format py
@@ -22,9 +22,9 @@ C:\Users\user\AppData\Local\Temp\algaecast_verify_pe_oehh9\AlgaeCast_녹조7일�
 [jupytext] Warning: Notebook is not trusted
 [jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
 [jupytext] Updating the timestamp of notebooks/01_train_eval.py
-submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 0a1fb2f4d8fd7213… 일치 · DataON 원값 없음(수위 피처 derived) · 소요 7.6 분
+submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 87b6d928e30c5fa8… 일치 · DataON 원값 없음(수위 피처 derived) · WAMIS 원값 없음(수문 피처 derived) · 소요 6.9 분
 
 ## 같은 날 다른 검증 실행 요약 (각 실행 로그는 형식이 같다)
-- 패키지 폴더(submission_package, --update-package, 10:23 — zip 안의 figures/reports/eval 기록): submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 0a1fb2f4d8fd7213… 일치 · DataON 원값 없음(수위 피처 derived) · 소요 8.6 분
-- 대체 zip(_with_dataon, DataON 원값 포함, 11:00): submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 0a1fb2f4d8fd7213… 일치 · DataON 원값 있음(수위 피처 raw) · 소요 7.6 분
-- zip sha256: 기본 2dd3d5c7d85aa76d… · 영상 제외 a88ca5fcb0dab02b… · _with_dataon dbbeede82147a383…
+- 패키지 폴더(submission_package, --update-package, 13:25 — zip 안의 figures/reports/eval 기록): submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 87b6d928e30c5fa8… 일치 · DataON 원값 없음(수위 피처 derived) · WAMIS 원값 없음(수문 피처 derived) · 소요 7.2 분
+- 대체 zip(_with_dataon, DataON 원값 포함, 13:42): submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 87b6d928e30c5fa8… 일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · 소요 7.0 분
+- zip sha256: 기본 fa50e0fcd5957a15… · 영상 제외 b5f9b5b07ab49fbc… · _with_dataon 90a9127d7f6be8ba…

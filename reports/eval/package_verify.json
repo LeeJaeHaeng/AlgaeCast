@@ -1,16 +1,18 @@
 {
- "when": "2026-10-23 10:52",
+ "when": "2026-10-23 13:34",
  "returncode": 0,
  "source": "dist\\AlgaeCast_녹조7일예측_이재행.zip",
  "dataon_raw_present": false,
  "level_cont_mode": "derived",
+ "wamis_raw_present": false,
+ "wamis_mode": "derived",
  "submission_regenerated": true,
  "submission_identical": true,
- "submission_sha256": "0c77ac8efd3142bbb386e791b3109ca3506eb7b99730490310ed5fe9d133c3b6",
+ "submission_sha256": "4741a3d37ef3ae9f71b381e083028d93e83ec378ae5d5a65beba2ed48545a8e7",
  "notebook_errors": 0,
  "notebook_stderr_warnings": 0,
  "notebook_abs_paths": 0,
- "demo_sha256": "0a1fb2f4d8fd72132df80759893805866d7181a43ad3eadb59b3823c43d337c6",
+ "demo_sha256": "87b6d928e30c5fa871511ab37af79743b7121971216370b95a7ebc042c70d180",
  "demo_sha_ok": true,
- "minutes": 7.6
+ "minutes": 6.9
 }

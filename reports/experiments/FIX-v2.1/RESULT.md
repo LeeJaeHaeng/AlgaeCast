@@ -102,7 +102,7 @@
   - 음성 대조(`audit_negative_control.py`): 수위 편차를 예전 방식(전 기간 평균)으로 되돌리면 5개 기준일 모두 불일치(0.009~1.453)로 잡혔다.
 - **데이터 유래 상수 메타데이터**: `config/derived_constants.json`(계산 자료·마지막 자료일).
 - **테스트** `tests/test_derived_constants.py`(15개): 사용 시점보다 늦은 자료, 폴드 임계 적용, 수위 편차 as-of, 폐기 상수 잔존을 검사한다.
-- 전체 테스트 477개 통과.
+- 전체 테스트 479개 통과(2026-10-23 13시). 패키지에 새 설정 파일(derived_constants.json)이 빠져 패키지 노트북이 멈춘 일을 데모 녹화 중 발견해 고쳤고, `tests/test_package_config.py` 가 config/ 전체 포함을 검사한다.
 
 ## 5. 선별 재실행(참고, 미채택)
 
@@ -117,4 +117,4 @@
 - Supabase run 7071a612: v2.1 전체 적재. 예측 381·지표 40·경계 사건 28·전환 150.
 - 일일 러너 강제 재예측 run 9269d95d(Actions 39894508590): 최신 예측 386행.
 - daily.yml FROZEN_TAG = model-frozen-v2.1-217260e.
-- submission.csv(v2.1) sha256 `4741a3d37ef3ae9f…`. v2 제출본은 `dist/v2/submission_v2.csv` 에 보존했다(v2 대비 |Δlog10| 중앙 0.051, 최대 0.193).
+- submission.csv(v2.1) sha256 `4741a3d37ef3ae9f…`. 원자료(DataON·WAMIS) 없는 기본 패키지를 새 가상환경에서 실행해도 바이트가 같다(2026-10-23 13:25, 7.2분). v2 제출본은 `dist/v2/submission_v2.csv` 에 보존했다(v2 대비 |Δlog10| 중앙 0.051, 최대 0.193).
