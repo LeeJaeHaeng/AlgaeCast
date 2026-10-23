@@ -5,7 +5,7 @@
 - 제출 전(2026-11-06)까지 재학습 금지: models/FROZEN.md(v1)·FROZEN_v2.md(있으면)의 sha256 과 불일치하면
   즉시 중단(종료코드 2).
 - 실패 시 model_runs 에 status='failed' 행을 남긴다(대시보드 배너). 대회 번들·모델 pickle 은 저장소에 없고
-  모델은 GitHub Release(환경변수 FROZEN_TAG, 기본 v2 model-frozen-v2-9dca86c; v1 은 model-frozen-13ac483) 에서
+  모델은 GitHub Release(환경변수 FROZEN_TAG, 기본 v2.1 model-frozen-v2.1-217260e) 에서
   워크플로가 내려받는다.
 - 회귀 current 가 ensemble_v2(v2 운영 모델)이면 as-of 피처 행에 상류 피처 5열을 붙여 예측한다
   (추가 수집 없음 — 이번에 모은 5지점 조류 자료를 행의 기준일까지 잘라 계산). v1 이면 동작이 이전과 같다.
@@ -45,8 +45,8 @@ from algaecast.predict.asof import (
 
 log = logging.getLogger("daily")
 LOG_DIR = ROOT / "logs"
-# 동결 모델 Release 태그(워크플로 env FROZEN_TAG). 2026-10-22 v2 동결(커밋 9dca86c) 뒤 기본값을 v2 로 바꿨다.
-FROZEN_TAG = os.environ.get("FROZEN_TAG", "model-frozen-v2-9dca86c")
+# 동결 모델 Release 태그(워크플로 env FROZEN_TAG). 2026-10-23 v2.1(누수 수정판, 커밋 217260e)로 기본값 변경.
+FROZEN_TAG = os.environ.get("FROZEN_TAG", "model-frozen-v2.1-217260e")
 
 
 def verify_frozen() -> None:

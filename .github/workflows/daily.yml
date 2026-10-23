@@ -27,11 +27,11 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # 동결 모델 Release 태그(기본값). 현재 v2 = model-frozen-v2-9dca86c (2026-10-22 v2 동결 커밋 9dca86c).
-  #   v1 = model-frozen-13ac483 (Release 유지). 자산 이름 규칙은 v1·v2 공통 models-frozen-*.tar.gz.
-  #   v2 자산(models-frozen-v2-9dca86c.tar.gz)은 registry.json·FROZEN.md·FROZEN_v2.md 와 v1 회귀·v2 회귀·
-  #   v1 분류기·v1 분위 디렉터리를 모두 담는다. verify_frozen.py 가 두 동결 문서를 모두 검증한다.
-  FROZEN_TAG: ${{ github.event.inputs.frozen_tag || 'model-frozen-v2-9dca86c' }}
+  # 동결 모델 Release 태그(기본값). 현재 v2.1 = model-frozen-v2.1-217260e (2026-10-23 데이터 유래 상수 누수 수정판,
+  #   동결 커밋 217260e, models/FROZEN_v2.1.md). 이전: v2 = model-frozen-v2-9dca86c, v1 = model-frozen-13ac483 (Release 유지).
+  #   v2.1 자산은 registry.json·FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md 와 그 문서들이 가리키는 회귀·분류기·분위
+  #   디렉터리를 모두 담는다. verify_frozen.py 가 세 동결 문서를 모두 검증한다.
+  FROZEN_TAG: ${{ github.event.inputs.frozen_tag || 'model-frozen-v2.1-217260e' }}
 
 jobs:
   forecast:
