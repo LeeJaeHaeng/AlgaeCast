@@ -10,7 +10,7 @@ const AX_LO = 2;
 const AX_HI = 6;
 export const axisPct = (v: number | null | undefined) => (v == null ? null : Math.max(0, Math.min(100, ((Math.log10(Math.max(v, 1) + 1) - AX_LO) / (AX_HI - AX_LO)) * 100)));
 
-/** 예상 범위 막대: q10~q90 범위 + 예상값(v2 한 값) 점 + 1천·1만·10만 기준선(라벨 포함). 점이 범위 밖이어도 그대로 찍는다 */
+/** 예상 범위 막대: q10~q90 범위 + 예상값(v2.1 한 값) 점 + 1천·1만·10만 기준선(라벨 포함). 점이 범위 밖이어도 그대로 찍는다 */
 export function RangeBar({ q10, point, q90, color, height = 10 }: { q10: number | null; point: number | null; q90: number | null; color: string; height?: number }) {
   const lo = axisPct(q10);
   const hi = axisPct(q90);
@@ -32,7 +32,7 @@ export function RangeBar({ q10, point, q90, color, height = 10 }: { q10: number 
   );
 }
 
-/** 지점 현황 타일: 지점명+조합 라벨+공식 발령 칩 / 현재 측정 → 예상값(v2 한 값, 32px) / 예상 범위 막대 / 1만 넘을 가능성. q50 은 전문가 보기에만 */
+/** 지점 현황 타일: 지점명+조합 라벨+공식 발령 칩 / 현재 측정 → 예상값(v2.1 한 값, 32px) / 예상 범위 막대 / 1만 넘을 가능성. q50 은 전문가 보기에만 */
 export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: boolean; rank: number; today: string }) {
   const t = tierOf(s.tier);
   const combo = comboOf(s.latest_alert_level, t);

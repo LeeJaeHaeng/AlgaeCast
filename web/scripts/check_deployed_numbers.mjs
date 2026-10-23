@@ -37,8 +37,8 @@ const checks = [
   // 2026 점예측 포착(v2.1·v2·v1·v1-fix)
   ["/performance", `${val("p26point", "total")}건 중 ${val("p26point", "v21")}건`],
   ["/performance", `${val("p26point", "total")}건 중 ${val("p26point", "v1")}건`],
-  // 2020~2025 감시 포착 v2.1·수정 전
-  ["/performance", `v2.1 ${val("priorWatch", "v21")}건(수정 전 ${val("priorWatch", "before")}건)`],
+  // 2020~2025 감시 포착 v2.1
+  ["/performance", `경계 사건 ${val("priorWatch", "total")}건 중 ${val("priorWatch", "v21")}건을 주의 관찰 단계로 미리 알렸습니다`],
   // 고지문·누수 안내·동결 커밋
   ["/performance", "수정본(v2.1·v1-fix)의 2026 은 블라인드가 아니다"],
   ["/performance", "2026년 자료까지 포함한 전 기간으로 계산돼 있었음을 발견"],

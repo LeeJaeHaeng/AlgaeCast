@@ -133,6 +133,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
           <h2 className="text-lg font-semibold">{PERF.expertTitle}</h2>
           <Section file="tbl_holdout_2025_v21.md" title="2025 홀드아웃·CV — v2.1 vs 수정 전 v2·v1(영향표), 같은 252행" pick={[0, 1, 2]} />
           <Section file="tbl_holdout_2026_posthoc_v21.md" title="2026 사후 — v2.1 · v2 · v1 · v1-fix (전체·리드타임·사건별·전환 분해)" pick={[0, 1, 2, 3, 4]} notice={V21_NOTICE} />
+          <Section file="tbl_holdout_2026_posthoc_v21_detail.md" title="2026 사후 세부(v2.1) — 지점별 · 관심(1천) 리드타임 · 강정·고령 5월" pick={[0, 1, 2, 3]} notice={V21_NOTICE} />
           <Section file="tbl_holdout_2025.md" title="2025 홀드아웃(v2.1 OOF) — 전 지표 + 부트스트랩 95% CI" pick={[0, 1]} />
           <Section file="tbl_transitions.md" title="상태 전환 구간 평가" pick={[0, 1]} maxRows={20} />
           <Section file="tbl_leadtime.md" title="리드타임 (2020~2025)" pick={[0, 1]} />
@@ -220,7 +221,7 @@ function CompareModels({ expert }: { expert: boolean }) {
         <CompareTable title={C.y2026(p26v21.n)} rows={rows26} expert={expert} notice={V21_NOTICE} />
       </div>
       <ul className="space-y-1 text-sm leading-relaxed">
-        <li style={{ color: "var(--safe)" }}>{C.prior(priorWatch.v21, priorWatch.before, priorWatch.total)}</li>
+        <li style={{ color: "var(--safe)" }}>{C.prior(priorWatch.v21, priorWatch.total)}</li>
         <li>{C.v1fix(n2(h25v1fix.r2raw), n2(p26v1fix.r2raw), n2(p26v1fix.f1_10k), p26point.v1fix, p26point.total)}</li>
         <li style={{ color: "var(--severe)" }}>{C.weak(n2(p26v21.r2raw), n2(h25v21.f1_10k), n2(h25b0.f1_10k), n2(p26v21.f1_10k), n2(p26b0.f1_10k))}</li>
         <li className="text-dim">{C.cv(n2(cvR2raw.v21), n2(cvR2raw.v2), n2(cvR2raw.v1), n2(cvR2raw.b0))}</li>

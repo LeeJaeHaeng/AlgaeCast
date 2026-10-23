@@ -2,7 +2,7 @@
 // 제출·운영 모델 = v2.1(데이터 유래 상수 누수 수정판, models/FROZEN_v2.1.md). v1·v2 는 수정 전 이력.
 // 원천: tbl_leadtime.md(2020~2025, v2.1 OOF, q90≥임계·B0), tbl_holdout_2026_posthoc_v21.md(2026 v2.1·v2·v1·v1-fix·B0),
 //   tbl_holdout_2025_v21.md(2025 같은 252행 v2.1·v1-fix·B0 + 수정 전 v2·v1), headline_metrics.json(전체 정밀도),
-//   reports/experiments/FIX-v2.1/baseline_v2/tbl_leadtime.md(수정 전 2020~2025 감시 포착), models/FROZEN*.md, config/model.yaml(운영점).
+//   models/FROZEN*.md, config/model.yaml(운영점), config/derived_constants.json(수온 기준), tbl_holdout_2026_posthoc_v21_detail.md(한계 문구).
 // 지표 값은 headline_metrics.json 의 전체 정밀도 값에서 한 번만 반올림해 대조하고(이중 반올림 금지), md 표(셋째 자리)와 그 JSON 이 일치하는지도 확인한다.
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -57,7 +57,6 @@ const leadTables = (md) => {
   return { q90: findRow(sum, "q90≥임계"), b0: findRow(sum, "B0"), leads: det.rows.filter((r) => r[0] === "q90≥임계").map((r) => num(r[col(det, "리드(E) 일")])) };
 };
 const LT = leadTables(read("tbl_leadtime.md"));
-const LT0 = leadTables(readFileSync(resolve(root, "reports", "experiments", "FIX-v2.1", "baseline_v2", "tbl_leadtime.md"), "utf-8"));
 const p26md = read("tbl_holdout_2026_posthoc_v21.md");
 const p26 = tables(p26md);
 const p26all = p26[0];
@@ -82,7 +81,6 @@ for (const [k, label] of [["events", "합계"], ["y2026", "2026"], ["prior", "20
   checks.push([`${label} 지속성 선행 탐지`, N[k].b0, S[k].b0]);
 }
 checks.push(["2020~25 감시 포착 v2.1(priorWatch)", pick("priorWatch", "v21"), S.prior.detected]);
-checks.push(["2020~25 감시 포착 수정 전(priorWatch)", pick("priorWatch", "before"), num(LT0.q90[2])]);
 checks.push(["2020~25 사건 수(priorWatch)", pick("priorWatch", "total"), S.prior.total]);
 
 // ── 헤드라인 지표(v2.1: 2025 같은 252행 · 2026 test 124) ───────────
@@ -175,6 +173,16 @@ const NOTICE = "수정본(v2.1·v1-fix)의 2026 은 블라인드가 아니다: �
   const op = num(myaml.match(/operating_point:[\s\S]*?threshold:\s*(-?[\d.]+)/)?.[1]);
   checks.push(["운영점 threshold = config/model.yaml", num(src.match(/OPERATING_POINT = \{[^}]*threshold:\s*([\d.]+)/)?.[1]), op]);
   checks.push(["운영점 비용비 = config/model.yaml", num(src.match(/OPERATING_POINT = \{[^}]*costRatio:\s*(\d+)/)?.[1]), num(myaml.match(/operating_point:[\s\S]*?cost_ratio:\s*(\d+)/)?.[1])]);
+}
+// 이 시스템은 — 한계: 강정·고령 2026-05 사건의 관심(1천) 감시 점등 값 = 2026 사후 세부 표(v2.1)의 2026-04-20 q90_cqr
+{
+  const det = read("tbl_holdout_2026_posthoc_v21_detail.md");
+  const t = tables(det).find((x) => x.header.includes("q90_cqr") && x.header.includes("base_date"));
+  const r = t?.rows.find((row) => row[0].startsWith("2026-04-20"));
+  const v = r ? Math.round(num(r[t.header.indexOf("q90_cqr")])) : NaN;
+  const copySrc = readFileSync(resolve(process.cwd(), "src/lib/copy.ts"), "utf-8");
+  const m = copySrc.match(/4월 20일 기준일에 예상 범위 위쪽이 ([\d,]+) 개\/mL/);
+  checks.push(["한계 문구 강정·고령 4/20 예상 범위 위쪽(개/mL)", m ? Number(m[1].replace(/,/g, "")) : NaN, v]);
 }
 // 녹조 이야기 ② 지점별 수온 기준 = config/derived_constants.json 최종(≤2025) 임계 — 모델 피처와 같은 값
 {

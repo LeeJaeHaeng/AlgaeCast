@@ -48,8 +48,8 @@ export const CMP = {
   /** 2026 경계 사건 8건 — 점예측이 1만 이상을 미리 낸 사건 수, 감시 단계 선행 탐지 */
   p26point: { total: 8, v21: 5, v2: 5, v1: 2, v1fix: 2, persistence: 2 },
   p26watch: { total: 8, v21: 7, v2: 7, v1: 7, medianLeadV21: 21, medianLeadV2: 21, medianLeadV1: 21 },
-  /** 2020~2025 경계 사건 20건 감시 포착 — v2.1(수정 피처 OOF) vs 수정 전 */
-  priorWatch: { total: 20, v21: 17, before: 18 },
+  /** 2020~2025 경계 사건 20건 감시 포착 — v2.1(수정 피처 OOF) */
+  priorWatch: { total: 20, v21: 17 },
 } as const;
 
 export const HEADLINE = `2025년까지 자료로만 만든 모델(v2.1)로 2026년 경계 사건 ${NUMBERS.y2026.total}건 중 ${NUMBERS.y2026.detected}건을 중앙 ${NUMBERS.y2026.medianLeadDays}일 앞서 감시 단계로 포착(지속성 ${NUMBERS.y2026.persistenceDetected}건). 2020~2026 합계 ${NUMBERS.events.total}건 중 ${NUMBERS.events.detected}건(${Math.round((NUMBERS.events.detected / NUMBERS.events.total) * 100)}%, 중앙 ${NUMBERS.events.medianLeadDays}일 앞서), 지속성 ${NUMBERS.events.persistenceDetected}건.`;

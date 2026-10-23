@@ -293,7 +293,7 @@ export const PERF = {
     },
     count: (hit: number, total: number) => `${total}건 중 ${hit}건`,
     countLead: (hit: number, total: number, med: number) => `${total}건 중 ${hit}건 (${med}일)`,
-    prior: (v21: number, before: number, n: number) => `2020~2025년 경계 사건 ${n}건을 주의 관찰 단계로 미리 알린 수: v2.1 ${v21}건(수정 전 ${before}건). 이 차이 때문에 2020~2026년 합계가 수정 전 25건에서 ${NUMBERS.events.detected}건으로 바뀌었습니다.`,
+    prior: (v21: number, n: number) => `2020~2025년 경계 사건 ${n}건 중 ${v21}건을 주의 관찰 단계로 미리 알렸습니다(v2.1). 2026년 ${NUMBERS.y2026.total}건을 더한 2020~2026년 합계는 ${NUMBERS.events.total}건 중 ${NUMBERS.events.detected}건입니다.`,
     cv: (a: string, b: string, c: string, d: string) => `2020~2024년 연도별 교차검증(통합) 원단위 결정계수: v2.1 ${a} · 수정 전 v2 ${b} · v1 ${c} · 지난주 값 그대로 ${d}. 결합 가중치를 이 자료로 정했으므로 같은 자료에서 잰 값입니다.`,
     v1fix: (r25: string, r26: string, f26: string, p: number, n: number) => `v1 구성을 같은 규칙으로 고친 v1-fix(민감도 확인용): 2025년 원단위 결정계수 ${r25}, 2026년 ${r26} · 경계 여부 맞히기 2026년 ${f26} · 한 값 예측이 1만 넘는 사건을 미리 잡은 수 ${n}건 중 ${p}건. 주의 관찰·넘을 가능성은 v2.1과 같은 모델이라 결과도 같습니다.`,
     weak: (r26: string, f25: string, b25: string, f26: string, b26: string) => `약한 점: 2026년 원단위 결정계수는 v2.1도 ${r26}에 그쳐 봉우리 높이는 여전히 못 맞힙니다. 경계 여부 맞히기는 지난주 값 그대로 쓰는 방법보다 조금 낮습니다(2025년 ${f25} 대 ${b25}, 2026년 ${f26} 대 ${b26}).`,
@@ -330,7 +330,7 @@ export const INSIGHTS = {
     body: "물 온도와 녹조 농도는 함께 움직입니다(로그 기준 상관 0.72). 다만 관심 수준(1천 개/mL)에 이르는 물 온도는 지점마다 달라서, 회남은 20.7℃에서 이미 시작하고 해평은 25.8℃가 돼야 시작합니다(2025년까지 측정). 그래서 이 시스템은 지점마다 다른 기준 온도를 특징으로 넣습니다. 이 기준 온도는 학습 기간 측정으로만 계산합니다.",
     rows: [["회남", 20.7], ["물금·매리", 22.8], ["칠서", 23.3], ["강정·고령", 24.0], ["해평", 25.8]] as [string, number][],
     unit: "관심 수준에 이르는 물 온도(℃, 2025년까지 측정)",
-    expert: "LOESS 적합이 1,000 cells/mL 와 만나는 수온(T2 S6). Kruskal-Wallis H=175, p=7.3e-37. 수온–log 세포수 Spearman 0.74(Pearson 0.72), 기온 이동평균 7일과 수온 Spearman 0.92.",
+    expert: "LOESS 적합이 1,000 cells/mL 와 만나는 수온(T2 S6, 측정 ≤2025 — 모델 피처 임계와 같은 값, config/derived_constants.json). Kruskal-Wallis(2012~2026 전 기간) H=175, p=7.3e-37. 수온–log 세포수 Spearman 0.74(Pearson 0.72), 기온 이동평균 7일과 수온 Spearman 0.92.",
   },
   sites: {
     title: "③ 같은 강이라도 지점마다 다르게 움직입니다",
@@ -371,7 +371,7 @@ export const ABOUT = {
   limits: [
     `올해(2026년) 성적은 지난해보다 낮습니다. 로그 기준 설명력 ${n2(NUMBERS.r2log.y2025)} → ${n2(NUMBERS.r2log.y2026)}※, 예상 범위 적중률 ${n2(NUMBERS.picp80.y2025)} → ${n2(NUMBERS.picp80.y2026)}※. 이례적으로 이른 발생 같은 새로운 패턴이 섞여 있습니다.`,
     LEAK_NOTE,
-    "강정·고령의 2026년 5월 18일 이례적 조기 관심 발령은 미리 알리지 못했습니다(첫 초과 당일에야 주의 관찰). 봄철 자료가 학습 구간에 거의 없었기 때문입니다.",
+    "강정·고령의 2026년 5월 18일 이례적 조기 관심 발령은 안정적으로 미리 알리지 못했습니다. 관심(1천) 기준으로는 4월 20일 기준일에 예상 범위 위쪽이 1,008 개/mL로 기준을 겨우 넘었다가 다음 두 주는 다시 내려갔고, 화면의 '주의 관찰'(1만 기준)은 발령 당일에야 켜졌습니다. 봄철 자료가 학습 구간에 거의 없었기 때문입니다.",
     `원래 목표였던 원단위 결정계수 0.6 · 효율계수 0.5는 이루지 못했습니다(v2.1 2025년 ${n2(NUMBERS.r2raw.y2025)}, 2026년 ${n2(NUMBERS.r2raw.y2026)}※). 봉우리 높이를 맞히는 데 약합니다.`,
     "CCTV 영상이나 위성 사진은 아직 쓰지 않습니다. 주 1~2회 측정 사이의 변화를 보려면 다음 단계에서 필요합니다.",
   ],
@@ -389,7 +389,7 @@ export const ABOUT = {
     rows: [
       ["고정 시각", `${V21_FROZEN} (커밋 ${MODELS.v21meta.commit})`, `${V2_FROZEN} (커밋 ${MODELS.v2meta.commit})`, `${V1_SEALED} (커밋 ${MODELS.v1meta.commit})`],
       ["예상값 = 한 값 예측 (화면의 큰 숫자 · 대회 제출값)", `세 가지 예측 + 녹조 종류별 예측의 가중 평균 · 특징 ${MODELS.v21meta.features}가지 · 가중치 ${MODELS.v21weights.c1.toFixed(3)} · ${MODELS.v21weights.c3.toFixed(3)} · ${MODELS.v21weights.c2.toFixed(3)} · ${MODELS.v21weights.cg.toFixed(3)}`, `같은 구성 · 특징 ${MODELS.v2meta.features}가지`, `세 가지 예측의 가중 평균 · 특징 ${MODELS.v1meta.features}가지`],
-      ["예상 범위 · 넘을 가능성 · 단계", `수정 피처로 다시 적합(운영점 ${OP_PCT}%)`, "v1 봉인본(운영점 52%)", "v1 봉인본(운영점 52%)"],
+      ["예상 범위 · 넘을 가능성 · 단계", `수정 피처로 다시 적합(운영점 ${OP_PCT}%)`, "v1 봉인본의 분류기·분위(이력)", "v1 봉인본의 분류기·분위(이력)"],
       ["데이터로 계산한 상수", "기준일까지 또는 학습 기간 자료만", "일부가 2026년까지 전 기간", "일부가 2026년까지 전 기간"],
       ["2026년 경계 사건 미리 알림(주의 관찰)", `${CMP.p26watch.total}건 중 ${CMP.p26watch.v21}건 (중앙 ${CMP.p26watch.medianLeadV21}일)※`, `${CMP.p26watch.total}건 중 ${CMP.p26watch.v2}건`, `${CMP.p26watch.total}건 중 ${CMP.p26watch.v1}건(봉인 당시 상수 일부에 2026 자료 포함)`],
       ["2026년 한 값 예측이 1만 넘는 사건을 미리 잡은 수", `${CMP.p26point.total}건 중 ${CMP.p26point.v21}건※`, `${CMP.p26point.total}건 중 ${CMP.p26point.v2}건`, `${CMP.p26point.total}건 중 ${CMP.p26point.v1}건`],
