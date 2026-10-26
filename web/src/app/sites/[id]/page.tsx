@@ -1,11 +1,13 @@
 import { notFound } from "next/navigation";
 import { Info } from "@/components/Info";
 import { PageFrame } from "@/components/PageFrame";
+import { ReplayBand, ReplayNotice } from "@/components/control/ReplayBand";
 import { RangeBar } from "@/components/control/SiteTile";
-import { BigChart, EnvChart } from "@/components/site/SiteCharts";
-import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, SITE, TERMS, TIER, TIER_EXPERT, UPSTREAM_PREFIX, comboOf, explainForecast, levelOfCells, outOfRange, outOfRangeTip, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
+import { BigChart, EnvChart, type SeriesPoint } from "@/components/site/SiteCharts";
+import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, REPLAY, SITE, TERMS, TIER, TIER_EXPERT, UPSTREAM_PREFIX, comboOf, explainForecast, levelOfCells, outOfRange, outOfRangeTip, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
 import { ALERT_LEVEL_LABEL, addDays, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
-import { getBloomEvents, getHydro, getLatestRun, getObservations, getPredictions, getShap, getSiteStatus, getSites, getWeather } from "@/lib/queries";
+import { getBloomEvents, getHydro, getLatestRun, getObservations, getObservationsAfter, getPredictions, getReplayBounds, getReplayRun, getShap, getSiteStatus, getSites, getWeather, type Observation, type Shap } from "@/lib/queries";
+import { addDaysISO, buildStatusAsOf, eventsAsOf, fillActualAsOf, mergeSameDate, obsAsOf, predsAsOf, replayMinOf, replayQuery, replayState, type Replay } from "@/lib/replay";
 import { OP_PCT } from "@/lib/numbers";
 
 export const revalidate = 300;
@@ -19,12 +21,35 @@ const GROUPS: FeatureGroup[] = ["ar", "water", "hydro", "weather", "forecast", "
 export default async function SitePage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string | undefined>> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const expert = sp.view === "expert";
-  const [sites, status, run] = await Promise.all([getSites(), getSiteStatus(), getLatestRun()]);
+  // 다시 보기(?asof=YYYY-MM-DD): 그날까지의 관측·그날 기준 예측만(쿼리 단계에서 거름). 틀리거나 범위 밖이면 현재 화면 + 한 줄 안내
+  const wantsReplay = sp.asof !== undefined && sp.asof !== "";
+  // 다시 보기는 고정한 run(REPLAY_RUN_ID, 없으면 최신 run)의 지난 예상값을 쓴다. 날짜가 틀려 현재 화면을 보일 때는 최신 run
+  const [sites, status0, latestRun, replayRun] = await Promise.all([getSites(), wantsReplay ? Promise.resolve(null) : getSiteStatus(), getLatestRun(), wantsReplay ? getReplayRun() : Promise.resolve(null)]);
+  const bounds = wantsReplay ? await getReplayBounds(replayRun?.run_id ?? null) : null;
+  const rstate = bounds ? replayState(sp.asof, bounds) : "none";
+  const replay: Replay | null = bounds && rstate === "ok" ? { asof: sp.asof as string, after: sp.after === "1" } : null;
+  const run = replay ? replayRun : latestRun;
+  const notice = bounds && (rstate === "bad" || rstate === "range") ? REPLAY.notice(replayMinOf(bounds), bounds.max ?? "–") : null;
+  const asof = replay?.asof;
   const site = sites.find((s) => s.site_id === id);
   if (!site) notFound();
-  const st = status.find((s) => s.site_id === id);
-  const [obs, preds, shap, events, hydro, weather] = await Promise.all([getObservations(id, 365), getPredictions(id, run?.run_id ?? null, 400), getShap(id, run?.run_id ?? null), getBloomEvents(id), getHydro(id, 180), getWeather(id, 180)]);
-  const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+  const status = status0 ?? (replay ? [] : await getSiteStatus());
+  const [obs, predsQ, shap0, eventsQ, hydro, weather] = await Promise.all([getObservations(id, 365, asof), getPredictions(id, run?.run_id ?? null, 400, asof), replay ? Promise.resolve([] as Shap[]) : getShap(id, run?.run_id ?? null), getBloomEvents(id, asof), getHydro(id, 180, asof), getWeather(id, 180, asof)]);
+  // 다시 보기: 예측 행의 실측은 목표일 ≤ asof 만(비어 있으면 그날까지의 목표일 관측으로 채움), 사건은 공식 발령일 ≤ asof 만, 지점 상태는 그날 기준으로 다시 만든다
+  const preds = replay ? fillActualAsOf(predsAsOf(predsQ, replay.asof), obs, replay.asof) : predsQ;
+  const events = replay ? eventsAsOf(eventsQ, replay.asof) : eventsQ;
+  const st = replay
+    ? buildStatusAsOf(
+        [site],
+        preds.map((p) => ({ ...p, site_id: id })),
+        obsAsOf(obs, replay.asof).map((o) => ({ site_id: id, obs_date: o.obs_date, cell_count: o.cell_count, alert_level: o.alert_level, water_temp: o.water_temp })),
+        replay.asof,
+      )[0]
+    : status.find((s) => s.site_id === id);
+  const shap = replay ? await getShap(id, run?.run_id ?? null, st?.base_date ?? null) : shap0;
+  const afterObs: Observation[] = replay?.after ? await getObservationsAfter(id, replay.asof) : [];
+  const today = replay ? replay.asof : new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+  const rq = replay ? replayQuery({ replay, expert }) : undefined;
   const fmt = expert ? fmtCells : fmtCellsKo;
   const t = tierOf(st?.tier);
   const combo = comboOf(st?.latest_alert_level, t);
@@ -39,7 +64,21 @@ export default async function SitePage({ params, searchParams }: { params: Promi
   // 큰 차트: 1년 측정 + 지난 예상값(회색) + 이번 예상값(파란 점·띠)
   const latest = preds.at(-1);
   const pastByTarget = new Map(preds.filter((x) => x.target_date !== latest?.target_date).map((x) => [x.target_date, x.pred_cell_count]));
-  const pts = [...obs.map((o) => ({ date: o.obs_date, obs: o.cell_count, past_pred: pastByTarget.get(o.obs_date) ?? null })), ...(latest ? [-2, 0, 2].map((d) => ({ date: addDays(latest.target_date, d).toISOString().slice(0, 10), obs: null, pred: d === 0 ? latest.pred_cell_count : null, lo: latest.q10_cqr, hi: latest.q90_cqr })) : [])].sort((a, b) => a.date.localeCompare(b.date));
+  // 다시 보기: 범위 띠의 앞뒤 2일 여백 점은 차트(BigChart bandPad)가 브라우저에서 만든다 — 서버가 보내는 자료에는 목표일 하나만(그날 뒤 날짜를 싣지 않음)
+  const pts0 = [...obs.map((o) => ({ date: o.obs_date, obs: o.cell_count, past_pred: pastByTarget.get(o.obs_date) ?? null })), ...(latest ? (replay ? [0] : [-2, 0, 2]).map((d) => ({ date: addDays(latest.target_date, d).toISOString().slice(0, 10), obs: null, pred: d === 0 ? latest.pred_cell_count : null, lo: latest.q10_cqr, hi: latest.q90_cqr })) : [])].sort((a, b) => a.date.localeCompare(b.date));
+  // 다시 보기: 그날 세로선 자리(그날 측정이 없으면 빈 점) + '그 뒤 실제로는' 실측(asof 뒤 21일, 켰을 때만)
+  const pts: SeriesPoint[] = replay ? [...pts0] : pts0;
+  if (replay) {
+    if (!pts.some((p) => p.date === replay.asof)) pts.push({ date: replay.asof, obs: null, past_pred: null });
+    // 값이 없는 측정 행(세포수 비어 있음)은 그릴 것이 없어 싣지 않는다(그날 뒤 날짜만 담긴 빈 점을 보내지 않게)
+    for (const a of afterObs.filter((x) => x.cell_count != null)) {
+      const i = pts.findIndex((p) => p.date === a.obs_date);
+      if (i >= 0) pts[i] = { ...pts[i], actual: a.cell_count };
+      else pts.push({ date: a.obs_date, past_pred: null, actual: a.cell_count });
+    }
+    // 같은 날짜 점 합치기(목표일 ≤ 그날이고 그 날 측정이 있으면 날짜가 겹쳐 그날 세로선이 사라지던 문제)
+    pts.splice(0, pts.length, ...mergeSameDate(pts));
+  }
 
   // 왜 이렇게 예상했나: 그룹별 기여 합 → 상위 3개 → §8.1 템플릿
   const byGroup = new Map<FeatureGroup, number>();
@@ -48,7 +87,8 @@ export default async function SitePage({ params, searchParams }: { params: Promi
     const g = (s.feature_name.startsWith(UPSTREAM_PREFIX) ? "upstream" : GROUPS.includes(s.feature_group as FeatureGroup) ? s.feature_group : "time_site") as FeatureGroup;
     byGroup.set(g, (byGroup.get(g) ?? 0) + (s.shap_value ?? 0));
   }
-  const hotDays = obs.filter((o) => o.obs_date >= new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10) && (o.water_temp ?? 0) >= 25).length;
+  const d30 = replay ? addDaysISO(replay.asof, -30) : new Date(Date.now() - 30 * 86_400_000).toISOString().slice(0, 10);
+  const hotDays = obs.filter((o) => o.obs_date >= d30 && (o.water_temp ?? 0) >= 25).length;
   const reasons = [...byGroup.entries()]
     .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
     .slice(0, 3)
@@ -61,14 +101,21 @@ export default async function SitePage({ params, searchParams }: { params: Promi
 
   const plain = explainForecast(point, st?.q90_cqr, p, fmt);
 
-  const wtData = obs.filter((o) => o.obs_date >= new Date(Date.now() - 180 * 86_400_000).toISOString().slice(0, 10)).map((o) => ({ date: o.obs_date, wt: o.water_temp }));
+  const d180 = replay ? addDaysISO(replay.asof, -180) : new Date(Date.now() - 180 * 86_400_000).toISOString().slice(0, 10);
+  const wtData = obs.filter((o) => o.obs_date >= d180).map((o) => ({ date: o.obs_date, wt: o.water_temp }));
   const hydroData = hydro.map((h) => ({ date: h.obs_date, inflow: h.inflow_cms, outflow: h.outflow_cms, rain: h.rainfall_mm }));
   const wxData = weather.map((w) => ({ date: w.obs_date, ta: w.ta_mean, rn: w.rn_sum }));
 
   return (
     // 글꼴 폴백 크기 보정(globals.css .fit-fallback-font): Pretendard 교체 때 아래 묶음이 밀리던 CLS 방지
     // .site-detail: 좁은 화면(≤767px) 가로 넘침 방지 규칙의 범위(globals.css), 768px 이상에는 적용되는 스타일 없음
-    <PageFrame title="" expert={expert} back={{ href: "/", label: SITE.back }} className="fit-fallback-font site-detail">
+    <PageFrame
+      title=""
+      expert={expert}
+      back={{ href: "/", label: SITE.back }}
+      className="fit-fallback-font site-detail"
+      {...(replay ? { top: <ReplayBand replay={replay} path={`/sites/${id}`} expert={expert} />, homeQuery: rq, expertHref: `/sites/${id}${replayQuery({ replay, expert: !expert })}` } : notice ? { top: <ReplayNotice text={notice} /> } : {})}
+    >
       {/* 머리: 지점 · 조합 라벨 · 공식/AI · 날짜 */}
       <header className="panel flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3" style={combo === "enter" ? { boxShadow: `inset 0 0 0 1px ${c.color}` } : undefined}>
         <h1 className="text-3xl font-bold">{site.name}</h1>
@@ -94,12 +141,15 @@ export default async function SitePage({ params, searchParams }: { params: Promi
         <section className="panel p-3">
           <div className="flex items-baseline justify-between">
             <h2 className="text-lg font-semibold">{SITE.chart.title}</h2>
-            <span className="text-xs text-dim">{SITE.chart.legend} · 회색 작은 점 = {SITE.chartLow}</span>
+            <span className="text-xs text-dim">
+              {SITE.chart.legend} · 회색 작은 점 = {SITE.chartLow}
+              {replay?.after && <span style={{ color: "var(--after)" }}> · {REPLAY.legendAfter}</span>}
+            </span>
           </div>
-          <BigChart points={pts} height={360} />
+          <BigChart points={pts} height={360} {...(replay ? { asof: replay.asof, bandPad: 2 } : {})} />
         </section>
-        {/* 앞으로 7일 */}
-        <section className="panel flex flex-col gap-3 p-4">
+        {/* 앞으로 7일 — data-replay-forecast(다시 보기에서만): 예측 목표일이 글자로 보이는 유일한 구역(scripts/check_asof.mjs 가 구역별로 검사) */}
+        <section className="panel flex flex-col gap-3 p-4" data-replay-forecast={replay?.asof}>
           <h2 className="text-lg font-semibold">{SITE.forecastBox}</h2>
           <div>
             <div className="flex items-center text-sm text-dim">
@@ -181,7 +231,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
                 </span>
               </li>
             ))}
-            {!reasons.length && <li className="text-sm text-dim">근거 자료가 아직 없습니다.</li>}
+            {!reasons.length && <li className="text-sm text-dim">{replay ? REPLAY.noShap : "근거 자료가 아직 없습니다."}</li>}
           </ol>
           {expert && shap.length > 0 && (
             <table className="tbl mt-3 text-xs">
@@ -207,8 +257,8 @@ export default async function SitePage({ params, searchParams }: { params: Promi
           )}
         </section>
 
-        {/* 지난 녹조 발생 기록과 미리 알림 */}
-        <section className="panel p-4">
+        {/* 지난 녹조 발생 기록과 미리 알림 — data-replay-history(다시 보기에서만): 이 구역의 날짜는 모두 그날 이하여야 한다(scripts/check_asof.mjs) */}
+        <section className="panel p-4" data-replay-history={replay?.asof}>
           <h2 className="flex items-center text-lg font-semibold">
             {SITE.historyBox}
             <Info term="leadTime" />

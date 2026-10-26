@@ -17,6 +17,10 @@
   --band: rgba(56, 189, 248, 0.25);
   --tile-num: 32px;
   --banner-font: 22px;
+  /* 다시 보기(?asof) 전용: 띠·진입 상자 테두리·'그날' 세로선(보라), '그 뒤 실제로는' 점선(분홍, rose-300) — 기본 화면에서는 쓰지 않음.
+     분홍은 차트의 측정(흰)·예상(파랑)·기준선(노랑·주황·빨강)·지난 예상(회색)·그날(보라)과 색각이상 시뮬레이션에서도 구별되는 색(ΔE≥8.5)으로 골랐다 */
+  --replay: #a78bfa;
+  --after: #fda4af;
 }
 /* 발표모드: 밝은 배경·고대비 (프로젝터) */
 :root[data-theme="light"] {
@@ -32,7 +36,10 @@
   --severe: #b91c1c;
   --line-obs: #0b1220;
   --band: rgba(3, 105, 161, 0.2);
+  --replay: #6d28d9;
+  --after: #db2777;
 }
+
 
 @theme inline {
   --color-bg: var(--bg);
@@ -223,6 +230,40 @@ a {
     overflow: hidden;
   }
 }
+/* 다시 보기(?asof)·날짜 안내: 맨 위에 띠 한 줄(auto)을 더한다. 기본 화면(.board 만)에는 적용되지 않음.
+   큰 화면(1600×900 이상)에서는 실시간 화면처럼 한 화면에 맞춘다(발표용 1920×1080 스크롤 없음, docs/12):
+   띠는 34px 한 줄, 그만큼 아래 지점 모니터 줄을 250 → 216px 로 줄인다 — 지점 타일 높이는 실시간 화면과 같게(타일 글자가 잘리지 않게).
+   같은 줄의 '향후 7일 날씨'(표 6줄 + 출처, 내용 267px)는 216px 줄에서 마지막 행·출처가 성적표 띠 뒤로 밀리므로
+   표 줄 위아래 여백(6 → 2px)과 패널 위아래 여백(12 → 8px)만 줄여 211px 로 맞춘다(글자 크기·열 그대로, 다시 보기 큰 화면에서만) */
+.board.board-replay {
+  grid-template-rows: auto 56px 48px auto minmax(40px, auto);
+}
+@media (min-width: 1600px) and (min-height: 900px) {
+  .board.board-replay {
+    grid-template-rows: 34px 56px 48px minmax(0, 1fr) minmax(40px, auto);
+  }
+  .board.board-replay > main {
+    grid-template-rows: minmax(0, 1fr) minmax(0, 216px);
+  }
+  .board.board-replay [data-weather-panel] {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .board.board-replay [data-weather-panel] .tbl th,
+  .board.board-replay [data-weather-panel] .tbl td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+}
+/* 성적표 띠 전문가 보기(.score-strip, 기본 메인): 전문가 글이 길어 320~341px 에서 문서가 가로로 넘치던 것(HEAD 부터) → 그 폭에서만 줄바꿈 허용.
+   342px 이상·쉽게 보기에는 적용되지 않음(화면 그대로) */
+@media (max-width: 341.98px) {
+  .score-strip {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 40px;
+  }
+}
 .scroll-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--panel-border) transparent;
@@ -267,5 +308,18 @@ a {
   .narrow-fit section > .tbl {
     display: block;
     overflow-x: auto;
+  }
+}
+/* 얼마나 잘 맞혔나 좁은 화면(≤767px) 가로 넘침 방지 — 768px 이상(태블릿·데스크톱)에는 적용되지 않음, 문구 그대로.
+   범위는 PageFrame className="perf-fit"(/performance)만.
+   '경계 사건을 미리 알린 비율' 막대 줄(.perf-bar)은 칸이 260px·막대·72px 고정이라 최소 356px 이 되어 360 폭에서 문서가 385px 로 넘쳤다
+   → 이름은 한 줄 전체, 그 아래 막대·비율 두 칸(minmax(0, 1fr) 72px), 설명도 한 줄 전체 */
+@media (max-width: 767px) {
+  .perf-fit .perf-bar {
+    grid-template-columns: minmax(0, 1fr) 72px;
+  }
+  .perf-fit .perf-bar > :first-child,
+  .perf-fit .perf-bar > :last-child {
+    grid-column: 1 / -1;
   }
 }

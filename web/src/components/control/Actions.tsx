@@ -10,21 +10,24 @@ function kstToday(): string {
   return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
 }
 
-/** 오늘의 조치 — 지점별 묶음, 지점당 2줄 + 더 보기. 체크 상태는 브라우저(localStorage)에 날짜별 저장 */
-export function Actions({ groups }: { groups: ActionGroup[] }) {
+/**
+ * 오늘의 조치 — 지점별 묶음, 지점당 2줄 + 더 보기. 체크 상태는 브라우저(localStorage)에 날짜별 저장.
+ * 다시 보기: storageDay("replay-YYYY-MM-DD")로 실시간 화면의 오늘 체크와 섞이지 않게, labels 로 '그날의 조치'.
+ */
+export function Actions({ groups, storageDay, labels }: { groups: ActionGroup[]; storageDay?: string; labels?: { title: string; reset: string; empty: string } }) {
   const [done, setDone] = useState<Record<string, boolean>>({});
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [day, setDay] = useState<string>("");
   const key = useMemo(() => `algaecast.actions.${day}`, [day]);
   useEffect(() => {
-    const d = kstToday();
+    const d = storageDay ?? kstToday();
     setDay(d);
     try {
       setDone(JSON.parse(localStorage.getItem(`algaecast.actions.${d}`) ?? "{}"));
     } catch {
       setDone({});
     }
-  }, []);
+  }, [storageDay]);
   const toggle = (id: string) => {
     const next = { ...done, [id]: !done[id] };
     setDone(next);
@@ -43,16 +46,16 @@ export function Actions({ groups }: { groups: ActionGroup[] }) {
   return (
     <section className="panel flex min-h-0 flex-col p-3" aria-label={BOARD.panels.actions}>
       <header className="mb-1 flex items-center justify-between">
-        <h2 className="panel-title">{BOARD.panels.actions}</h2>
+        <h2 className="panel-title">{labels?.title ?? BOARD.panels.actions}</h2>
         <span className="text-xs text-dim">
           {BOARD.actionsDone(n, all.length)}
           <button type="button" className="ml-2 underline opacity-70 hover:opacity-100" onClick={reset}>
-            {BOARD.actionsReset}
+            {labels?.reset ?? BOARD.actionsReset}
           </button>
         </span>
       </header>
       {all.length === 0 ? (
-        <p className="text-sm text-dim">{BOARD.actionsEmpty}</p>
+        <p className="text-sm text-dim">{labels?.empty ?? BOARD.actionsEmpty}</p>
       ) : (
         <ul className="scroll-thin min-h-0 flex-1 space-y-0.5 overflow-y-auto pr-1" style={{ scrollSnapType: "y proximity" }}>
           {groups.map((g) => {

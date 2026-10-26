@@ -33,7 +33,7 @@ export function RangeBar({ q10, point, q90, color, height = 10 }: { q10: number 
 }
 
 /** 지점 현황 타일: 지점명+조합 라벨+공식 발령 칩 / 현재 측정 → 예상값(v2.1 한 값, 32px) / 예상 범위 막대 / 1만 넘을 가능성. q50 은 전문가 보기에만 */
-export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: boolean; rank: number; today: string }) {
+export function SiteTile({ s, expert, rank, today, linkQuery }: { s: SiteStatus; expert: boolean; rank: number; today: string; linkQuery?: string }) {
   const t = tierOf(s.tier);
   const combo = comboOf(s.latest_alert_level, t);
   const c = COMBO[combo];
@@ -47,7 +47,7 @@ export function SiteTile({ s, expert, rank, today }: { s: SiteStatus; expert: bo
   const datesTip = `${TERMS.baseDate.label} ${fmtDateKo(s.base_date)} (${TERMS.baseDate.tip}) · ${BOARD.tile.measuredOn} ${fmtDateKo(s.latest_obs_date)} · ${BOARD.tile.ai} ${TIER[t].label}`;
   return (
     <Link
-      href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`}
+      href={`/sites/${s.site_id}${linkQuery ?? (expert ? "?view=expert" : "")}`}
       data-site={s.site_id}
       className="panel relative flex min-h-[132px] flex-1 flex-col justify-between gap-1 overflow-hidden px-3 py-1 pl-4 2xl:min-h-0 2xl:gap-0 transition-colors hover:border-[var(--accent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
       aria-label={`${s.name} ${c.label} (${rank}순위)`}

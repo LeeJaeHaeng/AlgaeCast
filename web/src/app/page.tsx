@@ -4,14 +4,16 @@ import { ControlMap } from "@/components/control/ControlMap";
 import { Escalation } from "@/components/control/Escalation";
 import { EventLog } from "@/components/control/EventLog";
 import { MiniChart } from "@/components/control/MiniChart";
-import { Banner, ScoreStrip, WeatherPanel } from "@/components/control/Panels";
+import { Banner, ReplayScoreStrip, ScoreStrip, WeatherPanel } from "@/components/control/Panels";
+import { ReplayBand, ReplayNotice } from "@/components/control/ReplayBand";
 import { SiteTile } from "@/components/control/SiteTile";
 import { TopBar, type Leds, type LedState } from "@/components/control/TopBar";
 import { unstable_cache } from "next/cache";
-import { BOARD, COMBO, comboOf } from "@/lib/copy";
+import { BOARD, COMBO, REPLAY, comboOf } from "@/lib/copy";
 import { toLogItems } from "@/lib/eventlog";
 import { fmtDateTimeKST, fmtTimeKST, tierOf } from "@/lib/format";
-import { getCollectStatus, getEventLog, getForecastAll, getLatestRunAny, getRecentObsAll, getSiteStatus, getSites } from "@/lib/queries";
+import { getCollectStatus, getEventLog, getForecastAll, getLatestRunAny, getObsAfterAll, getPredictionsAllAsOf, getRecentObsAll, getReplayBounds, getReplayRun, getReplayTierSeed, getSiteStatus, getSites, type ObsLite } from "@/lib/queries";
+import { REPLAY_RUN_ID, afterWindow, buildStatusAsOf, mergeLogAsOf, obsAsOf, replayMinOf, replayQuery, replayState, tierChangesAsOf, type Replay } from "@/lib/replay";
 
 export const revalidate = 300;
 
@@ -26,6 +28,27 @@ const getBoardData = unstable_cache(
   { revalidate: 60, tags: ["board-data"] },
 );
 
+/** 다시 보기 범위(다시 보기 run 의 2026 첫 기준일 ~ 마지막 기준일) — asof 파라미터가 있을 때만 부른다 */
+const getBounds = unstable_cache(async () => getReplayBounds((await getReplayRun())?.run_id ?? null), ["replay-bounds", REPLAY_RUN_ID], { revalidate: 300, tags: ["board-data"] });
+
+/**
+ * 다시 보기 자료: 관측은 관측일 ≤ asof, 예측은 기준일 ≤ asof 인 다시 보기 run(REPLAY_RUN_ID, 없으면 최신 run)의 지난 예상값(쿼리 단계에서 거름).
+ * '그 뒤 실제로는'(after)을 켰을 때만 asof 뒤 21일 관측을 따로 가져온다. 인자(asof, after)가 캐시 키에 들어간다.
+ * 상황 기록: 새 측정 기록은 뷰(v_event_log)에서, 예상 단계 변화는 같은 다시 보기 run 예측으로 만든다(타일·지도와 같은 run).
+ */
+const getReplayBoardData = unstable_cache(
+  async (asof: string, after: boolean) => {
+    const run = await getReplayRun();
+    const runId = run?.run_id ?? null;
+    const [sites, preds, seed, obs120, obsLog, fc, afterObs] = await Promise.all([getSites(), getPredictionsAllAsOf(runId, asof), getReplayTierSeed(runId), getRecentObsAll(120, asof), getEventLog(30, 80, asof), getForecastAll(asof), after ? getObsAfterAll(asof) : Promise.resolve([] as ObsLite[])]);
+    const status = buildStatusAsOf(sites, preds, obs120, asof);
+    const events = mergeLogAsOf(obsLog, tierChangesAsOf(preds, seed, sites, asof), asof, 30, 80);
+    return { status, sites, events, obs: obsAsOf(obs120, asof, 70), fc, afterObs };
+  },
+  ["board-replay", "log-from-run", REPLAY_RUN_ID],
+  { revalidate: 300, tags: ["board-data"] },
+);
+
 function age(h: number, iso: string | null): LedState {
   if (!iso) return "unknown";
   return Date.now() - new Date(iso).getTime() < h * 3600_000 ? "ok" : "stale";
@@ -34,10 +57,18 @@ function age(h: number, iso: string | null): LedState {
 export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const expert = sp.view === "expert";
+  // 다시 보기(?asof=YYYY-MM-DD): 허용 범위 안이면 그날 화면, 형식이 틀리거나 범위 밖이면 현재 화면 + 한 줄 안내
+  const bounds = sp.asof !== undefined && sp.asof !== "" ? await getBounds() : null;
+  const rstate = bounds ? replayState(sp.asof, bounds) : "none";
+  const replay: Replay | null = bounds && rstate === "ok" ? { asof: sp.asof as string, after: sp.after === "1" } : null;
+  const notice = bounds && (rstate === "bad" || rstate === "range") ? REPLAY.notice(replayMinOf(bounds), bounds.max ?? "–") : null;
   const dbOk = true; // 조회 실패 시 Next 가 오류 화면을 내므로 여기 도달하면 저장소 정상
-  const { status, sites, anyRun, events, obs, fc, collect } = await getBoardData();
-  const renderedAt = new Date().toISOString();
-  const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+  const { status, sites, anyRun, events, obs, fc, collect, afterObs } = replay
+    ? { ...(await getReplayBoardData(replay.asof, replay.after)), anyRun: null, collect: { fetched_at: null, obs_date: null } }
+    : { ...(await getBoardData()), afterObs: [] as ObsLite[] };
+  const renderedAt = replay ? replay.asof : new Date().toISOString();
+  const today = replay ? replay.asof : new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
+  const lq = replay ? replayQuery({ replay, expert }) : undefined; // 다시 보기 안 링크: asof 유지
   const nextRefresh = fmtTimeKST(new Date(Date.now() + 5 * 60_000));
 
   // 우선순위 = 공식 발령×AI 예상 조합 순위 → 가능성 내림차순 (가중치 없음, docs/07·docs/12 §8.4)
@@ -64,11 +95,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const rotation = ["/", ...ranked.map((s) => `/sites/${s.site_id}`)];
 
   return (
-    <div className="board">
+    <div className={replay || notice ? "board board-replay" : "board"}>
+      {replay && <ReplayBand replay={replay} path="/" expert={expert} />}
+      {notice && <ReplayNotice text={notice} />}
       <Suspense fallback={<div className="h-14 border-b border-border bg-panel" />}>
-        <TopBar leds={leds} renderedAt={renderedAt} rotation={rotation} expert={expert} />
+        <TopBar leds={leds} renderedAt={renderedAt} rotation={rotation} expert={expert} replay={replay} />
       </Suspense>
-      <Banner status={status} nextRefresh={nextRefresh} />
+      <Banner status={status} nextRefresh={nextRefresh} tail={replay ? REPLAY.bannerTail(replay.asof) : undefined} />
       {anyRun?.status === "failed" && (
         <div className="border-b border-[var(--severe)] bg-[color-mix(in_srgb,var(--severe)_20%,var(--bg))] px-4 py-1 text-sm" role="alert">
           {BOARD.failBanner(fmtDateTimeKST(anyRun.run_at))}
@@ -79,31 +112,40 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         <section className="order-1 flex min-h-0 min-w-0 flex-col gap-1.5 lg:row-span-1" aria-label={BOARD.panels.sites}>
           <h2 className="sr-only">{BOARD.panels.sites}</h2>
           {ranked.map((s, i) => (
-            <SiteTile key={s.site_id} s={s} expert={expert} rank={i + 1} today={today} />
+            <SiteTile key={s.site_id} s={s} expert={expert} rank={i + 1} today={today} linkQuery={lq} />
           ))}
         </section>
         {/* 중: 지도 */}
         <section className="panel order-3 min-h-[360px] overflow-hidden lg:order-2 2xl:min-h-0">
-          <ControlMap sites={mapSites} expert={expert} />
+          <ControlMap sites={mapSites} expert={expert} linkQuery={lq} />
         </section>
         {/* 우: 오늘의 조치 + 실시간 상황 기록 */}
         <div className="order-2 grid min-h-0 min-w-0 gap-2 lg:order-3 2xl:grid-rows-[minmax(0,60%)_minmax(0,1fr)]">
-          <Actions groups={actions} />
-          <EventLog items={logItems} expert={expert} />
+          {replay ? (
+            <>
+              <Actions groups={actions} storageDay={`replay-${replay.asof}`} labels={{ title: REPLAY.panels.actions, reset: REPLAY.actionsReset, empty: REPLAY.actionsEmpty }} />
+              <EventLog items={logItems} expert={expert} persist={false} moreHref={`/log${lq}`} title={REPLAY.panels.log} emptyText={REPLAY.logEmpty} />
+            </>
+          ) : (
+            <>
+              <Actions groups={actions} />
+              <EventLog items={logItems} expert={expert} />
+            </>
+          )}
         </div>
         {/* 하: 지점 모니터 5분할 + 날씨 */}
         <section className="order-4 grid min-h-0 min-w-0 grid-cols-[repeat(2,minmax(0,1fr))] gap-2 md:grid-cols-[repeat(5,minmax(0,1fr))] lg:col-span-2" aria-label={BOARD.panels.monitors}>
           <h2 className="sr-only">{BOARD.panels.monitors}</h2>
           {ranked.map((s) => (
-            <MiniChart key={s.site_id} s={s} obs={obs.filter((o) => o.site_id === s.site_id)} expert={expert} today={today} />
+            <MiniChart key={s.site_id} s={s} obs={obs.filter((o) => o.site_id === s.site_id)} expert={expert} today={today} linkQuery={lq} after={replay?.after ? { obs: afterObs.filter((o) => o.site_id === s.site_id), to: afterWindow(replay.asof).to } : undefined} />
           ))}
         </section>
         <div className="order-5 min-h-0">
           <WeatherPanel sites={ranked} fc={fc} />
         </div>
       </main>
-      <ScoreStrip expert={expert} />
-      <Escalation tiers={tiers} />
+      {replay ? <ReplayScoreStrip expert={expert} after={replay.after} /> : <ScoreStrip expert={expert} />}
+      {!replay && <Escalation tiers={tiers} />}
     </div>
   );
 }

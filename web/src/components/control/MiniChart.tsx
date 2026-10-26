@@ -8,15 +8,17 @@ const toLog = (v: number | null | undefined) => (v == null ? null : Math.log10(M
 /**
  * 지점 모니터 미니 차트(서버 렌더). 데이터 범위 기반 로그 축: 최소 100, 최대 = max(관측 최대×1.5, 예상 범위 위쪽×1.1).
  * 선·점은 퍼센트 좌표 SVG(preserveAspectRatio none + non-scaling-stroke)라 패널을 꽉 채우고, 글자는 HTML 이라 크기가 유지된다.
+ * 다시 보기 '그 뒤 실제로는'(after): asof 뒤 21일 실측을 분홍색 점선(--after)으로 겹친다(가로 축 끝을 asof+21 까지 늘림). 기본 화면에서는 after 가 없다.
  */
-export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus; obs: ObsLite[]; days?: number; expert: boolean; today: string }) {
+export function MiniChart({ s, obs, days = 60, expert, today, linkQuery, after }: { s: SiteStatus; obs: ObsLite[]; days?: number; expert: boolean; today: string; linkQuery?: string; after?: { obs: ObsLite[]; to: string } }) {
   const t = tierOf(s.tier);
   const c = COMBO[comboOf(s.latest_alert_level, t)];
-  const end = s.target_date ? new Date(s.target_date) : new Date();
+  const end = after ? new Date(s.target_date && s.target_date > after.to ? s.target_date : after.to) : s.target_date ? new Date(s.target_date) : new Date();
   const start = new Date(end);
   start.setDate(start.getDate() - days - 7);
   const rows = obs.filter((o) => o.cell_count != null && new Date(o.obs_date) >= start);
-  const obsMax = Math.max(0, ...rows.map((o) => o.cell_count!));
+  const afterRows = after ? after.obs.filter((o) => o.cell_count != null) : [];
+  const obsMax = Math.max(0, ...rows.map((o) => o.cell_count!), ...afterRows.map((o) => o.cell_count!));
   const yLo = 2; // 100
   const yHi = Math.max(3.5, toLog(Math.max(obsMax * 1.5, (s.q90_cqr ?? 0) * 1.1))!);
   const xp = (d: string | Date) => ((new Date(d).getTime() - start.getTime()) / (end.getTime() - start.getTime())) * 100;
@@ -33,6 +35,8 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
   const lo = yp(s.q10_cqr);
   const hi = yp(s.q90_cqr);
   const last = pts.at(-1);
+  const apts = afterRows.map((o) => ({ x: xp(o.obs_date), y: yp(o.cell_count)! }));
+  const apath = apts.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
   const ticks = [
     { lv: 3, label: BOARD.tile.axis.k1, color: "var(--watch)" },
     { lv: 4, label: BOARD.tile.axis.k10, color: "var(--alert)" },
@@ -41,7 +45,7 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
   const tl = targetLabel(s.target_date, today, point, s.obs_cell_count, fmt, { withValues: false });
   const title = `${s.name}: ${BOARD.monitorLegend.obs} 최근 ${days}일, ${BOARD.monitorLegend.pred} ${fmt(point)} ${BOARD.unit.cells}`;
   return (
-    <Link href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`} className="panel flex min-h-[240px] flex-col p-2 hover:border-[var(--accent)] 2xl:min-h-0" aria-label={title}>
+    <Link href={`/sites/${s.site_id}${linkQuery ?? (expert ? "?view=expert" : "")}`} className="panel flex min-h-[240px] flex-col p-2 hover:border-[var(--accent)] 2xl:min-h-0" aria-label={title}>
       <div className="flex items-center justify-between px-1 text-sm">
         <span className="font-semibold">{s.name}</span>
         <span style={{ color: c.color }}>
@@ -68,6 +72,10 @@ export function MiniChart({ s, obs, days = 60, expert, today }: { s: SiteStatus;
             {last && tx != null && py != null && <line x1={last.x} y1={last.y} x2={tx} y2={py} stroke="var(--accent)" strokeDasharray="3 4" strokeWidth={1.2} vectorEffect="non-scaling-stroke" />}
             {tx != null && py != null && <path d={`M${tx.toFixed(2)},${py.toFixed(2)}h0`} stroke="var(--accent)" strokeWidth={11} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
             {tx != null && s.obs_cell_count != null && <path d={`M${tx.toFixed(2)},${yp(s.obs_cell_count)!.toFixed(2)}h0`} stroke="var(--line-obs)" strokeWidth={7} strokeLinecap="round" vectorEffect="non-scaling-stroke" />}
+            {apts.length > 0 && <path d={apath} fill="none" stroke="var(--after)" strokeWidth={1.8} strokeDasharray="4 3" vectorEffect="non-scaling-stroke" data-after-path />}
+            {apts.map((p, i) => (
+              <path key={`a${i}`} d={`M${p.x.toFixed(2)},${p.y.toFixed(2)}h0`} stroke="var(--after)" strokeWidth={6} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+            ))}
           </svg>
           <span className="absolute -bottom-5 left-0 text-xs text-dim">{fmtDate(start)}</span>
           {tx != null && (

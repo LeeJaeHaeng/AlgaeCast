@@ -30,7 +30,7 @@ function FitBounds({ sites }: { sites: MapSite[] }) {
   return null;
 }
 
-export default function MapInner({ sites, expert, light }: { sites: MapSite[]; expert: boolean; light: boolean }) {
+export default function MapInner({ sites, expert, light, linkQuery }: { sites: MapSite[]; expert: boolean; light: boolean; linkQuery?: string }) {
   const [rivers, setRivers] = useState<FeatureCollection | null>(null);
   useEffect(() => {
     fetch("/rivers.geojson")
@@ -69,7 +69,7 @@ export default function MapInner({ sites, expert, light }: { sites: MapSite[]; e
                 <div>
                   {BOARD.tile.next} {fmtCellsKo(s.point)} {BOARD.unit.cells} · {BOARD.tile.chance} {pctInt(s.p_alert)}%
                 </div>
-                <a className="underline" style={{ color: "var(--accent)" }} href={`/sites/${s.site_id}${expert ? "?view=expert" : ""}`}>
+                <a className="underline" style={{ color: "var(--accent)" }} href={`/sites/${s.site_id}${linkQuery ?? (expert ? "?view=expert" : "")}`}>
                   지점 상세 보기
                 </a>
               </div>

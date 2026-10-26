@@ -8,8 +8,11 @@ export type MapSite = { site_id: string; name: string; lat: number; lon: number;
 
 const MapInner = dynamic(() => import("./MapInner"), { ssr: false, loading: () => <div className="h-full w-full animate-pulse bg-panel" aria-hidden /> });
 
-/** 중앙 지도: Esri Dark Gray Canvas(키 불필요) + 낙동강·금강 본류 물길(OSM 단순화) + 조합 라벨 마커. 발표모드에서는 밝은 타일 */
-export function ControlMap({ sites, expert }: { sites: MapSite[]; expert: boolean }) {
+/**
+ * 중앙 지도: Esri Dark Gray Canvas(키 불필요) + 낙동강·금강 본류 물길(OSM 단순화) + 조합 라벨 마커. 발표모드에서는 밝은 타일.
+ * linkQuery = 팝업의 지점 상세 링크 쿼리(다시 보기에서 asof 유지)
+ */
+export function ControlMap({ sites, expert, linkQuery }: { sites: MapSite[]; expert: boolean; linkQuery?: string }) {
   const [light, setLight] = useState(false);
   useEffect(() => {
     const read = () => setLight(document.documentElement.dataset.theme === "light");
@@ -20,7 +23,7 @@ export function ControlMap({ sites, expert }: { sites: MapSite[]; expert: boolea
   }, []);
   return (
     <div className="relative h-full w-full overflow-hidden rounded-xl" role="region" aria-label={`${BOARD.panels.map} — ${BOARD.mapLegend}`}>
-      <MapInner sites={sites} expert={expert} light={light} />
+      <MapInner sites={sites} expert={expert} light={light} linkQuery={linkQuery} />
       <div className="pointer-events-none absolute left-2 top-2 z-[400] rounded-md border border-border bg-panel/85 px-2 py-1 text-xs text-dim">
         <div className="flex flex-wrap gap-x-3 gap-y-0.5">
           {COMBO_ORDER.map((k) => (

@@ -61,7 +61,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
   const benchN = Number(bench?.match(/n=(\d+)/)?.[1] ?? "0");
 
   return (
-    <PageFrame title={PERF.title} lead={PERF.lead} expert={expert}>
+    <PageFrame title={PERF.title} lead={PERF.lead} expert={expert} className="perf-fit">
       {/* 제출·운영 모델 = v2.1(누수 수정판), v1·v2 = 수정 전 이력 */}
       <p className="panel px-4 py-2 text-sm leading-relaxed" style={{ borderColor: "var(--accent)" }}>
         {PERF.models}
@@ -233,7 +233,7 @@ function CompareModels({ expert }: { expert: boolean }) {
 
 function Bar({ label, pct, note, color }: { label: string; pct: number; note: string; color: string }) {
   return (
-    <div className="grid grid-cols-[260px_minmax(0,1fr)_72px] items-center gap-3 text-base">
+    <div className="perf-bar grid grid-cols-[260px_minmax(0,1fr)_72px] items-center gap-3 text-base">
       <span>{label}</span>
       <div className="h-5 w-full rounded bg-[var(--panel-border)]">
         <div className="h-full rounded" style={{ width: `${pct}%`, background: color }} />

@@ -177,10 +177,10 @@ export const ACTIONS: Record<Tier, string[]> = {
   normal: ["평소 일정대로 측정 결과 확인하기"],
 };
 
-/** §8.3 상황 배너 템플릿 — 조합 순위 순으로 "{지점, 지점} {라벨}" 을 · 로 잇는다. 전부 안전이면 다음 갱신 시각 */
-export const banner = (groups: { combo: Combo; sites: string[] }[], nextRefresh: string): string => {
+/** §8.3 상황 배너 템플릿 — 조합 순위 순으로 "{지점, 지점} {라벨}" 을 · 로 잇는다. 전부 안전이면 다음 갱신 시각(다시 보기에서는 tail = "YYYY-MM-DD 기준") */
+export const banner = (groups: { combo: Combo; sites: string[] }[], nextRefresh: string, tail?: string): string => {
   const live = groups.filter((g) => g.combo !== "safe" && g.sites.length);
-  if (!live.length) return `전 지점 안전 · 다음 갱신 ${nextRefresh}`;
+  if (!live.length) return tail ? `전 지점 안전 · ${tail}` : `전 지점 안전 · 다음 갱신 ${nextRefresh}`;
   return live.map((g) => `${g.sites.join(", ")} ${COMBO[g.combo].bannerWord}`).join(" · ");
 };
 
@@ -440,6 +440,46 @@ export const outOfRangeTip = (side: "above" | "below", q10: string, q90: string)
   `예상값이 예상 범위(${q10} ~ ${q90} 개/mL)의 ${side === "above" ? "위" : "아래"}에 있습니다. 예상값은 한 값 예측(앙상블)이, 예상 범위는 분위 회귀가 따로 계산해 서로 어긋날 수 있습니다(둘 다 v2.1). 값은 고치지 않고 그대로 보여 줍니다.`;
 export const LOG_MORE = (n: number) => `이전 기록 ${n}건`;
 export const LOG_PAGE = { title: "상황 기록 (최근 30일)", back: "메인 상황판으로" };
+
+/**
+ * 과거 시점 다시 보기(?asof=YYYY-MM-DD) — 심사·발표 기간(녹조 비시즌)에 2026년 급증기 화면을 사후 재현.
+ * 장면 날짜·지점은 lib/replay.ts SCENES(근거: bloom_events·predictions), 문구는 여기.
+ * 장면 설명에는 그날 이후의 측정값을 넣지 않는다(다시 보기 화면에도 메뉴가 들어가므로).
+ */
+export const REPLAY = {
+  /** 진입 버튼 글자 — 어느 화면 폭이든 이 글자 그대로(좁은 폭에서는 글자 크기만 줄임, ReplayMenu) */
+  button: "다시 보기",
+  menuTitle: "2026년 장면 다시 보기",
+  menuLead: "그날까지의 자료만으로 고정한 모델(v2.1)이 낸 예상을 그날 화면으로 다시 그립니다(사후 계산).",
+  /** 장면 이름·설명은 진입 메뉴에만 쓴다(다시 보기 화면 띠에는 넣지 않음). '처음 넘기'는 그 장면의 경계 사건 기준(같은 지점이 다른 때에도 1만을 넘었을 수 있음) */
+  scenes: {
+    pre: { title: "강정·고령 경계 진입 일주일 전", sub: "이번 경계 사건에서 1만을 처음 넘기 7일 전 화면" },
+    onset: { title: "강정·고령 경계 진입일", sub: "이번 경계 사건에서 1만을 처음 넘은 날(첫 초과일)의 화면" },
+    miss: { title: "회남 경계 진입 일주일 전 — 미리 알리지 못한 사례", sub: "이번 경계 사건에서 1만을 처음 넘기 7일 전 화면" },
+  },
+  sceneNo: ["①", "②", "③"],
+  /** 다시 보기 화면 맨 위 띠 — 지정 문구 고정(날짜만 바뀜) */
+  band: (d: string) => `다시 보기 — ${d} 기준. 동결 모델(v2.1)로 그날까지의 자료만 써서 사후 계산한 화면이며, 당시 실시간 운영 화면이 아닙니다.`,
+  back: "현재 화면으로 돌아가기",
+  afterOn: "그 뒤 실제로는? (21일 보기)",
+  afterOff: "그 뒤 실제로는 끄기",
+  chartAfter: "그 뒤 실제로 잰 값",
+  chartAsof: "그날",
+  /** '그 뒤 실제로는'을 켰을 때 범례(메인 성적표 띠·지점 상세 큰 차트) — 선 색(--after, 분홍)과 같은 이름 */
+  legendAfter: "분홍색 점선 = 그날 다음 날부터 21일 동안 실제로 잰 값",
+  bannerTail: (d: string) => `${d} 기준`,
+  noShap: "이 날짜의 근거(요인) 자료는 저장돼 있지 않습니다. 근거는 가장 최근 기준일 것만 저장합니다.",
+  /** 날짜가 틀렸거나 범위 밖일 때 한 줄 안내. lo = 다시 보기 run 의 2026년 첫 기준일, hi = 마지막 기준일 */
+  notice: (lo: string, hi: string) =>
+    `다시 보기는 ${lo}부터 ${hi}까지의 날짜만 볼 수 있습니다. ${lo} 전에는 그날을 기준으로 낸 예상이 없고, 2025년까지는 모델을 만드는 데 쓴 자료(학습 기간)와 겹쳐 뺐습니다. 지금은 현재 화면입니다.`,
+  panels: { actions: "그날의 조치", log: "그날까지의 상황 기록" },
+  actionsReset: "체크 초기화",
+  actionsEmpty: "그날 할 조치가 없습니다.",
+  logEmpty: "그날까지 30일 동안의 기록이 없습니다.",
+  logTitle: (d: string) => `상황 기록 (${d}까지 30일)`,
+  /** 다시 보기의 성적표 띠: 그날 뒤 측정으로 매긴 성적(사건 수)은 싣지 않는다 */
+  scoreNote: "다시 보기에는 그날 뒤의 측정으로 매긴 성적(미리 알린 경계 사건 수)을 싣지 않습니다.",
+} as const;
 
 /** 쉽게 보기에서 금지하는 표현(자동 점검용, §7·§10). 소문자 비교. */
 export const BANNED_EASY = [

@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { Info } from "@/components/Info";
-import { BOARD, COMBO, COMBO_ORDER, banner as bannerText, comboOf } from "@/lib/copy";
+import { BOARD, COMBO, COMBO_ORDER, REPLAY, banner as bannerText, comboOf } from "@/lib/copy";
 import { fmtDate, tierOf } from "@/lib/format";
 import { CMP, NUMBERS } from "@/lib/numbers";
 import type { ForecastLite, SiteStatus } from "@/lib/queries";
 
 /** 상황 배너(48px): 색 = 가장 높은 조합, 문구 = §8.3 템플릿(조합별 "지점, 지점 라벨" 을 · 로 연결), 우측 = 조합별 개수 */
-export function Banner({ status, nextRefresh }: { status: SiteStatus[]; nextRefresh: string }) {
+export function Banner({ status, nextRefresh, tail }: { status: SiteStatus[]; nextRefresh: string; tail?: string }) {
   const byCombo = COMBO_ORDER.map((k) => ({
     combo: k,
     sites: status
@@ -14,7 +14,7 @@ export function Banner({ status, nextRefresh }: { status: SiteStatus[]; nextRefr
       .sort((x, y) => (y.p_alert ?? 0) - (x.p_alert ?? 0))
       .map((s) => s.name),
   }));
-  const text = bannerText(byCombo, nextRefresh);
+  const text = bannerText(byCombo, nextRefresh, tail);
   const top = byCombo.find((g) => g.sites.length)?.combo ?? "safe";
   const color = COMBO[top].color;
   return (
@@ -43,10 +43,10 @@ function Count({ label, n, color, icon }: { label: string; n: number; color: str
   );
 }
 
-/** 향후 7일 날씨: 지점별 7일 평균 기온·비 합계 예보(기상청 단기·중기, 기준일 발표분) */
+/** 향후 7일 날씨: 지점별 7일 평균 기온·비 합계 예보(기상청 단기·중기, 기준일 발표분). data-weather-panel: 다시 보기 큰 화면 줄 높이 맞춤(globals.css) */
 export function WeatherPanel({ sites, fc }: { sites: SiteStatus[]; fc: ForecastLite[] }) {
   return (
-    <section className="panel flex min-h-0 flex-col p-3" aria-label={BOARD.panels.weather}>
+    <section className="panel flex min-h-0 flex-col p-3" aria-label={BOARD.panels.weather} data-weather-panel>
       <h2 className="panel-title mb-1">{BOARD.panels.weather}</h2>
       <table className="tbl text-sm">
         <thead>
@@ -77,12 +77,30 @@ export function WeatherPanel({ sites, fc }: { sites: SiteStatus[]; fc: ForecastL
   );
 }
 
+/** 다시 보기의 성적표 띠(40px): 그날 뒤 측정으로 매긴 사건 성적은 싣지 않고 안내 + '얼마나 잘 맞혔나' 링크. after = '그 뒤 실제로는' 켬 → 분홍 점선 범례 */
+export function ReplayScoreStrip({ expert, after = false }: { expert: boolean; after?: boolean }) {
+  return (
+    <footer className="flex min-h-10 flex-wrap items-center gap-x-6 gap-y-1 border-t border-border bg-panel px-4 py-1 text-sm" aria-label={BOARD.panels.score}>
+      <span className="panel-title">{BOARD.panels.score}</span>
+      <span className="min-w-0 text-dim">{REPLAY.scoreNote}</span>
+      {after && (
+        <span className="min-w-0 font-semibold" style={{ color: "var(--after)" }} data-after-note>
+          {REPLAY.legendAfter}
+        </span>
+      )}
+      <Link href={expert ? "/performance?view=expert" : "/performance"} className="ml-auto shrink-0 underline" style={{ color: "var(--accent)" }}>
+        {BOARD.score.detail}
+      </Link>
+    </footer>
+  );
+}
+
 /** 성적표 띠(40px): 2020~2026 경계 사건 포착·중앙 리드타임·2026 사후 계산(블라인드 아님) — 제출·운영 모델 v2.1 */
 export function ScoreStrip({ expert }: { expert: boolean }) {
   const { events: ev, y2026 } = NUMBERS; // 헤드라인 숫자는 numbers.ts(빌드 전 reports/eval 과 대조)
   const f2 = (v: number) => v.toFixed(2);
   return (
-    <footer className="flex h-10 items-center gap-6 border-t border-border bg-panel px-4 text-sm" aria-label={BOARD.panels.score}>
+    <footer className={`${expert ? "score-strip " : ""}flex h-10 items-center gap-6 border-t border-border bg-panel px-4 text-sm`} aria-label={BOARD.panels.score}>
       <span className="panel-title">{BOARD.panels.score}</span>
       <span>
         <b className="text-base">{BOARD.score.caught(ev.detected, ev.total)}</b>
