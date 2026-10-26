@@ -34,7 +34,7 @@ import { REPLAY_MIN, REPLAY_RUN_ID, SCENES, addDaysISO, tierChangesAsOf } from "
 const args = process.argv.slice(2);
 const outIdx = args.indexOf("--out");
 const out = outIdx >= 0 ? args[outIdx + 1] : null;
-const base = args.find((a, i) => !a.startsWith("--") && i !== outIdx + 1) ?? "http://localhost:3300";
+const base = args.find((a, i) => !a.startsWith("--") && (outIdx < 0 || i !== outIdx + 1)) ?? "http://localhost:3300";
 const SITES = ["2011G26", "2011G56", "2020G33", "2022G05", "3008G30"];
 
 const env = Object.fromEntries(
