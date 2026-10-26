@@ -47,10 +47,19 @@ blockquote { border-left: 3px solid #1f4e79; margin: 3mm 0; padding: 1mm 4mm; ba
 section.footnotes ol { columns: 2; column-gap: 6mm; padding-left: 6mm; margin: 0; }
 section.footnotes li { margin: 0 0 0.6mm; text-align: left; }
 section.footnotes { font-size: 6.2pt; line-height: 1.2; color: #333; border-top: 1px solid #bbb; margin-top: 6mm; }
-.cover { height: 250mm; display: flex; flex-direction: column; justify-content: center; }
-.cover .sub { font-size: 13pt; color: #333; margin-bottom: 10mm; }
-.cover .meta { font-size: 11pt; line-height: 2; }
-.cover .head { margin-top: 12mm; padding: 5mm 6mm; border: 2px solid #1f4e79; border-radius: 3mm; font-size: 10.5pt; background: #f6f9fc; }
+.cover { min-height: 250mm; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 4mm; }
+.cover h1 { margin-bottom: 2mm; }
+.cover .sub { font-size: 11.5pt; color: #333; margin-bottom: 3mm; }
+.cover .meta { font-size: 8.8pt; line-height: 1.55; color: #333; }
+.cover .head { margin-top: 4mm; padding: 3.5mm 5mm; border: 2px solid #1f4e79; border-radius: 3mm; font-size: 9.2pt; line-height: 1.5; background: #f6f9fc; }
+.cover .head .one { font-size: 12.5pt; font-weight: 700; color: #1f4e79; margin-bottom: 1.5mm; }
+.cover .head .sec { font-weight: 700; color: #1f4e79; margin: 2mm 0 0.5mm; }
+.cover .head ul, .cover .head ol { margin: 0; padding-left: 5mm; }
+.cover .head li { margin: 0 0 0.6mm; text-align: left; }
+.cover .head .box { margin: 2mm 0; padding: 1.5mm 3mm; border: 1px solid #9aa7b5; background: #fff; }
+.cover .head .box .sec { margin-top: 0; }
+.cover .head .note { font-size: 8.4pt; color: #444; margin-top: 1mm; }
+.cover .head code { font-size: 8pt; }
 .toc { page-break-before: always; page-break-after: always; }
 .toc h2 { page-break-before: avoid; }
 .toc ol { list-style: none; }

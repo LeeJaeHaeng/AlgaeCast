@@ -51,7 +51,8 @@ import matplotlib.pyplot as plt  # noqa: E402
 import matplotlib.ticker  # noqa: E402
 
 warnings.filterwarnings("ignore", message="IProgress not found")  # tqdm 진행 막대 위젯 안내(결과와 무관)
-ROOT = Path.cwd() if (Path.cwd() / "src").exists() else Path.cwd().parent
+# 정션·심볼릭 링크 경로에서도 algaecast.config 의 ROOT(resolve 된 실제 경로)와 맞도록 resolve
+ROOT = (Path.cwd() if (Path.cwd() / "src").exists() else Path.cwd().parent).resolve()
 sys.path.insert(0, str(ROOT / "src"))
 from algaecast.config import CONFIG_DIR, MODELS_DIR, SUBMISSION_PATH  # noqa: E402
 
