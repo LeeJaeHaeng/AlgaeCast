@@ -1,0 +1,104 @@
+{
+ "T24": {
+  "watch": {
+   "detected": 7,
+   "median_lead_e": 21.0
+  },
+  "alert": {
+   "detected": 7,
+   "median_lead_e": 14.0
+  },
+  "point": {
+   "detected": 4,
+   "median_lead_e": 10.5
+  }
+ },
+ "v2.1": {
+  "watch": {
+   "detected": 7,
+   "median_lead_e": 21.0
+  },
+  "alert": {
+   "detected": 7,
+   "median_lead_e": 14.0
+  },
+  "point": {
+   "detected": 5,
+   "median_lead_e": 7.0
+  }
+ },
+ "n_events": 8,
+ "overall": {
+  "T24 비상안(v2.1 구성, ≤2024 학습)": {
+   "n": 124.0,
+   "rmse_log": 0.7314576705496715,
+   "mae_log": 0.5656679407483127,
+   "r2_log": 0.5017676294596444,
+   "r2_raw": 0.002242551615681543,
+   "r2_pearson_raw": 0.10615880097362307,
+   "nse_raw": 0.002242551615681543,
+   "f1_10k": 0.8175182481751825,
+   "f1_1k": 0.9108910891089109
+  },
+  "v2.1 운영·제출(≤2025 학습)": {
+   "n": 124.0,
+   "rmse_log": 0.717811008454073,
+   "mae_log": 0.5488639662934663,
+   "r2_log": 0.5201850535305526,
+   "r2_raw": 0.0007632616542643245,
+   "r2_pearson_raw": 0.10041545502310793,
+   "nse_raw": 0.0007632616542643245,
+   "f1_10k": 0.8260869565217391,
+   "f1_1k": 0.9108910891089109
+  },
+  "B0 지속성": {
+   "n": 124.0,
+   "rmse_log": 0.9022027251934517,
+   "mae_log": 0.6331430859551672,
+   "r2_log": 0.24201290336959247,
+   "r2_raw": -0.3022771154537647,
+   "r2_pearson_raw": 0.12014028514085441,
+   "nse_raw": -0.3022771154537647,
+   "f1_10k": 0.8413793103448276,
+   "f1_1k": 0.9
+  }
+ },
+ "overall_intervals": {
+  "T24 비상안(v2.1 구성, ≤2024 학습)": {
+   "PICP80(CQR)": 0.717741935483871,
+   "MPIW80_log": 1.6901008381595657,
+   "Brier(p_alert vs ≥10k)": 0.14642537109756765
+  },
+  "v2.1 운영·제출(≤2025 학습)": {
+   "PICP80(CQR)": 0.7016129032258065,
+   "MPIW80_log": 1.668587018877756,
+   "Brier(p_alert vs ≥10k)": 0.139070994678181
+  },
+  "B0 지속성": {}
+ },
+ "frozen_commit": "a961caf",
+ "frozen_files": [
+  {
+   "name": "regression",
+   "version": "20261026_131722",
+   "sha256_model_pkl": "950dde7fbd1385019363af438a251fe49f901c09afbec7410032c033963b9152",
+   "bytes_model_pkl": 19820569,
+   "sha256_meta_json": "b795363da2abbce48b8711d92c4492202560a7360ded24ac318f82d166e4083d"
+  },
+  {
+   "name": "classifier",
+   "version": "20261026_131722",
+   "sha256_model_pkl": "496a1a75dd505e2de170461963f8a82bd1b49a3b2a29e8dc6e399e4c68dec696",
+   "bytes_model_pkl": 1584262,
+   "sha256_meta_json": "8c2960cc8b144bdab0bd9b6bbdb69fdcf75fbf36b7cc4579ed6b1db9e5391c41"
+  },
+  {
+   "name": "quantile",
+   "version": "20261026_131722",
+   "sha256_model_pkl": "9ebc0cef1c306bb5ad24eae06c643a0eb1cbb219289e023e7ebfe61e8a52defe",
+   "bytes_model_pkl": 7721406,
+   "sha256_meta_json": "39d80086b0e15b0df6aae175b60e4b76917bf22bfab79e4a0e4ea2d37393ff2e"
+  }
+ ],
+ "submission_T24_sha256": "057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73"
+}
