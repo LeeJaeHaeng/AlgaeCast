@@ -734,7 +734,8 @@ def build(out: Path) -> int:
     for d in DATAON_DIRS:
         (out / d).mkdir(parents=True, exist_ok=True)
         shutil.copy2(lic, out / d / "LICENSE_DataON.txt")
-    copy(ROOT / "docs", out / "src" / "docs")
+    # docs/handoff/(작업 보고서·화면 캡처, 내부 전달용)는 재현·설계와 무관해 넣지 않는다
+    copy(ROOT / "docs", out / "src" / "docs", extra_ignore=("handoff",))
     copy(ROOT / "pyproject.toml", out / "pyproject.toml")
     for s in SCRIPTS:
         copy(ROOT / "scripts" / s, out / "scripts" / s)

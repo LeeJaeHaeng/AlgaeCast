@@ -92,3 +92,11 @@ def test_api_algae_snapshot_not_packaged() -> None:
     own = {s["station_id"] for s in sites}
     ups = {s["upstream_chain"]["up1"] for s in sites if s["upstream_chain"]["up1"]}
     assert ups and ups <= own and {u for u in UPSTREAM_OF.values() if u} == ups
+
+
+def test_handoff_reports_not_packaged() -> None:
+    """docs/handoff(작업 보고서·화면 캡처)는 패키지 src/docs 에 넣지 않는다."""
+    src = (Path(__file__).resolve().parents[1] / "scripts" / "build_submission_package.py").read_text(
+        encoding="utf-8"
+    )
+    assert 'copy(ROOT / "docs", out / "src" / "docs", extra_ignore=("handoff",))' in src
