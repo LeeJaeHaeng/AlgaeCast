@@ -11,7 +11,8 @@ export default async function AboutPage({ searchParams }: { searchParams: Promis
   const expert = sp.view === "expert";
   const frozenV2 = parseTables(readReport("FROZEN_v2.1.md") ?? "")[0];
   return (
-    <PageFrame title={ABOUT.title} lead={ABOUT.lead} expert={expert}>
+    // .narrow-fit: 좁은 화면(≤767px) 가로 넘침 방지 규칙의 범위(globals.css), 768px 이상에는 적용되는 스타일 없음
+    <PageFrame title={ABOUT.title} lead={ABOUT.lead} expert={expert} className="narrow-fit">
       <section className="panel p-4">
         <p className="text-lg leading-relaxed">{ABOUT.what}</p>
         <p className="mt-2 text-base font-semibold" style={{ color: "var(--watch)" }}>

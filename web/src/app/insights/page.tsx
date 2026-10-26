@@ -27,7 +27,8 @@ export default async function InsightsPage({ searchParams }: { searchParams: Pro
   const top = [...rows].sort((a, b) => num(b, col("배수")) - num(a, col("배수"))).slice(0, 8);
   const maxT = 27;
   return (
-    <PageFrame title={INSIGHTS.title} lead={INSIGHTS.lead} expert={expert}>
+    // .narrow-fit: 좁은 화면(≤767px) 가로 넘침 방지 규칙의 범위(globals.css), 768px 이상에는 적용되는 스타일 없음
+    <PageFrame title={INSIGHTS.title} lead={INSIGHTS.lead} expert={expert} className="narrow-fit">
       {/* ① 조기 발생 vs 장기 추세 */}
       <section className="panel grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <div>

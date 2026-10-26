@@ -256,3 +256,16 @@ a {
     overflow-x: auto;
   }
 }
+/* 인사이트·소개 좁은 화면(≤767px) 가로 넘침 방지 — 768px 이상(태블릿·데스크톱)에는 적용되지 않음, 문구·배치 순서 그대로.
+   범위는 PageFrame className="narrow-fit"(/insights, /about)만.
+   ① 한 줄 격자(main 바로 아래 .grid) 칸이 안쪽 표의 최소 폭만큼 늘어나지 않게 minmax(0, 1fr) — 전문가 보기 추세 검정 표는 원래 감싼 상자 안에서 가로 스크롤
+   ② 섹션에 바로 놓인 넓은 표(급증 사례·쓰는 자료와 출처)는 자기 상자 안에서만 가로 스크롤(display: block + overflow-x: auto) */
+@media (max-width: 767px) {
+  .narrow-fit main > .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .narrow-fit section > .tbl {
+    display: block;
+    overflow-x: auto;
+  }
+}
