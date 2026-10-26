@@ -26,6 +26,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from algaecast.collect.algae_source import load_algae_source
 from algaecast.config import RAW_DIR
 from algaecast.features.base import cut_as_of, slope
 from algaecast.features.offset import data_as_of
@@ -63,9 +64,13 @@ def prepare_algae(raw: pd.DataFrame) -> pd.DataFrame:
     return a.sort_values(["station_id", "obs_date"]).reset_index(drop=True)
 
 
-def load_algae(path: Path = ALGAE_PARQUET) -> pd.DataFrame:
-    """조류경보제 원자료(5지점 측정 시계열)를 읽는다. 날짜로 자르지 않는다 — 행마다 as_of 로 자른다."""
-    raw = pd.read_parquet(path, columns=["station_id", "obs_date", "iem_bgalage_cell_co", "iem_wtrtp"])
+def load_algae(path: Path | None = None) -> pd.DataFrame:
+    """조류경보제 원자료(5지점 측정 시계열)를 읽는다. 날짜로 자르지 않는다 — 행마다 as_of 로 자른다.
+
+    path 가 None 이면 원천 선택(collect/algae_source.py)을 따른다: 저장소 = API parquet, 패키지 = 대회 번들.
+    """
+    cols = ["station_id", "obs_date", "iem_bgalage_cell_co", "iem_wtrtp"]
+    raw = load_algae_source(cols) if path is None else pd.read_parquet(path, columns=cols)
     return prepare_algae(raw)
 
 
@@ -124,7 +129,7 @@ def build_upstream(df: pd.DataFrame, algae: pd.DataFrame | None = None) -> pd.Da
 
     행마다 그 행의 base_date 를 as_of 로 make_upstream_features 를 부른다(원자료는 기준일까지만 사용).
     as_of_offset_days(features.offset, S 모델) 가 0 이 아니면 as_of = base_date − 오프셋.
-    algae 가 None 이면 data/raw/nier_algae parquet 을 읽는다.
+    algae 가 None 이면 load_algae()(원천 선택: 저장소 = API parquet, 제출 패키지 = 대회 번들)로 읽는다.
     일일 as-of 에서는 수집한 5지점 조류 자료를 넘긴다.
     """
     a = load_algae() if algae is None else prepare_algae(algae)

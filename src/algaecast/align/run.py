@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from algaecast.collect.algae_source import load_algae_source
 from algaecast.config import CONFIG_DIR, DATA_DIR, RAW_DIR
 
 log = logging.getLogger(__name__)
@@ -91,7 +92,8 @@ def load_cfg() -> tuple[dict, dict]:
 
 # ---------------------------------------------------------------- 원천 적재
 def load_sources() -> dict[str, pd.DataFrame]:
-    algae = pd.read_parquet(RAW_DIR / "nier_algae" / "nier_algae_2012_2026.parquet")
+    # 조류: 저장소 = API parquet, 제출 패키지 = 대회 번들(collect/algae_source.py, features.yaml algae_source)
+    algae = load_algae_source()
     algae["obs_date"] = pd.to_datetime(algae["obs_date"])
     asos = pd.read_parquet(RAW_DIR / "kma_asos" / "kma_asos_daily_2012_2026.parquet")
     asos["obs_date"] = pd.to_datetime(asos["obs_date"])

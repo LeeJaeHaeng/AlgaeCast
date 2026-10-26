@@ -13,9 +13,10 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from algaecast.collect.algae_source import load_algae_source
 from algaecast.collect.nier_algae import two_consecutive_levels
 from algaecast.collect.nier_forecast import level_from_cells
-from algaecast.config import CONFIG_DIR, DATA_DIR, RAW_DIR, ROOT
+from algaecast.config import CONFIG_DIR, DATA_DIR, ROOT
 from algaecast.eval.metrics import mpiw, picp
 
 log = logging.getLogger(__name__)
@@ -123,7 +124,7 @@ def official_events(level: float = T10K, start_year: int = 2020) -> pd.DataFrame
     """2회 연속 규칙 산출 '경계' 발령 사건: 지점별 측정 시계열에서 2consec 단계가 2 미만→2 이상으로
     바뀐 측정일(D)과
     그 사건의 첫 초과 측정일(E, D 직전 연속 초과 시작)."""
-    a = pd.read_parquet(RAW_DIR / "nier_algae" / "nier_algae_2012_2026.parquet")
+    a = load_algae_source()  # 저장소 = API parquet, 제출 패키지 = 대회 번들(collect/algae_source.py)
     a["obs_date"] = pd.to_datetime(a["obs_date"])
     a = a[a["obs_date"].dt.year >= start_year - 1]
     ev = []
@@ -159,7 +160,7 @@ def leadtime_table(
     methods = alarm_methods(o, thr, level)
     rows, detail = [], []
     o = o[o["year"] >= 2020]
-    meas = pd.read_parquet(RAW_DIR / "nier_algae" / "nier_algae_2012_2026.parquet")
+    meas = load_algae_source()
     meas["obs_date"] = pd.to_datetime(meas["obs_date"])
     meas["cells"] = meas["iem_bgalage_cell_co"].astype(float)
 

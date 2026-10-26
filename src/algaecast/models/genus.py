@@ -25,6 +25,7 @@ import lightgbm as lgb
 import numpy as np
 import pandas as pd
 
+from algaecast.collect.algae_source import load_algae_source
 from algaecast.config import RAW_DIR
 from algaecast.models import data as D
 from algaecast.models.train import SEED, VariantSpec, _lgb_params, _prep, to_cells
@@ -44,9 +45,13 @@ CONSISTENCY_TOL = 0.5
 
 
 # ---------------------------------------------------------------- 타깃
-def load_target_algae(path: Path = ALGAE_PARQUET, last: pd.Timestamp = TARGET_LAST) -> pd.DataFrame:
-    """속별 타깃용 조류 원자료(총합·4속). last(2025-12-31) 이후 측정은 읽은 즉시 버린다."""
-    a = pd.read_parquet(path, columns=["station_id", "obs_date", TOTAL_COL, *GENUS.values()])
+def load_target_algae(path: Path | None = None, last: pd.Timestamp = TARGET_LAST) -> pd.DataFrame:
+    """속별 타깃용 조류 원자료(총합·4속). last(2025-12-31) 이후 측정은 읽은 즉시 버린다.
+
+    path 가 None 이면 원천 선택(collect/algae_source.py)을 따른다: 저장소 = API parquet, 패키지 = 대회 번들.
+    """
+    cols = ["station_id", "obs_date", TOTAL_COL, *GENUS.values()]
+    a = load_algae_source(cols) if path is None else pd.read_parquet(path, columns=cols)
     a["obs_date"] = pd.to_datetime(a["obs_date"])
     a = a[a["obs_date"] <= last]
     return a.sort_values(["station_id", "obs_date"]).reset_index(drop=True)

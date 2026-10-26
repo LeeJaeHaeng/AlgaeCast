@@ -74,3 +74,21 @@ def test_verify_package_model_dir_check(tmp_path: Path) -> None:
     assert any(f"model/{v.PACKAGE_MODEL_DIRS[1]}/meta.json" in p for p in problems)
     (md / "HISTORY.md").unlink()
     assert any("HISTORY.md" in p for p in v.model_dir_problems(tmp_path))
+
+
+def test_api_algae_snapshot_not_packaged() -> None:
+    """패키지 재현의 조류 원천은 대회 번들(collect/algae_source.py) — 공공 API 조류 스냅샷(nier_algae/)은 넣지 않는다.
+
+    상류 피처의 바로 위 지점(upstream_chain up1)도 모두 예측 대상 5지점 안이라 API 파일에서 5지점 행을 빼면 남는 행이 없다.
+    """
+    import yaml
+
+    from algaecast.features.upstream import UPSTREAM_OF
+
+    b = _builder()
+    assert b.API_ALGAE_DIR == "nier_algae"
+    assert not [f for f in b.RAW_FILES if f.split("/")[0] == b.API_ALGAE_DIR]
+    sites = yaml.safe_load((ROOT / "config" / "sites.yaml").read_text(encoding="utf-8"))["sites"]
+    own = {s["station_id"] for s in sites}
+    ups = {s["upstream_chain"]["up1"] for s in sites if s["upstream_chain"]["up1"]}
+    assert ups and ups <= own and {u for u in UPSTREAM_OF.values() if u} == ups

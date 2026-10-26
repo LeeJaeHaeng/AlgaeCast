@@ -23,6 +23,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from algaecast.collect.algae_source import load_algae_source, source_path
 from algaecast.config import CONFIG_DIR, RAW_DIR
 
 log = logging.getLogger(__name__)
@@ -43,8 +44,10 @@ def threshold_year_for_valid(valid_year: int) -> int:
 
 
 # ---------------------------------------------------------------- 수온 임계 (R3)
-def load_nier(path: Path = NIER_PATH, max_year: int | None = None) -> pd.DataFrame:
-    a = pd.read_parquet(path, columns=["station_id", "obs_date", "iem_wtrtp", "iem_bgalage_cell_co"])
+def load_nier(path: Path | None = None, max_year: int | None = None) -> pd.DataFrame:
+    """조류경보제 측정(수온·세포수). path 가 None 이면 원천 선택(collect/algae_source.py)을 따른다."""
+    cols = ["station_id", "obs_date", "iem_wtrtp", "iem_bgalage_cell_co"]
+    a = load_algae_source(cols) if path is None else pd.read_parquet(path, columns=cols)
     a["obs_date"] = pd.to_datetime(a["obs_date"])
     if max_year is not None:
         a = a[a["obs_date"].dt.year <= max_year]  # 이후 연도 값은 읽지 않는다
@@ -76,7 +79,7 @@ def compute_site_thresholds(max_year: int, algae: pd.DataFrame | None = None) ->
     return {
         "values": values,
         "n": n,
-        "data_source": "data/raw/nier_algae/nier_algae_2012_2026.parquet (iem_wtrtp, iem_bgalage_cell_co)",
+        "data_source": f"{source_path()} (iem_wtrtp, iem_bgalage_cell_co)",
         "data_max_year": int(max_year),
         "data_last_date": max(used) if used else None,
         "data_last_date_by_site": last,

@@ -23,6 +23,11 @@ windows:
 # reports/experiments/PREREG_contingency.md 3절). 달력·지점 피처는 기준일 그대로. 0 이 아니면 피처 파일 이름에 오프셋이 붙는다.
 as_of_offset_days: 0
 
+# 예측 대상 5지점 조류경보 측정의 원천(collect/algae_source.py): auto = 제출 패키지 구조(src/config)에서는 대회 번들
+# algae_measure.csv, 저장소 구조에서는 공공데이터포털 조류경보 API 스냅샷(data/raw/nier_algae parquet). bundle·api 로 고정할 수 있다.
+# 대시보드 일일 운영(predict.asof)은 이 설정과 무관하게 API 수집 자료를 쓴다.
+algae_source: auto
+
 degree_day_base_c: 20 # 적산온도 기준 (수온·기온 공통)
 wtemp_hot_c: 25 # wtemp_days_over25
 dry_day_rain_mm: 5 # dry_days: 마지막 5 mm 이상 강우 이후 경과일
