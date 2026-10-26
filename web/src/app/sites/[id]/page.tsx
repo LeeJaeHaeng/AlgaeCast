@@ -67,7 +67,8 @@ export default async function SitePage({ params, searchParams }: { params: Promi
 
   return (
     // 글꼴 폴백 크기 보정(globals.css .fit-fallback-font): Pretendard 교체 때 아래 묶음이 밀리던 CLS 방지
-    <PageFrame title="" expert={expert} back={{ href: "/", label: SITE.back }} className="fit-fallback-font">
+    // .site-detail: 좁은 화면(≤767px) 가로 넘침 방지 규칙의 범위(globals.css), 768px 이상에는 적용되는 스타일 없음
+    <PageFrame title="" expert={expert} back={{ href: "/", label: SITE.back }} className="fit-fallback-font site-detail">
       {/* 머리: 지점 · 조합 라벨 · 공식/AI · 날짜 */}
       <header className="panel flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3" style={combo === "enter" ? { boxShadow: `inset 0 0 0 1px ${c.color}` } : undefined}>
         <h1 className="text-3xl font-bold">{site.name}</h1>

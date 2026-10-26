@@ -233,3 +233,26 @@ a {
 .board li {
   min-width: 0;
 }
+/* 지점 상세 좁은 화면(≤767px) 가로 넘침 방지 — 768px 이상(태블릿·데스크톱)에는 적용되지 않음, 문구·배치 순서 그대로.
+   ① ⓘ 설명(평소 투명, 폭 16rem·ⓘ 가운데 정렬)이 화면 오른쪽 밖으로 나가 문서 폭을 키우던 것 → 화면 아래 고정 상자로 띄움(고정 위치는 문서 폭에 안 잡힘)
+   ② 한 줄 격자 칸이 표의 최소 폭만큼 늘어나지 않게 minmax(0, 1fr)
+   ③ 표는 자기 상자 안에서만 가로 스크롤(display: block + overflow-x: auto) */
+@media (max-width: 767px) {
+  .site-detail [role="tooltip"] {
+    position: fixed;
+    top: auto;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    width: auto;
+    margin-top: 0;
+    translate: none;
+  }
+  .site-detail main > .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-detail .tbl {
+    display: block;
+    overflow-x: auto;
+  }
+}
