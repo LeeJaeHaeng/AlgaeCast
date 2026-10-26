@@ -59,15 +59,15 @@ export function BigChart({ points, height = 380 }: { points: SeriesPoint[]; heig
   );
 }
 
-/** 물·날씨 보조 차트 */
-export function EnvChart({ data, keys, height = 200, unit }: { data: Record<string, unknown>[]; keys: { k: string; label: string; color: string }[]; height?: number; unit?: string }) {
+/** 물·날씨 보조 차트. yWidth = Y축 칸 폭(px, 기본 44) — 눈금 글자가 긴 차트(물 흐름 "1350㎥/s")만 넓힌다 */
+export function EnvChart({ data, keys, height = 200, unit, yWidth = 44 }: { data: Record<string, unknown>[]; keys: { k: string; label: string; color: string }[]; height?: number; unit?: string; yWidth?: number }) {
   return (
     <div style={{ height, minHeight: height }}>
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={C.grid} />
         <XAxis dataKey="date" tickFormatter={fmtDate} minTickGap={36} fontSize={12} stroke={C.text} />
-        <YAxis fontSize={12} width={44} stroke={C.text} unit={unit} />
+        <YAxis fontSize={12} width={yWidth} stroke={C.text} unit={unit} />
         <Tooltip contentStyle={{ background: "#111A2E", border: "1px solid #1E2A44", color: "#E6EDF7" }} labelFormatter={(l) => `날짜 ${fmtDate(String(l))}`} />
         {keys.map((k) => (
           <Line key={k.k} dataKey={k.k} name={k.label} stroke={k.color} dot={false} strokeWidth={1.6} connectNulls isAnimationActive={false} />

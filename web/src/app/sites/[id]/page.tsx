@@ -304,7 +304,8 @@ export default async function SitePage({ params, searchParams }: { params: Promi
           <div>
             <div className="text-sm font-semibold">{SITE.tabs.flow}</div>
             <div className="text-xs text-dim">{SITE.envNote.flow}</div>
-            <EnvChart data={hydroData} keys={[{ k: "inflow", label: "들어오는 물", color: "#22C55E" }, { k: "outflow", label: "내보내는 물(방류)", color: "#F97316" }]} height={180} unit="㎥/s" />
+            {/* Y축 칸 72px: 눈금 "1350㎥/s"(12px 글자 폭 54px)가 기본 44px 칸에서 왼쪽으로 18px 잘리던 것 — 다섯 자리(1만㎥/s 이상)까지 들어감 */}
+            <EnvChart data={hydroData} keys={[{ k: "inflow", label: "들어오는 물", color: "#22C55E" }, { k: "outflow", label: "내보내는 물(방류)", color: "#F97316" }]} height={180} unit="㎥/s" yWidth={72} />
           </div>
           <div>
             <div className="text-sm font-semibold">{SITE.tabs.weather}</div>
