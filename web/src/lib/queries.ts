@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { REPLAY_MIN, REPLAY_RUN_ID, addDaysISO, afterWindow } from "./replay";
+import { REPLAY_MIN, REPLAY_RUN_ID, addDaysISO, afterWindow, weatherWindow, type WeatherObsLite } from "./replay";
 
 export type SiteStatus = {
   site_id: string;
@@ -325,6 +325,13 @@ export async function getForecastAll(asof?: string): Promise<ForecastLite[]> {
     out.push(r);
   }
   return out;
+}
+
+/** 다시 보기 메인 날씨 칸(실측): 전 지점 ASOS 관측(weather_daily ta_mean·rn_sum), 그날−6 ≤ 관측일 ≤ 그날 — 그날 뒤 자료는 쿼리 단계에서 뺀다 */
+export async function getWeatherWindowAll(asof: string): Promise<WeatherObsLite[]> {
+  const { from, to } = weatherWindow(asof);
+  const { data } = await supabase().from("weather_daily").select("site_id,obs_date,ta_mean,rn_sum").gte("obs_date", from).lte("obs_date", to).order("obs_date");
+  return (data ?? []) as WeatherObsLite[];
 }
 
 /** 수집 상태 LED 용: 관측 최신 적재 시각·최신 측정일 */

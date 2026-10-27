@@ -1,5 +1,5 @@
 import type { LogItem } from "@/components/control/EventLog";
-import { BOARD, OFFICIAL_LEVEL, TIER } from "@/lib/copy";
+import { BOARD, TIER, officialLabel } from "@/lib/copy";
 import { fmtCellsKo, tierOf } from "@/lib/format";
 
 /** v_event_log 행 → 표시용 (서버에서 호출) */
@@ -13,7 +13,8 @@ export function toLogItems(rows: { event_time: string; kind: "tier_change" | "ob
     }
     if (r.kind === "observation") {
       const lvl = r.alert_level ?? 0;
-      return { id, time: r.event_time, kind: r.kind, tone: "info", dateOnly: true, text: BOARD.log.observation(r.site_name ?? "", `${fmtCellsKo(r.cell_count)} ${BOARD.unit.cells}`, OFFICIAL_LEVEL[lvl]?.label ?? "–") };
+      // 공식 발령 문구는 officialLabel(접두어 + 접두어 뒤 라벨: "공식 발령 없음"·"공식 발령 관심") — 예전 '공식 발령 ' + "발령 없음" 조합의 단어 중복 방지
+      return { id, time: r.event_time, kind: r.kind, tone: "info", dateOnly: true, text: BOARD.log.observation(r.site_name ?? "", `${fmtCellsKo(r.cell_count)} ${BOARD.unit.cells}`, officialLabel(lvl)) };
     }
     const ok = r.status === "success";
     return { id, time: r.event_time, kind: r.kind, tone: ok ? "normal" : "fail", text: ok ? BOARD.log.runOk : BOARD.log.runFail };

@@ -61,8 +61,9 @@ export function SiteTile({ s, expert, rank, today, linkQuery }: { s: SiteStatus;
           {c.icon} {c.label}
         </span>
         <Info text={`${c.tip} ${datesTip}`} />
+        {/* '공식 발령' + 접두어 뒤 라벨(after: 없음·관심·경계·대발생) — 글자 마디를 전과 같게 두어(픽셀 동일) 0단계만 "공식 발령 없음"으로 바뀐다 */}
         <span className="ml-auto shrink-0 rounded border px-1 py-0.5 text-[11px]" style={{ borderColor: OFFICIAL_LEVEL[lvl].color, color: OFFICIAL_LEVEL[lvl].color }} title={BOARD.basis.nier}>
-          {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].label}
+          {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].after}
         </span>
       </div>
       {/* 2행: 현재 측정 → 예상값 (라벨 줄 + 숫자 줄) */}

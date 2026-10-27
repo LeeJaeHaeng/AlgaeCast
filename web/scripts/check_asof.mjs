@@ -26,10 +26,12 @@
 //  ⑧ 값으로 못 보는 limit 뒤 관측(1천 미만·1,900~2,100·애매)은 그 날짜가 어떤 형식으로도 나오지 않는지(허용 목표일과 같은 날이면 ⑥·⑦이 막음)를 센다.
 //  ⑨ 대조: 지점 상세 = 사건 구역(위), 상황 기록(/log) = 예상 단계 변화 줄이 다시 보기 run 예측으로 만든 것(tierChangesAsOf, 시각·지점)과 같고
 //     새 측정 줄 수가 DB 관측(그날까지 30일)과 같다 — v_event_log(최신 run) 에 기대지 않는지.
+//  ⑩ 날씨(실측, 메인): '그날까지 7일 날씨(실측)' 칸(data-replay-weather=asof)의 출처 줄 창이 (그날−6)~그날(창 끝 = 그날)이고,
+//     지점별 7일 평균 기온·비 합계·자료 일수가 DB weather_daily(그날−6 ≤ 관측일 ≤ 그날)를 같은 함수(summarizeWeatherAsOf)로 집계한 값과 같다.
 // 그 밖: 장면 3개가 허용 범위(max(2026-01-01, run 첫 기준일) ~ 마지막 기준일) 안, 기본 화면에는 띠 없음, 범위 밖·형식 틀림은 안내만.
 import { readFileSync, writeFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
-import { REPLAY_MIN, REPLAY_RUN_ID, SCENES, addDaysISO, tierChangesAsOf } from "../src/lib/replay.ts";
+import { REPLAY_MIN, REPLAY_RUN_ID, SCENES, addDaysISO, summarizeWeatherAsOf, tierChangesAsOf, weatherWindow } from "../src/lib/replay.ts";
 
 const args = process.argv.slice(2);
 const outIdx = args.indexOf("--out");
@@ -224,13 +226,18 @@ lines.push("");
 lines.push(
   "## 장면 × 쪽 × 토글",
   "",
-  "| URL | 응답 | 막는 관측값(애매) | ① 값 | ② 날짜 | ③ 예측 값 | ④⑤ 띠·성적 | ⑥ 구조(객체) | ⑦ SVG(지점 모니터) | ⑧ 값 대신 날짜로 막은 관측 | ⑨ 사건 구역·기록 대조 | 양성 대조 |",
-  "|---|---|---|---|---|---|---|---|---|---|---|---|",
+  "| URL | 응답 | 막는 관측값(애매) | ① 값 | ② 날짜 | ③ 예측 값 | ④⑤ 띠·성적 | ⑥ 구조(객체) | ⑦ SVG(지점 모니터) | ⑧ 값 대신 날짜로 막은 관측 | ⑨ 사건 구역·기록 대조 | ⑩ 날씨(실측) | 양성 대조 |",
+  "|---|---|---|---|---|---|---|---|---|---|---|---|---|",
 );
 let pages = 0;
+const mmdd = (d) => `${d.slice(5, 7)}.${d.slice(8, 10)}`;
 for (const scene of SCENES) {
   const asof = scene.asof;
   const yr = asof.slice(0, 4);
+  // ⑩ 정답: DB weather_daily 그날−6 ≤ 관측일 ≤ 그날 → 앱과 같은 함수로 집계
+  const wWin = weatherWindow(asof);
+  const WX = (await sb.from("weather_daily").select("site_id,obs_date,ta_mean,rn_sum").gte("obs_date", wWin.from).lte("obs_date", wWin.to)).data ?? [];
+  const WANT_W = summarizeWeatherAsOf(WX, SITES, asof);
   for (const after of [false, true]) {
     const limit = after ? addDaysISO(asof, 21) : asof; // 이 날짜 뒤 관측은 보이면 안 됨
     const target = Object.fromEntries(SITES.map((s) => [s, pick(s, asof)?.target_date ?? null]));
@@ -436,6 +443,47 @@ for (const scene of SCENES) {
         if (nObs === 0) hitsG.push("측정 점이 하나도 없음(검사 무력)");
         svg = hitsG.length ? `**${hitsG.length}**` : `0 (측정 ${nObs}점${after ? `·분홍 ${nAfter}` : ""})`;
       }
+      // ⑩ 날씨(실측) 칸 — 메인만: 창 끝 = 그날, 값·자료 일수 = DB 집계
+      const hitsW = [];
+      let cmpW = "–";
+      if (kind === "main") {
+        const wsec = html.body.match(/<section\b[^>]*data-weather-panel[^>]*>[^]*?<\/section>/)?.[0] ?? "";
+        if (!wsec) hitsW.push("날씨 칸(data-weather-panel) 없음");
+        else {
+          const attr = wsec.match(/data-replay-weather="([^"]*)"/)?.[1];
+          if (attr !== asof) hitsW.push(`다시 보기 날씨 칸 아님(data-replay-weather=${attr ?? "없음"} — 예보 칸?)`);
+          const wt = visibleText(wsec);
+          if (!wt.includes("그날까지 7일 날씨(실측)")) hitsW.push("제목이 '그날까지 7일 날씨(실측)' 아님");
+          if (/예보/.test(wt)) hitsW.push("날씨 칸에 '예보' 글자");
+          const bm = wt.match(/(\d\d\.\d\d)~(\d\d\.\d\d)/);
+          if (!bm) hitsW.push("출처 줄의 날짜 창(MM.DD~MM.DD) 없음");
+          else {
+            if (bm[2] !== mmdd(asof)) hitsW.push(`창 끝 ${bm[2]} ≠ 그날 ${mmdd(asof)}`);
+            if (bm[1] !== mmdd(wWin.from)) hitsW.push(`창 시작 ${bm[1]} ≠ 그날−6 ${mmdd(wWin.from)}`);
+          }
+          const rowsGot = [...(wsec.match(/<tbody[^>]*>([^]*?)<\/tbody>/)?.[1] ?? "").matchAll(/<tr[^>]*>([^]*?)<\/tr>/g)].map((m) => [...m[1].matchAll(/<td[^>]*>([^]*?)<\/td>/g)].map((c) => visibleText(c[1]).trim()));
+          let nRows = 0;
+          for (const cells of rowsGot) {
+            const name = (cells[0] ?? "").replace(/\s*\([^()]*\)$/, "").trim();
+            const sid = SITE_ROWS.find((s) => s.name === name)?.site_id;
+            const want = WANT_W.find((w) => w.site_id === sid);
+            if (!sid || !want) {
+              hitsW.push(`지점 이름 모름: ${cells[0]}`);
+              continue;
+            }
+            nRows++;
+            const wantTa = want.ta_mean != null ? `${want.ta_mean.toFixed(1)}℃` : "–";
+            const wantRn = want.rn_sum != null ? `${want.rn_sum.toFixed(1)}mm` : "–";
+            if (cells[1] !== wantTa) hitsW.push(`${name} 기온 ${cells[1]} ≠ DB ${wantTa}`);
+            if (cells[2] !== wantRn) hitsW.push(`${name} 비 ${cells[2]} ≠ DB ${wantRn}`);
+            const note = cells[0].match(/\(([^()]*)\)$/)?.[1] ?? null;
+            const wantNote = want.days >= 7 ? null : want.days ? `${want.days}일 자료` : "관측 자료 없음";
+            if (note !== wantNote) hitsW.push(`${name} 자료 일수 표시 '${note ?? "없음"}' ≠ '${wantNote ?? "없음"}'`);
+          }
+          if (nRows !== SITES.length) hitsW.push(`날씨 행 ${nRows}개 ≠ 지점 ${SITES.length}개`);
+          cmpW = hitsW.length ? `**${hitsW.length}**` : `${nRows}행=DB(${mmdd(wWin.from)}~${mmdd(asof)})`;
+        }
+      }
       // ⑧ 값으로 못 보는 관측 → 그 날짜가 어디에도 없는지(허용 목표일과 같은 날은 ⑥·⑦ 담당)
       const allDates = new Set([...datesIn(html.body, ["iso"], yr), ...datesIn(textOf(htmlText), ["dot", "mmdd", "ko"], yr), ...datesIn(rsc.body, ["iso", "dot", "ko"], yr)].filter((f) => !f.meta).map((f) => f.d));
       let byDateHit = 0;
@@ -459,13 +507,13 @@ for (const scene of SCENES) {
         }
         pos = s;
       }
-      const ok = html.status === 200 && rsc.status === 200 && rsc.type.includes("text/x-component") && !hitsV.length && !hitsD.size && !hitsP.length && band && score && !hitsS.length && !hitsG.length && !byDateHit && !hitsH.length;
+      const ok = html.status === 200 && rsc.status === 200 && rsc.type.includes("text/x-component") && !hitsV.length && !hitsD.size && !hitsP.length && band && score && !hitsS.length && !hitsG.length && !byDateHit && !hitsH.length && !hitsW.length;
       if (!ok) fails++;
       const n = (a) => (a ? `**${a}**` : 0);
       lines.push(
-        `| ${url} | ${html.status}/${rsc.status}${rsc.type.includes("text/x-component") ? "" : " (RSC 아님)"} | ${forbidObs.length}(${ambiguous}) | ${n(hitsV.length)} | ${n(hitsD.size)}${metaSeen.size ? ` (모델 고정 시각 ${[...metaSeen].sort().join("·")} 제외)` : ""} | ${n(hitsP.length)} | ${band ? "띠 있음" : "**띠 없음/장면 이름**"}·${score ? "성적 없음" : "**성적 있음**"} | ${n(hitsS.length)} | ${svg} | ${byDateOnly.length}건 중 발견 ${n(byDateHit)}(목표일과 같은 날 ${byDateTarget}) | ${hitsH.length ? `**${hitsH.length}**` : cmp9} | ${pos} |`,
+        `| ${url} | ${html.status}/${rsc.status}${rsc.type.includes("text/x-component") ? "" : " (RSC 아님)"} | ${forbidObs.length}(${ambiguous}) | ${n(hitsV.length)} | ${n(hitsD.size)}${metaSeen.size ? ` (모델 고정 시각 ${[...metaSeen].sort().join("·")} 제외)` : ""} | ${n(hitsP.length)} | ${band ? "띠 있음" : "**띠 없음/장면 이름**"}·${score ? "성적 없음" : "**성적 있음**"} | ${n(hitsS.length)} | ${svg} | ${byDateOnly.length}건 중 발견 ${n(byDateHit)}(목표일과 같은 날 ${byDateTarget}) | ${hitsH.length ? `**${hitsH.length}**` : cmp9} | ${cmpW} | ${pos} |`,
       );
-      for (const h of [...hitsV.slice(0, 3), ...[...hitsD].slice(0, 4), ...hitsP.slice(0, 3), ...hitsS.slice(0, 3), ...hitsG.slice(0, 3), ...hitsH.slice(0, 4)]) lines.push(`|  ↳ ${h.replace(/\|/g, "/")} | | | | | | | | | | | |`);
+      for (const h of [...hitsV.slice(0, 3), ...[...hitsD].slice(0, 4), ...hitsP.slice(0, 3), ...hitsS.slice(0, 3), ...hitsG.slice(0, 3), ...hitsH.slice(0, 4), ...hitsW.slice(0, 4)]) lines.push(`|  ↳ ${h.replace(/\|/g, "/")} | | | | | | | | | | | | |`);
     }
   }
 }

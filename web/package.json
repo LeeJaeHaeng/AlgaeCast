@@ -11,7 +11,8 @@
     "sync-reports": "node scripts/sync-reports.mjs",
     "check-numbers": "node scripts/check_numbers.mjs",
     "test": "node --test scripts/test_tip.mjs scripts/test_replay.mjs",
-    "check-asof": "node scripts/check_asof.mjs"
+    "check-asof": "node scripts/check_asof.mjs",
+    "check-dup-words": "node scripts/check_dup_words.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.5.0",

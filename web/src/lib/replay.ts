@@ -27,6 +27,8 @@ export const REPLAY_RUN_ID = "9269d95d-9b8f-4d12-babe-02f9f60b41c5";
 export const AFTER_DAYS = 21;
 /** 상황 기록 창(일) — 실시간 화면과 같음 */
 export const LOG_DAYS = 30;
+/** 다시 보기 메인 날씨 칸(실측)의 창 길이(일): 그날−6 ~ 그날 */
+export const WEATHER_DAYS = 7;
 
 export type SceneId = "pre" | "onset" | "miss";
 /** 미리 정한 장면 3개 — 날짜·근거는 DB bloom_events·predictions(현재 run) 에서 정함(docs/handoff/REPORT_다시보기.md) */
@@ -90,6 +92,42 @@ export function afterWindow(asof: string, days = AFTER_DAYS): { from: string; to
 export function obsAfter<T extends { obs_date: string }>(rows: T[], asof: string, days = AFTER_DAYS): T[] {
   const { to } = afterWindow(asof, days);
   return rows.filter((r) => r.obs_date > asof && r.obs_date <= to);
+}
+
+/** 다시 보기 날씨 칸의 창: 그날−(days−1) ≤ 관측일 ≤ 그날 (7일이면 asof−6 ~ asof). 창 끝 = 그날 — 그날 뒤 자료는 들어오지 않는다 */
+export function weatherWindow(asof: string, days = WEATHER_DAYS): { from: string; to: string } {
+  return { from: addDaysISO(asof, -(days - 1)), to: asof };
+}
+
+export type WeatherObsLite = { site_id: string; obs_date: string; ta_mean: number | null; rn_sum: number | null };
+export type WeatherSummary = { site_id: string; ta_mean: number | null; rn_sum: number | null; days: number };
+const round1 = (v: number) => Math.round(v * 10) / 10;
+
+/**
+ * 다시 보기 메인 '그날까지 7일 날씨(실측)': 지점별 7일 평균 기온(℃, 소수 1자리)·7일 비 합계(mm, 소수 1자리).
+ * - 창 밖 행(특히 그날 뒤)은 버린다(쿼리 단계 .gte/.lte 에 더해 한 번 더 거른다). 같은 날 행이 둘이면 값 있는 칸이 이긴다.
+ * - days = 창 안에서 기온이나 비 값이 하나라도 있는 날 수(7 미만이면 화면에 'n일 자료'). 기온은 값 있는 날 평균, 비는 값 있는 날 합계.
+ *   값이 하나도 없으면 null(화면 '–'). 화면(ReplayWeatherPanel)과 검사(scripts/check_asof.mjs)가 같은 함수를 쓴다.
+ */
+export function summarizeWeatherAsOf(rows: WeatherObsLite[], siteIds: string[], asof: string, days = WEATHER_DAYS): WeatherSummary[] {
+  const { from, to } = weatherWindow(asof, days);
+  return siteIds.map((sid) => {
+    const byDate = new Map<string, { ta: number | null; rn: number | null }>();
+    for (const r of rows) {
+      if (r.site_id !== sid || r.obs_date < from || r.obs_date > to) continue;
+      const cur = byDate.get(r.obs_date) ?? { ta: null, rn: null };
+      byDate.set(r.obs_date, { ta: r.ta_mean ?? cur.ta, rn: r.rn_sum ?? cur.rn });
+    }
+    const vals = [...byDate.values()];
+    const ta = vals.map((v) => v.ta).filter((v): v is number => v != null);
+    const rn = vals.map((v) => v.rn).filter((v): v is number => v != null);
+    return {
+      site_id: sid,
+      ta_mean: ta.length ? round1(ta.reduce((a, b) => a + b, 0) / ta.length) : null,
+      rn_sum: rn.length ? round1(rn.reduce((a, b) => a + b, 0)) : null,
+      days: vals.filter((v) => v.ta != null || v.rn != null).length,
+    };
+  });
 }
 
 /** 예측 행의 실측은 목표일 ≤ asof 일 때만 남긴다 */

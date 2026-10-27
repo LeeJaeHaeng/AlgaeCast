@@ -2,7 +2,7 @@
 // 관측·예측·사건·상황 기록 거르기, '그 뒤 실제로는' 21일 범위, 허용 범위 판정, 링크 쿼리.
 import assert from "node:assert/strict";
 import test from "node:test";
-import { AFTER_DAYS, REPLAY_MIN, REPLAY_RUN_ID, SCENES, addDaysISO, afterWindow, buildStatusAsOf, eventsAsOf, fillActualAsOf, isIsoDate, logAsOf, maskFutureActual, mergeLogAsOf, mergeSameDate, obsAfter, obsAsOf, parseReplay, pickPredAsOf, predsAsOf, replayMinOf, replayQuery, replayState, sceneOf, tierChangesAsOf } from "../src/lib/replay.ts";
+import { AFTER_DAYS, REPLAY_MIN, REPLAY_RUN_ID, SCENES, WEATHER_DAYS, addDaysISO, afterWindow, buildStatusAsOf, eventsAsOf, fillActualAsOf, isIsoDate, logAsOf, maskFutureActual, mergeLogAsOf, mergeSameDate, obsAfter, obsAsOf, parseReplay, pickPredAsOf, predsAsOf, replayMinOf, replayQuery, replayState, sceneOf, summarizeWeatherAsOf, tierChangesAsOf, weatherWindow } from "../src/lib/replay.ts";
 
 const bounds = { min: "2026-05-04", max: "2026-10-22" };
 
@@ -230,6 +230,38 @@ test("상황 기록 합치기: 새 측정(뷰) + 단계 변화(run), 그날까�
 test("다시 보기 run 고정: 상수 한 곳(uuid 형식)", () => {
   assert.match(REPLAY_RUN_ID, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
   assert.ok(REPLAY_RUN_ID.startsWith("9269d95d"));
+});
+
+test("다시 보기 날씨 칸(실측): 창 = 그날−6 ~ 그날(창 끝 = 그날), 그날 뒤·창 앞 행 제외, 평균·합계 소수 1자리, 자료 일수", () => {
+  assert.equal(WEATHER_DAYS, 7);
+  assert.deepEqual(weatherWindow("2026-07-27"), { from: "2026-07-21", to: "2026-07-27" });
+  assert.deepEqual(weatherWindow("2026-08-03"), { from: "2026-07-28", to: "2026-08-03" });
+  assert.deepEqual(weatherWindow("2026-03-02"), { from: "2026-02-24", to: "2026-03-02" }, "달 넘김");
+  const rows = [
+    { site_id: "A", obs_date: "2026-07-20", ta_mean: 10, rn_sum: 100 }, // 창 앞(그날−7)
+    { site_id: "A", obs_date: "2026-07-21", ta_mean: 28.1, rn_sum: 0 },
+    { site_id: "A", obs_date: "2026-07-22", ta_mean: 28.4, rn_sum: 1.2 },
+    { site_id: "A", obs_date: "2026-07-23", ta_mean: null, rn_sum: 0.3 }, // 기온 없음(비만)
+    { site_id: "A", obs_date: "2026-07-27", ta_mean: 30, rn_sum: null }, // 그날(포함), 비 없음
+    { site_id: "A", obs_date: "2026-07-28", ta_mean: 99, rn_sum: 999 }, // 그날 다음 날 → 제외
+    { site_id: "B", obs_date: "2026-07-27", ta_mean: 25.04, rn_sum: 5.26 },
+    { site_id: "B", obs_date: "2026-07-25", ta_mean: null, rn_sum: null }, // 값 없는 행은 일수에 안 셈
+  ];
+  const [a, b, c] = summarizeWeatherAsOf(rows, ["A", "B", "C"], "2026-07-27");
+  assert.deepEqual(a, { site_id: "A", ta_mean: 28.8, rn_sum: 1.5, days: 4 }, "A: 기온 (28.1+28.4+30)/3=28.83→28.8, 비 0+1.2+0.3=1.5, 자료 4일");
+  assert.deepEqual(b, { site_id: "B", ta_mean: 25.0, rn_sum: 5.3, days: 1 }, "B: 소수 1자리 반올림, 값 없는 날은 안 셈");
+  assert.deepEqual(c, { site_id: "C", ta_mean: null, rn_sum: null, days: 0 }, "C: 자료 없음 → null");
+  const flat = JSON.stringify([a, b, c]);
+  assert.ok(!flat.includes("99") && !flat.includes("100"), "그날 뒤·창 앞 값이 섞이지 않음");
+  // 7일 모두 있으면 days = 7
+  const full = Array.from({ length: 7 }, (_, i) => ({ site_id: "D", obs_date: addDaysISO("2026-07-21", i), ta_mean: 20 + i, rn_sum: 1 }));
+  assert.deepEqual(summarizeWeatherAsOf(full, ["D"], "2026-07-27")[0], { site_id: "D", ta_mean: 23.0, rn_sum: 7.0, days: 7 });
+  // 같은 날 두 행이면 값 있는 칸이 이김
+  const dup = [
+    { site_id: "E", obs_date: "2026-07-27", ta_mean: null, rn_sum: 2 },
+    { site_id: "E", obs_date: "2026-07-27", ta_mean: 21, rn_sum: null },
+  ];
+  assert.deepEqual(summarizeWeatherAsOf(dup, ["E"], "2026-07-27")[0], { site_id: "E", ta_mean: 21.0, rn_sum: 2.0, days: 1 });
 });
 
 test("큰 차트 같은 날짜 점 합치기: 측정 점과 목표일 예상 점이 한 점으로, 값 있는 칸 유지", () => {

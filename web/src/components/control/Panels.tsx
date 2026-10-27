@@ -4,6 +4,7 @@ import { BOARD, COMBO, COMBO_ORDER, REPLAY, banner as bannerText, comboOf } from
 import { fmtDate, tierOf } from "@/lib/format";
 import { CMP, NUMBERS } from "@/lib/numbers";
 import type { ForecastLite, SiteStatus } from "@/lib/queries";
+import { WEATHER_DAYS, weatherWindow, type WeatherSummary } from "@/lib/replay";
 
 /** 상황 배너(48px): 색 = 가장 높은 조합, 문구 = §8.3 템플릿(조합별 "지점, 지점 라벨" 을 · 로 연결), 우측 = 조합별 개수 */
 export function Banner({ status, nextRefresh, tail }: { status: SiteStatus[]; nextRefresh: string; tail?: string }) {
@@ -73,6 +74,46 @@ export function WeatherPanel({ sites, fc }: { sites: SiteStatus[]; fc: ForecastL
         {BOARD.weather.basis}
         {fc[0] ? ` (${fmtDate(fc[0].obs_date)} 발표)` : ` — ${BOARD.weather.none}`}
       </p>
+    </section>
+  );
+}
+
+/**
+ * 다시 보기 메인의 날씨 칸: 그날까지 발표된 예보가 없어 비어 있던 예보 칸 대신 '그날까지 7일 날씨(실측)' — 지점별 ASOS 7일 평균 기온·비 합계
+ * (창 = 그날−6 ~ 그날, 집계는 replay.ts summarizeWeatherAsOf). 표 모양·data-weather-panel 은 실시간 칸과 같게(큰 화면 줄 높이 규칙 공유, globals.css).
+ * 자료가 7일 미만이면 지점 이름 옆에 'n일 자료'. data-replay-weather = 그날(scripts/check_asof.mjs 가 이 칸의 값·창 끝을 DB 와 대조).
+ */
+export function ReplayWeatherPanel({ sites, wx, asof }: { sites: SiteStatus[]; wx: WeatherSummary[]; asof: string }) {
+  const { from, to } = weatherWindow(asof);
+  return (
+    <section className="panel flex min-h-0 flex-col p-3" aria-label={REPLAY.weather.title} data-weather-panel data-replay-weather={asof}>
+      <h2 className="panel-title mb-1">{REPLAY.weather.title}</h2>
+      <table className="tbl text-sm">
+        <thead>
+          <tr>
+            <th>지점</th>
+            <th className="text-right">{REPLAY.weather.temp}</th>
+            <th className="text-right">{REPLAY.weather.rain}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sites.map((s) => {
+            const w = wx.find((x) => x.site_id === s.site_id);
+            const n = w?.days ?? 0;
+            return (
+              <tr key={s.site_id}>
+                <td>
+                  {s.name}
+                  {n < WEATHER_DAYS && <span className="ml-1 text-xs text-dim">({n ? REPLAY.weather.days(n) : REPLAY.weather.none})</span>}
+                </td>
+                <td className="text-right">{w?.ta_mean != null ? `${w.ta_mean.toFixed(1)}${BOARD.unit.temp}` : "–"}</td>
+                <td className="text-right">{w?.rn_sum != null ? `${w.rn_sum.toFixed(1)}${BOARD.unit.mm}` : "–"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <p className="mt-auto pt-1 text-xs text-dim">{REPLAY.weather.basis(fmtDate(from), fmtDate(to))}</p>
     </section>
   );
 }

@@ -85,7 +85,6 @@ export function addDays(d: string | Date, n: number): Date {
   return x;
 }
 
-export const ALERT_LEVEL_LABEL: Record<number, string> = { 0: "없음", 1: "관심", 2: "경계", 3: "대발생" };
 
 /** 추세 화살표: 예상/현재 비율 ±20% */
 export function trendArrow(now: number | null | undefined, next: number | null | undefined): "↑" | "↓" | "→" {

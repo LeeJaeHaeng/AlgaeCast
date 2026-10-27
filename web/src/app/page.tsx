@@ -4,7 +4,7 @@ import { ControlMap } from "@/components/control/ControlMap";
 import { Escalation } from "@/components/control/Escalation";
 import { EventLog } from "@/components/control/EventLog";
 import { MiniChart } from "@/components/control/MiniChart";
-import { Banner, ReplayScoreStrip, ScoreStrip, WeatherPanel } from "@/components/control/Panels";
+import { Banner, ReplayScoreStrip, ReplayWeatherPanel, ScoreStrip, WeatherPanel } from "@/components/control/Panels";
 import { ReplayBand, ReplayNotice } from "@/components/control/ReplayBand";
 import { SiteTile } from "@/components/control/SiteTile";
 import { TopBar, type Leds, type LedState } from "@/components/control/TopBar";
@@ -12,8 +12,8 @@ import { unstable_cache } from "next/cache";
 import { BOARD, COMBO, REPLAY, comboOf } from "@/lib/copy";
 import { toLogItems } from "@/lib/eventlog";
 import { fmtDateTimeKST, fmtTimeKST, tierOf } from "@/lib/format";
-import { getCollectStatus, getEventLog, getForecastAll, getLatestRunAny, getObsAfterAll, getPredictionsAllAsOf, getRecentObsAll, getReplayBounds, getReplayRun, getReplayTierSeed, getSiteStatus, getSites, type ObsLite } from "@/lib/queries";
-import { REPLAY_RUN_ID, afterWindow, buildStatusAsOf, mergeLogAsOf, obsAsOf, replayMinOf, replayQuery, replayState, tierChangesAsOf, type Replay } from "@/lib/replay";
+import { getCollectStatus, getEventLog, getForecastAll, getLatestRunAny, getObsAfterAll, getPredictionsAllAsOf, getRecentObsAll, getReplayBounds, getReplayRun, getReplayTierSeed, getSiteStatus, getSites, getWeatherWindowAll, type ForecastLite, type ObsLite } from "@/lib/queries";
+import { REPLAY_RUN_ID, afterWindow, buildStatusAsOf, mergeLogAsOf, obsAsOf, replayMinOf, replayQuery, replayState, summarizeWeatherAsOf, tierChangesAsOf, type Replay, type WeatherSummary } from "@/lib/replay";
 
 export const revalidate = 300;
 
@@ -35,17 +35,23 @@ const getBounds = unstable_cache(async () => getReplayBounds((await getReplayRun
  * 다시 보기 자료: 관측은 관측일 ≤ asof, 예측은 기준일 ≤ asof 인 다시 보기 run(REPLAY_RUN_ID, 없으면 최신 run)의 지난 예상값(쿼리 단계에서 거름).
  * '그 뒤 실제로는'(after)을 켰을 때만 asof 뒤 21일 관측을 따로 가져온다. 인자(asof, after)가 캐시 키에 들어간다.
  * 상황 기록: 새 측정 기록은 뷰(v_event_log)에서, 예상 단계 변화는 같은 다시 보기 run 예측으로 만든다(타일·지도와 같은 run).
+ * 날씨 칸: 예보(getForecastAll) 대신 그날까지 7일 ASOS 관측(getWeatherWindowAll, 그날−6 ~ 그날)을 지점별로 집계한다(summarizeWeatherAsOf).
  */
 const getReplayBoardData = unstable_cache(
   async (asof: string, after: boolean) => {
     const run = await getReplayRun();
     const runId = run?.run_id ?? null;
-    const [sites, preds, seed, obs120, obsLog, fc, afterObs] = await Promise.all([getSites(), getPredictionsAllAsOf(runId, asof), getReplayTierSeed(runId), getRecentObsAll(120, asof), getEventLog(30, 80, asof), getForecastAll(asof), after ? getObsAfterAll(asof) : Promise.resolve([] as ObsLite[])]);
+    const [sites, preds, seed, obs120, obsLog, wxRows, afterObs] = await Promise.all([getSites(), getPredictionsAllAsOf(runId, asof), getReplayTierSeed(runId), getRecentObsAll(120, asof), getEventLog(30, 80, asof), getWeatherWindowAll(asof), after ? getObsAfterAll(asof) : Promise.resolve([] as ObsLite[])]);
     const status = buildStatusAsOf(sites, preds, obs120, asof);
     const events = mergeLogAsOf(obsLog, tierChangesAsOf(preds, seed, sites, asof), asof, 30, 80);
-    return { status, sites, events, obs: obsAsOf(obs120, asof, 70), fc, afterObs };
+    const wx = summarizeWeatherAsOf(
+      wxRows,
+      sites.map((s) => s.site_id),
+      asof,
+    );
+    return { status, sites, events, obs: obsAsOf(obs120, asof, 70), wx, afterObs };
   },
-  ["board-replay", "log-from-run", REPLAY_RUN_ID],
+  ["board-replay", "log-from-run", "weather-obs", REPLAY_RUN_ID],
   { revalidate: 300, tags: ["board-data"] },
 );
 
@@ -63,9 +69,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const replay: Replay | null = bounds && rstate === "ok" ? { asof: sp.asof as string, after: sp.after === "1" } : null;
   const notice = bounds && (rstate === "bad" || rstate === "range") ? REPLAY.notice(replayMinOf(bounds), bounds.max ?? "–") : null;
   const dbOk = true; // 조회 실패 시 Next 가 오류 화면을 내므로 여기 도달하면 저장소 정상
-  const { status, sites, anyRun, events, obs, fc, collect, afterObs } = replay
-    ? { ...(await getReplayBoardData(replay.asof, replay.after)), anyRun: null, collect: { fetched_at: null, obs_date: null } }
-    : { ...(await getBoardData()), afterObs: [] as ObsLite[] };
+  const { status, sites, anyRun, events, obs, fc, wx, collect, afterObs } = replay
+    ? { ...(await getReplayBoardData(replay.asof, replay.after)), anyRun: null, collect: { fetched_at: null, obs_date: null }, fc: [] as ForecastLite[] }
+    : { ...(await getBoardData()), afterObs: [] as ObsLite[], wx: [] as WeatherSummary[] };
   const renderedAt = replay ? replay.asof : new Date().toISOString();
   const today = replay ? replay.asof : new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
   const lq = replay ? replayQuery({ replay, expert }) : undefined; // 다시 보기 안 링크: asof 유지
@@ -141,7 +147,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           ))}
         </section>
         <div className="order-5 min-h-0">
-          <WeatherPanel sites={ranked} fc={fc} />
+          {replay ? <ReplayWeatherPanel sites={ranked} wx={wx} asof={replay.asof} /> : <WeatherPanel sites={ranked} fc={fc} />}
         </div>
       </main>
       {replay ? <ReplayScoreStrip expert={expert} after={replay.after} /> : <ScoreStrip expert={expert} />}

@@ -64,7 +64,7 @@ export default function MapInner({ sites, expert, light, linkQuery }: { sites: M
                   {s.name} <span style={{ color: c.hex }}>{c.label}</span>
                 </div>
                 <div>
-                  {BOARD.tile.now} {fmtCellsKo(s.latest_cell_count)} {BOARD.unit.cells} · {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].label} · {BOARD.tile.ai} {TIER[t].label}
+                  {BOARD.tile.now} {fmtCellsKo(s.latest_cell_count)} {BOARD.unit.cells} · {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].after} · {BOARD.tile.ai} {TIER[t].label}
                 </div>
                 <div>
                   {BOARD.tile.next} {fmtCellsKo(s.point)} {BOARD.unit.cells} · {BOARD.tile.chance} {pctInt(s.p_alert)}%

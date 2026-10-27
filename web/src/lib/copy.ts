@@ -127,12 +127,17 @@ export const COMBO: Record<Combo, { rank: number; label: string; bannerWord: str
 };
 export const COMBO_ORDER: Combo[] = ["enter", "watch", "persist", "improve", "safe"];
 
-/** 공식 발령 단계(측정 기준) */
-export const OFFICIAL_LEVEL: Record<number, { label: string; color: string }> = {
-  0: { label: "발령 없음", color: "var(--text-dim)" },
-  1: { label: "관심", color: "var(--watch)" },
-  2: { label: "경계", color: "var(--alert)" },
-  3: { label: "대발생", color: "var(--severe)" },
+/**
+ * 공식 발령 단계(측정 기준).
+ * - label: 단독으로 쓸 때의 전체 라벨("발령 없음").
+ * - after: '공식 발령' 접두어 뒤에 붙이는 라벨("없음" → "공식 발령 없음"; 그 밖의 단계는 label 과 같음 → "공식 발령 관심").
+ *   접두어와 label 을 그대로 이으면 "공식 발령 발령 없음"(단어 중복)이 되므로, 접두어가 있는 곳은 반드시 officialLabel()·after 를 쓴다.
+ */
+export const OFFICIAL_LEVEL: Record<number, { label: string; after: string; color: string }> = {
+  0: { label: "발령 없음", after: "없음", color: "var(--text-dim)" },
+  1: { label: "관심", after: "관심", color: "var(--watch)" },
+  2: { label: "경계", after: "경계", color: "var(--alert)" },
+  3: { label: "대발생", after: "대발생", color: "var(--severe)" },
 };
 
 /** §8 피처 그룹 → 쉬운 이름 */
@@ -208,7 +213,8 @@ export const BOARD = {
   actionsLess: "접기",
   log: {
     tierChange: (site: string, from: string | null, to: string) => (from ? `${site} 예상 단계 ${from} → ${to}` : `${site} 예상 단계 ${to}`),
-    observation: (site: string, cells: string, official: string) => `${site} 새 측정 ${cells} · 공식 발령 ${official}`,
+    /** official = officialLabel(단계) 전체 문구("공식 발령 없음"·"공식 발령 관심") */
+    observation: (site: string, cells: string, official: string) => `${site} 새 측정 ${cells} · ${official}`,
     runOk: "예측 갱신 완료",
     runFail: "예측 갱신 실패 — 마지막 성공 결과를 표시 중",
     empty: "최근 30일 기록이 없습니다.",
@@ -229,6 +235,12 @@ export const BOARD = {
   unit: { cells: "개/mL", pct: "%", days: "일", temp: "℃", mm: "mm" },
   basis: { nier: "국립환경과학원 조류경보제 측정값", model: "고정된 모델 예상값", cqr: "10번 중 8번 들어오는 범위", chance: `대응 필요 기준 ${OP_PCT}%` },
 } as const;
+
+/**
+ * "공식 발령 없음" / "공식 발령 관심" — 문자열 자리(상황 기록 등)용. 접두어(BOARD.tile.official) + 접두어 뒤 라벨(OFFICIAL_LEVEL[].after). 모르는 단계는 "공식 발령 –".
+ * JSX 자리(타일 배지·지점 머리·지도 팝업·권고 조치 설명)는 글자 마디를 전과 같게 두려고 `{BOARD.tile.official} {OFFICIAL_LEVEL[lvl].after}` 로 같은 조합을 쓴다.
+ */
+export const officialLabel = (level: number | null | undefined): string => `${BOARD.tile.official} ${OFFICIAL_LEVEL[level ?? 0]?.after ?? "–"}`;
 
 /** 지점 상세 문구 (§4) */
 export const SITE = {
@@ -479,6 +491,19 @@ export const REPLAY = {
   logTitle: (d: string) => `상황 기록 (${d}까지 30일)`,
   /** 다시 보기의 성적표 띠: 그날 뒤 측정으로 매긴 성적(사건 수)은 싣지 않는다 */
   scoreNote: "다시 보기에는 그날 뒤의 측정으로 매긴 성적(미리 알린 경계 사건 수)을 싣지 않습니다.",
+  /**
+   * 다시 보기 메인의 날씨 칸: 그날까지 발표된 예보가 없어(예보는 2026년 10월부터 모음) 비어 있던 '향후 7일 날씨' 대신
+   * 그날까지 7일(그날−6 ~ 그날)의 기상청 ASOS 관측을 보여 준다(그날 뒤 자료 금지). 출처 줄의 창 끝 = 그날.
+   */
+  weather: {
+    title: "그날까지 7일 날씨(실측)",
+    temp: "7일 평균 기온",
+    rain: "7일 비 합계",
+    basis: (from: string, to: string) => `기상청 ASOS 관측, ${from}~${to}`,
+    /** 창 안에 자료가 7일 미만일 때 지점 이름 옆에 */
+    days: (n: number) => `${n}일 자료`,
+    none: "관측 자료 없음",
+  },
 } as const;
 
 /** 쉽게 보기에서 금지하는 표현(자동 점검용, §7·§10). 소문자 비교. */

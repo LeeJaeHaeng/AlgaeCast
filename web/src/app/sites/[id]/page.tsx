@@ -5,7 +5,7 @@ import { ReplayBand, ReplayNotice } from "@/components/control/ReplayBand";
 import { RangeBar } from "@/components/control/SiteTile";
 import { BigChart, EnvChart, type SeriesPoint } from "@/components/site/SiteCharts";
 import { BOARD, COMBO, GROUP_LABEL, OFFICIAL_LEVEL, REASON, REASON_WATER_UP_MILD, REPLAY, SITE, TERMS, TIER, TIER_EXPERT, UPSTREAM_PREFIX, comboOf, explainForecast, levelOfCells, outOfRange, outOfRangeTip, reasonWaterDays, targetLabel, type FeatureGroup } from "@/lib/copy";
-import { ALERT_LEVEL_LABEL, addDays, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
+import { addDays, fmtCells, fmtCellsKo, fmtDate, fmtDateFull, fmtDateKo, pctInt, tierOf } from "@/lib/format";
 import { getBloomEvents, getHydro, getLatestRun, getObservations, getObservationsAfter, getPredictions, getReplayBounds, getReplayRun, getShap, getSiteStatus, getSites, getWeather, type Observation, type Shap } from "@/lib/queries";
 import { addDaysISO, buildStatusAsOf, eventsAsOf, fillActualAsOf, mergeSameDate, obsAsOf, predsAsOf, replayMinOf, replayQuery, replayState, type Replay } from "@/lib/replay";
 import { OP_PCT } from "@/lib/numbers";
@@ -123,8 +123,9 @@ export default async function SitePage({ params, searchParams }: { params: Promi
           {c.icon} {c.label}
         </span>
         <Info text={c.tip} />
+        {/* '공식 발령' + 접두어 뒤 라벨(after) — 글자 마디를 전과 같게 두어(픽셀 동일) 0단계만 "공식 발령 없음"으로 바뀐다 */}
         <span className="rounded border px-2 py-0.5 text-sm" style={{ borderColor: OFFICIAL_LEVEL[lvl].color, color: OFFICIAL_LEVEL[lvl].color }}>
-          {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].label} <span className="opacity-70">({SITE.measuredBasis})</span>
+          {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].after} <span className="opacity-70">({SITE.measuredBasis})</span>
         </span>
         <span className="rounded border px-2 py-0.5 text-sm" style={{ borderColor: TIER[t].color, color: TIER[t].color }}>
           {BOARD.tile.ai} {TIER[t].label}
@@ -337,7 +338,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
             ))}
           </ul>
           <p className="mt-3 text-sm text-dim">
-            {BOARD.tile.official} {ALERT_LEVEL_LABEL[lvl]} ({SITE.measuredBasis}) 과 {BOARD.tile.ai} {TIER[t].label} 을 함께 본 판단입니다. 공식 발령을 대체하지 않습니다.
+            {BOARD.tile.official} {OFFICIAL_LEVEL[lvl].after} ({SITE.measuredBasis}) 과 {BOARD.tile.ai} {TIER[t].label} 을 함께 본 판단입니다. 공식 발령을 대체하지 않습니다.
           </p>
         </section>
       </div>
