@@ -60,14 +60,18 @@ section.footnotes { font-size: 6.2pt; line-height: 1.2; color: #333; border-top:
 .cover .head .box .sec { margin-top: 0; }
 .cover .head .note { font-size: 8.4pt; color: #444; margin-top: 1mm; }
 .cover .head code { font-size: 8pt; }
+.nw { white-space: nowrap; }
+.formmap { page-break-before: always; }
+.formmap h2 { margin-top: 0; }
+.formmap table { font-size: 8.4pt; line-height: 1.45; }
 .toc { page-break-before: always; page-break-after: always; }
 .toc h2 { page-break-before: avoid; }
 .toc ol { list-style: none; }
-.toc > ol { columns: 2; column-gap: 8mm; font-size: 10pt; line-height: 1.55; padding-left: 0; }
+.toc > ol { columns: 2; column-gap: 8mm; font-size: 9.6pt; line-height: 1.42; padding-left: 0; }
 .toc > ol > li { font-weight: 600; }
 .toc ol ol li { font-weight: 400; }
 .toc > ol > li { break-inside: avoid; margin-bottom: 1.5mm; }
-.toc ol ol { font-size: 8.6pt; line-height: 1.4; color: #333; padding-left: 5mm; }
+.toc ol ol { font-size: 8.3pt; line-height: 1.3; color: #333; padding-left: 5mm; }
 """
 
 
@@ -97,7 +101,14 @@ def main() -> int:
     md = MD.read_text(encoding="utf-8")
     cover_end = md.index("\n## ")
     cover_md, body_md = md[:cover_end], md[cover_end:]
+    # 번호 없는 쪽(제출 양식 항목 대응표): 표지(1쪽 요약) 바로 뒤 첫 절이 번호·'부록'으로 시작하지 않으면
+    # 목차 앞 독립된 한 쪽으로 찍고 목차에서는 뺀다.
+    pre_md = ""
+    if re.match(r"\n## (?!\d|부록)", body_md):
+        nxt = body_md.index("\n## ", 1)
+        pre_md, body_md = body_md[:nxt], body_md[nxt:]
     render = mistune.create_markdown(plugins=["table", "footnotes", "strikethrough"], escape=False)
+    pre = f'<div class="formmap">{render(pre_md)}</div>' if pre_md else ""
     body = render(body_md)
     # 그림 아래 캡션(대체 텍스트)
     # 본문에 '*그림 x-y. …*' 캡션이 바로 뒤따르는 그림은 대체 텍스트 캡션을 생략한다(중복 방지).
@@ -108,7 +119,7 @@ def main() -> int:
     )
     cover = render(cover_md)
     html = f"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>AlgaeCast-7 방법설명서</title><style>{CSS}</style></head>
-<body><div class="cover">{cover}</div>{toc(body_md)}{body}</body></html>"""
+<body><div class="cover">{cover}</div>{pre}{toc(body_md)}{body}</body></html>"""
     HTML.write_text(html, encoding="utf-8")
     missing = [p for p in re.findall(r'<img src="([^"]+)"', html) if not (REP / p).exists()]
     if missing:

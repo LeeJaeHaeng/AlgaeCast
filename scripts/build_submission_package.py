@@ -16,7 +16,7 @@
 사용(3단계):
   1) python scripts/build_submission_package.py             # 패키지 생성(+민감정보 검사)
   2) python scripts/verify_package.py --update-package      # 새 venv 재현(diff 0·노트북 오류 0·데모 sha256) → 실행본 ipynb 를 패키지에 반영
-  3) python scripts/build_submission_package.py --zip-only  # README 체크리스트를 검증 결과로 갱신 → 민감정보 재검사 → zip 3개
+  3) python scripts/build_submission_package.py --zip-only  # README 체크리스트를 검증 결과로 갱신 → 민감정보 재검사 → 모델자료 zip 3개 → 문서자료 zip 2개(A안·B안)
      (기본 2개 = 영상 포함·영상 제외, DataON 원값 미포함 / 대체 1개 = _with_dataon, 운영사무국 허용 시에만)
 """
 
@@ -37,10 +37,23 @@ from pathlib import Path
 from algaecast.config import ROOT
 
 PKG_NAME = "AlgaeCast_녹조7일예측_이재행"
-ZIP_NAME = f"{PKG_NAME}.zip"
-ZIP_NOVIDEO = f"{PKG_NAME}_영상제외.zip"
+# 제출란 두 칸(공지 2026-10-27): ① 문서자료(필수) ② 모델자료. 둘 다 최상위 폴더 하나인 zip.
+ZIP_NAME = "AlgaeCast_모델자료_이재행.zip"  # 모델자료 기본(영상 포함) — 2026-10-27 전 이름 AlgaeCast_녹조7일예측_이재행.zip
+ZIP_NOVIDEO = "AlgaeCast_모델자료_영상제외_이재행.zip"  # 모델자료 업로드가 용량 때문에 실패할 때
 ZIP_DATAON = (
     f"{PKG_NAME}_with_dataon.zip"  # DataON 원값 포함 대체본 — 기본 제출 zip 아님(운영사무국 허용 시에만)
+)
+DOC_PKG = "AlgaeCast_문서자료_이재행"  # 문서자료 zip 의 최상위 폴더(A안·B안 같음)
+ZIP_DOC = f"{DOC_PKG}.zip"  # 문서자료 A안: 방법설명서.pdf + 읽어보기.txt — 모델자료(영상 포함)와 짝
+ZIP_DOC_VIDEO = (
+    "AlgaeCast_문서자료_영상포함_이재행.zip"  # B안: A안 + demo/ 영상·README_DEMO — 모델자료 영상제외와 짝
+)
+DASHBOARD_URL = "https://algaecast-7.vercel.app"
+# 다시 보기 장면 3개(web/src/lib/replay.ts SCENES, 방법설명서 8.4절)
+REPLAY_SCENES = (
+    ("2026-07-27", "강정·고령 경계 진입 7일 전(그날 경보 단계)"),
+    ("2026-08-03", "같은 사건의 첫 초과일"),
+    ("2026-07-06", "회남 경계 사건 7일 전(그날 안전 — 미리 알리지 못한 사례)"),
 )
 # DataON 원값(CC BY-NC-SA)이 든 연속 수위 시계열 — 기본 패키지에서 빼고 _with_dataon zip 에만 넣는다
 DATAON_RAW_FILE = "dataon/level_continuous_long.parquet"
@@ -359,11 +372,13 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 **버전 이력**: 방법설명서 부록 B 참조.
 
 ## 1. 구성 (공지 #564 구조)
+제출은 두 칸으로 나뉜다. 문서자료(방법설명서 PDF·읽어보기)와 모델자료(이 패키지)다. 기본 조합은 문서자료 `{ZIP_DOC}` + 모델자료 `{ZIP_NAME}`이다. 모델자료 업로드가 용량 때문에 안 되면 문서자료 `{ZIP_DOC_VIDEO}`(데모 영상 포함) + 모델자료 `{ZIP_NOVIDEO}`(영상제외판)로 낸다.
+
 | 위치 | 내용 | 크기 |
 |---|---|---|
 | `README.md` | 이 문서(구성·데이터·모델·실행환경·설치·실행·AI 활용·제출 전 확인사항) | |
 | `submission.csv` | 제출 파일 = 제출·운영 모델 v2.1 예측(124행, `station_id,base_date,target_date,pred_cells`, UTF-8 BOM, 예시와 같은 행 순서). 이전 제출 후보(submission.csv)는 저장소에 보존(v1 태그 `v1-submission`, v2 동결 커밋 `{frozen['v2']}`) | |
-| `방법설명서.pdf` | 방법 설명서(배경·데이터·통계분석·피처·모델·평가·설명가능성·시스템·재현·한계, 10장) | {sizes.get('pdf', '-')} |
+| `방법설명서.pdf` | 방법 설명서(문서자료와 같은 PDF — 1쪽 요약, 제출 양식 항목 대응표, 배경·데이터·통계분석·피처·모델·평가·설명가능성·시스템·재현·한계·기대효과 11장, 부록 A~C) | {sizes.get('pdf', '-')} |
 | `requirements.txt` · `pyproject.toml` | 라이브러리 정확한 버전(pip freeze) · 패키지 설치 정보 | |
 | `data/` | 대회 번들(`data/raw/competition/`, 심사용 — 공개 시 제외·대회 종료 후 폐기, `README_심사용_공개시제외.txt`) + 외부 공공 데이터 스냅샷(parquet; 조류경보 API 스냅샷은 미포함 — 조류는 대회 번들 사용; WAMIS 원값 제외 — `data/raw/hydro/hydro_daily_long.parquet` 는 WAMIS 출처 행을 뺀 사본) + DataON 가공 수위 피처(`data/processed/level_cont_features_S1.parquet`; DataON 원값은 미포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`) + WAMIS 가공 수문 피처(`data/processed/wamis_hydro_features_S1.parquet`, 33열; WAMIS 원값은 미포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
 | `model/` | 동결 모델: **v2.1**(제출·운영, 데이터 유래 상수 누수 수정판 — 회귀·경보 분류기·분위 회귀 {' · '.join(f'`{d}`' for d in PACKAGE_MODEL_DIRS)}, 재현에 불러오는 모델은 이 3개뿐) + `registry.json`(current = v2.1) + `FROZEN_v2.1.md`(v2.1 sha256, 동결 커밋 `{frozen['v2.1']}`). 이력 모델 파일(수정 전 v1 회귀·분류기·분위, v2 회귀, 민감도용 v1-fix 회귀 — 5개 폴더)은 재현에 쓰지 않아 넣지 않았다: 폴더별 sha256·동결 커밋·재학습 명령·제공 방법(요청 시 제공)은 `HISTORY.md`. 동결 문서 `FROZEN.md`(v1, 동결 커밋 `{frozen['v1']}`)·`FROZEN_v2.md`(v2, 동결 커밋 `{frozen['v2']}`)는 기록으로 남김 | {sizes.get('model', '-')} |
@@ -798,6 +813,12 @@ def make_zips(out: Path) -> int:
     mp4 = out / "demo" / "AlgaeCast_demo.mp4"
     if not mp4.exists() or not sha256(mp4).startswith(DEMO_SHA_PREFIX):
         raise SystemExit("zip 중단: 패키지 데모 영상이 없거나 sha256 이 승인본과 다르다.")
+    # 문서자료·모델자료가 같은 최신 PDF 를 담도록: 9절 검증 시각을 고쳐 다시 렌더링했으면 패키지에 복사한 뒤 zip 한다
+    src_pdf = ROOT / "reports" / "방법설명서.pdf"
+    if sha256(out / "방법설명서.pdf") != sha256(src_pdf):
+        raise SystemExit(
+            "zip 중단: 패키지 방법설명서.pdf 가 reports/방법설명서.pdf 와 다르다 — PDF 를 패키지에 복사한 뒤 다시 실행한다."
+        )
     write_readme(out)  # 체크리스트에 최신 검증 결과 반영
     security(out)
     write_readme(out)
@@ -825,7 +846,8 @@ def make_zips(out: Path) -> int:
                 z.writestr(
                     f"{PKG_NAME}/demo/영상_별도_안내.txt",
                     f"데모 영상 AlgaeCast_demo.mp4(2분 28초, {mp4.stat().st_size / 1e6:.1f} MB, sha256 {sha256(mp4)})는 "
-                    f"용량 제한에 대비해 이 zip 에서 제외했다. 영상 포함본: {ZIP_NAME}\n",
+                    f"용량 제한에 대비해 이 zip 에서 제외했다. 영상 포함본: {ZIP_NAME}, "
+                    f"또는 문서자료 {ZIP_DOC_VIDEO} 의 demo/ 폴더\n",
                 )
             if name == ZIP_DATAON:
                 z.write(raw, Path(PKG_NAME) / "data" / "raw" / DATAON_RAW_FILE)
@@ -838,14 +860,86 @@ def make_zips(out: Path) -> int:
                     "원자료가 있으면 노트북은 원자료로 수위 피처를 계산하고, 결과(submission.csv)는 기본 패키지와 같다.\n",
                 )
         print(f"zip {zpath.name} {zpath.stat().st_size / 1e6:.1f} MB sha256 {sha256(zpath)}")
+    make_doc_zips(out, dist)
     return 0
+
+
+def doc_readme(pdf: Path, pair_zip: str, pair_sha: str, mp4: Path | None) -> str:
+    """문서자료 zip 의 읽어보기.txt — 대시보드·다시 보기 주소, 짝이 되는 모델자료 zip 이름·sha256, 재현 안내."""
+    lines = [
+        "AlgaeCast-7 — 수질·수문·기상 융합 기반 댐·하천 유해남조류(녹조) 7일 예측",
+        "2026 DATA·AI 분석 경진대회(KISTI) 문제해결 부문 · 참가자 이재행",
+        "",
+        "[이 zip — 문서자료]",
+        f"- 방법설명서.pdf : 문제해결 방법 설명 문서. 1쪽 요약, 2쪽 제출 양식 항목 대응표(개요·활용 데이터·모델 개발 방법·"
+        f"실험 및 평가·기대효과 → 해당 절), 부록 C AI 활용범위 및 주요 검토 과정. sha256 {sha256(pdf)}",
+        "- 읽어보기.txt : 이 파일",
+    ]
+    if mp4 is not None:
+        lines += [
+            f"- demo/AlgaeCast_demo.mp4 : 데모 영상(2분 28초, 추론 과정과 운영 대시보드), sha256 {sha256(mp4)}",
+            "- demo/README_DEMO.md : 영상 구성·편집 내역(여기서 말하는 자막 .srt·콘티 script.md·캡처 captures/ 는 "
+            "모델자료 zip 의 demo/ 에 있다)",
+        ]
+    lines += [
+        "",
+        "[대시보드]",
+        f"- {DASHBOARD_URL} (매일 05시 KST 자동 갱신)",
+        "- 다시 보기: 2026년 사건을 그날까지의 자료로 다시 그린 사후 재현 화면이다(당시 실시간 운영 화면이 아님).",
+    ]
+    for i, (asof, label) in enumerate(REPLAY_SCENES, 1):
+        lines.append(f"  {i}) {DASHBOARD_URL}/?asof={asof}  {label}")
+    lines += [
+        "",
+        "[짝이 되는 모델자료]",
+        f"- {pair_zip}",
+        f"  sha256 {pair_sha}",
+        f"- 모델자료 zip 의 폴더 {PKG_NAME}/ 에 코드·데이터·동결 모델(v2.1)·submission.csv·실행 결과를 담은 노트북이 있다.",
+    ]
+    if mp4 is not None:
+        lines.append("- 이 모델자료는 영상제외판이다. 데모 영상은 이 문서자료 zip 의 demo/ 에 있다.")
+    else:
+        lines.append(
+            f"- 데모 영상(2분 28초)은 이 모델자료 zip 의 {PKG_NAME}/demo/AlgaeCast_demo.mp4 에 있다."
+        )
+    lines += [
+        "",
+        "[재현]",
+        "- 모델자료 README.md 의 '4. 설치·실행' 절을 따른다(Python 3.11, CPU 전용, 설치 후 인터넷 없이 재현).",
+        "- 다시 만든 submission.csv 는 제출본과 바이트가 같다(sha256 4741a3d37ef3ae9f71b381e083028d93e83ec378ae5d5a65beba2ed48545a8e7).",
+        "",
+    ]
+    return "\r\n".join(lines)
+
+
+def make_doc_zips(out: Path, dist: Path) -> None:
+    """문서자료 zip 2종(최상위 폴더 DOC_PKG 하나). A안 = PDF + 읽어보기(모델자료 영상 포함과 짝),
+    B안 = A안 + demo/ 영상·README_DEMO(모델자료 영상제외와 짝). 모델자료 zip 을 만든 뒤에 부른다(짝 sha256)."""
+    pdf = out / "방법설명서.pdf"
+    mp4 = out / "demo" / "AlgaeCast_demo.mp4"
+    readme_demo = out / "demo" / "README_DEMO.md"
+    for name, pair, video in ((ZIP_DOC, ZIP_NAME, False), (ZIP_DOC_VIDEO, ZIP_NOVIDEO, True)):
+        pair_path = dist / pair
+        if not pair_path.exists():
+            raise SystemExit(f"zip 중단: 짝이 되는 모델자료 {pair} 가 없다.")
+        zpath = dist / name
+        with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+            z.write(pdf, f"{DOC_PKG}/방법설명서.pdf")
+            text = doc_readme(pdf, pair, sha256(pair_path), mp4 if video else None)
+            z.writestr(f"{DOC_PKG}/읽어보기.txt", text.encode("utf-8-sig"))  # 메모장에서 바로 열리게 BOM·CRLF
+            if video:
+                z.write(mp4, f"{DOC_PKG}/demo/AlgaeCast_demo.mp4")
+                z.write(readme_demo, f"{DOC_PKG}/demo/README_DEMO.md")
+        print(f"zip {zpath.name} {zpath.stat().st_size / 1e6:.1f} MB sha256 {sha256(zpath)}")
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--out", type=Path, default=ROOT / "submission_package")
     ap.add_argument(
-        "--zip-only", action="store_true", help="기존 패키지에서 README 갱신·민감정보 재검사·zip 3개만"
+        "--zip-only",
+        action="store_true",
+        help="기존 패키지에서 README 갱신·민감정보 재검사·모델자료 zip 3개·문서자료 zip 2개만",
     )
     args = ap.parse_args(argv)
     if args.zip_only:
