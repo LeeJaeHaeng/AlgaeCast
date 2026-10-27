@@ -1,28 +1,25 @@
-# 제출 후보 기록 — `submission-candidate-final`
+# 제출 후보 기록 — `submission-final-1028`
 
-- 작성: 2026-10-27(패키지 빌드 2026-10-26 23:5x KST).
-- 이 문서를 담은 커밋에 git 태그 `submission-candidate-final` 을 단다.
-- 패키지는 이 태그 커밋과 같은 작업 트리로 빌드했다. 빌드 뒤에 더한 것은 세 가지뿐이다.
-  - `reports/eval/package_verify.*` 검증 기록
-  - 이 문서
-  - `docs/handoff/` 보고서·캡처 — 패키지에는 넣지 않는다.
+- 작성: 2026-10-27(패키지 빌드 2026-10-27 10:34, zip 10:44 KST).
+- 이 문서를 담은 커밋에 git 태그 `submission-final-1028` 을 단다.
+- 패키지는 이 태그 커밋과 같은 작업 트리로 빌드했다. 빌드 뒤에 바꾼 것은 `reports/eval/package_verify.*` 검증 기록, 방법설명서 9절 검증 시각(PDF 를 다시 렌더링해 zip 만들기 전에 패키지에 넣음), 이 문서, `docs/handoff/`(패키지 제외)뿐이다.
 - **저장소 밖 보관본: `C:\Users\user\OneDrive\Desktop\경진대회\제출본\`**
-  - zip 3종과 `SHA256SUMS.txt` 가 들어 있다. `sha256sum -c` 로 대조했다.
+  - zip 3종과 `SHA256SUMS.txt`. `sha256sum -c` 로 대조했다.
+  - 이전 후보(`submission-candidate-final`)의 사본은 `제출본\이전\` 으로 옮겼다.
   - 저장소에서 다시 빌드해도 이 사본은 건드리지 않는다. 제출에는 이 사본을 쓴다.
-- 이전 후보 `submission-candidate-1026`(zip 기본 `d6a0f33e…`)과 비교한 변경 사항:
-  - 다시 보기 문구(README §0·방법설명서)
-  - T24 공식 분할 기록
-  - DataON 문장
-  - `docs/handoff/` 제외
-  - `submission.csv`·모델은 같다.
+- 이전 후보 `submission-candidate-final`(zip 기본 `28dc846c…`)과 비교한 변경 사항:
+  - 대시보드 문구 '공식 발령 발령 없음' → '공식 발령 없음'(웹, 패키지 밖)과 다시 보기 근거·날씨 실측 칸 — 방법설명서 8.4절에 반영
+  - `docs/PROGRESS.md` 기록, 방법설명서 9절 검증 시각
+  - 일일 자동 커밋이 갱신한 `data/raw/kma_forecast/`·`reports/eval/live_benchmark.csv`
+  - `submission.csv`·모델·데모 영상(v6 `0907b110…`)·스크린샷은 같다.
 
 ## zip 3종
 
 | 파일 | 크기 | sha256 | 용도 |
 |---|---|---|---|
-| `AlgaeCast_녹조7일예측_이재행.zip` | 62,924,210 B (62.9 MB) | `28dc846c830990902f1dbe6975a820d0c731b36d8b1035653f35bde5b74e4f31` | 기본 제출 zip(영상 포함, DataON·WAMIS 원값 없음) |
-| `AlgaeCast_녹조7일예측_이재행_영상제외.zip` | 40,296,645 B (40.3 MB) | `0895e12328e7b924b0da104b03a38e6fca5674947b6f4ff9f0ce678d4c2af7f9` | 용량 제한 대비(영상 제외) |
-| `AlgaeCast_녹조7일예측_이재행_with_dataon.zip` | 63,767,344 B (63.8 MB) | `97197dea3ec16f7301658093493a9bcf2154a02c3826c97c18f699e51f5cb36a` | DataON 원값 포함 대체본 — 운영사무국이 허용할 때만 |
+| `AlgaeCast_녹조7일예측_이재행.zip` | 62,928,919 B (62.9 MB) | `a4195fbf72ad67c6ba872492325fe34765e0571d43b4f24bd24d487a3f2027fa` | 기본 제출 zip(영상 포함, DataON·WAMIS 원값 없음) |
+| `AlgaeCast_녹조7일예측_이재행_영상제외.zip` | 40,301,354 B (40.3 MB) | `19c66310dea026b4d9ae593b49c0c301dfd8f4451311e6e36310df03a274a479` | 용량 제한 대비(영상 제외) |
+| `AlgaeCast_녹조7일예측_이재행_with_dataon.zip` | 63,772,053 B (63.8 MB) | `6c7e4754a52ade64ca22299cb3d27ae6343f3854a88fa76e3385a9023bdf996a` | DataON 원값 포함 대체본 — 운영사무국이 허용할 때만 |
 
 ## 제출 모델 v2.1
 
@@ -37,40 +34,32 @@
 
 - `submission.csv`(124행) sha256: `4741a3d37ef3ae9f71b381e083028d93e83ec378ae5d5a65beba2ed48545a8e7`.
 
-## 재현 결과(2026-10-26~27)
+## 재현 결과(2026-10-27)
 
 | 검증 | 결과 |
 |---|---|
-| 새 venv 재현 — 패키지 폴더(23:51) | `submission.csv` 바이트 동일(diff 0), 노트북 오류 0, 7.1분 |
-| 새 venv 재현 — 기본 zip | diff 0, 노트북 오류 0, 7.2분 |
-| 새 venv 재현 — with_dataon zip | diff 0, 노트북 오류 0, 수위 피처 raw, 7.0분 |
-| 오프라인 재현(최종 기본 zip `28dc846c…`) | 네트워크를 막은 상태(감사 훅)에서 노트북·predict 모두 rc 0, sha256 `4741a3d3…` 같음, 외부 접속 시도 0건 |
-| pytest(전체) | 533 통과 |
+| 새 venv 재현 — 패키지 폴더(2026-10-27 10:44) | `submission.csv` 바이트 동일(diff 0), 노트북 오류 0, 9.2분 |
+| 새 venv 재현 — 기본 zip | diff 0, 노트북 오류 0, 8.5분 |
+| 새 venv 재현 — with_dataon zip | diff 0, 노트북 오류 0, 수위 피처 raw, 8.6분 |
+| 오프라인 재현(최종 기본 zip `a4195fbf…`) | 네트워크를 막은 상태(감사 훅)에서 노트북·predict 모두 rc 0, sha256 `4741a3d3…` 같음, 외부 접속 시도 0건 |
+| pytest(전체) | 540 통과 |
 | 화면 숫자 대조(check_numbers) | 178/178 |
-| 배포본 숫자(check_deployed_numbers, 0224285 배포본) | 63/63 |
-| 다시 보기 미래 관측 누수(check_asof, 프로덕션) | 54쪽 실패 0 |
-| 쉽게 보기 금지어(기본 10 + 다시 보기 7 URL, 프로덕션) | 0건 |
+| 배포본 숫자(check_deployed_numbers, 4db74cf 배포본) | 63/63 |
+| 다시 보기 미래 관측 누수(check_asof, 프로덕션) | 장면 3개 × 9쪽 × 토글 끔·켬 = 54쪽 실패 0 |
+| 단어 중복(check_dup_words, 프로덕션) | copy.ts 0건 + 화면 0건 |
+| 쉽게 보기 금지어(기본 11 + 다시 보기 8 URL, 프로덕션) | 0건 |
 | 패키지 민감정보 검사 | 0건 |
 | 방법설명서 PDF | 1쪽 = 심사위원용 요약 |
 
 ## 다시 빌드할 때 주의
 
-- 패키지를 다시 빌드하면 zip sha256 이 달라진다. `submission.csv` 는 같다. 이유는 두 가지다.
-  - README 에 생성일(`date.today()`)이 들어간다.
-  - 일일 자동 커밋이 패키지에 복사되는 파일을 갱신한다.
-- 일일 자동 커밋(GitHub Actions)이 커밋하는 경로:
-  - `daily.yml`: `reports/eval/live_benchmark.csv`
-  - `mulmoa_snapshot.yml`: `data/raw/mulmoa/*.csv`, `data/raw/kma_forecast/*.csv`, `reports/eval/live_benchmark.csv`
-- 이 중 패키지에 들어가는 것:
-  - `data/raw/kma_forecast/`(폴더째 복사)
-  - `reports/eval/live_benchmark.csv`(`figures/reports/eval/` 로 복사)
-  - `data/raw/mulmoa/` 는 들어가지 않는다.
+- 패키지를 다시 빌드하면 zip sha256 이 달라진다. `submission.csv` 는 같다. 이유는 README 생성일(`date.today()`)과 일일 자동 커밋이 갱신하는 파일(`data/raw/kma_forecast/`, `reports/eval/live_benchmark.csv`)이다.
 - `models/`·`submission/`·`config/`·`src/` 는 일일 자동 커밋이 건드리지 않는다.
 - 이미 만든 zip(`dist/`, git 추적 밖)과 `제출본` 보관본은 일일 커밋의 영향을 받지 않는다.
 
 ## 이전 후보
 
-- `submission-candidate-1026`(커밋 45a4ef1)의 zip sha256 은 다음과 같다(`dist/` 에서는 이미 덮어써짐).
-  - 기본 `d6a0f33e…`
-  - 영상제외 `1da213c9…`
-  - with_dataon `9a2e7510…`
+| 태그 | 커밋 | 기본 zip sha256 | 비고 |
+|---|---|---|---|
+| `submission-candidate-final` | 34ebd01 | `28dc846c…` | `제출본\이전\` 에 보관 |
+| `submission-candidate-1026` | 45a4ef1 | `d6a0f33e…` | `dist/` 에서 덮어써짐(파일 없음) |
