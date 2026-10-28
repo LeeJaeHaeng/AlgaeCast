@@ -16,8 +16,8 @@
 사용(3단계):
   1) python scripts/build_submission_package.py             # 패키지 생성(+민감정보 검사)
   2) python scripts/verify_package.py --update-package      # 새 venv 재현(diff 0·노트북 오류 0·데모 sha256) → 실행본 ipynb 를 패키지에 반영
-  3) python scripts/build_submission_package.py --zip-only  # README 체크리스트를 검증 결과로 갱신 → 민감정보 재검사 → 모델자료 zip 3개 → 문서자료 zip 2개(A안·B안)
-     (기본 2개 = 영상 포함·영상 제외, DataON 원값 미포함 / 대체 1개 = _with_dataon, 운영사무국 허용 시에만)
+  3) python scripts/build_submission_package.py --zip-only  # README 체크리스트를 검증 결과로 갱신 → 민감정보 재검사 → 모델자료 zip 2개 → 문서자료 zip 2개(A안·B안)
+     (모델자료 = 영상 포함·영상 제외, 둘 다 DataON 원값 포함 — 운영사무국 답변 2026-10-28 '결과물 data/ 에 포함 가능')
 """
 
 from __future__ import annotations
@@ -40,8 +40,10 @@ PKG_NAME = "AlgaeCast_녹조7일예측_이재행"
 # 제출란 두 칸(공지 2026-10-27): ① 문서자료(필수) ② 모델자료. 둘 다 최상위 폴더 하나인 zip.
 ZIP_NAME = "AlgaeCast_모델자료_이재행.zip"  # 모델자료 기본(영상 포함) — 2026-10-27 전 이름 AlgaeCast_녹조7일예측_이재행.zip
 ZIP_NOVIDEO = "AlgaeCast_모델자료_영상제외_이재행.zip"  # 모델자료 업로드가 용량 때문에 실패할 때
-ZIP_DATAON = (
-    f"{PKG_NAME}_with_dataon.zip"  # DataON 원값 포함 대체본 — 기본 제출 zip 아님(운영사무국 허용 시에만)
+# 2026-10-28 전에는 DataON 원값을 기본 zip 에서 빼고 대체 zip AlgaeCast_녹조7일예측_이재행_with_dataon.zip 에만 넣었다.
+# 운영사무국 답변(2026-10-28, '결과물 data/ 폴더에 원자료 포함 가능')으로 모델자료 zip 2종 모두에 넣고 대체 zip 은 없앴다.
+DATAON_ANSWER = (
+    "운영사무국 답변(2026-10-28): DataON 원자료(일평균수위 원값)를 결과물 data/ 폴더에 포함해 제출 가능"
 )
 DOC_PKG = "AlgaeCast_문서자료_이재행"  # 문서자료 zip 의 최상위 폴더(A안·B안 같음)
 ZIP_DOC = f"{DOC_PKG}.zip"  # 문서자료 A안: 방법설명서.pdf + 읽어보기.txt — 모델자료(영상 포함)와 짝
@@ -55,9 +57,10 @@ REPLAY_SCENES = (
     ("2026-08-03", "같은 사건의 첫 초과일"),
     ("2026-07-06", "회남 경계 사건 7일 전(그날 안전 — 미리 알리지 못한 사례)"),
 )
-# DataON 원값(CC BY-NC-SA)이 든 연속 수위 시계열 — 기본 패키지에서 빼고 _with_dataon zip 에만 넣는다
+# DataON 원값(CC BY-NC-SA)이 든 연속 수위 시계열(DataON ≤2024 + 같은 관측소 WAMIS 일수위 2025~, 기준면 오프셋 보정)
+# — 패키지에 넣고 노트북은 이 원자료로 수위 피처를 계산한다(level_cont_mode = raw)
 DATAON_RAW_FILE = "dataon/level_continuous_long.parquet"
-# DataON 가공 수위 피처(level_cont_t0·level_cont_diff7) — 원자료 없이 같은 submission.csv 를 만드는 데 쓴다
+# DataON 가공 수위 피처(level_cont_t0·level_cont_diff7) — 원자료로 계산한 값과 같은지 대조용으로 함께 둔다
 LEVEL_FEATURE_FILE = "level_cont_features_S1.parquet"
 # WAMIS 원값 — 기본 패키지에서 뺀다(회원약관 제15조④ 적용 여부가 분명하지 않아 원값 재배포 안 함).
 # wamis_dam/ 는 통째로, hydro_daily_long 은 WAMIS 출처 행만 뺀 사본을 넣고 가공 수문 피처 파일로 재현한다.
@@ -75,7 +78,8 @@ MANIFEST_PACKAGE_NOTE = (
     "> 제출 패키지 사본 주(빌더가 붙임): 아래 WQ-01·WQ-01b(공공데이터포털 조류경보 API 스냅샷 `data/raw/nier_algae/`·"
     "`nier_algae_all/`) 파일은 이 패키지에 없다. 패키지 재현은 예측 대상 5지점 조류(상류 피처의 바로 위 지점도 이 5지점 안)를 "
     "대회 번들 `data/raw/competition/` 의 `algae_measure.csv` 에서 읽는다. API 조류는 대시보드 일일 운영에만 쓴다. "
-    "WAMIS·DataON 원값도 기본 패키지에 없다(README §1·§2).\n"
+    "WAMIS 원값(`wamis_dam/`·`hydro_daily_long` 의 WAMIS 행)은 패키지에 없고, DataON 연속 수위 원값은 "
+    "`data/raw/dataon/` 에 있다(README §1·§2·§6).\n"
 )
 
 
@@ -380,7 +384,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 | `submission.csv` | 제출 파일 = 제출·운영 모델 v2.1 예측(124행, `station_id,base_date,target_date,pred_cells`, UTF-8 BOM, 예시와 같은 행 순서). 이전 제출 후보(submission.csv)는 저장소에 보존(v1 태그 `v1-submission`, v2 동결 커밋 `{frozen['v2']}`) | |
 | `방법설명서.pdf` | 방법 설명서(문서자료와 같은 PDF — 1쪽 요약, 제출 양식 항목 대응표, 배경·데이터·통계분석·피처·모델·평가·설명가능성·시스템·재현·한계·기대효과 11장, 부록 A~C) | {sizes.get('pdf', '-')} |
 | `requirements.txt` · `pyproject.toml` | 라이브러리 정확한 버전(pip freeze) · 패키지 설치 정보 | |
-| `data/` | 대회 번들(`data/raw/competition/`, 심사용 — 공개 시 제외·대회 종료 후 폐기, `README_심사용_공개시제외.txt`) + 외부 공공 데이터 스냅샷(parquet; 조류경보 API 스냅샷은 미포함 — 조류는 대회 번들 사용; WAMIS 원값 제외 — `data/raw/hydro/hydro_daily_long.parquet` 는 WAMIS 출처 행을 뺀 사본) + DataON 가공 수위 피처(`data/processed/level_cont_features_S1.parquet`; DataON 원값은 미포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`) + WAMIS 가공 수문 피처(`data/processed/wamis_hydro_features_S1.parquet`, 33열; WAMIS 원값은 미포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
+| `data/` | 대회 번들(`data/raw/competition/`, 심사용 — 공개 시 제외·대회 종료 후 폐기, `README_심사용_공개시제외.txt`) + 외부 공공 데이터 스냅샷(parquet; 조류경보 API 스냅샷은 미포함 — 조류는 대회 번들 사용; WAMIS 원값 제외 — `data/raw/hydro/hydro_daily_long.parquet` 는 WAMIS 출처 행을 뺀 사본) + DataON 연속 수위 원값(`data/raw/dataon/level_continuous_long.parquet` — DataON 2010~2024 + 같은 관측소 WAMIS 일수위 2025~, 운영사무국 답변 2026-10-28 '포함 가능', 노트북이 이 원자료로 수위 피처 계산)과 대조용 가공 수위 피처(`data/processed/level_cont_features_S1.parquet`) + WAMIS 가공 수문 피처(`data/processed/wamis_hydro_features_S1.parquet`, 33열; WAMIS 원값은 미포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`) + `data/raw/MANIFEST.md`(출처·수집일시·라이선스) | {sizes.get('data', '-')} |
 | `model/` | 동결 모델: **v2.1**(제출·운영, 데이터 유래 상수 누수 수정판 — 회귀·경보 분류기·분위 회귀 {' · '.join(f'`{d}`' for d in PACKAGE_MODEL_DIRS)}, 재현에 불러오는 모델은 이 3개뿐) + `registry.json`(current = v2.1) + `FROZEN_v2.1.md`(v2.1 sha256, 동결 커밋 `{frozen['v2.1']}`). 이력 모델 파일(수정 전 v1 회귀·분류기·분위, v2 회귀, 민감도용 v1-fix 회귀 — 5개 폴더)은 재현에 쓰지 않아 넣지 않았다: 폴더별 sha256·동결 커밋·재학습 명령·제공 방법(요청 시 제공)은 `HISTORY.md`. 동결 문서 `FROZEN.md`(v1, 동결 커밋 `{frozen['v1']}`)·`FROZEN_v2.md`(v2, 동결 커밋 `{frozen['v2']}`)는 기록으로 남김 | {sizes.get('model', '-')} |
 | `src/` | 파이썬 패키지 `algaecast`(정렬·피처·모델·평가, 재현에 필요한 코드만) + `src/config/`(지점·피처·모델·시드 설정, `seed.yaml`=42, `derived_constants.json` — 데이터 유래 상수와 계산 자료 메타데이터) + `src/docs/`(설계 문서) | {sizes.get('src', '-')} |
 | `notebooks/01_train_eval.ipynb` | 동결 모델 검증(`FROZEN.md`·`FROZEN_v2.md`·`FROZEN_v2.1.md` — 제출 모델은 파일 해시, 패키지에 없는 이력 모델은 `model/HISTORY.md` 해시 대조) → 데이터 로드·전처리 → 피처(+ 상류 피처) → 학습(동결 파라미터, v2.1·비교용 v1-fix) → 2025 검증 지표(v2.1·v1-fix 나란히) → `submission.csv`(v2.1) 생성 → 그림. 실행 결과(출력) 포함 | |
@@ -391,7 +395,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 ## 2. 데이터·모델 요약
 - 타깃: 조류경보제 5지점(해평·강정고령·칠서·물금매리·회남) 유해남조류 세포수(cells/mL), 기준일(base_date)+7일(±3일 매칭) 예측.
 - 조류 원천: 예측 대상 지점 조류 = 대회 번들(`algae_measure.csv`). 상류 지점 조류도 대회 번들이다(상류 피처의 바로 위 지점 해평·강정고령·칠서가 모두 예측 대상 5지점 안이라 같은 파일, 기준일 이전 값만). 공공데이터포털 조류경보 API 는 대시보드 일일 운영에만 쓰고 패키지에 넣지 않았다(겹치는 기간 값은 번들과 같음, 방법설명서 2장·9.1절).
-- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS — WAMIS 원값은 기본 패키지에 넣지 않고 수문 피처 33열 가공 파일만 포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — DataON 원값은 기본 패키지에 넣지 않고 수위 피처 2열 가공 파일만 포함, 받는 법 `data/raw/dataon/README_GET_DATAON.md`, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
+- 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS — WAMIS 원값은 기본 패키지에 넣지 않고 수문 피처 33열 가공 파일만 포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — 운영사무국 답변(2026-10-28)에 따라 연속 수위 원값을 `data/raw/dataon/` 에 포함, `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청), 단기·중기예보(2026-10-21 이후 누적). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
 - 모델: **제출·운영 모델 v2.1**(2026-10-23 동결, 커밋 `{frozen['v2.1']}`, 데이터 유래 상수 누수 수정판) = LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.055 · c3 0.280 · c2 0.267 · cg 0.398) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률, 운영점 p ≥ 0.46 = 놓침:헛경보 비용비 r=3) + 분위 회귀 q10/50/90(CQR 보정 q̂ 0.165, 감시 규칙 q90 ≥ 10,000). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점도 수정 피처로 다시 적합했다. 데이터로 계산한 상수는 기준일까지(as-of) 또는 학습기간 자료로만 쓴다: 수위 편차 = 관측소별 직전 365일 평균 대비, 지점별 수온 임계 = 학습기간 측정만(폴드마다, 최종 ≤2025, `src/config/derived_constants.json`). 이력(수정 전): v1(2026-10-21 봉인, 커밋 `{frozen['v1']}`, 같은 3종 NNLS 앙상블·피처 30개), v2(2026-10-22 동결, 커밋 `{frozen['v2']}`, v2.1 과 같은 구성), v1-fix(v1 구성 + 수정 피처, 민감도용) — 이력 모델 파일은 재현에 쓰지 않아 패키지에 넣지 않았다(`model/HISTORY.md`: sha256·재학습 명령, 요청 시 제공).
 - 검증: 연도 expanding-window CV(2020~2024) → 2025 홀드아웃(목표일 ≤2025-12-31 인 252행) → v1 동결(2026-10-21) → v2 사전등록 확인 실험(EXP-confirm)으로 채택·동결(2026-10-22) → 2026-10-23 데이터 유래 상수 전수 점검에서 누수 발견 → 사전등록(FIX-v2.1) 규칙대로 고친 v2.1 을 결과와 무관하게 채택·동결 → 2026 사후 계산(v2.1 동결 뒤 1회. 모델 선택·수정 규칙에 2026 미사용, 단 팀은 v1·v2 의 2026 결과를 이미 봤으므로 블라인드 아님). 누수 감사: 기준일까지 잘라낸 달력 재계산 표본 300·원자료부터 재계산 표본 60 불일치 0, 예전 방식 음성 대조 5/5 검출, 데이터 유래 상수 테스트 15개.
 - 핵심 결과: 2025 홀드아웃(같은 252행) v2.1 rmse_log 0.712 · log R² 0.778 · 원단위 R² 0.175 · 경계 F1 0.705(지속성 F1 0.727, 봉우리 1건이 분산의 43%). **2025년까지 자료로만 만든 모델(v2.1)로 2026년 경계 사건 8건 중 7건을 중앙 21일 앞서 감시 단계로 포착(지속성 2건)**, **2020~2026년 합계 28건 중 24건(86%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 포착(지속성 3건)**. 2026 test 124조합: v2.1 log R² 0.520 · 원단위 R² 0.001 · F1@10k 0.826(지속성 F1 0.841). 누수 수정: 이전 모델 v1·v2 가 일부 데이터 유래 상수(수위 편차 관측소 평균·지점별 수온 임계·ASOS 관측소 선정)를 2026 자료까지 포함해 계산했음을 2026-10-23 사후 발견해 사전등록 규칙대로 고쳤다(경위와 수정 전후 비교는 방법설명서 5.11절). v1 봉인본의 2026 7/8 은 이력으로만 남긴다. 2026 사후 성능 저하와 한계는 방법설명서 5.11절·6.11절·10장.
@@ -407,7 +411,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 
   원단위 설명력은 정의·집계·해에 따라 −0.03~0.29로 흔들리고 모두 0.6 아래(2026 통합 r²는 지속성이 더 높음)지만, 로그 RMSE는 두 해 모두 지속성보다 약 20% 작다.
 
-> **DataON 활용과 기여** — 국가참조표준 「댐유역 하천 일평균수위」(K-water, DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA)로 5지점 상류 관측소 23곳의 연속 수위 피처 2개(`level_cont_t0` 기준일 수위 편차, `level_cont_diff7` 7일 변화, 직전 365일 평균 대비)를 만들어 회귀·분류기·분위에 넣었다. DataON 범위(≤2024) 뒤는 같은 관측소의 WAMIS 일수위를 2020~2024 겹침 구간 중앙값 오프셋으로 이어 붙였고(2026 기준일은 365일 창이 모두 WAMIS 라 제출 124행 값은 DataON 원값과 무관), 일일 운영도 같은 정의로 계산한다. 원값은 CC BY-NC-SA·원 배포처 약관 때문에 기본 패키지에서 빼고 가공 파일(`data/processed/level_cont_features_S1.parquet`)로 채우며(바이트 동일 재현), 받는 법은 `data/raw/dataon/README_GET_DATAON.md` 에 있다. 기여: 문제 설명서가 제안한 '하천 구간 수위 보강으로 체류시간 대리변수의 설명력 제고' 가설을 동결 파이프라인으로 검증했다. 두 피처를 뺀 비교(2026 미계산)에서 CV rmse_log 0.7917→0.7919, 2025 rmse_log 0.7120→0.7100, 감시 포착 17→18/20 으로 차이가 부트스트랩 95% 구간 안이라 정확도 기여는 확인되지 않았다. DataON 은 학습기간 상류 23개 관측소의 연속 수위를 제공해, 운영(WAMIS)과 같은 정의의 피처로 학습할 수 있게 했다(방법설명서 2.4절 상자).
+> **DataON 활용과 기여** — 국가참조표준 「댐유역 하천 일평균수위」(K-water, DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA)로 5지점 상류 관측소 23곳의 연속 수위 피처 2개(`level_cont_t0` 기준일 수위 편차, `level_cont_diff7` 7일 변화, 직전 365일 평균 대비)를 만들어 회귀·분류기·분위에 넣었다. DataON 범위(≤2024) 뒤는 같은 관측소의 WAMIS 일수위를 2020~2024 겹침 구간 중앙값 오프셋으로 이어 붙였고(2026 기준일은 365일 창이 모두 WAMIS 라 제출 124행 값은 DataON 원값과 무관), 일일 운영도 같은 정의로 계산한다. 원 배포처 약관에 사전 허가 없는 배포 제한 문구가 있어 운영사무국에 문의했고, '결과물 data/ 폴더에 원자료 포함 가능'이라는 답변(2026-10-28)에 따라 연속 수위 원값(`data/raw/dataon/level_continuous_long.parquet`)을 넣었다. 노트북은 이 원자료로 두 피처를 계산하고, 결과는 가공 파일(`data/processed/level_cont_features_S1.parquet`)과 같다(바이트 동일 재현). 원 배포 xlsx 부터 다시 만드는 경로는 `data/raw/dataon/README_GET_DATAON.md`. 기여: 문제 설명서가 제안한 '하천 구간 수위 보강으로 체류시간 대리변수의 설명력 제고' 가설을 동결 파이프라인으로 검증했다. 두 피처를 뺀 비교(2026 미계산)에서 CV rmse_log 0.7917→0.7919, 2025 rmse_log 0.7120→0.7100, 감시 포착 17→18/20 으로 차이가 부트스트랩 95% 구간 안이라 정확도 기여는 확인되지 않았다. DataON 은 학습기간 상류 23개 관측소의 연속 수위를 제공해, 운영(WAMIS)과 같은 정의의 피처로 학습할 수 있게 했다(방법설명서 2.4절 상자).
 
 ## 3. 실행 환경
 - OS {info['os']}, Python {info['python']}, lightgbm {info['lightgbm']}, scikit-learn {info['scikit-learn']}, pandas {info['pandas']}, numpy {info['numpy']}, jupyterlab {info['jupyterlab']}. **GPU 미사용(CPU 전용)**.
@@ -422,7 +426,7 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 ```
 - 화면에서 셀 단위로 실행해 보려면: `.venv/Scripts/jupyter lab notebooks/01_train_eval.ipynb` (위 2줄 설치 후).
 - 재현 소요 시간: 약 20분(대부분 피처 생성, 8코어 CPU 기준). 다시 만든 `submission.csv` 는 패키지 루트 제출 파일과 바이트 동일(`scripts/verify_package.py` 로 새 가상환경에서 확인).
-- **DataON 원자료는 재현에 필요 없다.** 수위 피처 2열(`level_cont_t0`·`level_cont_diff7`)은 `data/processed/level_cont_features_S1.parquet` 에서 채운다(패키지를 만들 때 이 파일이 원자료로 계산한 `features_S1` 의 두 열과 완전히 같은지 검사). 원자료부터 다시 만드는 경로는 `data/raw/dataon/README_GET_DATAON.md`.
+- **DataON 수위는 원자료로 계산한다.** 노트북은 `data/raw/dataon/level_continuous_long.parquet`(DataON 원값 포함 연속 시계열)로 수위 피처 2열(`level_cont_t0`·`level_cont_diff7`)을 만든다. 가공 파일 `data/processed/level_cont_features_S1.parquet` 는 대조용이며, 원자료 파일을 치우면 노트북이 이 파일로 두 열을 채워 같은 `submission.csv` 를 만든다. 원 배포 xlsx 부터 다시 만드는 경로는 `data/raw/dataon/README_GET_DATAON.md`.
 - **WAMIS 원자료도 재현에 필요 없다.** 수문 피처 33열은 `data/processed/wamis_hydro_features_S1.parquet` 에서 채운다. `data/raw/hydro/hydro_daily_long.parquet` 는 WAMIS 출처 행을 뺀 사본(K-water delist·다목적댐·대회 번들 행)이다. 원자료부터 다시 만드는 경로와 같은 값을 받는 공식 경로(공공데이터포털 #3068550·#3040409)는 `data/raw/hydro/README_GET_WAMIS.md`.
 - **외부 API는 재현에 필요 없다.** `data/` 스냅샷만 사용한다. 공공 API 키(.env)는 대시보드 일일 운영(GitHub Actions)에만 쓰이며 패키지에 포함되지 않는다.
 - 대시보드(운영 데모): https://algaecast-7.vercel.app · 코드 저장소: 비공개 저장소 — 요청 시 열람 권한 제공
@@ -485,11 +489,10 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt 
 ## 6. 라이선스·출처
 `data/raw/MANIFEST.md` 참조(첫 표 라이선스 칸과 '라이선스 확인' 절 — 2026-10-22~23 각 출처 페이지에서 다시 확인). 외부 데이터는 출처별 라이선스를 MANIFEST 에 기록하고 그 조건을 지킨다. 공공데이터포털 자료는 공공누리 제1유형(출처표시) 또는 이용허락범위 제한 없음이다. WAMIS 자료는 개방 API 의 인증키 없는 엔드포인트로 수집했고(회원가입 안 함, 저장소의 `WAMIS_KEY` 는 실제로는 한강홍수통제소 OpenAPI 키이며 수집에 쓰지 않음), 같은 값이 공공데이터포털 #3068550(한강홍수통제소_수자원 정보)·#3040409(한강홍수통제소_표준수문DB)에 이용허락범위 제한 없음으로 등록돼 있다. DataON 수위 자료는 CC BY-NC-SA(저작자표시-비영리-동일조건변경허락)다. 라이선스를 확인하지 못한 물환경정보시스템 수질자동측정소 목록·좌표는 실험(EXP-009) 전용이며 제출 모델에 쓰지 않았고 이 패키지에 넣지 않았다.
 
-- **WAMIS 원값은 이 패키지에 넣지 않았다.** WAMIS OPEN API 회원약관 제15조④(회원은 서비스를 이용해 얻은 정보를 사전 승낙 없이 복제·제공할 수 없음)가 회원이 아닌 이용자에게도 적용되는지 약관만으로 분명하지 않기 때문이다. 빠진 파일은 `data/raw/wamis_dam/` 과 `data/raw/hydro/hydro_daily_long.parquet` 의 WAMIS 출처 행이다. 대신 가공 수문 피처 `data/processed/wamis_hydro_features_S1.parquet`(33열)를 넣었고, 원값을 받는 공식 경로·라이선스·재생성 명령은 `data/raw/hydro/README_GET_WAMIS.md` 에 적었다. 출처 표시: 한강홍수통제소 국가수자원관리종합정보시스템(WAMIS).
-- **대회 제공 데이터**(`data/raw/competition/`): 참가신청서 경진대회 규정 3항(승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 발생 시 출처 명시)에 따라 **심사용으로만** 넣었다. 공개할 때는 이 폴더를 빼고, 대회가 끝나면 폐기한다(`README_심사용_공개시제외.txt`).
+- **WAMIS 원값은 이 패키지에 넣지 않았다.** WAMIS OPEN API 회원약관 제15조④(회원은 서비스를 이용해 얻은 정보를 사전 승낙 없이 복제·제공할 수 없음)가 회원이 아닌 이용자에게도 적용되는지 약관만으로 분명하지 않기 때문이다. 빠진 파일은 `data/raw/wamis_dam/` 과 `data/raw/hydro/hydro_daily_long.parquet` 의 WAMIS 출처 행이다. 대신 가공 수문 피처 `data/processed/wamis_hydro_features_S1.parquet`(33열)를 넣었고, 원값을 받는 공식 경로·라이선스·재생성 명령은 `data/raw/hydro/README_GET_WAMIS.md` 에 적었다. 출처 표시: 한강홍수통제소 국가수자원관리종합정보시스템(WAMIS). 예외: DataON 연속 수위 시계열(`data/raw/dataon/level_continuous_long.parquet`)의 2025년 이후 구간은 같은 관측소의 WAMIS 일수위를 기준면 오프셋으로 이어 붙인 값이다. 이 값은 공공데이터포털 #3068550·#3040409(이용허락범위 제한 없음)에서도 받을 수 있다.
+- **대회 제공 데이터**(`data/raw/competition/`): 참가신청서 경진대회 규정 3항(승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 발생 시 출처 명시)에 따라 **심사용으로만** 넣었다. 운영사무국은 심사 재현을 위해 결과물 data/ 폴더에 포함해도 된다고 답했다(2026-10-28, '별도의 컴퓨터에서 재현이 원활하도록 구성'). 공개할 때는 이 폴더를 빼고, 대회가 끝나면 폐기한다(`README_심사용_공개시제외.txt`).
 - **DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다.** 원 자료: 「댐유역 하천 일평균수위」(국가참조표준), 생산 한국수자원공사 오재우·이영창·이재용, 발행 국가참조표준센터, DOI 10.20925/KSRD.74670854.v5, 제·개정 2025-12-16.
-- 이 패키지(기본 zip 2종)의 DataON 유래 파일: `data/processed/level_cont_features_S1.parquet`(수위 피처 2열 가공값, 2,979행), `src/config/level_cont_stats.json`(기준면 오프셋·관측소 목록, 일일 운영용), 노트북 실행으로 생기는 `data/processed/features_*.parquet` 의 `level_cont_*` 열. 해당 폴더마다 `LICENSE_DataON.txt` 를 붙였다. **DataON 원값(연속 수위 시계열·원 배포 xlsx)은 넣지 않았다**(받는 법: `data/raw/dataon/README_GET_DATAON.md`).
-- DataON 원값(연속 수위 시계열 스냅샷)이 든 대체 zip `{ZIP_DATAON}` 은 기본 제출 zip 이 아니며, 운영사무국이 허용한 경우에만 쓴다.
+- 이 패키지의 DataON 유래 파일: `data/raw/dataon/level_continuous_long.parquet`(연속 수위 원값 — DataON 2010~2024 + WAMIS 2025~), `data/processed/level_cont_features_S1.parquet`(수위 피처 2열 가공값, 2,979행, 대조용), `src/config/level_cont_stats.json`(기준면 오프셋·관측소 목록, 일일 운영용), 노트북 실행으로 생기는 `data/processed/features_*.parquet` 의 `level_cont_*` 열. 해당 폴더마다 `LICENSE_DataON.txt` 를 붙였다. 원값은 원 배포처 약관의 배포 제한 문구 때문에 운영사무국에 문의한 뒤 넣었다({DATAON_ANSWER}). 원 배포 xlsx 는 넣지 않았다(받는 법: `data/raw/dataon/README_GET_DATAON.md`).
 
 ## 7. 제출 전 확인사항 (공지 #564)
 {check_md}
@@ -692,7 +695,11 @@ def build(out: Path) -> int:
         ROOT / "docs" / "reference" / "README_COMPETITION_DATA.txt",
         out / "data" / "raw" / "competition" / "README_심사용_공개시제외.txt",
     )
-    # DataON: 원값(연속 시계열)은 빼고 수위 피처 2열 가공 파일 + 받는 법 안내만 넣는다
+    # DataON: 연속 수위 원값(운영사무국 답변 2026-10-28 '포함 가능') + 대조용 가공 수위 피처 2열 + 받는 법 안내
+    dataon_raw = ROOT / "data" / "raw" / DATAON_RAW_FILE
+    if not dataon_raw.exists():
+        raise SystemExit(f"빌드 중단: DataON 연속 수위 원값 {dataon_raw} 가 없다.")
+    copy(dataon_raw, out / "data" / "raw" / DATAON_RAW_FILE)
     copy(level_feature_file(), out / "data" / "processed" / LEVEL_FEATURE_FILE)
     # WAMIS: 원값(wamis_dam/·hydro 의 WAMIS 행)은 빼고 가공 수문 피처 + 받는 법 안내
     import pandas as pd
@@ -795,9 +802,8 @@ def build(out: Path) -> int:
     security(out)
     write_readme(out)  # 검사 결과를 README 에 반영한 뒤, README 를 포함해 다시 검사
     hits = security(out)
-    leaked = out / "data" / "raw" / DATAON_RAW_FILE
-    if leaked.exists():
-        raise SystemExit(f"빌드 중단: 기본 패키지에 DataON 원값 파일이 있다: {leaked}")
+    if sha256(out / "data" / "raw" / DATAON_RAW_FILE) != sha256(ROOT / "data" / "raw" / DATAON_RAW_FILE):
+        raise SystemExit("빌드 중단: 패키지 DataON 연속 수위 원값이 저장소 파일과 다르다")
     if (out / "data" / "raw" / "wamis_dam").exists():
         raise SystemExit("빌드 중단: 기본 패키지에 WAMIS 원값 폴더(wamis_dam/)가 있다")
     if (out / "data" / "raw" / API_ALGAE_DIR).exists():
@@ -827,15 +833,11 @@ def make_zips(out: Path) -> int:
     dist = ROOT / "dist"
     dist.mkdir(exist_ok=True)
     files = sorted(p for p in out.rglob("*") if p.is_file())
-    raw = ROOT / "data" / "raw" / DATAON_RAW_FILE
-    if not raw.exists():
-        raise SystemExit(f"zip 중단: {raw} 가 없어 {ZIP_DATAON} 을 만들 수 없다.")
-    if any(p.name == Path(DATAON_RAW_FILE).name for p in files):
-        raise SystemExit("zip 중단: 기본 패키지 폴더에 DataON 원값 파일이 있다.")
+    if not (out / "data" / "raw" / DATAON_RAW_FILE).exists():
+        raise SystemExit("zip 중단: 패키지에 DataON 연속 수위 원값이 없다(1단계 빌드를 다시 한다).")
     for name, keep in (
         (ZIP_NAME, lambda p: True),
         (ZIP_NOVIDEO, lambda p: p != mp4),
-        (ZIP_DATAON, lambda p: True),
     ):
         zpath = dist / name
         with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as z:
@@ -848,16 +850,6 @@ def make_zips(out: Path) -> int:
                     f"데모 영상 AlgaeCast_demo.mp4(2분 28초, {mp4.stat().st_size / 1e6:.1f} MB, sha256 {sha256(mp4)})는 "
                     f"용량 제한에 대비해 이 zip 에서 제외했다. 영상 포함본: {ZIP_NAME}, "
                     f"또는 문서자료 {ZIP_DOC_VIDEO} 의 demo/ 폴더\n",
-                )
-            if name == ZIP_DATAON:
-                z.write(raw, Path(PKG_NAME) / "data" / "raw" / DATAON_RAW_FILE)
-                z.writestr(
-                    f"{PKG_NAME}/data/raw/dataon/WITH_DATAON_안내.txt",
-                    f"이 zip 은 DataON 원값(연속 수위 시계열 스냅샷 {Path(DATAON_RAW_FILE).name}, sha256 {sha256(raw)})을 "
-                    f"포함한 대체본이다. 기본 제출 zip 은 {ZIP_NAME}(영상 포함)·{ZIP_NOVIDEO}(영상 제외)이며 DataON 원값이 없다. "
-                    "이 zip 은 운영사무국이 허용한 경우에만 쓴다.\n"
-                    "DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다(LICENSE_DataON.txt). "
-                    "원자료가 있으면 노트북은 원자료로 수위 피처를 계산하고, 결과(submission.csv)는 기본 패키지와 같다.\n",
                 )
         print(f"zip {zpath.name} {zpath.stat().st_size / 1e6:.1f} MB sha256 {sha256(zpath)}")
     make_doc_zips(out, dist)
@@ -895,6 +887,8 @@ def doc_readme(pdf: Path, pair_zip: str, pair_sha: str, mp4: Path | None) -> str
         f"- {pair_zip}",
         f"  sha256 {pair_sha}",
         f"- 모델자료 zip 의 폴더 {PKG_NAME}/ 에 코드·데이터·동결 모델(v2.1)·submission.csv·실행 결과를 담은 노트북이 있다.",
+        "- data/ 에는 대회 제공 데이터(심사용)와 DataON 연속 수위 원값이 들어 있다"
+        "(운영사무국 답변 2026-10-28: 둘 다 결과물 data/ 폴더에 포함 가능).",
     ]
     if mp4 is not None:
         lines.append("- 이 모델자료는 영상제외판이다. 데모 영상은 이 문서자료 zip 의 demo/ 에 있다.")

@@ -33,8 +33,8 @@
 
 - 정리: **공공데이터포털 자료는 공공누리 제1유형(출처표시) 또는 이용허락범위 제한 없음, DataON 수위 자료는 CC BY-NC-SA**(저작자표시-비영리-동일조건변경허락)다. 모든 외부 자료가 공공누리·이용 제한 없음인 것은 아니다.
 - **DataON 유래 데이터와 그 가공물은 CC BY-NC-SA 로만 재배포할 수 있다.** 제출 패키지의 해당 파일은 다음과 같고, 같은 폴더에 `LICENSE_DataON.txt` 를 붙인다.
-  - 기본 zip 2종: `data/processed/level_cont_features_S1.parquet`(수위 피처 2열 가공값, 원자료 없이 같은 submission.csv 재현), `src/config/level_cont_stats.json`(연속 시계열 집계 통계), 노트북 실행으로 생기는 `data/processed/features_*.parquet` 의 `level_cont_*` 열. DataON 원값은 넣지 않는다(받는 법 `data/raw/dataon/README_GET_DATAON.md`).
-  - 대체 zip `_with_dataon`(운영사무국 허용 시에만): 위 파일 + `data/raw/dataon/level_continuous_long.parquet`(DataON 일평균수위 2010~2024 + WAMIS 일수위 2025~ 연속 시계열, DataON 원값 포함).
+  - 모델자료 zip 2종(2026-10-28~): `data/raw/dataon/level_continuous_long.parquet`(DataON 일평균수위 2010~2024 + WAMIS 일수위 2025~ 연속 시계열, DataON 원값 포함 — 노트북이 이 파일로 수위 피처 계산), `data/processed/level_cont_features_S1.parquet`(수위 피처 2열 가공값, 대조용 — 원자료를 치워도 같은 submission.csv 재현), `src/config/level_cont_stats.json`(연속 시계열 집계 통계), 노트북 실행으로 생기는 `data/processed/features_*.parquet` 의 `level_cont_*` 열.
+  - 운영사무국 답변(2026-10-28, 참가자 이메일 문의): ① DataON 원자료(일평균수위 원값)를 결과물 data/ 폴더에 포함해 제출 — 가능, ③ 대회 제공 데이터(datas_participants.zip)를 결과물 data/ 폴더에 포함 — 가능('별도의 컴퓨터에서 재현이 원활하도록 구성'). 그 전(~2026-10-27)에는 원 배포처 약관의 배포 제한 문구 때문에 원값을 기본 zip 에서 빼고 대체 zip `_with_dataon` 에만 넣었다.
   - 대시보드·Supabase 에는 DataON 원값을 올리지 않는다(2026-10-23 `hydrology_daily.water_level` 3,655행을 비우고 업로드 코드에서 뺐다).
 - **WAMIS 원값도 기본 zip 에서 뺀다**(2026-10-23). 빠진 것: `data/raw/wamis_dam/wamis_dam_daily.parquet`, `data/raw/hydro/hydro_daily_long.parquet` 의 `wamis_mn_dtdata`·`wamis_wl_dtdata` 행.
   - 이유: 회원약관 제15조④의 비회원 적용 여부가 분명하지 않다(HY-06 행 참고). 같은 값은 공공데이터포털 #3068550·#3040409(이용허락범위 제한 없음)로 받을 수 있다.

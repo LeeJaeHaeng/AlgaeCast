@@ -1,6 +1,8 @@
 # WAMIS 원값 받기 — 국가수자원관리종합정보시스템 댐·보 일자료·수위 (선택)
 
-이 제출 패키지의 **기본 zip 2종에는 WAMIS 원값을 넣지 않았다.** 빠진 파일은 다음과 같다.
+이 제출 패키지(모델자료 zip 2종)에는 **WAMIS 원값을 넣지 않았다.** 빠진 파일은 다음과 같다.
+(예외: DataON 연속 수위 시계열 `data/raw/dataon/level_continuous_long.parquet` 의 2025년 이후 구간은 같은 관측소 WAMIS 일수위를
+기준면 오프셋으로 이어 붙인 값이다. 같은 값은 공공데이터포털 #3068550·#3040409(이용허락범위 제한 없음)에서도 받을 수 있다.)
 - `data/raw/wamis_dam/wamis_dam_daily.parquet`
 - `data/raw/hydro/hydro_daily_long.parquet` 의 `wamis_mn_dtdata`·`wamis_wl_dtdata` 행
 

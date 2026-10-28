@@ -1,9 +1,10 @@
 # DataON 원자료 받기 — 댐유역 하천 일평균수위 (선택)
 
-이 제출 패키지의 **기본 zip 2종에는 DataON 원값이 들어 있지 않다.** 노트북과 `make reproduce` 는 DataON 원자료 없이
-`data/processed/level_cont_features_S1.parquet`(수위 피처 2열, DataON 가공물)로 수위 피처를 채워 제출본과 같은
-`submission.csv` 를 만든다. 2026-10-23 확인 결과, 원자료가 있든 없든 `features_S1` 은 완전히 같고 `submission.csv` 는 바이트까지 같다.
-DataON 원자료부터 다시 만들고 싶을 때만 아래를 따른다.
+이 제출 패키지(모델자료 zip 2종)에는 **DataON 연속 수위 원값 `data/raw/dataon/level_continuous_long.parquet` 이 들어 있다**
+(운영사무국 답변(2026-10-28): 결과물 data/ 폴더에 포함해 제출 가능). 노트북과 `make reproduce` 는 이 원자료로 수위 피처를 계산한다. 원자료 파일을 치우면
+`data/processed/level_cont_features_S1.parquet`(수위 피처 2열, DataON 가공물)로 두 열을 채우며, 어느 쪽이든 `features_S1` 은
+완전히 같고 `submission.csv` 는 바이트까지 같다(2026-10-23·10-28 확인).
+원 배포 xlsx 부터 다시 만들고 싶을 때만 아래를 따른다.
 
 ## 1. 자료
 
@@ -56,12 +57,14 @@ python -m algaecast.models.predict --out submission_from_dataon.csv
     `level_cont_diff7` 는 117행(대부분 칠서), `submission.csv` 는 124행 중 26행(최대 상대차 14.7%)이 달라졌다.
   - 제출본 v2.1 은 관측소별 직전 365일 평균(기준일 미포함)을 쓴다. 그래서 2026-10-20 잠정값 차이는 표본 행(기준일 ≤2026-10-15)의
     피처에 들어가지 않고, 보현산댐 2025년~ 값은 코드가 뺀다. 다만 WAMIS 가 과거 값을 고치면 달라질 수 있으므로 제출본 재현에는 아래 파일을 쓴다.
-- **제출본과 같은 결과가 필요하면** 기본 패키지의 가공 피처 파일을 쓴다. 운영사무국이 허용한 경우에는 DataON 원값이 든 대체 zip(`AlgaeCast_녹조7일예측_이재행_with_dataon.zip`)에 있는 연속 시계열 스냅샷을 쓴다.
+- **제출본과 같은 결과가 필요하면** 패키지에 든 연속 시계열 스냅샷을 쓴다(다시 받지 않는다).
   - 파일: `data/raw/dataon/level_continuous_long.parquet`, 144,068행
   - sha256: `c37195353178e9d30fc0d6873a57a27379dd16558ae8a4f7016ccd8eaf981830`
-  - 이 스냅샷으로 돌려도 결과는 같다(2026-10-26 대체 zip 재현 검증: DataON 원값으로 수위 피처를 계산해도 `submission.csv` 바이트 동일).
+  - 이 스냅샷으로 수위 피처를 계산해도 `submission.csv` 는 바이트까지 같다(2026-10-26·10-27 대체 zip, 2026-10-28 모델자료 zip 재현 검증).
 
-## 5. 기본 패키지에 든 DataON 유래 파일 (CC BY-NC-SA, 같은 폴더에 `LICENSE_DataON.txt`)
+## 5. 패키지에 든 DataON 유래 파일 (CC BY-NC-SA, 같은 폴더에 `LICENSE_DataON.txt`)
+
+- `data/raw/dataon/level_continuous_long.parquet`: 연속 수위 원값(DataON 2010~2024 + 같은 관측소 WAMIS 2025~, 기준면 오프셋 보정), 144,068행.
 
 - `data/processed/level_cont_features_S1.parquet`
   - 2,979행 × 4열(`station_id`, `base_date`, `level_cont_t0`, `level_cont_diff7`)

@@ -40,6 +40,6 @@ make reproduce    # 동결 모델 해시 확인 → 정렬 → 피처 → 예측
 python scripts/render_method_doc.py                       # reports/방법설명서.md → .pdf (헤드리스 Edge)
 python scripts/build_submission_package.py                # submission_package/ 생성(데모 영상 sha256 확인)
 python scripts/verify_package.py --update-package         # 새 venv 재현 검증(diff 0·노트북 오류 0)
-python scripts/build_submission_package.py --zip-only     # dist/ 에 모델자료 zip 3종(AlgaeCast_모델자료_이재행·_영상제외·_with_dataon) + 문서자료 zip 2종(A안 AlgaeCast_문서자료_이재행, B안 _영상포함)
+python scripts/build_submission_package.py --zip-only     # dist/ 에 모델자료 zip 2종(AlgaeCast_모델자료_이재행·_영상제외, 둘 다 DataON 원값 포함) + 문서자료 zip 2종(A안 AlgaeCast_문서자료_이재행, B안 _영상포함)
 ```
 패키지 안에서는 `jupyter lab notebooks/01_train_eval.ipynb` 로 노트북을 열어 셀 단위로 실행할 수 있다.

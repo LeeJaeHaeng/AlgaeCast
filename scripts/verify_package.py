@@ -5,7 +5,8 @@
 1) submission.csv(패키지 루트)가 제출본(저장소 submission/submission.csv)과 바이트 동일(diff 0)
 2) 노트북 재실행 오류 0 (실행본 ipynb 의 error 출력·Traceback 0)
 3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(0907b110…, 2026-10-23 v6)으로 시작
-4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(기본 패키지는 없음 → 가공 수위 피처로 재현)
+4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(2026-10-28~ 모델자료에 포함 → 원자료로 수위 피처 계산,
+   없으면 가공 수위 피처로 재현)
 5) model/ 의 모델 폴더가 허용 목록(PACKAGE_MODEL_DIRS)과 같고 각 폴더에 model.pkl·meta.json, model/HISTORY.md 가 있다
    (목록 밖 폴더가 있거나 필수 파일이 없으면 새 venv 실행 전에 실패)
 결과: reports/eval/package_verify.log(실행 기록), reports/eval/package_verify.json(체크리스트용 요약)

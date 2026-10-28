@@ -16,9 +16,9 @@
 - [ ] 깨끗한 venv에서 `make reproduce` → `submission.csv` diff 0
 - [ ] 시드 고정, requirements 버전 고정, Python 버전 명시
 - [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재(공공데이터포털 자료는 공공누리/이용허락범위 제한 없음, WAMIS 는 같은 값의 포털 #3068550·#3040409 등록분 기준(수집은 키 없는 개방 API, 회원약관 제15조④ 비회원 적용 불분명), DataON 수위 자료는 CC BY-NC-SA — 패키지의 DataON 유래 파일에 LICENSE_DataON.txt)
-- [ ] DataON 원값은 기본 zip 2종(영상 포함·제외)에 넣지 않음: 수위 피처 2열 가공 파일(`data/processed/level_cont_features_S1.parquet`)로 원자료 없이 submission.csv diff 0, 받는 법은 `data/raw/dataon/README_GET_DATAON.md`. 원값 포함 대체 zip(`_with_dataon`)은 운영사무국 허용 시에만
+- [ ] DataON 연속 수위 원값(`data/raw/dataon/level_continuous_long.parquet`)을 모델자료 zip 2종에 넣음(운영사무국 답변 2026-10-28 '결과물 data/ 포함 가능'): 노트북이 원자료로 수위 피처 계산(raw) → submission.csv diff 0, 원자료를 치워도 가공 파일(`data/processed/level_cont_features_S1.parquet`)로 diff 0. 2025년 이후 구간은 WAMIS 일수위 연장분(README_GET_WAMIS 예외 문구)
 - [ ] WAMIS 원값도 기본 zip 에 넣지 않음: 수문 피처 33열 가공 파일(`data/processed/wamis_hydro_features_S1.parquet`)로 원자료 없이 submission.csv diff 0, 받는 법은 `data/raw/hydro/README_GET_WAMIS.md`(#3068550·#3040409)
-- [ ] 대회 제공 데이터는 저장소에 커밋하지 않음(참가신청서 규정 3항: 승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 출처 명시). 패키지에는 심사용으로만(`data/raw/competition/README_심사용_공개시제외.txt`)
+- [ ] 대회 제공 데이터는 저장소에 커밋하지 않음(참가신청서 규정 3항: 승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 출처 명시). 패키지에는 심사용으로만(`data/raw/competition/README_심사용_공개시제외.txt`) — 운영사무국 답변(2026-10-28): 결과물 data/ 에 포함 가능, 별도 컴퓨터에서 재현이 원활하도록 구성
 
 ## C. 우수성 증빙 (방법 설명서에 포함)
 - [ ] 베이스라인 B0~B4 비교표
