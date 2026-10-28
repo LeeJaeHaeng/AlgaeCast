@@ -53,7 +53,7 @@ for (let i = 0; i < n; i++) {
     // 실행 완료: 프롬프트가 [*] 가 아니고 숫자
     // 실행 중([*])이 되었다가 숫자로 바뀔 때까지; 10초마다 디버그 캡처
     let seenBusy = false;
-    for (let k = 0; k < 180; k++) {
+    for (let k = 0; k < 1500; k++) {
       const p = await cell.locator(".jp-InputPrompt").first().textContent().catch(() => "");
       if (/\*/.test(p)) seenBusy = true;
       if (/\[\s*\d+\s*\]/.test(p) && (seenBusy || k > 2)) break;

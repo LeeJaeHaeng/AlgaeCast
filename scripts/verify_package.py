@@ -4,7 +4,7 @@
 확인 항목
 1) submission.csv(패키지 루트)가 제출본(저장소 submission/submission.csv)과 바이트 동일(diff 0)
 2) 노트북 재실행 오류 0 (실행본 ipynb 의 error 출력·Traceback 0)
-3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(0907b110…, 2026-10-23 v6)으로 시작
+3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(5c648ac0…, 2026-10-28 v7 — 제출 모델 T24 기준)으로 시작
 4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(2026-10-28~ 모델자료에 포함 → 원자료로 수위 피처 계산,
    없으면 가공 수위 피처로 재현)
 5) model/ 의 모델 폴더가 허용 목록(PACKAGE_MODEL_DIRS)과 같고 각 폴더에 model.pkl·meta.json, model/HISTORY.md 가 있다
@@ -30,7 +30,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEMO_SHA_PREFIX = "0907b110"  # 2026-10-23 v6(성능 페이지 3장면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4·v5 87b6d928 → dist/backup_demo_2026102*
+DEMO_SHA_PREFIX = "5c648ac0"  # 2026-10-28 v7(제출 모델 T24 기준 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4·v5 87b6d928·v6 0907b110(v2.1 기준) → dist/backup_demo_2026102*
 # 패키지 model/ 에 있어야 하는(그리고 이것만 있어야 하는) 모델 폴더 — 재현에 실제로 불러오는 제출·운영 T24 3개
 # (2026-10-28 운영사무국 답변으로 v2.1 → T24 전환, v2.1 은 이력).
 # 2026-10-23 추적(make_submission·노트북): 이 3개 폴더의 model.pkl 만 모델로 로드, 이력 폴더는 verify_frozen 해시 읽기뿐.

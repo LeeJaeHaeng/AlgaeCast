@@ -66,7 +66,7 @@ LEVEL_FEATURE_FILE = "level_cont_features_S1.parquet"
 # wamis_dam/ 는 통째로, hydro_daily_long 은 WAMIS 출처 행만 뺀 사본을 넣고 가공 수문 피처 파일로 재현한다.
 WAMIS_SOURCES = ("wamis_mn_dtdata", "wamis_wl_dtdata")
 WAMIS_FEATURE_FILE = "wamis_hydro_features_S1.parquet"
-DEMO_SHA_PREFIX = "0907b110"  # 2026-10-23 v6(성능 페이지 3장면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4·v5 87b6d928 → dist/backup_demo_2026102*
+DEMO_SHA_PREFIX = "5c648ac0"  # 2026-10-28 v7(제출 모델 T24 기준 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4·v5 87b6d928·v6 0907b110(v2.1 기준) → dist/backup_demo_2026102*
 # DataON 유래 파일이 있는(또는 노트북 실행으로 생기는) 폴더 — LICENSE_DataON.txt 를 붙인다
 DATAON_DIRS = ("data/raw/dataon", "data/interim", "data/processed", "src/config")
 DEMO_FILES = ["AlgaeCast_demo.mp4", "AlgaeCast_demo.srt", "script.md", "README_DEMO.md"]
@@ -394,7 +394,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 | `src/` | 파이썬 패키지 `algaecast`(정렬·피처·모델·평가, 재현에 필요한 코드만) + `src/config/`(지점·피처·모델·시드 설정, `seed.yaml`=42, `derived_constants.json` — 데이터 유래 상수와 계산 자료 메타데이터) + `src/docs/`(설계 문서) | {sizes.get('src', '-')} |
 | `notebooks/01_train_eval.ipynb` | 동결 모델 검증(`FROZEN.md`·`FROZEN_v2.md`·`FROZEN_v2.1.md`·`FROZEN_T24.md` — 제출 모델은 파일 해시, 패키지에 없는 이력 모델은 `model/HISTORY.md` 해시 대조) → 데이터 로드·전처리 → 피처(+ 상류 피처, 수온 임계 ≤2024) → 학습(동결 파라미터, T24·비교용 v1-fix, 학습 행 = 대회 split=train 2,310행 확인) → 2025 검증 지표(T24·v1-fix 나란히, 재학습 = 동결 T24 확인) → `submission.csv`(T24) 생성 → 그림. 실행 결과(출력) 포함 | |
 | `scripts/` | `verify_frozen.py`(네 동결 문서 해시 검증 — 제출 모델 3개는 파일이 있어야 하고, 이력 모델은 '패키지 미포함(이력, model/HISTORY.md)'으로 표시), `leakage_audit.py`(누수 감사, 원자료부터 재계산 포함), `verify_package.py`(새 venv 재현 검증, `model/` 허용 폴더 점검), `security_scan.txt` | |
-| `demo/` | 데모 영상 `AlgaeCast_demo.mp4`(2분 28초, 1080p H.264, 한국어 자막. 2026-10-28 T24 전환 전 v2.1 기준 녹화 — 추론 절차·헤드라인 수치는 T24와 같고 모델 이름·제출 파일 sha256 이 다름, 방법설명서 9.4절) · `AlgaeCast_demo.srt` · `script.md`(콘티) · `README_DEMO.md`(구성·편집 내역) · `captures/`(장면 캡처 6장). {RAW_NOTE} | {sizes.get('demo', '-')} |
+| `demo/` | 데모 영상 `AlgaeCast_demo.mp4`(2분 28초, 1080p H.264, 한국어 자막. 2026-10-28 제출 모델 T24 기준 녹화 — 노트북 실행·운영 화면·다시 보기 장면 ①, 방법설명서 9.4절) · `AlgaeCast_demo.srt` · `script.md`(콘티) · `README_DEMO.md`(구성·편집 내역) · `captures/`(장면 캡처 7장). {RAW_NOTE} | {sizes.get('demo', '-')} |
 | `figures/` | 방법설명서·발표용 핵심 그림, 대시보드 스크린샷(`dashboard_*.png`), `figures/reports/`(평가·통계 표 원본 — 방법설명서 각주의 출처) | {sizes.get('figures', '-')} |
 
 ## 2. 데이터·모델 요약
@@ -922,7 +922,7 @@ def doc_readme(pdf: Path, pair_zip: str, pair_sha: str, mp4: Path | None) -> str
         "[재현]",
         "- 모델자료 README.md 의 '4. 설치·실행' 절을 따른다(Python 3.11, CPU 전용, 설치 후 인터넷 없이 재현).",
         "- 다시 만든 submission.csv 는 제출본과 바이트가 같다(sha256 057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73).",
-        "- 제출 모델 T24 는 2024년까지 자료로만 학습했다(대회 공식 학습 분할 split=train, 운영사무국 답변 2026-10-28). 데모 영상은 전환 전 v2.1 기준으로 녹화했다(방법설명서 9.4절).",
+        "- 제출 모델 T24 는 2024년까지 자료로만 학습했다(대회 공식 학습 분할 split=train, 운영사무국 답변 2026-10-28). 데모 영상도 T24 기준으로 다시 녹화했다(2026-10-28, 방법설명서 9.4절).",
         "",
     ]
     return "\r\n".join(lines)
