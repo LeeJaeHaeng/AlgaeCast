@@ -30,7 +30,7 @@ export function MiniChart({ s, obs, days = 60, expert, today, linkQuery, after }
   const path = pts.map((p, i) => `${i ? "L" : "M"}${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ");
   const fmt = expert ? fmtCells : fmtCellsKo;
   const tx = s.target_date ? xp(s.target_date) : null;
-  const point = s.pred_cell_count; // 예상값 = v2.1 한 값 예측
+  const point = s.pred_cell_count; // 예상값 = T24 한 값 예측
   const py = yp(point);
   const lo = yp(s.q10_cqr);
   const hi = yp(s.q90_cqr);

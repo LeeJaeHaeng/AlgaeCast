@@ -136,7 +136,7 @@ export function ReplayScoreStrip({ expert, after = false }: { expert: boolean; a
   );
 }
 
-/** 성적표 띠(40px): 2020~2026 경계 사건 포착·중앙 리드타임·2026 사후 계산(블라인드 아님) — 제출·운영 모델 v2.1 */
+/** 성적표 띠(40px): 2020~2026 경계 사건 포착·중앙 리드타임·2026 사후 계산(블라인드 아님) — 제출·운영 모델 T24 */
 export function ScoreStrip({ expert }: { expert: boolean }) {
   const { events: ev, y2026 } = NUMBERS; // 헤드라인 숫자는 numbers.ts(빌드 전 reports/eval 과 대조)
   const f2 = (v: number) => v.toFixed(2);
@@ -155,7 +155,7 @@ export function ScoreStrip({ expert }: { expert: boolean }) {
         </span>
       </span>
       {expert && (
-        <span className="text-dim">{BOARD.score.expert(f2(CMP.h25v21.f1_10k), f2(CMP.h25b0.f1_10k), f2(CMP.p26v21.f1_10k), f2(CMP.p26b0.f1_10k))}</span>
+        <span className="text-dim">{BOARD.score.expert(f2(CMP.h25t24.f1_10k), f2(CMP.h25b0.f1_10k), f2(CMP.p26t24.f1_10k), f2(CMP.p26b0.f1_10k))}</span>
       )}
       <span className="ml-auto flex items-center gap-3 text-dim">
         <span>

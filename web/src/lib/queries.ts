@@ -141,7 +141,7 @@ export async function getObservationsAfter(siteId: string, asof: string): Promis
 
 export async function getPredictions(siteId: string, runId: string | null, days = 400, asof?: string): Promise<Prediction[]> {
   if (asof) {
-    // 다시 보기: 기준일 max(2026-01-01, asof-days) ~ asof 의 지난 예상값만(2025 이전 기준일은 v2.1 학습기간과 겹쳐 제외)
+    // 다시 보기: 기준일 max(2026-01-01, asof-days) ~ asof 의 지난 예상값만(2025 이전 기준일은 학습(≤2024)·검증(2025) 기간과 겹쳐 제외)
     const lo = addDaysISO(asof, -days) > REPLAY_MIN ? addDaysISO(asof, -days) : REPLAY_MIN;
     let rq = supabase()
       .from("predictions")

@@ -1,4 +1,4 @@
-// 배포 후 숫자 검사: src/lib/numbers.ts 의 헤드라인(v2.1)·비교표 값이 운영 화면(보이는 글자)에 그대로 나오는지 확인한다.
+// 배포 후 숫자 검사: src/lib/numbers.ts 의 헤드라인(T24 — 2026-10-28 전환 제출·운영 모델)·비교표 값이 운영 화면(보이는 글자)에 그대로 나오는지 확인한다.
 // 빌드 전 check_numbers.mjs 가 numbers.ts ↔ reports/eval 원천을 대조하고, 이 스크립트는 numbers.ts ↔ 배포 화면을 대조한다.
 // 사용: node scripts/check_deployed_numbers.mjs https://algaecast-7.vercel.app  → 0 이면 전부 일치
 import { readFileSync } from "node:fs";
@@ -25,7 +25,7 @@ for (const p of ["/", "/performance", "/about"]) {
 }
 const all = Object.values(pages).join(" ");
 const checks = [
-  // 헤드라인(v2.1)
+  // 헤드라인(T24)
   ["/", `${val("events", "total")}건 중 ${val("events", "detected")}건`],
   ["/", `${val("y2026", "total")}건 중 ${val("y2026", "detected")}건`],
   ["/performance", `${val("events", "total")}건 중 ${val("events", "detected")}건`],
@@ -34,25 +34,29 @@ const checks = [
   ["/performance", `중앙값 ${val("y2026", "medianLeadDays")}일`],
   ["/performance", `${val("r2log", "y2025").toFixed(2)} / ${val("r2log", "y2026").toFixed(2)}`],
   ["/performance", `${val("f1_10k", "y2025").toFixed(2)} / ${val("f1_10k", "y2026").toFixed(2)}`],
-  // 2026 점예측 포착(v2.1·v2·v1·v1-fix)
+  // 2026 점예측 포착(T24·v2.1·v2·v1·v1-fix)
+  ["/performance", `${val("p26point", "total")}건 중 ${val("p26point", "t24")}건`],
   ["/performance", `${val("p26point", "total")}건 중 ${val("p26point", "v21")}건`],
   ["/performance", `${val("p26point", "total")}건 중 ${val("p26point", "v1")}건`],
-  // 2020~2025 감시 포착 v2.1
-  ["/performance", `경계 사건 ${val("priorWatch", "total")}건 중 ${val("priorWatch", "v21")}건을 주의 관찰 단계로 미리 알렸습니다`],
+  // 2020~2025 감시 포착(T24 와 같은 구성)
+  ["/performance", `경계 사건 ${val("priorWatch", "total")}건 중 ${val("priorWatch", "t24")}건을 주의 관찰 단계로 미리 알렸습니다`],
   // 고지문·누수 안내·동결 커밋
-  ["/performance", "수정본(v2.1·v1-fix)의 2026 은 블라인드가 아니다"],
+  ["/performance", "T24 의 2026 은 블라인드가 아니다: 팀은 v2.1 의 2026 결과를 이미 봤다"],
   ["/performance", "2026년 자료까지 포함한 전 기간으로 계산돼 있었음을 발견"],
-  ["/performance", "217260e"],
+  ["/performance", "a961caf"],
+  ["/about", "a961caf"],
   ["/about", "217260e"],
+  ["/about", "2024년까지(대회 공식 학습 자료 2,310건)"],
   ["/about", "9dca86c"],
   ["/about", "13ac483"],
 ];
 // 비교표의 모든 값(2자리)이 성능 페이지에 있는지
-for (const b of ["h25v21", "h25v2", "h25v1", "h25b0", "p26v21", "p26v2", "p26v1", "p26b0"]) {
+for (const b of ["h25t24", "h25v2", "h25v1", "h25b0", "p26t24", "p26v2", "p26v1", "p26b0"]) {
   for (const k of ["rmselog", "r2log", "r2raw", "nseraw", "f1_10k"]) checks.push(["/performance", f2(val(b, k))]);
 }
-for (const k of ["v21", "v2", "v1", "b0"]) checks.push(["/performance", f2(val("cvR2raw", k))]);
+for (const k of ["t24", "v2", "v1", "b0"]) checks.push(["/performance", f2(val("cvR2raw", k))]);
 for (const k of ["r2raw", "f1_10k"]) checks.push(["/performance", f2(val("p26v1fix", k))]);
+for (const k of ["r2log", "f1_10k"]) checks.push(["/performance", f2(val("p26v21", k))]);
 
 let bad = 0;
 for (const [p, want] of checks) {

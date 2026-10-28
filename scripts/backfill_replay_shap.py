@@ -1,6 +1,6 @@
 """다시 보기용 SHAP 근거 백필(1회): 고정 run 의 2026 기준일 예측에 '왜 이렇게 예상했나' 근거를 채운다.
 
-- 대상: run(기본 web/src/lib/replay.ts 의 REPLAY_RUN_ID = v2.1 고정 run)의 predictions 중
+- 대상: run(기본 web/src/lib/replay.ts 의 REPLAY_RUN_ID = T24 고정 run, 2026-10-28 전환)의 predictions 중
   기준일 ≥ 2026-01-01 인 (지점, 기준일) 가운데 shap_contributions 에 아직 없는 키.
   이미 있는 키(예: 10-19·10-22 일일 운영분)는 건드리지 않는다.
 - 계산은 일일 운영과 같게: algaecast.db.upload.shap_and_reco_rows 를 기준일 묶음(지점당 1행)마다 그대로 호출
@@ -43,7 +43,8 @@ from algaecast.models import registry as R
 
 log = logging.getLogger("backfill_replay_shap")
 
-REPLAY_RUN_ID = "9269d95d-9b8f-4d12-babe-02f9f60b41c5"  # web/src/lib/replay.ts REPLAY_RUN_ID 와 같은 값
+# web/src/lib/replay.ts REPLAY_RUN_ID 와 같은 값(T24 고정 run, 2026-10-28 — 이전 v2.1 9269d95d)
+REPLAY_RUN_ID = "665d140c-9c93-41e7-8d0e-e7ae7d59ca95"
 REPLAY_MIN = "2026-01-01"  # web/src/lib/replay.ts REPLAY_MIN
 TOP_K = 8  # shap_and_reco_rows 와 같은 상위 개수
 SOURCES = ("features", "asof")  # 대조 순서: 번들 피처 → as-of 수집

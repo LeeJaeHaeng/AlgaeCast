@@ -229,7 +229,7 @@ test("상황 기록 합치기: 새 측정(뷰) + 단계 변화(run), 그날까�
 
 test("다시 보기 run 고정: 상수 한 곳(uuid 형식)", () => {
   assert.match(REPLAY_RUN_ID, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-  assert.ok(REPLAY_RUN_ID.startsWith("9269d95d"));
+  assert.ok(REPLAY_RUN_ID.startsWith("665d140c"));
 });
 
 test("다시 보기 날씨 칸(실측): 창 = 그날−6 ~ 그날(창 끝 = 그날), 그날 뒤·창 앞 행 제외, 평균·합계 소수 1자리, 자료 일수", () => {

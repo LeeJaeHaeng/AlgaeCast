@@ -56,7 +56,7 @@ export default async function SitePage({ params, searchParams }: { params: Promi
   const c = COMBO[combo];
   const lvl = st?.latest_alert_level ?? 0;
   const p = pctInt(st?.p_alert);
-  // 예상값 = v2.1 한 값 예측(pred_cell_count). q50(v2.1 분위 중앙값)은 전문가 보기에만
+  // 예상값 = T24 한 값 예측(pred_cell_count). q50(T24 분위 중앙값)은 전문가 보기에만
   const point = st?.pred_cell_count ?? null;
   const tl = targetLabel(st?.target_date, today, point, st?.obs_cell_count, fmt);
   const oor = outOfRange(point, st?.q10_cqr, st?.q90_cqr);

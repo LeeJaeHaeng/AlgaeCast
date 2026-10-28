@@ -9,7 +9,7 @@ export const revalidate = 86400;
 export default async function AboutPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const sp = await searchParams;
   const expert = sp.view === "expert";
-  const frozenV2 = parseTables(readReport("FROZEN_v2.1.md") ?? "")[0];
+  const frozenV2 = parseTables(readReport("FROZEN_T24.md") ?? "")[0];
   return (
     // .narrow-fit: 좁은 화면(≤767px) 가로 넘침 방지 규칙의 범위(globals.css), 768px 이상에는 적용되는 스타일 없음
     <PageFrame title={ABOUT.title} lead={ABOUT.lead} expert={expert} className="narrow-fit">
@@ -45,7 +45,7 @@ export default async function AboutPage({ searchParams }: { searchParams: Promis
         </p>
       </section>
 
-      {/* 제출·운영 모델 v2.1 · 이력 v2·v1 */}
+      {/* 제출·운영 모델 T24 · 이력 v2.1·v2·v1 */}
       <section className="panel p-4" style={{ borderColor: "var(--accent)" }}>
         <h2 className="text-xl font-semibold">{ABOUT.models.title}</h2>
         <p className="mt-1 text-sm leading-relaxed text-dim">{ABOUT.models.lead}</p>

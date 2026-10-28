@@ -2,7 +2,7 @@ import { Info } from "@/components/Info";
 import { MdTable } from "@/components/MdTable";
 import { PageFrame } from "@/components/PageFrame";
 import { Timeline } from "@/components/perf/Timeline";
-import { PERF, TERMS, V21_NOTICE, n2 } from "@/lib/copy";
+import { PERF, T24_NOTICE, TERMS, V21_NOTICE, n2 } from "@/lib/copy";
 import { CMP, NUMBERS } from "@/lib/numbers";
 import { getBloomEvents } from "@/lib/queries";
 import { firstParagraphs, parseTables, readReport } from "@/lib/reports";
@@ -11,7 +11,7 @@ export const revalidate = 3600;
 
 const f2 = (v: number | null | undefined) => (v == null ? "–" : v.toFixed(2));
 
-function Section({ file, title, pick = [0], maxRows, notice }: { file: string; title: string; pick?: number[]; maxRows?: number; notice?: string }) {
+function Section({ file, title, pick = [0], maxRows, notice, dir = "reports/eval" }: { file: string; title: string; pick?: number[]; maxRows?: number; notice?: string; dir?: string }) {
   const md = readReport(file);
   if (!md) return null;
   const tables = parseTables(md);
@@ -30,7 +30,7 @@ function Section({ file, title, pick = [0], maxRows, notice }: { file: string; t
         </p>
       ))}
       {pick.map((i) => (tables[i] ? <MdTable key={i} table={tables[i].table} caption={tables[i].title} maxRows={maxRows} /> : null))}
-      <p className="text-[11px] text-dim">출처 reports/eval/{file}</p>
+      <p className="text-[11px] text-dim">출처 {dir}/{file}</p>
     </section>
   );
 }
@@ -62,7 +62,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
 
   return (
     <PageFrame title={PERF.title} lead={PERF.lead} expert={expert} className="perf-fit">
-      {/* 제출·운영 모델 = v2.1(누수 수정판), v1·v2 = 수정 전 이력 */}
+      {/* 제출·운영 모델 = T24(2026-10-28 전환, v2.1 구성·2024년까지 학습), v2.1 = 이력, v1·v2 = 수정 전 이력 */}
       <p className="panel px-4 py-2 text-sm leading-relaxed" style={{ borderColor: "var(--accent)" }}>
         {PERF.models}
         <span className="mt-1 block text-dim">{PERF.leak}</span>
@@ -76,7 +76,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
       </div>
       <p className="text-xs text-dim">{PERF.basis}</p>
       <p className="text-xs font-semibold" style={{ color: "var(--watch)" }}>
-        {PERF.v21Footnote}
+        {PERF.t24Footnote}
       </p>
 
       <CompareModels expert={expert} />
@@ -131,10 +131,11 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
       {expert && (
         <section className="space-y-3">
           <h2 className="text-lg font-semibold">{PERF.expertTitle}</h2>
-          <Section file="tbl_holdout_2025_v21.md" title="2025 홀드아웃·CV — v2.1 vs 수정 전 v2·v1(영향표), 같은 252행" pick={[0, 1, 2]} />
-          <Section file="tbl_holdout_2026_posthoc_v21.md" title="2026 사후 — v2.1 · v2 · v1 · v1-fix (전체·리드타임·사건별·전환 분해)" pick={[0, 1, 2, 3, 4]} notice={V21_NOTICE} />
-          <Section file="tbl_holdout_2026_posthoc_v21_detail.md" title="2026 사후 세부(v2.1) — 지점별 · 관심(1천) 리드타임 · 강정·고령 5월" pick={[0, 1, 2, 3]} notice={V21_NOTICE} />
-          <Section file="tbl_holdout_2025.md" title="2025 홀드아웃(v2.1 OOF) — 전 지표 + 부트스트랩 95% CI" pick={[0, 1]} />
+          <Section file="tbl_holdout_2025_v21.md" title="2025 홀드아웃·CV — v2.1 구성(= T24 학습, 같은 값) vs 수정 전 v2·v1(영향표), 같은 252행" pick={[0, 1, 2]} />
+          <Section file="tbl_holdout_2026_posthoc_T24.md" dir="reports/experiments/contingency_T24" title="2026 사후 — T24(제출·운영) · v2.1(이력) (전체·리드타임·사건별·전환 분해)" pick={[0, 1, 2, 3, 4]} notice={T24_NOTICE} />
+          <Section file="tbl_holdout_2026_posthoc_T24_detail.md" dir="reports/experiments/contingency_T24" title="2026 사후 세부(T24) — 지점별 · 정의별 · 관심(1천) 리드타임 · 강정·고령 4~6월" pick={[0, 1, 3, 8]} notice={T24_NOTICE} />
+          <Section file="tbl_holdout_2026_posthoc_v21.md" title="2026 사후(이력) — v2.1 · v2 · v1 · v1-fix (전체·리드타임·사건별·전환 분해)" pick={[0, 1, 2, 3, 4]} notice={V21_NOTICE} />
+          <Section file="tbl_holdout_2025.md" title="2025 홀드아웃(v2.1 구성 OOF = T24) — 전 지표 + 부트스트랩 95% CI" pick={[0, 1]} />
           <Section file="tbl_transitions.md" title="상태 전환 구간 평가" pick={[0, 1]} maxRows={20} />
           <Section file="tbl_leadtime.md" title="리드타임 (2020~2025)" pick={[0, 1]} />
           <Section file="tbl_operating_points.md" title="운영점 (비용비 r)" pick={[0]} />
@@ -150,7 +151,7 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
   );
 }
 
-type MetricRow = { key: keyof typeof PERF.compare.rows; v21: string; v2: string; v1: string; b0: string };
+type MetricRow = { key: keyof typeof PERF.compare.rows; t24: string; v2: string; v1: string; b0: string };
 
 function CompareTable({ title, rows, expert, notice }: { title: string; rows: MetricRow[]; expert: boolean; notice?: string }) {
   return (
@@ -180,7 +181,7 @@ function CompareTable({ title, rows, expert, notice }: { title: string; rows: Me
                     {expert && <span className="ml-1 text-xs text-dim">({meta.expert})</span>}
                   </td>
                   <td className="text-right font-bold" style={{ color: "var(--accent)" }}>
-                    {r.v21}
+                    {r.t24}
                   </td>
                   <td className="text-right text-dim">{r.v2}</td>
                   <td className="text-right text-dim">{r.v1}</td>
@@ -196,19 +197,19 @@ function CompareTable({ title, rows, expert, notice }: { title: string; rows: Me
   );
 }
 
-/** v2.1(제출·운영)과 수정 전 v2·v1 나란히. 숫자는 numbers.ts CMP(빌드 전 원천 대조) */
+/** T24(제출·운영)와 수정 전 v2·v1 나란히(v2.1 이력은 아래 한 줄). 숫자는 numbers.ts CMP(빌드 전 원천 대조) */
 function CompareModels({ expert }: { expert: boolean }) {
   const C = PERF.compare;
-  const { h25v21, h25v2, h25v1, h25v1fix, h25b0, p26v21, p26v2, p26v1, p26v1fix, p26b0, p26point, p26watch, cvR2raw, priorWatch } = CMP;
+  const { h25t24, h25v2, h25v1, h25v1fix, h25b0, p26t24, p26v21, p26v2, p26v1, p26v1fix, p26b0, p26point, p26watch, cvR2raw, priorWatch } = CMP;
   type M = { rmselog: number; r2log: number; r2raw: number; nseraw: number; f1_10k: number };
   const metricRows = (a: M, b: M, c: M, d: M): MetricRow[] => [
-    ...(["r2log", "rmselog", "r2raw", "nseraw"] as const).map((k): MetricRow => ({ key: k, v21: n2(a[k]), v2: n2(b[k]), v1: n2(c[k]), b0: n2(d[k]) })),
-    { key: "f1", v21: n2(a.f1_10k), v2: n2(b.f1_10k), v1: n2(c.f1_10k), b0: n2(d.f1_10k) },
+    ...(["r2log", "rmselog", "r2raw", "nseraw"] as const).map((k): MetricRow => ({ key: k, t24: n2(a[k]), v2: n2(b[k]), v1: n2(c[k]), b0: n2(d[k]) })),
+    { key: "f1", t24: n2(a.f1_10k), v2: n2(b.f1_10k), v1: n2(c.f1_10k), b0: n2(d.f1_10k) },
   ];
   const rows26: MetricRow[] = [
-    ...metricRows(p26v21, p26v2, p26v1, p26b0),
-    { key: "point", v21: C.count(p26point.v21, p26point.total), v2: C.count(p26point.v2, p26point.total), v1: C.count(p26point.v1, p26point.total), b0: C.count(p26point.persistence, p26point.total) },
-    { key: "watch", v21: C.countLead(p26watch.v21, p26watch.total, p26watch.medianLeadV21), v2: C.countLead(p26watch.v2, p26watch.total, p26watch.medianLeadV2), v1: C.countLead(p26watch.v1, p26watch.total, p26watch.medianLeadV1), b0: C.count(NUMBERS.y2026.persistenceDetected, NUMBERS.y2026.total) },
+    ...metricRows(p26t24, p26v2, p26v1, p26b0),
+    { key: "point", t24: C.count(p26point.t24, p26point.total), v2: C.count(p26point.v2, p26point.total), v1: C.count(p26point.v1, p26point.total), b0: C.count(p26point.persistence, p26point.total) },
+    { key: "watch", t24: C.countLead(p26watch.t24, p26watch.total, p26watch.medianLeadT24), v2: C.countLead(p26watch.v2, p26watch.total, p26watch.medianLeadV2), v1: C.countLead(p26watch.v1, p26watch.total, p26watch.medianLeadV1), b0: C.count(NUMBERS.y2026.persistenceDetected, NUMBERS.y2026.total) },
   ];
   return (
     <section className="panel space-y-3 p-4" aria-label={C.title}>
@@ -217,14 +218,15 @@ function CompareModels({ expert }: { expert: boolean }) {
         <p className="text-sm text-dim">{C.lead}</p>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <CompareTable title={C.y2025(h25v21.n)} rows={metricRows(h25v21, h25v2, h25v1, h25b0)} expert={expert} />
-        <CompareTable title={C.y2026(p26v21.n)} rows={rows26} expert={expert} notice={V21_NOTICE} />
+        <CompareTable title={C.y2025(h25t24.n)} rows={metricRows(h25t24, h25v2, h25v1, h25b0)} expert={expert} />
+        <CompareTable title={C.y2026(p26t24.n)} rows={rows26} expert={expert} notice={T24_NOTICE} />
       </div>
       <ul className="space-y-1 text-sm leading-relaxed">
-        <li style={{ color: "var(--safe)" }}>{C.prior(priorWatch.v21, priorWatch.total)}</li>
+        <li style={{ color: "var(--safe)" }}>{C.prior(priorWatch.t24, priorWatch.total)}</li>
+        <li>{C.v21(n2(p26v21.r2log), n2(p26v21.f1_10k), p26point.v21, p26point.total)}</li>
         <li>{C.v1fix(n2(h25v1fix.r2raw), n2(p26v1fix.r2raw), n2(p26v1fix.f1_10k), p26point.v1fix, p26point.total)}</li>
-        <li style={{ color: "var(--severe)" }}>{C.weak(n2(p26v21.r2raw), n2(h25v21.f1_10k), n2(h25b0.f1_10k), n2(p26v21.f1_10k), n2(p26b0.f1_10k))}</li>
-        <li className="text-dim">{C.cv(n2(cvR2raw.v21), n2(cvR2raw.v2), n2(cvR2raw.v1), n2(cvR2raw.b0))}</li>
+        <li style={{ color: "var(--severe)" }}>{C.weak(n2(p26t24.r2raw), n2(h25t24.f1_10k), n2(h25b0.f1_10k), n2(p26t24.f1_10k), n2(p26b0.f1_10k))}</li>
+        <li className="text-dim">{C.cv(n2(cvR2raw.t24), n2(cvR2raw.v2), n2(cvR2raw.v1), n2(cvR2raw.b0))}</li>
       </ul>
       <p className="text-[11px] text-dim">{C.source}</p>
     </section>

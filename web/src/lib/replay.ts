@@ -6,7 +6,8 @@
  *   (같은 기준일이면 목표일 늦은 것 — v_site_status 와 같은 순서).
  *   예측 행의 실측(obs_cell_count)은 목표일 ≤ asof 일 때만 남긴다(목표일이 asof 뒤면 그 실측은 asof 이후 관측이다).
  *   DB 예측 행에 실측이 비어 있으면(일부 지점 2026 행) 목표일 ≤ asof 일 때만 그 날의 관측값으로 채운다(fillActualAsOf, DB 는 바꾸지 않음).
- * - 2025 이전 기준일 예측은 제출 모델 v2.1 의 학습기간(≤2025)과 겹쳐 '그날까지의 자료만'이 성립하지 않으므로 쓰지 않는다(REPLAY_MIN).
+ * - 2026 이전 기준일 예측은 쓰지 않는다(REPLAY_MIN): 제출 모델 T24 는 2024년까지 학습했고 2025년은 검증·모델 선택에 쓴 해라
+ *   '그날까지의 자료만'으로 다시 그린다는 말이 성립하지 않는다(2026-10-23~28 v2.1 은 ≤2025 학습).
  * - 사건 표는 그날까지 판정된 사건(공식 발령일 ≤ asof)만.
  * - 상황 기록의 예상 단계 변화는 v_event_log(최신 run 기준 뷰)를 쓰지 않고 다시 보기 run 의 예측으로 직접 만든다(tierChangesAsOf) —
  *   타일·지도와 같은 run 이 되게. 새 측정 도착 기록만 뷰에서 가져온다(run 과 무관).
@@ -18,11 +19,12 @@ import type { BloomEvent, EventRow, ObsLite, Prediction, Site, SiteStatus } from
 /** 다시 보기 가장 이른 날(정책): 2026-01-01. 실제 하한은 이 날 이후 첫 기준일(데이터) */
 export const REPLAY_MIN = "2026-01-01";
 /**
- * 다시 보기 전용 run(설정 상수는 이 한 곳). 2026 기준일 이력(2026-05-04 ~ 2026-10-22, 134행)을 모두 가진 v2.1 run 이다.
+ * 다시 보기 전용 run(설정 상수는 이 한 곳). 2026 기준일 이력(2026-05-04 ~ 2026-10-22, 134행)을 모두 가진 T24 run 이다
+ * (2026-10-28 T24 전환: 적재 run 418b2923 + 일일 러너 강제 재예측 665d140c, 이전 v2.1 고정 run 9269d95d).
  * 이유: 매일 도는 파이프라인의 새 run 은 기준일 이력을 다 싣지 않을 수 있어 '최신 run' 에 기대면 장면 날짜가 범위 밖으로 빠질 수 있다.
  * 이 run 이 DB 에 없으면(삭제 등) 최신 성공 run 으로 대신한다(queries.getReplayRun). 장면 3개가 범위 안인지는 scripts/check_asof.mjs 가 본다.
  */
-export const REPLAY_RUN_ID = "9269d95d-9b8f-4d12-babe-02f9f60b41c5";
+export const REPLAY_RUN_ID = "665d140c-9c93-41e7-8d0e-e7ae7d59ca95";
 /** '그 뒤 실제로는' 겹쳐 보는 날 수 */
 export const AFTER_DAYS = 21;
 /** 상황 기록 창(일) — 실시간 화면과 같음 */
@@ -33,11 +35,13 @@ export const WEATHER_DAYS = 7;
 export type SceneId = "pre" | "onset" | "miss";
 /** 미리 정한 장면 3개 — 날짜·근거는 DB bloom_events·predictions(현재 run) 에서 정함(docs/handoff/REPORT_다시보기.md) */
 export const SCENES: { id: SceneId; asof: string; siteId: string; eventId: string }[] = [
-  // ① 강정·고령 경계 사건(첫 초과 E 2026-08-03) 7일 전 기준일: 예상값 10,662 · q90 45,882 · p 0.773(대응 필요) → 경계 진입 예상
+  // ① 강정·고령 경계 사건(첫 초과 E 2026-08-03) 7일 전 기준일: T24 예상값 7,886 · q90 40,995 · p 0.691(대응 필요) → 경계 진입 예상
+  //    (v2.1 run 은 10,662 · 45,882 · 0.773 — 예상값이 1만 아래로 내려가 설명 문장이 '범위 위쪽이 1만을 넘기 때문'으로 바뀜)
   { id: "pre", asof: "2026-07-27", siteId: "2011G56", eventId: "GJGR-2026-08-03" },
   // ② 같은 사건 첫 초과일(측정 98,859, 공식 발령은 아직 관심)
   { id: "onset", asof: "2026-08-03", siteId: "2011G56", eventId: "GJGR-2026-08-03" },
-  // ③ 놓친 사례: 회남 경계 사건(E 2026-07-13) 7일 전 기준일: 예상값 55 · q90 858 · p 0.003(안전) — 2026 경계 8건 중 감시·경보 모두 못 잡은 유일한 사건
+  // ② T24 예상값 24,055 · q90 121,324 · p 0.983(v2.1 26,550 · 108,218 · 0.977)
+  // ③ 놓친 사례: 회남 경계 사건(E 2026-07-13) 7일 전 기준일: T24 예상값 60 · q90 918 · p 0.003(안전, v2.1 55 · 858 · 0.003) — 2026 경계 8건 중 감시·경보 모두 못 잡은 유일한 사건
   { id: "miss", asof: "2026-07-06", siteId: "3008G30", eventId: "DCHN-2026-07-13" },
 ];
 export const sceneOf = (asof: string | null | undefined) => SCENES.find((s) => s.asof === asof);

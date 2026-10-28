@@ -1,4 +1,4 @@
-// reports/eval·eda 의 표(md)·그림(png) 과 models/FROZEN_v2.1.md(제출·운영)·FROZEN.md·FROZEN_v2.md(이력) 를 web 로 동기화: md 는 src/generated/reports.json(빌드 시 임포트), png 는 public/reports
+// reports/eval·eda 의 표(md)·그림(png), contingency_T24 사후 표, models/FROZEN_T24.md(제출·운영)·FROZEN_v2.1.md·FROZEN.md·FROZEN_v2.md(이력) 를 web 로 동기화: md 는 src/generated/reports.json(빌드 시 임포트), png 는 public/reports
 import fs from "node:fs";
 import path from "node:path";
 
@@ -20,8 +20,13 @@ for (const d of srcDirs) {
     if (f.endsWith(".png")) fs.copyFileSync(p, path.join(pubDir, f));
   }
 }
-// 동결 문서: v2.1(제출·운영, FROZEN_v2.1.md) · 이력 v1(FROZEN.md)·v2(FROZEN_v2.md)
-for (const f of ["FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md"]) {
+// T24(제출·운영, 2026-10-28 전환) 2026 사후 표 — reports/experiments/contingency_T24/
+for (const f of ["tbl_holdout_2026_posthoc_T24.md", "tbl_holdout_2026_posthoc_T24_detail.md"]) {
+  const p = path.join(root, "reports", "experiments", "contingency_T24", f);
+  if (fs.existsSync(p)) md[f] = fs.readFileSync(p, "utf8");
+}
+// 동결 문서: T24(제출·운영, FROZEN_T24.md) · 이력 v2.1(FROZEN_v2.1.md)·v1(FROZEN.md)·v2(FROZEN_v2.md)
+for (const f of ["FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md", "FROZEN_T24.md"]) {
   const p = path.join(root, "models", f);
   if (fs.existsSync(p)) md[f] = fs.readFileSync(p, "utf8");
 }
