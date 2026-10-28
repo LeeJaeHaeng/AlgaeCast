@@ -37,13 +37,13 @@ npx vercel --prod --yes --token "$VERCEL_TOKEN"
 
 ## 일일 자동화 (T8, `.github/workflows/daily.yml`)
 - 스케줄 cron `0 20 * * *`(UTC) = KST 05:00, `workflow_dispatch`(입력 dry_run). 물모아 스냅샷은 `mulmoa_snapshot.yml` 이 KST 06/09/18시에 별도 수행(단계 중복 없음).
-- 단계: Release `model-frozen-v2.1-217260e`(2026-10-23 v2.1 동결 뒤; 이전 v2 `model-frozen-v2-9dca86c`·v1 `model-frozen-13ac483` Release 유지) 다운로드 → `scripts/verify_frozen.py`(FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md sha256 불일치 시 중단) → `scripts/daily_run.py`
+- 단계: Release `model-frozen-T24-a961caf`(2026-10-28 T24 전환 뒤, T24 3폴더 + 이력 8폴더; 이전 v2.1 `model-frozen-v2.1-217260e`·v2 `model-frozen-v2-9dca86c`·v1 `model-frozen-13ac483` Release 유지) 다운로드 → `scripts/verify_frozen.py`(FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md·FROZEN_T24.md sha256 불일치 시 중단) → `scripts/daily_run.py`(current 회귀의 학습 수온 임계 연도와 FINAL_THRESHOLD_YEAR 가 다르면 종료코드 2)
   (공공 API 최근 120일 증분 수집 → S1 달력 → as-of 피처 → 동결 모델 예측 q50·CQR q10/q90·p_alert·tier → Supabase model_runs/predictions/shap/recommendations
   → 관측 증분 upsert → backfill_obs → live_benchmark.csv 에 pred_level·p_alert 결합 → `POST /api/revalidate`) → 로그 artifact(30일).
 - as-of base_date = 오늘 이전 가장 최근 조류 측정일(지점별). 이미 predictions 에 있는 base_date 면 예측을 건너뛰고 backfill·revalidate 만 수행.
 - 실패 시 `model_runs.status='failed'` 행이 기록되고 대시보드 홈 상단에 빨간 배너가 뜬다(마지막 성공 run 의 예측은 유지).
 - 러너에는 대회 번들·모델 pickle 이 없다(대회 데이터는 저장소에 올리지 않음). as-of 피처 재현 검증: `reports/eval/tbl_asof_reproduction.md`
-  (2026-10-23 v2.1 피처 재계산: 최근 base_date × 5지점 × 30피처 = 1,050값, 허용오차 |상대차| ≤1% 일치 96.2%, 완전 일치 86.0%; horizon_days 를 빼면 98.7%, 나머지 불일치는 수집 창 시작 직후 기준일의 연속 수위 편차·수집 시점 차이).
+  (2026-10-23 v2.1 피처 재계산, T24 전환 뒤 다시 하지 않음 — 수온 임계 2열만 다름: 최근 base_date × 5지점 × 30피처 = 1,050값, 허용오차 |상대차| ≤1% 일치 96.2%, 완전 일치 86.0%; horizon_days 를 빼면 98.7%, 나머지 불일치는 수집 창 시작 직후 기준일의 연속 수위 편차·수집 시점 차이).
 - 재학습 금지(제출 2026-11-06 전). 필요한 시크릿: DATA_GO_KR_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, REVALIDATE_SECRET (등록 완료).
 
 ### Supabase 무료 플랜 일시정지 방지
@@ -58,6 +58,14 @@ npx vercel --prod --yes --token "$VERCEL_TOKEN"
 ## 운영 모델 v2 동결(2026-10-22 완료)
 - 최종 모델 C 를 v2 로 동결했다: 커밋 `9dca86c`, `models/FROZEN_v2.md`, Release `model-frozen-v2-9dca86c`(자산 `models-frozen-v2-9dca86c.tar.gz` — registry.json·FROZEN.md·FROZEN_v2.md, v1 회귀·v2 회귀·v1 분류기·v1 분위). `daily.yml` FROZEN_TAG 기본값을 같은 push 에서 교체했다. 절차·검증은 `reports/v2/BUILD.md`.
 - 아래 절차는 제출 뒤 2026 자료까지 넣어 다시 학습하는 경우(v3)에 쓴다.
+
+## 운영 모델 v2.1 동결(2026-10-23)
+- 데이터 유래 상수 누수 수정판 v2.1: 커밋 `217260e`, `models/FROZEN_v2.1.md`, Release `model-frozen-v2.1-217260e`. 적재 run `7071a612` → 강제 재예측 run `9269d95d`(다시 보기 고정 run). 수온 임계 ≤2025.
+
+## 운영 모델 T24 전환(2026-10-28)
+- 운영사무국 답변('학습은 24년까지')에 따라 사전등록 규칙(PREREG_contingency 2·7·8절)대로 제출·운영 모델을 T24(v2.1 구성, 대회 split=train 2,310행, 동결 커밋 `a961caf`, `models/FROZEN_T24.md`)로 바꿨다.
+- 순서: ① 코드 상수 `FINAL_THRESHOLD_YEAR = 2024`·registry current T24·`verify_frozen` DOCS 에 FROZEN_T24·`daily_run` 수온 임계 연도 가드를 한 커밋으로(7ab18e0) → ② 운영용 Release `model-frozen-T24-a961caf`(자산 `models-frozen-T24-a961caf.tar.gz` sha256 `2777e6ee…`, 이력 8폴더는 v2.1 운영 tar 와 바이트 동일) → ③ `daily.yml` FROZEN_TAG 를 같은 push 에서 교체 → ④ Actions dry-run(40619095795) 통과 → ⑤ `python scripts/upload_t24_run.py`(run `418b2923`, 예측 381·지표 40·사건 28·전환 150, 2026 행 129개 = 제출본·사후 예측 차이 0) → ⑥ 바로 `force_predict` 실행(run `665d140c`, 386행) → ⑦ `web/src/lib/replay.ts` REPLAY_RUN_ID = `665d140c`, `scripts/backfill_replay_shap.py`(129키 1,032행) → 웹 커밋을 HEAD 로 push(Vercel 빌드).
+- `bloom_events`·`transition_metrics` 는 run 에 묶이지 않아 2026 행이 T24 값으로 바뀌었다(v2.1 값은 reports 파일에 보존).
 
 ## 제출 후 재학습(v3) 절차 (실행은 2026-11-07 이후 지시로)
 1. `git tag submission-2026-11-06` 로 제출 시점 고정, `models/FROZEN.md` 는 보존.

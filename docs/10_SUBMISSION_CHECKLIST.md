@@ -12,6 +12,7 @@
 - [ ] 2026 평가 조합 전체에 대해 피처 계산에 사용된 최대 obs_date ≤ base_date 임을 출력하는 스크립트 실행, 로그 첨부 (`reports/eval/leakage_audit.md`)
 - [ ] 원자료부터 다시 계산하는 누수 감사(`scripts/leakage_audit.py --raw-sample 60`: 원천을 기준일로 잘라 정렬·피처를 다시 만들어 대조) 불일치 0, 음성 대조(전 기간 평균으로 되돌리면 검출) 통과
 - [ ] 데이터로 계산한 상수는 as-of 또는 학습기간 자료로만: `config/derived_constants.json` 계산 자료 메타데이터 + `tests/test_derived_constants.py` 통과(FIX-v2.1, 2026-10-23)
+- [ ] 제출 모델 학습은 2024년까지(운영사무국 답변 2026-10-28): registry current = T24(`models/FROZEN_T24.md`), `FINAL_THRESHOLD_YEAR = 2024`, 노트북의 split=train 2,310행 일치 assert 통과
 - [ ] 코드 내 실측치 룩업·하드코딩 없음 (grep "sample_submission" 이외 정답 파일 참조 없음)
 - [ ] 깨끗한 venv에서 `make reproduce` → `submission.csv` diff 0
 - [ ] 시드 고정, requirements 버전 고정, Python 버전 명시

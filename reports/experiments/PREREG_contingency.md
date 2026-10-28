@@ -206,6 +206,13 @@
 4. **T24S 는 2026 정답으로 채점하지 않는다.** 교체가 일어나면 그때 동결 뒤 1회만 2026 사후를 계산한다(동결 뒤 1회 원칙).
 - T24S 모델과 submission 은 제출 패키지에 넣지 않는다(비공개 저장소 Release·로컬 보관).
 
+**전환 실행 기록(2026-10-28, 이 절 뒤 덧붙임 — 규칙·모델은 바꾸지 않음).**
+- 저장소 전환 커밋 7ab18e0(코드 상수 `FINAL_THRESHOLD_YEAR = 2024`, registry current = T24 `20261026_131722` ×3, `models/FROZEN_T24.md`, verify_frozen DOCS, 일일 러너 수온 임계 연도 가드, submission.csv = T24 `057afeee…`).
+- 재현 확인: 피처를 다시 만들고(`align` → `features`, 임계 2열만 바뀜) `python -m algaecast.models.predict` 결과가 submission_T24.csv 와 바이트 동일.
+- 운영: Release `model-frozen-T24-a961caf`(T24 + 이력 8폴더) → `daily.yml` FROZEN_TAG 교체 → 적재 run 418b2923 → 강제 재예측 run 665d140c(다시 보기 고정 run, SHAP 129키 백필).
+- 학습 범위 점검 결과와 결정별 사용 자료 공개: `docs/handoff/REPORT_T24전환.md`, 방법설명서 5.11절 표 5-15·5.12절.
+- T24S(엄격판)는 동결만 하고(db2b3f2) 2026 은 채점하지 않았다. 운영사무국에 '목표일 2025 인 5행'을 다시 문의한다.
+
 ## 부록 A. 2026 실측 사후 분석이 들어간 위치(분석 결과, 2026-10-23)
 
 대체 원천: [LT] `reports/eval/tbl_leadtime.md`(2020~2025 경계 20건 중 17건·중앙 14일, D 기준 21일, 지속성 1/20; 관심 48건 중 43건·14일), [H25] `tbl_holdout_2025_v21.md`·`headline_metrics.json` same252_2025(v2.1 0.712·0.778·0.175·F1 0.705, 지속성 F1 0.727), [CV] `headline_metrics.json` cv_pooled_r2_raw(v2.1 0.289), [TR] `tbl_transitions.md`(2025 진입 12건), [OP] `tbl_operating_points.md`, [CQR] `tbl_cqr.md`(2025 PICP80 0.845), [SITE] `tbl_by_site.md`(2025 지점별).

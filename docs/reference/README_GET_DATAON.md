@@ -55,7 +55,7 @@ python -m algaecast.models.predict --out submission_from_dataon.csv
   - v2 까지는 정렬 단계의 관측소 평균이 연속 시계열 전 기간 평균이어서 위 차이가 수위 편차 피처 값을 옮겼다.
     2026-10-23 그 규칙(v2)으로 다시 받은 시계열을 돌린 결과: `level_cont_t0` 2,979행 모두 조금씩 달라졌다(최대 차 1.21).
     `level_cont_diff7` 는 117행(대부분 칠서), `submission.csv` 는 124행 중 26행(최대 상대차 14.7%)이 달라졌다.
-  - 제출본 v2.1 은 관측소별 직전 365일 평균(기준일 미포함)을 쓴다. 그래서 2026-10-20 잠정값 차이는 표본 행(기준일 ≤2026-10-15)의
+  - 제출본(T24, 수위 피처 정의는 v2.1 과 같음)은 관측소별 직전 365일 평균(기준일 미포함)을 쓴다. 그래서 2026-10-20 잠정값 차이는 표본 행(기준일 ≤2026-10-15)의
     피처에 들어가지 않고, 보현산댐 2025년~ 값은 코드가 뺀다. 다만 WAMIS 가 과거 값을 고치면 달라질 수 있으므로 제출본 재현에는 아래 파일을 쓴다.
 - **제출본과 같은 결과가 필요하면** 패키지에 든 연속 시계열 스냅샷을 쓴다(다시 받지 않는다).
   - 파일: `data/raw/dataon/level_continuous_long.parquet`, 144,068행
@@ -72,4 +72,4 @@ python -m algaecast.models.predict --out submission_from_dataon.csv
   - sha256 `86243a68758a473a2ca6fc9cd3915b30f05ccdf916df12b33fe3c3ab4bed89f0`(v2.1 피처, 2026-10-23 12:10 생성).
   - 원자료가 있는 환경에서 `python -m algaecast.features.run --strategy S1 --export-level-cont` 로 다시 만들 수 있다.
 - `src/config/level_cont_stats.json`: 관측소별 기준면 오프셋(2020~2024 겹침 구간 DataON − WAMIS 중앙값)·관측소 목록·본댐 대체 표.
-  대시보드 일일 운영 전용이고 재현에는 쓰지 않는다(전 기간 평균 값은 v2.1 에서 폐기).
+  대시보드 일일 운영 전용이고 재현에는 쓰지 않는다(전 기간 평균 값은 v2.1 에서 폐기, T24 도 같음).
