@@ -27,4 +27,4 @@
 | quantile | 20261026_131722 | `9ebc0cef1c306bb5ad24eae06c643a0eb1cbb219289e023e7ebfe61e8a52defe` | 7,721,406 | `39d80086b0e15b0df6aae175b60e4b76917bf22bfab79e4a0e4ea2d37393ff2e` | T24-fold 분위 q10·q50·q90(피처 30) |
 
 - 위 표의 meta.json 해시는 동결 당시 작업 트리 바이트(CRLF) 기준이다. 저장소 커밋에는 LF 로 들어가 다시 체크아웃하면 meta.json 해시가 달라질 수 있다. 검증(`scripts/verify_frozen.py`)은 model.pkl 해시로 한다.
-- 저장소 `models/` 사본(2026-10-28 커밋 시 줄바꿈 정규화: LF·파일 끝 줄바꿈, 내용 같음)의 meta.json sha256: regression `59c9b57b3dbf35770a63a9f35949a03ffe139593a64aa1b5cbc9cd74282dba54`, classifier `b07c6b6778f18624cc14b6cfac6c608be4745a40ede71f99ced2ed0ac3b10449`, quantile `c1cc8e5485d126e0a15050d40c04484cfa6c76ba8894f1ae87d297566ef0eac7`. 운영용 Release `model-frozen-T24-a961caf`·제출 패키지 `model/` 은 이 사본을 담는다.
+- 저장소 `models/` 사본(2026-10-28 커밋 시 줄바꿈 정규화: LF·파일 끝 줄바꿈, 내용 같음)의 meta.json sha256: regression `a494f9e2e0c6e5c0df1308053d83c7c7166f12ade9bbc15997771c94b08e6076`, classifier `cc96825af47fde9e2b69a3cefd564e7f205ca6d7737f9c3edc166005dbeabff1`, quantile `1eeec04a66abab7bda057a771fd115fc0a7a66196bb49db8ce4197e7de6253dd`. 운영용 Release `model-frozen-T24-a961caf`·제출 패키지 `model/` 은 이 사본을 담는다.
