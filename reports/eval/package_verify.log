@@ -1,20 +1,23 @@
-# 패키지 재현 검증 2026-10-28 11:49
+# 2026-10-28 데모 영상 v7 반영 패키지 재검증 3건(아래 순서): 패키지 폴더(--update-package) 13:43, 모델자료 영상제외 zip 14:20, 모델자료 zip 14:36.
+# 모델자료 zip 은 14:08 에도 검증했다(diff 0·노트북 오류 0·데모 sha256 일치·11.3분). 그 실행 기록은 다음 검증이 덮어써서, 기록 보존을 위해 14:36 에 다시 실행했다.
+
+# 패키지 재현 검증 2026-10-28 13:43
 원본: C:\Users\user\OneDrive\Desktop\경진대회\algaecast\submission_package
 
 $ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_bur7ijhb\pkg\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_bur7ijhb\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_bur7ijhb\pkg\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_bur7ijhb\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_bur7ijhb\pkg\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
-C:\Users\user\AppData\Local\Temp\algaecast_verify_bur7ijhb\pkg\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
+C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
   self._get_loop()
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
 [jupytext] Reading notebooks/01_train_eval.py in format py
@@ -22,49 +25,25 @@ C:\Users\user\AppData\Local\Temp\algaecast_verify_bur7ijhb\pkg\.venv\Lib\site-pa
 [jupytext] Warning: Notebook is not trusted
 [jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
 [jupytext] Updating the timestamp of notebooks/01_train_eval.py
-submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 0907b1103c25371a… 일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 12.6 분
-# 패키지 재현 검증 2026-10-28 12:15
-원본: dist\AlgaeCast_모델자료_이재행.zip
+submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 5c648ac0b38021a1… 일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 11.5 분
 
-$ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
-
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_lbvbijc5\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
-
-[notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_lbvbijc5\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
-
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_lbvbijc5\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
-
-[notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_lbvbijc5\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
-
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_lbvbijc5\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
-C:\Users\user\AppData\Local\Temp\algaecast_verify_lbvbijc5\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
-  self._get_loop()
-[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
-[jupytext] Reading notebooks/01_train_eval.py in format py
-[jupytext] Executing notebook with kernel python3
-[jupytext] Warning: Notebook is not trusted
-[jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
-[jupytext] Updating the timestamp of notebooks/01_train_eval.py
-submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 0907b1103c25371a… 일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 12.7 분
-# 패키지 재현 검증 2026-10-28 12:28
+# 패키지 재현 검증 2026-10-28 14:20
 원본: dist\AlgaeCast_모델자료_영상제외_이재행.zip
 
 $ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_kn6hmshk\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_kn6hmshk\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_kn6hmshk\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_kn6hmshk\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_kn6hmshk\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
-C:\Users\user\AppData\Local\Temp\algaecast_verify_kn6hmshk\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
+C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
   self._get_loop()
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
 [jupytext] Reading notebooks/01_train_eval.py in format py
@@ -72,4 +51,30 @@ C:\Users\user\AppData\Local\Temp\algaecast_verify_kn6hmshk\AlgaeCast_녹조7일�
 [jupytext] Warning: Notebook is not trusted
 [jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
 [jupytext] Updating the timestamp of notebooks/01_train_eval.py
-submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 None… 불일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 11.3 분
+submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 None… 불일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 14.7 분
+
+# 패키지 재현 검증 2026-10-28 14:36
+원본: dist\AlgaeCast_모델자료_이재행.zip
+
+$ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
+
+[notice] A new release of pip is available: 24.0 -> 26.2.2
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
+
+[notice] A new release of pip is available: 24.0 -> 26.2.2
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
+C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+  self._get_loop()
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+[jupytext] Reading notebooks/01_train_eval.py in format py
+[jupytext] Executing notebook with kernel python3
+[jupytext] Warning: Notebook is not trusted
+[jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
+[jupytext] Updating the timestamp of notebooks/01_train_eval.py
+submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 5c648ac0b38021a1… 일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 17.5 분

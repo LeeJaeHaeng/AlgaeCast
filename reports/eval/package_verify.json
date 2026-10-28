@@ -1,5 +1,5 @@
 {
- "when": "2026-10-28 12:28",
+ "when": "2026-10-28 14:53",
  "returncode": 0,
  "source": "dist\\AlgaeCast_모델자료_이재행.zip",
  "model_dirs": [
@@ -18,7 +18,7 @@
  "notebook_errors": 0,
  "notebook_stderr_warnings": 0,
  "notebook_abs_paths": 0,
- "demo_sha256": "0907b1103c25371a38d052a430616c01554b44020d8cf7473d2511ed0f6f9044",
+ "demo_sha256": "5c648ac0b38021a12a5c4cbd1b4db97becc6e750babf9e42249f6899cd4d56a1",
  "demo_sha_ok": true,
- "minutes": 12.7
+ "minutes": 17.5
 }
