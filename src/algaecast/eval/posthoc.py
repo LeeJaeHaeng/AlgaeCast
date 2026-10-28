@@ -52,11 +52,16 @@ def _md(t: pd.DataFrame, nd: int = 3) -> str:
     )
 
 
-def predict_2026() -> pd.DataFrame:
+def predict_2026(threshold_year: int | None = None) -> pd.DataFrame:
+    """threshold_year: 2026 행 수온 임계 자료 끝 연도(None = 피처 파일 값 그대로, v2.1 이력 재현은 2025)."""
     feat = pd.read_parquet(D._features_path("S1"))
     feat["base_date"] = pd.to_datetime(feat["base_date"])
     feat["target_date"] = pd.to_datetime(feat["target_date"])
     f26 = feat[feat["base_date"].dt.year == 2026].reset_index(drop=True)
+    if threshold_year is not None:
+        from algaecast.features.constants import apply_site_thresholds
+
+        f26 = apply_site_thresholds(f26, threshold_year)
     pr = predict_registry(f26)
     out = pd.concat(
         [f26[["station_id", "site_code", "base_date", "target_date", "split", "cell_log_t0"]], pr], axis=1

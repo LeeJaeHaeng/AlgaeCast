@@ -4,7 +4,7 @@
 - 실제 데이터(없으면 skip): 축약 v2 모델을 임시 레지스트리(분류기·분위 = v1 파일 사본)에 등록 →
   make_submission 124행·sample 순서·정수·NaN/음수 없음·UTF-8 BOM, 분위·분류기 출력이 v1 경로와 같음,
   as-of 피처에 상류 열 부착(v2)·미부착(v1). freeze_v2 --dry-run 이 models/·submission/ 을 건드리지 않음.
-- verify_frozen: FROZEN.md + FROZEN_v2.md 해시·current 확인, 패키지에서 뺀 이력 모델(HISTORY.md 해시) 처리.
+- verify_frozen: FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md·FROZEN_T24.md 해시·current(T24) 확인, 패키지에서 뺀 이력 모델(HISTORY.md 해시) 처리.
 """
 
 from __future__ import annotations

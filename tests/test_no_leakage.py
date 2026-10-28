@@ -132,7 +132,7 @@ def test_water_hydro_weather_windows() -> None:
     as_of = date(2026, 10, 22)
     w = make_water_features(df, as_of, SITE)
     assert w["wtemp_ma7"] == 1.0 and w["wtemp_degree_days20"] == 0.0 and w["wtemp_days_over25"] == 0.0
-    th = site_thresholds(FINAL_THRESHOLD_YEAR)["GJGR"]  # 측정 ≤2025 임계(FIX-v2.1 R3)
+    th = site_thresholds(FINAL_THRESHOLD_YEAR)["GJGR"]  # 측정 ≤2024 임계(T24, FIX-v2.1 R3)
     assert w["wtemp_over_site_thresh_days"] == 0.0 and w["wtemp_minus_site_thresh"] == pytest.approx(1.0 - th)
     h = make_hydro_features(df, as_of, SITE)
     assert (

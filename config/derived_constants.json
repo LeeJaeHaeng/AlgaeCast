@@ -1,5 +1,5 @@
 {
- "_about": "데이터로 계산한 상수와 계산 자료·기간(FIX-v2.1 PREREG R3·R4). 사용 규칙: CV 폴드(검증 V) → site_caution_wtemp[V−1], 2025 홀드아웃 → [2024], 최종 모델·2026 예측·일일 운영 → [2025]. 테스트(tests/test_derived_constants.py)가 사용 시점보다 늦은 자료를 막는다.",
+ "_about": "데이터로 계산한 상수와 계산 자료·기간(FIX-v2.1 PREREG R3·R4). 사용 규칙: CV 폴드(검증 V) → site_caution_wtemp[V−1], 2025 홀드아웃 → [2024], 제출 모델 T24·2026 예측·일일 운영 → [2024](2026-10-28 전환), v2.1 이력 → [2025]. 테스트(tests/test_derived_constants.py)가 사용 시점보다 늦은 자료를 막는다.",
  "computed_at": "2026-10-23T15:10:40",
  "site_caution_wtemp": {
   "2019": {

@@ -303,8 +303,16 @@ def main(argv: list[str] | None = None) -> int:
         & (clf_tbl["구간"] == "Final 2025")
     ].iloc[0]
 
-    # ---- 레지스트리: ≤2025 전체로 재학습 (제출·대시보드용)
-    full = df
+    # ---- 레지스트리: ≤2025 전체로 재학습 (v2.1 이력 경로 — T24 전환(2026-10-28) 뒤에는 쓰지 않는다)
+    from algaecast.features.constants import V21_THRESHOLD_YEAR, apply_site_thresholds
+    from algaecast.models import registry as _R
+
+    if str(_R.current_entry("regression").get("meta", {}).get("model_name", "")).startswith("T24"):
+        raise SystemExit(
+            "중단: registry current 가 제출 모델 T24 다 — "
+            "이 경로(≤2025 재적합)는 v2.1 이력용이라 T24 를 덮어쓴다."
+        )
+    full = apply_site_thresholds(df, V21_THRESHOLD_YEAR)  # v2.1 최종 적합 임계 ≤2025
     reg_fit = fit_predict(full, full.iloc[:5], cols, spec_c1)  # smear 계수 확보용
     nums, cats = D.numeric_and_categorical(cols)
     import lightgbm as lgb

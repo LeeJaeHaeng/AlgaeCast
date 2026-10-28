@@ -1,21 +1,25 @@
 # 이력 모델 — 제출 패키지 미포함 목록
 
 제출 패키지 `model/` 에는 submission.csv 재현과 노트북 실행에서 실제로 불러오는 모델만 넣는다.
-제출·운영 모델 v2.1 의 회귀 `regression/20261023_120818`, 경보 분류기 `classifier/20261023_120255`,
-분위 회귀 `quantile/20261023_120257` 세 폴더다(`FROZEN_v2.1.md` 표의 이름별 첫 행 = `registry.json` current).
+제출·운영 모델 T24 의 회귀 `regression/20261026_131722`, 경보 분류기 `classifier/20261026_131722`,
+분위 회귀 `quantile/20261026_131722` 세 폴더다(`FROZEN_T24.md` 표의 이름별 첫 행 = `registry.json` current).
+T24 는 운영사무국 답변(2026-10-28, "학습은 24년까지의 데이터만 활용 가능")에 따라 사전등록 규칙대로 v2.1 에서 바꾼
+제출 모델이다(`reports/experiments/PREREG_contingency.md` 8절). 구성은 v2.1 과 같고 학습은 대회 번들 split=train 2,310행이다.
 
-- 근거(2026-10-23 추적): 패키지 사본에서 `make_submission` 단독 실행과 노트북 전체 실행
+- 근거(2026-10-23 추적, v2.1 때): 패키지 사본에서 `make_submission` 단독 실행과 노트북 전체 실행
   (`jupytext --to notebook --execute`, 커널 프로세스 포함)을 하면서, 파이썬 감사 훅(open 이벤트)과
   `pickle.load`·`joblib.load`·`lightgbm.Booster(model_file=...)`·`registry.load_current` 래퍼로 `model/` 아래에서
-  열린 파일을 기록했다. 모델로 불러온 파일은 위 세 폴더의 `model.pkl` 뿐이었고, 아래 다섯 폴더는
-  `scripts/verify_frozen.py` 의 sha256 읽기로만 열렸다. 노트북의 v1-fix 비교값은 동결 파라미터로 다시 학습해 만들고
-  (파일을 불러오지 않음), v2.1 회귀 객체의 `aux`(v1 30열·범주)는 v1-fix 에서 복사해 v2.1 `model.pkl` 안에 들어 있다.
-- 아래 다섯 폴더는 수정 전 이력(v1 봉인본·v2)과 민감도 보고용(v1-fix)이다. 동결 문서 `FROZEN.md`(v1)·`FROZEN_v2.md`(v2)와
-  `FROZEN_v2.1.md` 의 v1-fix 행은 기록으로 패키지에 남긴다. `registry.json` 도 저장소와 같은 항목(이력 포함)을 담으며
-  current 는 v2.1 이다(패키지 사본에는 이력 항목에 `"package"` 표시만 더한다).
+  열린 파일을 기록했다. 모델로 불러온 파일은 current 세 폴더의 `model.pkl` 뿐이었고, 이력 폴더는
+  `scripts/verify_frozen.py` 의 sha256 읽기로만 열렸다. T24 는 코드 경로가 같고 current 만 바뀌었다. T24 회귀 객체의
+  `aux`(v1 30열·범주)는 T24 학습 행에서 만들어 `model.pkl` 안에 들어 있다(이력 파일을 열지 않는다).
+- 아래 여덟 폴더는 이력이다: 수정 전 v1 봉인본(3)·v2 회귀(1), 민감도 보고용 v1-fix 회귀(1), 그리고 2026-10-23~27 의
+  제출·운영 모델 v2.1(3, 최종 학습 ≤2025). 동결 문서 `FROZEN.md`(v1)·`FROZEN_v2.md`(v2)·`FROZEN_v2.1.md`(v2.1·v1-fix)는
+  기록으로 패키지에 남긴다. `registry.json` 도 저장소와 같은 항목(이력 포함)을 담으며 current 는 T24 다
+  (패키지 사본에는 이력 항목에 `"package"` 표시만 더한다).
 - 제공: **요청 시 제공(비공개 저장소 Release·로컬 보관)**. Release `model-frozen-v2.1-217260e`
-  (자산 `models-frozen-v2.1-217260e.tar.gz`)에 다섯 폴더가 모두 있고, v1 세 폴더는 `model-frozen-13ac483`,
-  v1 세 폴더와 v2 회귀는 `model-frozen-v2-9dca86c` 에도 있다. 저장소 작업 폴더 `models/` 에도 보관한다.
+  (자산 `models-frozen-v2.1-217260e.tar.gz`)에 v2.1 세 폴더와 v1·v2·v1-fix 다섯 폴더가 모두 있고, v1 세 폴더는
+  `model-frozen-13ac483`, v1 세 폴더와 v2 회귀는 `model-frozen-v2-9dca86c` 에도 있다. T24 는 `contingency-T24-a961caf`.
+  저장소 작업 폴더 `models/` 에도 보관한다.
 - 검증: 패키지에서 `python scripts/verify_frozen.py` 는 이력 행의 파일이 없을 때 아래 표의 `model.pkl` sha256 이
   동결 문서 표와 같으면 '패키지 미포함(이력, model/HISTORY.md)'으로 표시하고 통과한다. 제출·운영 모델 세 폴더는
   파일이 있고 해시가 맞아야 통과한다. 저장소 `models/` 에서는 지금처럼 모든 파일을 검증한다.
@@ -100,3 +104,54 @@
 |---|---|---|
 | `regression/20261023_120255/model.pkl` | `4e341732fe4d9ba48be768a570dd9836b0050d9233a29d5cc924dbe87d4dfed7` | 15,371,621 |
 | `regression/20261023_120255/meta.json` | `ef23538a7c1737d50e9b2a5e8a3c354004026c246a346f6ff5707c713c42ea4e` | 1,273 |
+
+## regression/20261023_120818 — v2.1 회귀(2026-10-23~27 제출·운영)
+
+- 역할: v2.1 제출·운영 모델(2026-10-23 동결 ~ 2026-10-28 T24 전환) 회귀 = ensemble_v2(c1·c3·c2·cg, 피처 35, 가중치 c1 0.055·c3 0.280·c2 0.267·cg 0.398). 최종 적합 ≤2025(2,562행), 수온 임계 ≤2025
+- 동결 문서: `FROZEN_v2.1.md` (표 첫 행)
+- 동결 커밋: `217260ee42e26519a52b187cca7149162046e222` (2026-10-23 12:14:45 KST)
+- 동결 시각: 2026-10-23 12:08:19 KST (FROZEN_v2.1.md). 파일 생성 2026-10-23 12:08:18
+- 재학습 명령: `python -m algaecast.models.alert --skip-tune`(분류기·분위) → `python scripts/freeze_v21.py --oof` → `--freeze`(회귀)
+- 주의: v2.1 제출본(`4741a3d3…`)은 test 수온 임계 ≤2025 로 만든 것이다. 2026-10-28 부터 코드 기본값이
+  `FINAL_THRESHOLD_YEAR = 2024`(T24)이므로, v2.1 재현 경로(`scripts/freeze_v21.py`·`models/alert.py` 최종 적합·
+  `eval/posthoc_v21.py`)는 `V21_THRESHOLD_YEAR = 2025` 를 명시해 쓴다. 원본 대조는 동결 커밋 217260e 와 Release 로 한다
+- 제공: 요청 시 제공(비공개 저장소 Release·로컬 보관) — Release `model-frozen-v2.1-217260e`
+
+| 파일 | sha256 | bytes |
+|---|---|---|
+| `regression/20261023_120818/model.pkl` | `d95e7a4e8dab50a59583dd8ecf8ab2482786ec05f7bfa1f256c657bec3a091f0` | 20,414,068 |
+| `regression/20261023_120818/meta.json` | `059772416e24bd2723cf4483612c9873d5d6afe441c308f1dd92d233861bcf9f` | 3,558 |
+
+## classifier/20261023_120255 — v2.1 경보 분류기 b
+
+- 역할: v2.1 경보 분류기 b(+4~+10일 창 ≥1만, 피처 30). 최종 적합 ≤2025
+- 동결 문서: `FROZEN_v2.1.md` (표 둘째 행)
+- 동결 커밋: `217260ee42e26519a52b187cca7149162046e222` (2026-10-23 12:14:45 KST)
+- 동결 시각: 2026-10-23 12:08:19 KST (FROZEN_v2.1.md). 파일 생성 2026-10-23 12:02:55
+- 재학습 명령: `python -m algaecast.models.alert --skip-tune`
+- 주의: v2.1 제출본(`4741a3d3…`)은 test 수온 임계 ≤2025 로 만든 것이다. 2026-10-28 부터 코드 기본값이
+  `FINAL_THRESHOLD_YEAR = 2024`(T24)이므로, v2.1 재현 경로(`scripts/freeze_v21.py`·`models/alert.py` 최종 적합·
+  `eval/posthoc_v21.py`)는 `V21_THRESHOLD_YEAR = 2025` 를 명시해 쓴다. 원본 대조는 동결 커밋 217260e 와 Release 로 한다
+- 제공: 요청 시 제공(비공개 저장소 Release·로컬 보관) — Release `model-frozen-v2.1-217260e`
+
+| 파일 | sha256 | bytes |
+|---|---|---|
+| `classifier/20261023_120255/model.pkl` | `cce848b6c1b5d1608d73403d5ef089bf8e4dc04bdc358eea8afd7fcb3ae1c77d` | 1,653,681 |
+| `classifier/20261023_120255/meta.json` | `8427c45acb1e243389efd8cd8ebc2b9ab96e55087e9f1c6c56604a23fe85c4a1` | 1,033 |
+
+## quantile/20261023_120257 — v2.1 분위 회귀
+
+- 역할: v2.1 분위 회귀 q10·q50·q90(피처 30). 최종 적합 ≤2025
+- 동결 문서: `FROZEN_v2.1.md` (표 셋째 행)
+- 동결 커밋: `217260ee42e26519a52b187cca7149162046e222` (2026-10-23 12:14:45 KST)
+- 동결 시각: 2026-10-23 12:08:19 KST (FROZEN_v2.1.md). 파일 생성 2026-10-23 12:02:57
+- 재학습 명령: `python -m algaecast.models.alert --skip-tune`
+- 주의: v2.1 제출본(`4741a3d3…`)은 test 수온 임계 ≤2025 로 만든 것이다. 2026-10-28 부터 코드 기본값이
+  `FINAL_THRESHOLD_YEAR = 2024`(T24)이므로, v2.1 재현 경로(`scripts/freeze_v21.py`·`models/alert.py` 최종 적합·
+  `eval/posthoc_v21.py`)는 `V21_THRESHOLD_YEAR = 2025` 를 명시해 쓴다. 원본 대조는 동결 커밋 217260e 와 Release 로 한다
+- 제공: 요청 시 제공(비공개 저장소 Release·로컬 보관) — Release `model-frozen-v2.1-217260e`
+
+| 파일 | sha256 | bytes |
+|---|---|---|
+| `quantile/20261023_120257/model.pkl` | `9b52945aa53e2af2a0189eb8368389410eabd001a6336620684baaca07258bee` | 7,926,563 |
+| `quantile/20261023_120257/meta.json` | `7b75f8078b9ce065acc7b2389f0f1bf4e1b331bc0208e96d7c666ff51353a272` | 962 |

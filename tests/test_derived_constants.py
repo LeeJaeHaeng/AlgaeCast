@@ -1,7 +1,8 @@
 """데이터 유래 상수는 as-of 또는 학습기간 자료로만 계산한다 (FIX-v2.1 PREREG R1·R3·R4, 재발 방지).
 
 - config/derived_constants.json 의 각 상수에 계산 자료의 마지막 날이 기록돼 있고, 그 날이 사용 시점보다 앞서야 한다.
-  CV 폴드(검증 연도 V) → 임계[V−1], 2025 홀드아웃 → [2024], 최종·2026·운영 → [2025].
+  CV 폴드(검증 연도 V) → 임계[V−1], 2025 홀드아웃 → [2024], 제출 모델 T24·2026·운영 → [2024](2026-10-28 전환),
+  v2.1 이력 → [2025].
 - 폴드 프레임은 그 폴드 학습기간 임계를 적용한다(models.cv.fold_frames).
 - 수위 편차는 직전 365일 평균 대비라 뒤에 자료가 붙어도 앞 날짜 값이 바뀌지 않는다.
 - 폐기한 전 기간 상수(features.yaml site_caution_wtemp, level_cont_stats station_mean_wl_adj)가 남아 있지 않다.
@@ -47,7 +48,8 @@ def test_fold_threshold_precedes_validation(valid_year: int) -> None:
 
 
 def test_final_threshold_precedes_test() -> None:
-    assert K.FINAL_THRESHOLD_YEAR == 2025
+    assert K.FINAL_THRESHOLD_YEAR == 2024  # T24(학습 = 대회 split=train, 운영사무국 답변 2026-10-28)
+    assert K.V21_THRESHOLD_YEAR == 2025  # v2.1 이력 재현 전용
     assert _last(K.FINAL_THRESHOLD_YEAR) < FIRST_TEST_BASE
 
 

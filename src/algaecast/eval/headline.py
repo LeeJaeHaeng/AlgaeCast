@@ -4,11 +4,13 @@
 표시 값은 이 파일의 값에서 **한 번만** 반올림한다(셋째 자리 표 값을 다시 둘째 자리로 반올림하는 이중 반올림 금지).
 
 원천
-- 2026(test 124조합): data/processed/posthoc_2026_v21.parquet(v2.1·v1-fix 회귀)·posthoc_2026_v2.parquet(v2)·posthoc_2026.parquet(v1)의
-  예측·타깃으로 전체 정밀도 재계산.
+- 2026(test 124조합): data/processed/posthoc_2026_T24.parquet(T24, 동결 a961caf 뒤 1회)·posthoc_2026_v21.parquet(v2.1·v1-fix 회귀)·
+  posthoc_2026_v2.parquet(v2)·posthoc_2026.parquet(v1)의 예측·타깃으로 전체 정밀도 재계산.
   사후 검증 산출물을 다시 읽어 같은 지표를 정밀하게 계산할 뿐, 모델을 다시 돌리지 않는다.
 - 2025 같은 252행·CV: reports/eval/tbl_holdout_2025_v21.json(eval/holdout_v21: v2.1·v1-fix·지속성, 수정 전 v2·v1 값 포함).
-- v2.1(FIX-v2.1, 데이터 유래 상수 누수 수정판)이 제출·운영 모델이다. v1·v2 값은 수정 전 이력이다.
+- T24(2026-10-28 운영사무국 답변 '학습은 24년까지'에 따른 사전등록 전환, v2.1 구성·대회 split=train 학습)가 제출·운영 모델이다.
+  T24 는 v2.1 의 Final 폴드 적합 그 자체라 2025 같은 252행·CV 값은 v2.1 과 같다(same252_2025.t24 = v21 복사, FROZEN_T24 Δ 0).
+  v2.1(최종 ≤2025)은 2026-10-23~28 제출·운영 이력, v1·v2 값은 수정 전 이력이다.
 - v1 2025 공개값(256행, 2026-10-21): 4행이 2026-10-22 격리돼 다시 계산할 수 없다. 남은 가장 정밀한 기록인
   models/registry.json 의 v1 회귀 metrics_holdout(소수 넷째 자리)과 tbl_holdout_2025.md(셋째 자리, 지속성·PICP)를 쓴다.
   이 값들은 'precision' 을 함께 적고, 둘째 자리 반올림이 그 정밀도 안에서 한 가지로 정해지는지(unambiguous_2dp) 검사한다.
@@ -87,6 +89,7 @@ def main() -> int:
     same = json.loads((EVAL / "tbl_holdout_2025_v21.json").read_text(encoding="utf-8"))
     p1, p2 = posthoc("posthoc_2026.parquet"), posthoc("posthoc_2026_v2.parquet")
     p21, pfix = posthoc("posthoc_2026_v21.parquet"), posthoc("posthoc_2026_v21.parquet", "pred_v1fix")
+    p24 = posthoc("posthoc_2026_T24.parquet")
     limited = {
         "v1_2025_public": {
             "values": {k: v1reg[k] for k in ("rmse_log", "r2_log", "r2_raw", "nse_raw", "f1_10k")},
@@ -114,6 +117,8 @@ def main() -> int:
                 m: {k: same["h2025"][m][k]["value"] for k in KEYS} | {"n": same["h2025"][m]["n"]}
                 for m in ("v21", "v1fix", "b0")
             },
+            # T24 = v2.1 Final 폴드(≤2024 적합, 같은 252행) — 값이 같다
+            "t24": {k: same["h2025"]["v21"][k]["value"] for k in KEYS} | {"n": same["h2025"]["v21"]["n"]},
             **{
                 m: {k: same["before"]["h2025"][m][k]["value"] for k in KEYS}
                 | {"n": same["before"]["h2025"][m]["n"]}
@@ -122,11 +127,13 @@ def main() -> int:
         },
         "cv_pooled_r2_raw": {
             **{m: same["cv"][m]["r2_raw_pooled"] for m in ("v21", "v1fix", "b0")},
+            "t24": same["cv"]["v21"]["r2_raw_pooled"],
             **{m: same["before"]["cv"][m]["r2_raw_pooled"] for m in ("v2", "v1")},
         },
         "picp80_2025_same252": same["shared_2025"]["picp80"],
         "picp80_2025_same252_before": same["before"]["shared_2025"]["picp80"],
         "posthoc2026": {
+            "t24": p24["model"],
             "v21": p21["model"],
             "v1fix": {k: v for k, v in pfix["model"].items() if k in (*KEYS, "n")},
             "v2": p2["model"],
@@ -134,7 +141,7 @@ def main() -> int:
             "b0": p1["b0"],
         },
     }
-    assert p1["b0"] == p2["b0"] == p21["b0"], "사후 파일의 지속성 지표가 다르다(행이 다름)"
+    assert p1["b0"] == p2["b0"] == p21["b0"] == p24["b0"], "사후 파일의 지속성 지표가 다르다(행이 다름)"
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
     # 이중 반올림으로 달라지는 값 목록(점검용 출력)
     flat = []

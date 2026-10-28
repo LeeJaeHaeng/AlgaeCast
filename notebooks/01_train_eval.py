@@ -20,16 +20,19 @@
 # 위에서 아래로 한 번에 실행된다. 외부 API 호출은 없다. 재현 순서:
 #
 # 1. 동결 모델 sha256 검증 → 2. 일 달력 정렬(S1) → 3. 피처 생성·분할(test 타깃 격리) + 상류 피처
-# → 4. 동결 파라미터로 재학습(train ≤2024: v2.1 = 로그 앙상블 + 상류 피처 + 속별 구성원, 비교용 v1-fix = v1 구성)
-# → 5. 2025 홀드아웃 지표(v2.1·v1-fix 나란히) → 6. `submission.csv`(패키지 루트, 동결 레지스트리 current) 생성·검증
+# → 4. 동결 파라미터로 재학습(train ≤2024: T24 = 로그 앙상블 + 상류 피처 + 속별 구성원, 비교용 v1-fix = v1 구성)
+# → 5. 2025 홀드아웃 지표(T24·v1-fix 나란히) → 6. `submission.csv`(패키지 루트, 동결 레지스트리 current = T24) 생성·검증
 # → 7. 핵심 그림 저장(`figures/`)
 #
-# 제출·운영 모델 v2.1(누수 수정판): 로그 앙상블(C1 smearing·C3 hurdle·C2 tweedie, v1 하이퍼파라미터)
+# 제출·운영 모델 T24(2026-10-28, 운영사무국 답변 '학습은 24년까지'에 따른 사전등록 전환): v2.1(누수 수정판) 구성 그대로,
+# 학습 = 대회 번들 eval_pairs.csv 의 split=train 정의 그대로(2,310행, 기준일 ≤2024-12-30, 이 중 5행은 목표일 2025-01-06).
+# 구성: 로그 앙상블(C1 smearing·C3 hurdle·C2 tweedie, v1 하이퍼파라미터)
 # + 낙동강 상류 지점 피처 5열(lag 0, 1단계) + 속별 구성원 cg(Microcystis + 나머지 3속, 부분별 log 회귀),
 # log 공간 NNLS 가중치(2020~2024 CV OOF, 시드 42). 분류기·분위·CQR·운영점도 수정 피처로 다시 적합했다.
 # 데이터로 계산한 상수는 기준일까지(as-of) 또는 학습기간 자료로만 쓴다(reports/experiments/FIX-v2.1/PREREG.md):
-# 수위 편차 = 관측소별 직전 365일 평균 대비, 지점별 수온 임계 = 학습기간 측정만(폴드마다, 최종 ≤2025).
-# 2026 정답은 읽지 않는다(test 행은 피처만, 상류 피처는 원자료를 행의 기준일까지만 사용).
+# 수위 편차 = 관측소별 직전 365일 평균 대비, 지점별 수온 임계 = 학습기간 측정만(폴드마다, 제출 모델 T24 ≤2024).
+# 2025·2026 측정은 예측 시점의 입력(as-of 피처)으로만 쓴다(학습 아님). 2026 정답은 읽지 않는다
+# (test 행은 피처만, 상류 피처는 원자료를 행의 기준일까지만 사용).
 #
 # 소요 시간: 약 20분(대부분 3단계 피처 생성, 8코어 CPU 기준, GPU 미사용). 실행 결과(출력)를 포함해 저장되어 있다.
 
@@ -74,11 +77,11 @@ FIG = ROOT / "figures"
 FIG.mkdir(exist_ok=True)
 
 # %% [markdown]
-# ## 1. 동결 모델 검증 (`model/FROZEN.md`(v1)·`FROZEN_v2.md`(v2)·`FROZEN_v2.1.md`(v2.1, 제출) 의 sha256 과 대조)
+# ## 1. 동결 모델 검증 (`model/FROZEN.md`(v1)·`FROZEN_v2.md`(v2)·`FROZEN_v2.1.md`(v2.1)·`FROZEN_T24.md`(T24, 제출) 의 sha256 과 대조)
 #
 # `verify_frozen.py` 는 동결 문서 표의 파일 해시를 확인하고, 레지스트리 current 가 가장 최근 동결 문서
-# (`FROZEN_v2.1.md`)의 버전과 같은지도 확인한다. 제출·운영 모델 v2.1(회귀·분류기·분위) 파일은
-# 반드시 있고 해시가 맞아야 한다. 제출 패키지에는 재현에 쓰지 않는 이력 모델(v1·v2·v1-fix) 파일을
+# (`FROZEN_T24.md`)의 버전과 같은지도 확인한다. 제출·운영 모델 T24(회귀·분류기·분위) 파일은
+# 반드시 있고 해시가 맞아야 한다. 제출 패키지에는 재현에 쓰지 않는 이력 모델(v1·v2·v1-fix·v2.1) 파일을
 # 넣지 않았으므로, 그 행은 `model/HISTORY.md` 에 적힌 sha256 이 동결 문서와 같은지 확인해
 # '패키지 미포함(이력, model/HISTORY.md)'으로 표시한다(저장소 `models/` 에서는 파일을 직접 대조).
 
@@ -86,7 +89,9 @@ FIG.mkdir(exist_ok=True)
 from algaecast.models.registry import current_entry  # noqa: E402
 
 FROZEN_DOC = next(
-    MODELS_DIR / d for d in ("FROZEN_v2.1.md", "FROZEN_v2.md", "FROZEN.md") if (MODELS_DIR / d).exists()
+    MODELS_DIR / d
+    for d in ("FROZEN_T24.md", "FROZEN_v2.1.md", "FROZEN_v2.md", "FROZEN.md")
+    if (MODELS_DIR / d).exists()
 )
 print("동결 문서:", FROZEN_DOC.relative_to(ROOT).as_posix())
 r = subprocess.run(
@@ -96,8 +101,8 @@ print(r.stdout)
 assert r.returncode == 0, "동결 모델 해시 불일치 — 재현 중단"
 REG_ENTRY = current_entry("regression")
 REG_KIND = REG_ENTRY["meta"].get("kind")
-print("current 회귀:", REG_ENTRY["version"], REG_KIND)
-if FROZEN_DOC.name in ("FROZEN_v2.1.md", "FROZEN_v2.md"):
+print("current 회귀:", REG_ENTRY["version"], REG_KIND, REG_ENTRY["meta"].get("model_name", ""))
+if FROZEN_DOC.name in ("FROZEN_T24.md", "FROZEN_v2.1.md", "FROZEN_v2.md"):
     assert REG_KIND == "ensemble_v2", f"{FROZEN_DOC.name} 가 있는데 current 회귀가 v2 계열이 아님"
 
 # %% [markdown]
@@ -145,7 +150,8 @@ assert (pd.to_datetime(tv2["target_date"]) <= pd.Timestamp("2025-12-31")).all()
 # %% [markdown]
 # ## 4. 학습 — 동결 파라미터로 train ≤2024 를 재학습해 2025 검증용 예측을 만든다
 #
-# - v2.1: C1·C3·C2 + 속별 cg, 피처 35열, 가중치 = 동결 v2.1 레지스트리(meta.weights)
+# - T24(제출 모델): C1·C3·C2 + 속별 cg, 피처 35열, 가중치 = 동결 레지스트리(meta.weights, v2.1 과 같음).
+#   train ≤2024(대회 split=train 2,310행) 재학습이 곧 동결 T24 이므로, 레지스트리 모델의 2025 예측과 직접 대조한다.
 # - v1-fix(비교용): v1 구성 C1·C3·C2, 피처 30열, 가중치 `model.yaml` ensemble(수정 피처로 다시 적합)
 # - 학습 ≤2024 → 2025 검증이므로 지점별 수온 임계도 ≤2024 측정으로 계산한 값을 쓴다(폴드 규칙).
 #
@@ -173,10 +179,10 @@ wmap = {"C1": w["회귀 C1(smearing)"], "C3": w["회귀 C3 hurdle"], "C2": w["�
 ens_retrain = np.clip(10 ** sum(wmap[k] * np.log10(parts[k] + 1) for k in parts) - 1, 0, None)
 print("v1-fix 재학습 앙상블 가중치", wmap)
 
-# v2.1: 동결 가중치(레지스트리) → train ≤2024 로 구성원 재학습 → 2025 예측
+# T24: 동결 가중치(레지스트리) → train ≤2024(split=train) 로 구성원 재학습 → 2025 예측
 if REG_KIND == "ensemble_v2":
     w_v2 = {k: float(v) for k, v in REG_ENTRY["meta"]["weights"].items()}
-    w_src = f"동결 v2.1 레지스트리 regression/{REG_ENTRY['version']}"
+    w_src = f"동결 레지스트리 regression/{REG_ENTRY['version']}({REG_ENTRY['meta'].get('model_name', '')})"
 else:
     w_v2 = V2.fit_weights(tv2, V2.SEED, cfg_v2)
     w_src = "동결 전 — 2020~2024 CV OOF NNLS 재계산"
@@ -186,13 +192,37 @@ tr2, va2 = tv2_24[yrs <= 2024].reset_index(drop=True), tv2_24[yrs == 2025].reset
 model_v2 = V2.fit_final(tr2, cfg_v2, weights=w_v2)
 mem_v2 = model_v2.predict_members(va2)
 ens_v2 = model_v2.predict(va2)
-print("v2.1 가중치", {k: round(v, 4) for k, v in w_v2.items()}, "|", w_src)
+print("T24 가중치", {k: round(v, 4) for k, v in w_v2.items()}, "|", w_src)
+# T24 학습 행 = 대회 번들 eval_pairs.csv split=train 그대로(5행은 목표일 2025-01-06)
+_ep = bundle["eval_pairs"]
+_k = lambda d: set(
+    zip(
+        d["station_id"].astype(str),
+        pd.to_datetime(d["base_date"]).dt.date,
+        pd.to_datetime(d["target_date"]).dt.date,
+    )
+)  # noqa: E731
+assert len(tr2) == 2310 and _k(tr2) == _k(
+    _ep[_ep["split"] == "train"]
+), "T24 학습 행이 대회 split=train 과 다름"
+print(
+    "T24 학습 행",
+    len(tr2),
+    "= 대회 split=train, 목표일 2025 인 행:",
+    int((pd.to_datetime(tr2["target_date"]).dt.year >= 2025).sum()),
+)
 assert (
     len(va2) == len(va)
     and (va2["station_id"].astype(str).to_numpy() == va["station_id"].astype(str).to_numpy()).all()
 )
 
-# 동결 모델(≤2025 전체 학습) 과의 비교는 '학습 데이터가 다르므로' 직접 비교 대신 2025 OOF 캐시와 대조
+# 동결 T24(레지스트리)의 2025 예측과 재학습 결과를 직접 대조한다(같은 행·가중치·임계 → 최대차 0).
+from algaecast.db.upload import predict_registry  # noqa: E402
+
+_reg25 = predict_registry(va2.copy())["pred_cell_count"].to_numpy()
+print("동결 T24 vs 재학습 2025 예측 최대 절대차:", float(np.nanmax(np.abs(_reg25 - ens_v2))))
+assert float(np.nanmax(np.abs(_reg25 - ens_v2))) == 0.0, "재학습 결과가 동결 T24 와 다름"
+# 개발 시 OOF 캐시(v2.1 구성 Final 폴드 = T24 와 같은 학습)와도 대조
 oof = (
     pd.read_parquet(ROOT / "data" / "processed" / "oof_predictions.parquet")
     if (ROOT / "data" / "processed" / "oof_predictions.parquet").exists()
@@ -208,12 +238,12 @@ from algaecast.eval.metrics import compute_all  # noqa: E402
 obs = va["target_cells"].to_numpy(dtype=float)
 rows = []
 for name, pred in (
-    ("v2.1 앙상블(재학습, train≤2024)", ens_v2),
+    ("T24 앙상블(재학습 = 동결 T24, train≤2024)", ens_v2),
     ("v1-fix 앙상블(재학습, train≤2024)", ens_retrain),
     ("C1", parts["C1"]),
     ("C3 hurdle", parts["C3"]),
     ("C2 tweedie", parts["C2"]),
-    ("v2.1 속별 cg", mem_v2["cg"]),
+    ("T24 속별 cg", mem_v2["cg"]),
     ("B0 지속성", np.clip(10 ** va["cell_log_t0"].fillna(0).to_numpy() - 1, 0, None)),
 ):
     m = compute_all(obs, pred)
@@ -246,14 +276,15 @@ if oof is not None:
         on=["station_id", "base_date"],
     )
     print(
-        "OOF 캐시(개발 시, v2.1) 앙상블 rmse_log:",
+        "OOF 캐시(개발 시, Final 폴드 = T24 학습) 앙상블 rmse_log:",
         round(compute_all(o25["target_cells"].to_numpy(), o25["ens"].to_numpy())["rmse_log"], 3),
     )
 
 # %% [markdown]
-# ## 6. submission.csv — 동결 레지스트리 current(model/, ≤2025 전체 학습)로 sample_submission 124 조합 예측
+# ## 6. submission.csv — 동결 레지스트리 current(model/, T24 = 대회 split=train 학습)로 sample_submission 124 조합 예측
 #
-# current 회귀가 v2.1(`ensemble_v2`)이면 test 행 피처에 상류 피처를 붙여 예측한다. test 행의 수온 임계는 ≤2025 측정 값이다.
+# current 회귀가 `ensemble_v2`(T24)이면 test 행 피처에 상류 피처를 붙여 예측한다. test 행의 수온 임계는 ≤2024 측정 값이다
+# (`FINAL_THRESHOLD_YEAR = 2024`, 학습과 같은 임계).
 
 # %%
 from algaecast.models.predict import make_submission, validate_submission, write_submission  # noqa: E402
@@ -266,7 +297,7 @@ print(validate_submission(out))
 print(sub.head(8).to_string(index=False))
 
 # %% [markdown]
-# ## 7. 핵심 그림 — 2025 예측 vs 실측(5지점, v2.1·v1-fix), 리드타임 요약
+# ## 7. 핵심 그림 — 2025 예측 vs 실측(5지점, T24·v1-fix), 리드타임 요약
 
 # %%
 from IPython.display import Image, display  # noqa: E402
@@ -275,7 +306,7 @@ va_plot = va2.assign(pred_v2=ens_v2, pred_v1=ens_retrain).sort_values(["station_
 fig, axes = plt.subplots(5, 1, figsize=(12, 15), sharex=False)
 for ax, (sid, g) in zip(axes, va_plot.groupby("station_id", observed=True)):
     ax.plot(pd.to_datetime(g["target_date"]), g["target_cells"], "k.-", label="관측")
-    ax.plot(pd.to_datetime(g["target_date"]), g["pred_v2"], "r.-", label="7일 예측(v2.1 앙상블)")
+    ax.plot(pd.to_datetime(g["target_date"]), g["pred_v2"], "r.-", label="7일 예측(T24 앙상블)")
     ax.plot(
         pd.to_datetime(g["target_date"]),
         g["pred_v1"],
@@ -295,7 +326,7 @@ fig.savefig(FIG / "fig_2025_pred_vs_obs.png", dpi=130)
 plt.close(fig)
 display(Image(filename=str(FIG / "fig_2025_pred_vs_obs.png"), width=900))  # 실행본에 그림 포함
 # 리드타임 집계(예측값 아님): figures/reports/eval/tbl_leadtime.md(2020~2025 17/20, 지속성 1/20)·
-# tbl_holdout_2026_posthoc_v21.md(2026 7/8, 지속성 2/8) — v2.1 분위·분류기(수정 피처) 기준
+# reports/experiments/contingency_T24/tbl_holdout_2026_posthoc_T24.md(2026 T24 7/8, 지속성 2/8) — T24 분위·분류기 기준
 lead = {"2020~2025 감시(q90≥10k)": (17, 20), "2026 사후 감시": (7, 8), "지속성(2020~2026)": (3, 28)}
 fig, ax = plt.subplots(figsize=(7, 3.5))
 ax.barh(list(lead), [v[0] / v[1] for v in lead.values()], color=["#d97706", "#dc2626", "#6b7280"])

@@ -1,7 +1,8 @@
 """수온·수질 피처 (03 문서 4.2절 + T2 반영: 지점별 관심 도달 수온 임계) (T3-b).
 
-지점별 임계는 config/derived_constants.json 의 연도별 값(FIX-v2.1 R3). 피처 파일에는 최종 모델용(측정 ≤2025)
-임계로 계산하고, CV 폴드는 features.constants.apply_site_thresholds 가 그 폴드 학습기간 임계로 다시 계산한다.
+지점별 임계는 config/derived_constants.json 의 연도별 값(FIX-v2.1 R3). 피처 파일에는
+제출 모델 T24용(측정 ≤2024, FINAL_THRESHOLD_YEAR) 임계로 계산하고,
+CV 폴드는 features.constants.apply_site_thresholds 가 그 폴드 학습기간 임계로 다시 계산한다.
 
 일 단위 ``wtemp`` 는 정렬 전략(S1 LOCF / S2 보간 / S3 모델)으로 채워진 값, ``*_obs`` 는 측정일 원값.
 총인·총질소는 조류경보제 자료에 없어 생략(수질측정망 결합 시 추가).

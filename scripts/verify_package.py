@@ -31,13 +31,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEMO_SHA_PREFIX = "0907b110"  # 2026-10-23 v6(성능 페이지 3장면 재녹화). 이전: v1 6a0d78e3·v2a 43761cbc·v3 5363e22a·v4 0a1fb2f4·v5 87b6d928 → dist/backup_demo_2026102*
-# 패키지 model/ 에 있어야 하는(그리고 이것만 있어야 하는) 모델 폴더 — 재현에 실제로 불러오는 제출·운영 v2.1 3개.
+# 패키지 model/ 에 있어야 하는(그리고 이것만 있어야 하는) 모델 폴더 — 재현에 실제로 불러오는 제출·운영 T24 3개
+# (2026-10-28 운영사무국 답변으로 v2.1 → T24 전환, v2.1 은 이력).
 # 2026-10-23 추적(make_submission·노트북): 이 3개 폴더의 model.pkl 만 모델로 로드, 이력 폴더는 verify_frozen 해시 읽기뿐.
 # scripts/build_submission_package.py 의 PACKAGE_MODEL_DIRS 와 같아야 한다(tests/test_package_config.py).
 PACKAGE_MODEL_DIRS = (
-    "regression/20261023_120818",
-    "classifier/20261023_120255",
-    "quantile/20261023_120257",
+    "regression/20261026_131722",
+    "classifier/20261026_131722",
+    "quantile/20261026_131722",
 )
 MODEL_FILES = ("model.pkl", "meta.json")
 

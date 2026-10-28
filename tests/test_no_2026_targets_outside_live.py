@@ -9,7 +9,7 @@
 - dist/ 아래 zip 안의 parquet·csv·json
 - git 추적 파일 중 parquet·csv·json
 허용(live): data/processed/test_targets_DO_NOT_USE.parquet(격리 파일),
-data/processed/posthoc_2026.parquet·posthoc_2026_v2.parquet(동결 모델 사후 검증 산출물, eval/live 통로).
+data/processed/posthoc_2026.parquet·posthoc_2026_v2.parquet·_v21·_T24(동결 모델 사후 검증 산출물, eval/live 통로).
 제외: data/raw/(측정 시계열 원자료 — 2026 test 피처 계산에 필요한 입력이며 목표일 정렬 표가 아님),
 마크다운 보고서(집계·서술).
 """
@@ -34,6 +34,7 @@ ALLOWED = {
     "data/processed/posthoc_2026.parquet",
     "data/processed/posthoc_2026_v2.parquet",
     "data/processed/posthoc_2026_v21.parquet",  # v2.1 동결 뒤 1회 사후 계산(eval.posthoc_v21)
+    "data/processed/posthoc_2026_T24.parquet",  # T24 동결 뒤 1회 사후 계산(eval.posthoc_t24, 사본 산출물 복사)
 }
 TABLE_SUFFIX = (".parquet", ".csv", ".json")
 

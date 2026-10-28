@@ -36,7 +36,7 @@ import yaml
 from algaecast.collect.base import KST
 from algaecast.config import CONFIG_DIR, DATA_DIR, MODELS_DIR, ROOT, SUBMISSION_PATH
 from algaecast.eval.metrics import compute_all
-from algaecast.features.constants import FINAL_THRESHOLD_YEAR, site_thresholds
+from algaecast.features.constants import V21_THRESHOLD_YEAR, apply_site_thresholds, site_thresholds
 from algaecast.models import registry as R
 from algaecast.models import v2 as V2
 from algaecast.models.predict import make_submission, validate_submission, write_submission
@@ -108,7 +108,7 @@ def run_oof(seed: int) -> dict:
         "cv_mean_2020_2024": cv_mean,
         "cv_by_year": cv_by_year,
         "oof_cache_rows_without_v21": n_missing,
-        "site_caution_wtemp_final": site_thresholds(FINAL_THRESHOLD_YEAR),
+        "site_caution_wtemp_final": site_thresholds(V21_THRESHOLD_YEAR),
     }
     OUT.mkdir(parents=True, exist_ok=True)
     FIT_JSON.write_text(json.dumps(doc, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
@@ -149,7 +149,7 @@ def frozen_md(
         for r in rows
     )
     mc = yaml.safe_load((CONFIG_DIR / "model.yaml").read_text(encoding="utf-8"))
-    th = site_thresholds(FINAL_THRESHOLD_YEAR)
+    th = site_thresholds(V21_THRESHOLD_YEAR)
     return f"""# 모델 동결 v2.1 (FROZEN_v2.1) — 데이터 유래 상수 누수 수정판(운영·제출 모델)
 
 - 동결 커밋: `{PLACEHOLDER}` (이 커밋 이후 v2.1 모델·가중치·피처·운영점을 변경하지 않는다)
@@ -203,7 +203,9 @@ def run_freeze(seed: int, force: bool) -> int:
         "source": f"regression/{entry['version']}",
     }
     cfg = V2.config_v2()
-    frame = V2.load_training_frame(config=cfg)
+    frame = apply_site_thresholds(
+        V2.load_training_frame(config=cfg), V21_THRESHOLD_YEAR
+    )  # v2.1 최종 적합 임계 ≤2025
     weights = {k: float(v) for k, v in fit["weights"].items()}
     model = V2.fit_final(frame, cfg, weights=weights, seed=seed)
     model.aux = aux
@@ -234,7 +236,8 @@ def run_freeze(seed: int, force: bool) -> int:
     )
     from algaecast.models import data as D
 
-    test_feat = D.load_test_features("S1").reset_index(drop=True)
+    # v2.1 이력 재현: 최종 적합·test 의 수온 임계는 ≤2025(V21_THRESHOLD_YEAR) — 2026-10-28 기본값이 T24(2024)로 바뀜
+    test_feat = apply_site_thresholds(D.load_test_features("S1").reset_index(drop=True), V21_THRESHOLD_YEAR)
     obj2, _ = R.load_current("regression")
     reloaded = V2.V2Model.from_registry(obj2).predict(test_feat)
     roundtrip = float(np.max(np.abs(reloaded - model.predict(test_feat))))
@@ -244,7 +247,7 @@ def run_freeze(seed: int, force: bool) -> int:
         V2_COPY.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(SUBMISSION_PATH, V2_COPY)
         log.info("v2 제출본 보존: %s", V2_COPY)
-    sub = make_submission()
+    sub = make_submission(threshold_year=V21_THRESHOLD_YEAR)
     write_submission(sub, SUBMISSION_PATH)
     val = validate_submission(SUBMISSION_PATH)
     val["sha256_full"] = R.file_sha256(SUBMISSION_PATH)

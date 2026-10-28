@@ -1,10 +1,12 @@
-"""동결 모델 검증 — models/FROZEN.md(v1)·FROZEN_v2.md·FROZEN_v2.1.md(있으면)의 sha256 을 현재 파일과 대조한다.
+"""동결 모델 검증 — models/FROZEN.md(v1)·FROZEN_v2.md·FROZEN_v2.1.md·FROZEN_T24.md(있으면)의 sha256 을
+현재 파일과 대조한다.
 
 - 각 동결 문서 표의 행 `| name | version | `sha256` | ...` 마다
   <models>/<name>/<version>/model.pkl 의 sha256 을 비교한다.
-- 필수(제출·운영 모델) = 가장 최근 동결 문서(FROZEN_v2.1.md → FROZEN_v2.md → FROZEN.md 순으로 있는 것)의
-  이름별 첫 행과 registry.json current. 파일이 있고 해시가 맞아야 한다.
-- 이력 = 그 밖의 행(v1·v2·v1-fix). 저장소(models/)에서는 필수와 똑같이 파일이 있고 해시가 맞아야 한다.
+- 필수(제출·운영 모델) = 가장 최근 동결 문서(FROZEN_T24.md → FROZEN_v2.1.md → FROZEN_v2.md → FROZEN.md 순으로
+  있는 것)의 이름별 첫 행과 registry.json current. 파일이 있고 해시가 맞아야 한다.
+- 이력 = 그 밖의 행(v1·v2·v1-fix·v2.1, 2026-10-28 T24 전환 뒤). 저장소(models/)에서는 필수와 똑같이
+  파일이 있고 해시가 맞아야 한다.
   제출 패키지(model/)처럼 이력 모델 파일을 빼고 HISTORY.md 에 sha256 을 적어 둔 곳에서는, 파일이 없을 때
   HISTORY.md 의 model.pkl sha256 이 동결 문서와 같으면 '패키지 미포함(이력, model/HISTORY.md)'으로
   표시하고 통과한다(파일이 있으면 해시를 검증한다).
@@ -25,7 +27,7 @@ from pathlib import Path
 
 from algaecast.config import MODELS_DIR, PACKAGE_LAYOUT
 
-DOCS: tuple[str, ...] = ("FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md")  # 오래된 것 → 최근
+DOCS: tuple[str, ...] = ("FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md", "FROZEN_T24.md")  # 오래된 것 → 최근
 ROW = re.compile(r"\| (\w+) \| (\d+_\d+) \| `([0-9a-f]{64})` \|")
 HISTORY_DOC = "HISTORY.md"
 # HISTORY.md 파일 표의 model.pkl 행: | `regression/20261021_091108/model.pkl` | `sha256` | bytes |

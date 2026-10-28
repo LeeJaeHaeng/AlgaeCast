@@ -27,11 +27,13 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  # 동결 모델 Release 태그(기본값). 현재 v2.1 = model-frozen-v2.1-217260e (2026-10-23 데이터 유래 상수 누수 수정판,
-  #   동결 커밋 217260e, models/FROZEN_v2.1.md). 이전: v2 = model-frozen-v2-9dca86c, v1 = model-frozen-13ac483 (Release 유지).
-  #   v2.1 자산은 registry.json·FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md 와 그 문서들이 가리키는 회귀·분류기·분위
-  #   디렉터리를 모두 담는다. verify_frozen.py 가 세 동결 문서를 모두 검증한다.
-  FROZEN_TAG: ${{ github.event.inputs.frozen_tag || 'model-frozen-v2.1-217260e' }}
+  # 동결 모델 Release 태그(기본값). 현재 T24 = model-frozen-T24-a961caf (2026-10-28 운영사무국 답변 '학습은 24년까지'에 따라
+  #   사전등록 규칙대로 전환한 제출·운영 모델, v2.1 구성·대회 split=train 학습, 동결 커밋 a961caf, models/FROZEN_T24.md).
+  #   이전: v2.1 = model-frozen-v2.1-217260e(2026-10-23~28), v2 = model-frozen-v2-9dca86c, v1 = model-frozen-13ac483 (Release 유지).
+  #   T24 운영용 자산은 registry.json(current T24)·FROZEN.md·FROZEN_v2.md·FROZEN_v2.1.md·FROZEN_T24.md 와 그 문서들이 가리키는
+  #   회귀·분류기·분위 디렉터리 11개를 모두 담는다. verify_frozen.py 가 네 동결 문서를 모두 검증하고, daily_run 이
+  #   current 회귀의 학습 수온 임계 연도(2024)와 코드 상수 FINAL_THRESHOLD_YEAR 가 같은지 확인한다.
+  FROZEN_TAG: ${{ github.event.inputs.frozen_tag || 'model-frozen-T24-a961caf' }}
 
 jobs:
   forecast:

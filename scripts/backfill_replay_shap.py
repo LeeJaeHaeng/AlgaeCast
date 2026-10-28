@@ -206,7 +206,10 @@ def features_from_bundle(keys: list[tuple[str, str]], code2sid: dict[str, str]) 
     dup = out.duplicated(["station_id", "base_date"]).sum()
     if dup:
         raise SystemExit(f"중단: features_S1 에 같은 (지점, 기준일) 행이 {dup}개 겹침")
-    return out.reset_index(drop=True)
+    # 수온 임계는 제출 모델과 같은 연도(T24 = ≤2024)로 다시 계산 — 피처 파일의 임계 연도와 무관하게
+    from algaecast.features.constants import FINAL_THRESHOLD_YEAR, apply_site_thresholds
+
+    return apply_site_thresholds(out.reset_index(drop=True), FINAL_THRESHOLD_YEAR)
 
 
 def features_from_asof(

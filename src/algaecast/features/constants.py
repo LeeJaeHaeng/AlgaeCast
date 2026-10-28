@@ -4,7 +4,8 @@
 사전등록: reports/experiments/FIX-v2.1/PREREG.md (R3·R4). 규칙
 - 지점별 관심 도달 수온 임계(T2 S6 정의): NIER 조류경보 측정에서 지점별 (수온, log10(세포수+1))
   결측 없는 측정행 → statsmodels lowess(frac=0.4) → LOESS ≥ 3 인 최소 수온(소수 첫째 자리), 없으면 결측.
-  계산 자료 = 측정일 연도 ≤ Y. 사용: CV 폴드(검증 V) Y = V−1, 2025 홀드아웃 Y = 2024, 최종·2026·운영 Y = 2025.
+  계산 자료 = 측정일 연도 ≤ Y. 사용: CV 폴드(검증 V) Y = V−1, 2025 홀드아웃 Y = 2024,
+  제출 모델 T24(대회 split=train, 2026-10-28 전환)·2026 예측·운영 Y = 2024, v2.1 이력(2026-10-23~27 제출·운영) Y = 2025.
 - 선택 결정(≤2024 재계산): D1 ASOS 주 관측소, D2 일사 관측소, D3 보 1차 수문(T2 S4), D4 hurdle 후보(T2 S1).
 
 사용: python -m algaecast.features.constants --build   (원자료 필요, 결과 JSON 을 다시 쓴다)
@@ -31,8 +32,10 @@ log = logging.getLogger(__name__)
 DERIVED_PATH = CONFIG_DIR / "derived_constants.json"
 NIER_PATH = RAW_DIR / "nier_algae" / "nier_algae_2012_2026.parquet"
 SITE_ORDER = ["HP", "GJGR", "CS", "MGMR", "DCHN"]
-THRESHOLD_YEARS = tuple(range(2019, 2026))  # CV 폴드 2020~2024 → 2019~2023, 홀드아웃 2024, 최종 2025
-FINAL_THRESHOLD_YEAR = 2025  # 최종 모델(학습 ≤2025)·2026 예측·일일 운영
+THRESHOLD_YEARS = tuple(range(2019, 2026))  # CV 폴드 2020~2024 → 2019~2023, 홀드아웃·T24 2024, v2.1 이력 2025
+# 제출 모델 T24(학습 = 대회 번들 split=train, 기준일 ≤2024)·2026 예측·일일 운영 — 운영사무국 답변 2026-10-28 '학습은 24년까지'
+FINAL_THRESHOLD_YEAR = 2024
+V21_THRESHOLD_YEAR = 2025  # v2.1 이력(최종 학습 ≤2025) 재현 전용 — freeze_v21·alert 최종 적합·posthoc_v21
 DECISION_YEAR = 2024  # 선택 결정 재계산 자료 끝 연도
 LOESS_FRAC = 0.4
 CAUTION_LOG = 3.0  # 관심 1,000 cells/mL → log10(1000+1) ≈ 3
@@ -189,7 +192,7 @@ def build(path: Path = DERIVED_PATH) -> dict:
     sites_cfg = yaml.safe_load((CONFIG_DIR / "sites.yaml").read_text(encoding="utf-8"))
     algae = load_nier(max_year=max(THRESHOLD_YEARS))
     doc = {
-        "_about": "데이터로 계산한 상수와 계산 자료·기간(FIX-v2.1 PREREG R3·R4). 사용 규칙: CV 폴드(검증 V) → site_caution_wtemp[V−1], 2025 홀드아웃 → [2024], 최종 모델·2026 예측·일일 운영 → [2025]. 테스트(tests/test_derived_constants.py)가 사용 시점보다 늦은 자료를 막는다.",
+        "_about": "데이터로 계산한 상수와 계산 자료·기간(FIX-v2.1 PREREG R3·R4). 사용 규칙: CV 폴드(검증 V) → site_caution_wtemp[V−1], 2025 홀드아웃 → [2024], 제출 모델 T24·2026 예측·일일 운영 → [2024](2026-10-28 전환), v2.1 이력 → [2025]. 테스트(tests/test_derived_constants.py)가 사용 시점보다 늦은 자료를 막는다.",
         "computed_at": datetime.now().isoformat(timespec="seconds"),
         "site_caution_wtemp": {str(y): compute_site_thresholds(y, algae) for y in THRESHOLD_YEARS},
         "decisions": {
@@ -265,6 +268,7 @@ if __name__ == "__main__":
 __all__ = [
     "DERIVED_PATH",
     "FINAL_THRESHOLD_YEAR",
+    "V21_THRESHOLD_YEAR",
     "THRESHOLD_YEARS",
     "build",
     "compute_site_thresholds",

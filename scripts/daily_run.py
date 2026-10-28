@@ -5,8 +5,11 @@
 - 제출 전(2026-11-06)까지 재학습 금지: models/FROZEN.md(v1)·FROZEN_v2.md(있으면)의 sha256 과 불일치하면
   즉시 중단(종료코드 2).
 - 실패 시 model_runs 에 status='failed' 행을 남긴다(대시보드 배너). 대회 번들·모델 pickle 은 저장소에 없고
-  모델은 GitHub Release(환경변수 FROZEN_TAG, 기본 v2.1 model-frozen-v2.1-217260e) 에서
+  모델은 GitHub Release(환경변수 FROZEN_TAG, 기본 T24 model-frozen-T24-a961caf) 에서
   워크플로가 내려받는다.
+- 수온 임계 연도 가드: current 회귀가 학습에 쓴 수온 임계 연도(meta.train.threshold_year,
+  기록이 없는 v2.1 이전 모델은 2025)가 운영 피처의 FINAL_THRESHOLD_YEAR(T24 = 2024)와 다르면
+  중단(종료코드 2) — Release 태그와 코드 상수가 어긋난 채(예: v2.1 모델 + 2024 임계) 예측하지 않는다.
 - 회귀 current 가 ensemble_v2(v2 운영 모델)이면 as-of 피처 행에 상류 피처 5열을 붙여 예측한다
   (추가 수집 없음 — 이번에 모은 5지점 조류 자료를 행의 기준일까지 잘라 계산). v1 이면 동작이 이전과 같다.
 - --force-predict: 새 측정이 없어도(최신 base_date 가 이미 predictions 에 있어도) 지점별 최신 base_date 를
@@ -45,8 +48,10 @@ from algaecast.predict.asof import (
 
 log = logging.getLogger("daily")
 LOG_DIR = ROOT / "logs"
-# 동결 모델 Release 태그(워크플로 env FROZEN_TAG). 2026-10-23 v2.1(누수 수정판, 커밋 217260e)로 기본값 변경.
-FROZEN_TAG = os.environ.get("FROZEN_TAG", "model-frozen-v2.1-217260e")
+# 동결 모델 Release 태그(워크플로 env FROZEN_TAG). 2026-10-23 v2.1(누수 수정판, 커밋 217260e) →
+# 2026-10-28 T24(운영사무국 답변 '학습은 24년까지', 동결 커밋 a961caf, 이력 모델 포함 운영용 Release)로
+# 기본값 변경.
+FROZEN_TAG = os.environ.get("FROZEN_TAG", "model-frozen-T24-a961caf")
 
 
 def verify_frozen() -> None:
@@ -56,6 +61,24 @@ def verify_frozen() -> None:
     log.info(r.stdout.strip())
     if r.returncode != 0:
         raise SystemExit(2)
+    check_threshold_year()
+
+
+def check_threshold_year() -> None:
+    """current 회귀의 학습 수온 임계 연도와 운영 피처의 FINAL_THRESHOLD_YEAR 가 같은지(다르면 종료코드 2)."""
+    from algaecast.features.constants import FINAL_THRESHOLD_YEAR, V21_THRESHOLD_YEAR
+    from algaecast.models.registry import current_entry
+
+    train = current_entry("regression").get("meta", {}).get("train", {})
+    year = int(train.get("threshold_year") or V21_THRESHOLD_YEAR)
+    if year != FINAL_THRESHOLD_YEAR:
+        log.error(
+            "current 회귀 학습 수온 임계 연도 %s ≠ 운영 FINAL_THRESHOLD_YEAR %s — Release·코드 상수 불일치",
+            year,
+            FINAL_THRESHOLD_YEAR,
+        )
+        raise SystemExit(2)
+    log.info("수온 임계 연도 확인: current 회귀 %s = 운영 %s", year, FINAL_THRESHOLD_YEAR)
 
 
 def _sb() -> Any:

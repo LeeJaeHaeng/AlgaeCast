@@ -31,7 +31,7 @@
 | cell_log_lag1w | ar | 0.2 | 0.764 |  |
 | wtemp_ma14 | water | 8.4 | 0.735 |  |
 | wtemp_ma7 | water | 8.4 | 0.735 |  |
-| wtemp_minus_site_thresh | water | 8.4 | 0.732 |  |
+| wtemp_minus_site_thresh | water | 8.4 | 0.73 |  |
 | wtemp_t0 | water | 8.4 | 0.726 |  |
 | wtemp_ma30 | water | 8.4 | 0.725 |  |
 | cell_log_lag2w | ar | 0.3 | 0.698 |  |
@@ -70,8 +70,8 @@
 | wtemp_diff7 | water | 8.6 | -0.063 |  |
 | wtemp_days_over25 | water | 8.4 | 0.556 |  |
 | wtemp_degree_days20 | water | 8.4 | 0.694 |  |
-| wtemp_over_site_thresh_days | water | 8.4 | 0.643 |  |
-| wtemp_minus_site_thresh | water | 8.4 | 0.732 |  |
+| wtemp_over_site_thresh_days | water | 8.4 | 0.63 |  |
+| wtemp_minus_site_thresh | water | 8.4 | 0.73 |  |
 | wtemp_missing_days30 | water | 0.0 | -0.098 |  |
 | weir_inflow_t0 | hydro | 0.0 | 0.387 |  |
 | weir_outflow_t0 | hydro | 0.0 | 0.377 |  |

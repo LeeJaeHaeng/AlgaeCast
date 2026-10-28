@@ -1,0 +1,68 @@
+{
+ "name": "classifier",
+ "version": "20261026_131722",
+ "created": "2026-10-26T13:17:22",
+ "features": [
+  "cell_log_t0",
+  "cell_max_4w",
+  "cell_log_lag1w",
+  "wtemp_minus_site_thresh",
+  "ta_degree_days20",
+  "wtemp_ma14",
+  "rn_sum30",
+  "consecutive_over_1k",
+  "season_day",
+  "inflow_t0",
+  "cell_slope_3",
+  "weir_outflow_t0",
+  "outflow_change7",
+  "level_cont_diff7",
+  "level_cont_t0",
+  "wtemp_diff7",
+  "weir_storage_rate_t0",
+  "hm_mean7",
+  "weir_outflow_ma7",
+  "chla_lag1w",
+  "cell_log_lag3w",
+  "ph_t0",
+  "storage_rate_t0",
+  "outflow_t0",
+  "weir_residence_proxy",
+  "ws_mean7",
+  "horizon_days",
+  "dominant_genus",
+  "facility_type",
+  "basin"
+ ],
+ "features_hash": "5bdc74f7c30d",
+ "metrics_holdout": {
+  "pr_auc": 0.7802,
+  "brier": 0.0847,
+  "f1": 0.6667,
+  "thr": 0.87
+ },
+ "meta": {
+  "model_name": "T24-fold",
+  "train_through": 2024,
+  "target": "over_window(+4~+10일 창 ≥10k)",
+  "purpose": "contingency T24 probability",
+  "basis": "reports/experiments/PREREG_contingency.md 7절",
+  "train": {
+   "n_rows": 2310,
+   "base_date_min": "2012-04-02",
+   "base_date_max": "2024-12-30",
+   "target_date_max": "2025-01-06",
+   "rule": "기준일 연도 ≤ 2024 인 학습 행(2025 홀드아웃 Final 폴드와 같음, 목표일 2025-01-06 5행 포함)",
+   "rows_by_site": {
+    "CS": 503,
+    "DCHN": 668,
+    "GJGR": 458,
+    "HP": 431,
+    "MGMR": 250
+   },
+   "threshold_year": 2024,
+   "seed": 42
+  }
+ },
+ "path": "models/classifier/20261026_131722/model.pkl"
+}

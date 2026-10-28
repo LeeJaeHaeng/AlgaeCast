@@ -378,6 +378,10 @@ def predictions_rows(
     test = feat[feat["split"] == "test"]
     latest = feat.sort_values("base_date").groupby("station_id", observed=True).tail(1)
     sel = pd.concat([test, latest]).drop_duplicates(["station_id", "base_date"])
+    # 수온 임계는 제출 모델과 같은 연도(T24 = ≤2024)로 다시 계산 — 피처 파일의 임계 연도와 무관하게
+    from algaecast.features.constants import FINAL_THRESHOLD_YEAR, apply_site_thresholds
+
+    sel = apply_site_thresholds(sel, FINAL_THRESHOLD_YEAR)
     pr = predict_registry(sel)
     t_rows = pd.DataFrame(
         {

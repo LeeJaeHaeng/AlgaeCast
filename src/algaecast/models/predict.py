@@ -4,6 +4,9 @@
 순서·컬럼 기준)
 - 회귀 current 가 ensemble_v2(v2 운영 모델)이면 test 행 피처에 상류 피처(features.upstream.build_upstream,
   원자료를 행의 기준일까지만 사용)를 붙여 예측한다. 제출 형식·검증은 v1 과 같다.
+- test 행의 지점별 수온 임계 피처는 FINAL_THRESHOLD_YEAR(제출 모델 T24 = ≤2024 측정)로 다시 계산한다
+  (피처 파일이 다른 연도 임계로 만들어져 있어도 같은 결과). current 회귀 meta 의 train.threshold_year 가
+  있으면 그 값과 같아야 한다(다르면 중단).
 - 출력: submission/submission.csv — 컬럼 station_id, base_date, target_date, pred_cells(정수, ≥0),
 UTF-8(BOM, 예시 서식과 동일)
 사용: python -m algaecast.models.predict [--sample
@@ -23,7 +26,9 @@ import pandas as pd
 
 from algaecast.config import ROOT, SUBMISSION_PATH
 from algaecast.db.upload import predict_registry
+from algaecast.features.constants import FINAL_THRESHOLD_YEAR, apply_site_thresholds
 from algaecast.models import data as D
+from algaecast.models import registry as R
 
 log = logging.getLogger(__name__)
 DEFAULT_SAMPLE = ROOT / "data" / "raw" / "competition" / "algae_contest_2026" / "sample_submission.csv"
@@ -36,15 +41,23 @@ def make_submission(
     *,
     reg_dir: Path | None = None,
     algae: pd.DataFrame | None = None,
+    threshold_year: int = FINAL_THRESHOLD_YEAR,
 ) -> pd.DataFrame:
     """sample_submission 조합 순서대로 레지스트리 current 예측(정수 반올림, ≥0).
 
     reg_dir: 레지스트리 디렉터리(None = models/, freeze_v2 --dry-run 은 임시 레지스트리).
     algae: v2 상류 피처용 조류 원자료(None = data/raw parquet, 행마다 기준일까지만 사용).
+    threshold_year: test 행 수온 임계의 계산 자료 끝 연도(T24 = 2024, v2.1 이력 재현 = 2025).
     """
+    meta_year = R.current_entry("regression", reg_dir).get("meta", {}).get("train", {}).get("threshold_year")
+    if meta_year is not None and int(meta_year) != int(threshold_year):
+        raise SystemExit(
+            f"중단: current 회귀의 학습 수온 임계 연도({meta_year})와 "
+            f"예측 임계 연도({threshold_year})가 다르다."
+        )
     sample = pd.read_csv(sample_path, encoding="utf-8-sig", dtype={"station_id": str})
     cols = list(sample.columns)
-    test = D.load_test_features(strategy)
+    test = apply_site_thresholds(D.load_test_features(strategy), threshold_year, strategy)
     test["base_date"] = pd.to_datetime(test["base_date"]).dt.strftime("%Y-%m-%d")
     test["target_date"] = pd.to_datetime(test["target_date"]).dt.strftime("%Y-%m-%d")
     pr = predict_registry(test, reg_dir=reg_dir, algae=algae)
@@ -105,9 +118,17 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--strategy", default="S1")
     ap.add_argument("--registry", type=Path, default=None, help="레지스트리 디렉터리(기본 models/)")
+    ap.add_argument(
+        "--threshold-year",
+        type=int,
+        default=FINAL_THRESHOLD_YEAR,
+        help="test 수온 임계 자료 끝 연도(T24 = 2024)",
+    )
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    out = make_submission(args.sample, args.strategy, reg_dir=args.registry)
+    out = make_submission(
+        args.sample, args.strategy, reg_dir=args.registry, threshold_year=args.threshold_year
+    )
     write_submission(out, args.out)
     print(validate_submission(args.out, args.sample))
     return 0

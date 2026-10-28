@@ -4,8 +4,8 @@
 패키지 루트(공지 #564): README.md, data/, model/, src/, notebooks/, scripts/, demo/, figures/
   + 루트 파일: submission.csv(제출 파일), 방법설명서.pdf, requirements.txt(pip freeze), pyproject.toml(설치용)
 - data/   : 대회 번들 + 외부 수집 원천 parquet + MANIFEST.md (git 미포함, 패키지 전용)
-- model/  : 재현에 불러오는 동결 모델 폴더만(PACKAGE_MODEL_DIRS = registry current v2.1 회귀·분류기·분위)
-            + registry.json(current 그대로, 패키지에 없는 이력 항목에 "package" 표시) + 동결 문서 3종(sha256)
+- model/  : 재현에 불러오는 동결 모델 폴더만(PACKAGE_MODEL_DIRS = registry current T24 회귀·분류기·분위)
+            + registry.json(current 그대로, 패키지에 없는 이력 항목에 "package" 표시) + 동결 문서 4종(sha256)
             + HISTORY.md(뺀 이력 모델 폴더의 파일별 sha256·동결 커밋·재학습 명령·제공 방법)
 - src/    : 파이썬 패키지 algaecast(재현에 필요한 코드만) + src/config/(설정) + src/docs/(설계 문서)
 - scripts/: verify_frozen.py, leakage_audit.py, verify_package.py
@@ -115,18 +115,19 @@ SRC_SKIP_FILES = {
     "posthoc_v21_detail.py",
     "posthoc_metrics_by_definition.py",  # 회귀 지표 정의별 표(2026 사후 예측 재집계)
     "posthoc_answer_source.py",  # 2026 사후 분석 정답 출처 점검(번들 끝 이후 측정 의존 여부)
-    "posthoc_t24.py",  # 비상안 T24 모델 2026 사후(동결 뒤 1회)
+    "posthoc_t24.py",  # T24 모델 2026 사후(동결 뒤 1회)
+    "posthoc_t24_detail.py",  # T24 2026 사후 세부 재집계(저장 예측·정답)
 }  # test 타깃 로더·사후 검증(전용) — 패키지에서 제외
 SCRIPTS = ["verify_frozen.py", "leakage_audit.py", "verify_package.py"]
 # 패키지 model/ 에 넣는 모델 폴더 — 재현에 실제로 불러오는 것만(2026-10-23 추적: make_submission·노트북 모두
 # registry current 3개 폴더의 model.pkl 만 모델로 불러오고, 나머지 동결 폴더는 verify_frozen 의 sha256 읽기뿐).
 # scripts/verify_package.py 의 PACKAGE_MODEL_DIRS 와 같아야 한다(tests/test_package_config.py).
 PACKAGE_MODEL_DIRS = (
-    "regression/20261023_120818",  # v2.1 회귀(제출·운영)
-    "classifier/20261023_120255",  # v2.1 경보 분류기 b
-    "quantile/20261023_120257",  # v2.1 분위 회귀
+    "regression/20261026_131722",  # T24 회귀(제출·운영, 2026-10-28 전환)
+    "classifier/20261026_131722",  # T24 경보 분류기 b
+    "quantile/20261026_131722",  # T24 분위 회귀
 )
-FROZEN_DOCS = ("FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md")
+FROZEN_DOCS = ("FROZEN.md", "FROZEN_v2.md", "FROZEN_v2.1.md", "FROZEN_T24.md")
 FROZEN_ROW = re.compile(r"\| (\w+) \| (\d+_\d+) \| `([0-9a-f]{64})` \|")
 HISTORY_DOC = "HISTORY.md"  # 뺀 이력 모델 목록(models/HISTORY.md → model/HISTORY.md)
 HISTORY_FILE_ROW = re.compile(r"\| `(\w+/\d+_\d+/[\w.]+)` \| `([0-9a-f]{64})` \|")
@@ -139,6 +140,7 @@ EXP_INTERMEDIATE = (
     "*.log",
     "model_yaml_*.yaml",
     "*_v21.csv",
+    "submission_*.csv",  # 비상안 T24S 제출본 사본(contingency_T24S/) — 제출 파일과 헷갈리지 않게 패키지에서 뺀다
 )
 SECRET_PATTERNS = [
     r"serviceKey" "=",
@@ -345,7 +347,7 @@ def checklist(out: Path, verify: dict | None) -> str:
 
 
 def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: str) -> str:
-    """제출 패키지 README. frozen = 동결 커밋 앞 7자 {"v1": FROZEN.md, "v2": FROZEN_v2.md, "v2.1": FROZEN_v2.1.md}."""
+    """제출 패키지 README. frozen = 동결 커밋 앞 7자 {"v1": FROZEN.md, "v2": FROZEN_v2.md, "v2.1": FROZEN_v2.1.md, "T24": FROZEN_T24.md}."""
     return f"""# AlgaeCast-7 — 수질·수문·기상 융합 기반 댐·하천 유해남조류 7일 예측 (제출 패키지)
 
 2026 DATA·AI 분석 경진대회(KISTI) 문제해결 부문 · 참가자 이재행 · 생성일 {date.today()}
@@ -568,9 +570,14 @@ def scan_secrets(root: Path) -> list[str]:
 
 
 def frozen_commits(model_dir: Path) -> dict[str, str]:
-    """동결 문서(v1 FROZEN.md, v2 FROZEN_v2.md, v2.1 FROZEN_v2.1.md)의 동결 커밋 앞 7자. 문서가 없거나 형식이 다르면 '?'."""
+    """동결 문서(v1 FROZEN.md, v2 FROZEN_v2.md, v2.1 FROZEN_v2.1.md, T24 FROZEN_T24.md)의 동결 커밋 앞 7자. 문서가 없거나 형식이 다르면 '?'."""
     out = {}
-    for key, doc in (("v1", "FROZEN.md"), ("v2", "FROZEN_v2.md"), ("v2.1", "FROZEN_v2.1.md")):
+    for key, doc in (
+        ("v1", "FROZEN.md"),
+        ("v2", "FROZEN_v2.md"),
+        ("v2.1", "FROZEN_v2.1.md"),
+        ("T24", "FROZEN_T24.md"),
+    ):
         p = model_dir / doc
         m = re.search(r"동결 커밋: `([0-9a-f]+)`", p.read_text(encoding="utf-8")) if p.exists() else None
         out[key] = m.group(1)[:7] if m else "?"
@@ -626,7 +633,7 @@ def level_feature_file() -> Path:
 def model_dir_problems(models_dir: Path | None = None) -> list[str]:
     """패키지 model/ 구성 점검(빈 목록 = 통과).
 
-    - PACKAGE_MODEL_DIRS = registry current(제출·운영 v2.1 3개 폴더)이고, 그 폴더에 model.pkl·meta.json 이 있어야 한다.
+    - PACKAGE_MODEL_DIRS = registry current(제출·운영 T24 3개 폴더)이고, 그 폴더에 model.pkl·meta.json 이 있어야 한다.
     - 동결 문서 표에 있으나 패키지에서 빼는 폴더(이력)는 HISTORY.md 에 model.pkl sha256(동결 문서와 같은 값)과
       저장소 폴더의 파일별 sha256 이 모두 적혀 있어야 한다.
     """
@@ -722,7 +729,7 @@ def build(out: Path) -> int:
         (out / "data" / sub / ".gitkeep").write_text("", encoding="utf-8")
     # model/ (동결 모델 — 코드가 model/ 을 읽도록 algaecast.config 가 패키지 구조를 감지)
     # 재현에 불러오는 폴더(PACKAGE_MODEL_DIRS)만 넣는다. 이력 모델은 HISTORY.md(sha256·재학습 명령)로 대신하고,
-    # verify_frozen 은 패키지에 없는 이력 행을 HISTORY.md 해시로 대조한다. 동결 문서 3종은 기록으로 남긴다.
+    # verify_frozen 은 패키지에 없는 이력 행을 HISTORY.md 해시로 대조한다. 동결 문서 4종은 기록으로 남긴다.
     for doc in FROZEN_DOCS:
         if (ROOT / "models" / doc).exists():
             copy(ROOT / "models" / doc, out / "model" / doc)
@@ -886,7 +893,7 @@ def doc_readme(pdf: Path, pair_zip: str, pair_sha: str, mp4: Path | None) -> str
         "[짝이 되는 모델자료]",
         f"- {pair_zip}",
         f"  sha256 {pair_sha}",
-        f"- 모델자료 zip 의 폴더 {PKG_NAME}/ 에 코드·데이터·동결 모델(v2.1)·submission.csv·실행 결과를 담은 노트북이 있다.",
+        f"- 모델자료 zip 의 폴더 {PKG_NAME}/ 에 코드·데이터·동결 모델(T24 — 2024년까지 자료로만 학습, 대회 공식 학습 분할)·submission.csv·실행 결과를 담은 노트북이 있다.",
         "- data/ 에는 대회 제공 데이터(심사용)와 DataON 연속 수위 원값이 들어 있다"
         "(운영사무국 답변 2026-10-28: 둘 다 결과물 data/ 폴더에 포함 가능).",
     ]
@@ -900,7 +907,7 @@ def doc_readme(pdf: Path, pair_zip: str, pair_sha: str, mp4: Path | None) -> str
         "",
         "[재현]",
         "- 모델자료 README.md 의 '4. 설치·실행' 절을 따른다(Python 3.11, CPU 전용, 설치 후 인터넷 없이 재현).",
-        "- 다시 만든 submission.csv 는 제출본과 바이트가 같다(sha256 4741a3d37ef3ae9f71b381e083028d93e83ec378ae5d5a65beba2ed48545a8e7).",
+        "- 다시 만든 submission.csv 는 제출본과 바이트가 같다(sha256 057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73).",
         "",
     ]
     return "\r\n".join(lines)
@@ -933,7 +940,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--zip-only",
         action="store_true",
-        help="기존 패키지에서 README 갱신·민감정보 재검사·모델자료 zip 3개·문서자료 zip 2개만",
+        help="기존 패키지에서 README 갱신·민감정보 재검사·모델자료 zip 2개·문서자료 zip 2개만",
     )
     args = ap.parse_args(argv)
     if args.zip_only:

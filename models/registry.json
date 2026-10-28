@@ -1,8 +1,8 @@
 {
  "current": {
-  "regression": "20261023_120818",
-  "classifier": "20261023_120255",
-  "quantile": "20261023_120257"
+  "regression": "20261026_131722",
+  "classifier": "20261026_131722",
+  "quantile": "20261026_131722"
  },
  "versions": [
   {
@@ -638,6 +638,302 @@
     "v1fix_regression_version": "20261023_120255"
    },
    "path": "models/regression/20261023_120818/model.pkl"
+  },
+  {
+   "name": "classifier",
+   "version": "20261026_131722",
+   "created": "2026-10-26T13:17:22",
+   "features": [
+    "cell_log_t0",
+    "cell_max_4w",
+    "cell_log_lag1w",
+    "wtemp_minus_site_thresh",
+    "ta_degree_days20",
+    "wtemp_ma14",
+    "rn_sum30",
+    "consecutive_over_1k",
+    "season_day",
+    "inflow_t0",
+    "cell_slope_3",
+    "weir_outflow_t0",
+    "outflow_change7",
+    "level_cont_diff7",
+    "level_cont_t0",
+    "wtemp_diff7",
+    "weir_storage_rate_t0",
+    "hm_mean7",
+    "weir_outflow_ma7",
+    "chla_lag1w",
+    "cell_log_lag3w",
+    "ph_t0",
+    "storage_rate_t0",
+    "outflow_t0",
+    "weir_residence_proxy",
+    "ws_mean7",
+    "horizon_days",
+    "dominant_genus",
+    "facility_type",
+    "basin"
+   ],
+   "features_hash": "5bdc74f7c30d",
+   "metrics_holdout": {
+    "pr_auc": 0.7802,
+    "brier": 0.0847,
+    "f1": 0.6667,
+    "thr": 0.87
+   },
+   "meta": {
+    "model_name": "T24-fold",
+    "train_through": 2024,
+    "target": "over_window(+4~+10일 창 ≥10k)",
+    "purpose": "contingency T24 probability",
+    "basis": "reports/experiments/PREREG_contingency.md 7절",
+    "train": {
+     "n_rows": 2310,
+     "base_date_min": "2012-04-02",
+     "base_date_max": "2024-12-30",
+     "target_date_max": "2025-01-06",
+     "rule": "기준일 연도 ≤ 2024 인 학습 행(2025 홀드아웃 Final 폴드와 같음, 목표일 2025-01-06 5행 포함)",
+     "rows_by_site": {
+      "CS": 503,
+      "DCHN": 668,
+      "GJGR": 458,
+      "HP": 431,
+      "MGMR": 250
+     },
+     "threshold_year": 2024,
+     "seed": 42
+    }
+   },
+   "path": "models/classifier/20261026_131722/model.pkl"
+  },
+  {
+   "name": "quantile",
+   "version": "20261026_131722",
+   "created": "2026-10-26T13:17:22",
+   "features": [
+    "cell_log_t0",
+    "cell_max_4w",
+    "cell_log_lag1w",
+    "wtemp_minus_site_thresh",
+    "ta_degree_days20",
+    "wtemp_ma14",
+    "rn_sum30",
+    "consecutive_over_1k",
+    "season_day",
+    "inflow_t0",
+    "cell_slope_3",
+    "weir_outflow_t0",
+    "outflow_change7",
+    "level_cont_diff7",
+    "level_cont_t0",
+    "wtemp_diff7",
+    "weir_storage_rate_t0",
+    "hm_mean7",
+    "weir_outflow_ma7",
+    "chla_lag1w",
+    "cell_log_lag3w",
+    "ph_t0",
+    "storage_rate_t0",
+    "outflow_t0",
+    "weir_residence_proxy",
+    "ws_mean7",
+    "horizon_days",
+    "dominant_genus",
+    "facility_type",
+    "basin"
+   ],
+   "features_hash": "5bdc74f7c30d",
+   "metrics_holdout": {
+    "picp80": 0.6667,
+    "mpiw80_log": 1.3719
+   },
+   "meta": {
+    "model_name": "T24-fold",
+    "train_through": 2024,
+    "quantiles": [
+     0.1,
+     0.5,
+     0.9
+    ],
+    "basis": "reports/experiments/PREREG_contingency.md 7절",
+    "train": {
+     "n_rows": 2310,
+     "base_date_min": "2012-04-02",
+     "base_date_max": "2024-12-30",
+     "target_date_max": "2025-01-06",
+     "rule": "기준일 연도 ≤ 2024 인 학습 행(2025 홀드아웃 Final 폴드와 같음, 목표일 2025-01-06 5행 포함)",
+     "rows_by_site": {
+      "CS": 503,
+      "DCHN": 668,
+      "GJGR": 458,
+      "HP": 431,
+      "MGMR": 250
+     },
+     "threshold_year": 2024,
+     "seed": 42
+    }
+   },
+   "path": "models/quantile/20261026_131722/model.pkl"
+  },
+  {
+   "name": "regression",
+   "version": "20261026_131722",
+   "created": "2026-10-26T13:17:23",
+   "features": [
+    "cell_log_t0",
+    "cell_max_4w",
+    "cell_log_lag1w",
+    "wtemp_minus_site_thresh",
+    "ta_degree_days20",
+    "wtemp_ma14",
+    "rn_sum30",
+    "consecutive_over_1k",
+    "season_day",
+    "inflow_t0",
+    "cell_slope_3",
+    "weir_outflow_t0",
+    "outflow_change7",
+    "level_cont_diff7",
+    "level_cont_t0",
+    "wtemp_diff7",
+    "weir_storage_rate_t0",
+    "hm_mean7",
+    "weir_outflow_ma7",
+    "chla_lag1w",
+    "cell_log_lag3w",
+    "ph_t0",
+    "storage_rate_t0",
+    "outflow_t0",
+    "weir_residence_proxy",
+    "ws_mean7",
+    "horizon_days",
+    "dominant_genus",
+    "facility_type",
+    "basin",
+    "up1_cell_log",
+    "up1_slope3",
+    "up1_wtemp",
+    "up1_days",
+    "up1_diff"
+   ],
+   "features_hash": "a3076b49cfc7",
+   "metrics_holdout": {
+    "rmse_log": 0.712,
+    "r2_log": 0.7783,
+    "r2_raw": 0.1754,
+    "r2_pearson_raw": 0.2041,
+    "nse_raw": 0.1754,
+    "f1_10k": 0.7045
+   },
+   "meta": {
+    "kind": "ensemble_v2",
+    "model_name": "T24-fold",
+    "train_through": 2024,
+    "purpose": "contingency T24 cells (v2.1 구성·가중치, 최종 적합 ≤2024)",
+    "basis": "reports/experiments/PREREG_contingency.md 7절",
+    "config": {
+     "name": "v2_C",
+     "base_features": [
+      "cell_log_t0",
+      "cell_max_4w",
+      "cell_log_lag1w",
+      "wtemp_minus_site_thresh",
+      "ta_degree_days20",
+      "wtemp_ma14",
+      "rn_sum30",
+      "consecutive_over_1k",
+      "season_day",
+      "inflow_t0",
+      "cell_slope_3",
+      "weir_outflow_t0",
+      "outflow_change7",
+      "level_cont_diff7",
+      "level_cont_t0",
+      "wtemp_diff7",
+      "weir_storage_rate_t0",
+      "hm_mean7",
+      "weir_outflow_ma7",
+      "chla_lag1w",
+      "cell_log_lag3w",
+      "ph_t0",
+      "storage_rate_t0",
+      "outflow_t0",
+      "weir_residence_proxy",
+      "ws_mean7",
+      "horizon_days",
+      "dominant_genus",
+      "facility_type",
+      "basin"
+     ],
+     "feature_groups": [
+      "upstream"
+     ],
+     "extra_features": [
+      "up1_cell_log",
+      "up1_slope3",
+      "up1_wtemp",
+      "up1_days",
+      "up1_diff"
+     ],
+     "members": [
+      {
+       "name": "c1",
+       "kind": "log_w",
+       "params": "c1",
+       "label": "회귀 C1(smearing)"
+      },
+      {
+       "name": "c3",
+       "kind": "hurdle",
+       "params": "c3",
+       "label": "회귀 C3 hurdle"
+      },
+      {
+       "name": "c2",
+       "kind": "tweedie",
+       "params": "c2",
+       "label": "회귀 C2 tweedie"
+      },
+      {
+       "name": "cg",
+       "kind": "genus",
+       "params": "c1",
+       "label": "속별 cg(G2: Microcystis + 나머지 3속, smearing)"
+      }
+     ],
+     "weights": null,
+     "seed": 42
+    },
+    "weights": {
+     "c1": 0.05530932107613325,
+     "c3": 0.27986211998401955,
+     "c2": 0.26699397876434244,
+     "cg": 0.3978345801755047
+    },
+    "weights_basis": "v2.1 과 같음 — 2020~2024 연도 확장 CV OOF NNLS(log10, 합=1), reports/experiments/FIX-v2.1/v21_fit.json",
+    "train": {
+     "n_rows": 2310,
+     "base_date_min": "2012-04-02",
+     "base_date_max": "2024-12-30",
+     "target_date_max": "2025-01-06",
+     "rule": "기준일 연도 ≤ 2024 인 학습 행(2025 홀드아웃 Final 폴드와 같음, 목표일 2025-01-06 5행 포함)",
+     "rows_by_site": {
+      "CS": 503,
+      "DCHN": 668,
+      "GJGR": 458,
+      "HP": 431,
+      "MGMR": 250
+     },
+     "threshold_year": 2024,
+     "seed": 42
+    },
+    "seed": 42,
+    "classifier_version": "20261026_131722",
+    "quantile_version": "20261026_131722",
+    "aux_source": "T24 학습 행(fold) — 분류기·분위 입력 열·범주"
+   },
+   "path": "models/regression/20261026_131722/model.pkl"
   }
  ]
 }

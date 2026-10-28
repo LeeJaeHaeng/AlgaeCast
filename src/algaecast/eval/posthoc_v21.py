@@ -155,7 +155,7 @@ def main(argv: list[str] | None = None) -> int:
     if R.current_kind("regression") != "ensemble_v2":
         raise SystemExit("중단: current 회귀가 v2.1(ensemble_v2)이 아니다 — 동결 뒤 실행.")
     commit = frozen_commit()
-    v21 = PH.predict_2026()
+    v21 = PH.predict_2026(threshold_year=2025)  # v2.1 이력: 수온 임계 ≤2025(V21_THRESHOLD_YEAR)
     feat = pd.read_parquet(D._features_path("S1"))
     feat["base_date"] = pd.to_datetime(feat["base_date"])
     f26 = feat[feat["base_date"].dt.year == 2026].reset_index(drop=True)
