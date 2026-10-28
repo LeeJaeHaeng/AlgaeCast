@@ -1,0 +1,179 @@
+{
+ "model_name": "T24S",
+ "rule": "기준일·목표일 모두 ≤ 2024-12-31 인 학습 행(T24S 엄격판, PREREG_contingency 8절) — 목표일 2025-01-06 5행 제외",
+ "train_regression": {
+  "n_rows": 2305,
+  "base_date_min": "2012-04-02",
+  "base_date_max": "2024-12-23",
+  "target_date_max": "2024-12-30",
+  "rule": "기준일·목표일 모두 ≤ 2024-12-31 인 학습 행(T24S 엄격판, PREREG_contingency 8절) — 목표일 2025-01-06 5행 제외",
+  "rows_by_site": {
+   "CS": 502,
+   "DCHN": 667,
+   "GJGR": 457,
+   "HP": 430,
+   "MGMR": 249
+  },
+  "threshold_year": 2024,
+  "seed": 42
+ },
+ "train_classifier_quantile": {
+  "n_rows": 2305,
+  "base_date_min": "2012-04-02",
+  "base_date_max": "2024-12-23",
+  "target_date_max": "2024-12-30",
+  "rule": "기준일·목표일 모두 ≤ 2024-12-31 인 학습 행(T24S 엄격판, PREREG_contingency 8절) — 목표일 2025-01-06 5행 제외",
+  "rows_by_site": {
+   "CS": 502,
+   "DCHN": 667,
+   "GJGR": 457,
+   "HP": 430,
+   "MGMR": 249
+  },
+  "threshold_year": 2024,
+  "seed": 42
+ },
+ "excluded_rows": [
+  {
+   "station_id": "HP",
+   "base_date": "2024-12-30",
+   "target_date": "2025-01-06"
+  },
+  {
+   "station_id": "GJGR",
+   "base_date": "2024-12-30",
+   "target_date": "2025-01-06"
+  },
+  {
+   "station_id": "CS",
+   "base_date": "2024-12-30",
+   "target_date": "2025-01-06"
+  },
+  {
+   "station_id": "MGMR",
+   "base_date": "2024-12-30",
+   "target_date": "2025-01-06"
+  },
+  {
+   "station_id": "DCHN",
+   "base_date": "2024-12-30",
+   "target_date": "2025-01-06"
+  }
+ ],
+ "site_thresholds_year": 2024,
+ "decisions": {
+  "weights": {
+   "c1": 0.07576881780507226,
+   "c3": 0.25575878270746016,
+   "c2": 0.24280108415810117,
+   "cg": 0.4256713153293663
+  },
+  "thr_clf_a": 0.58,
+  "thr_clf_b": 0.8699999999999999,
+  "operating_point_r3": 0.46,
+  "cqr_qhat_log10": 0.1620302791484182,
+  "cqr_n_calib": 526,
+  "n_cv_rows": 1273
+ },
+ "decisions_same_as_t24": {
+  "thr_clf_a": true,
+  "thr_clf_b": true,
+  "operating_point_r3": true
+ },
+ "eval_2025": {
+  "regression.rmse_log": 0.7191865257928645,
+  "regression.mae_log": 0.5384947781078333,
+  "regression.r2_log": 0.773811071860135,
+  "regression.r2_raw": 0.1574510887937397,
+  "regression.r2_pearson_raw": 0.1894576551077934,
+  "regression.nse_raw": 0.1574510887937397,
+  "regression.f1_10k": 0.6896551724137931,
+  "regression.f1_1k": 0.8738738738738738,
+  "cqr_shared.picp80_cqr": 0.8650793650793651,
+  "cqr_shared.mpiw80_log_cqr": 1.6661011529990182,
+  "cqr_shared.brier_10k_clf_a": 0.08325817595890156,
+  "quantile.q50_rmse_log": 0.7514411530373433,
+  "quantile.picp80": 0.6587301587301587,
+  "quantile.mpiw80_log": 1.3757472139297355,
+  "quantile.mpiw80_raw": 9669.060652739137,
+  "quantile.q90_10k_f1_a": 0.75,
+  "clf_b.pr_auc": 0.7864287563067801,
+  "clf_b.brier": 0.08323123353748031,
+  "clf_b.f1": 0.6595744680851063,
+  "clf_b.precision": 0.7209302325581395,
+  "clf_b.recall": 0.6078431372549019,
+  "clf_b.thr": 0.8699999999999999,
+  "clf_a.pr_auc": 0.7793606842399257,
+  "clf_a.brier": 0.08325817595890156,
+  "clf_a.f1": 0.7407407407407407,
+  "clf_a.precision": 0.6666666666666666,
+  "clf_a.recall": 0.8333333333333334,
+  "clf_a.thr": 0.58,
+  "operating_point.threshold": 0.46,
+  "operating_point.tp": 44,
+  "operating_point.fp": 21,
+  "operating_point.fn": 7,
+  "operating_point.precision": 0.676923076923077,
+  "operating_point.recall": 0.8627450980392157
+ },
+ "registry_roundtrip": {
+  "pred_cell_count": {
+   "n": 252,
+   "nan_mismatch": 0,
+   "max_abs": 0.0
+  },
+  "test_pred_cell_count": {
+   "n": 124,
+   "nan_mismatch": 0,
+   "max_abs": 0.0
+  }
+ },
+ "files": [
+  {
+   "name": "regression",
+   "version": "20261028_102920",
+   "sha256_model_pkl": "8a4999e573deee501c5d4a71427c8765b2568d35264576f7bc7417a3fe6bc946",
+   "bytes_model_pkl": 19850990,
+   "sha256_meta_json": "948798f2a78c54e7321c3ca3d83bd3d532d663dc993318cb59352c52e0e57733"
+  },
+  {
+   "name": "classifier",
+   "version": "20261028_102920",
+   "sha256_model_pkl": "80317d6b013138f8c28d18ec35ad74c366ed93ae617af7bbd9f50f29f26974a3",
+   "bytes_model_pkl": 1582623,
+   "sha256_meta_json": "b65f092c70a46ed80771cd406bfe8c7f6e2821473fdce04654def51109fa2bf4"
+  },
+  {
+   "name": "quantile",
+   "version": "20261028_102920",
+   "sha256_model_pkl": "4a5de21da34ceb1c7cef9b3be41775184a45862b8ff5db871a403e26fe87fbcf",
+   "bytes_model_pkl": 7733446,
+   "sha256_meta_json": "a87a90d85081d9e84d844b0af022969853a6e6817a38291e938ccf32bb98ec0b"
+  }
+ ],
+ "submission_T24S": {
+  "rows": 124,
+  "columns": true,
+  "order_same_as_sample": true,
+  "nan": 0,
+  "negative": 0,
+  "bom": true,
+  "sha256": "f9e1e8a51b5a64be",
+  "min": 4,
+  "max": 58806,
+  "median": 10248.5,
+  "sha256_full": "f9e1e8a51b5a64be76949918eb25dffcff69b269bdcc4d2cf333567016fb8324",
+  "path": "submission/submission_T24S.csv",
+  "vs_t24_median_abs_log10_diff": 0.0273856597689357,
+  "vs_t24_max_abs_log10_diff": 0.11286751811161011,
+  "t24_sha256": "057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73",
+  "scored_on_2026": false
+ },
+ "registry_current": {
+  "regression": "20261028_102920",
+  "classifier": "20261028_102920",
+  "quantile": "20261028_102920"
+ },
+ "frozen_at_kst": "2026-10-28 10:29:22",
+ "minutes": 0.26
+}
