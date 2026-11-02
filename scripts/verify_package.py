@@ -5,8 +5,10 @@
 1) submission.csv(패키지 루트)가 제출본(저장소 submission/submission.csv)과 바이트 동일(diff 0)
 2) 노트북 재실행 오류 0 (실행본 ipynb 의 error 출력·Traceback 0)
 3) 데모 영상 demo/AlgaeCast_demo.mp4 의 sha256 이 승인본(5c648ac0…, 2026-10-28 v7 — 제출 모델 T24 기준)으로 시작
-4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(2026-10-28~ 모델자료에 포함 → 원자료로 수위 피처 계산,
-   없으면 가공 수위 피처로 재현)
+4) DataON 원값 파일(data/raw/dataon/level_continuous_long.parquet) 유무를 기록(2026-11-02~ 패키지에 없음 — 공식 Q&A 2026-10-30 ⑥,
+   가공 수위 피처로 재현. 2026-10-28 업로드본은 원값 포함 → 원자료로 계산)
+6) README 4-1절 '심사 재현(추론만)' 4줄(verify_frozen → align S1 → features S1 → predict --out submission_reproduced.csv)을
+   노트북보다 먼저 깨끗한 사본에서 실행해 submission_reproduced.csv 가 제출본과 바이트 동일한지(공식 Q&A ④: 제출된 학습 완료 모델로 추론)
 5) model/ 의 모델 폴더가 허용 목록(PACKAGE_MODEL_DIRS)과 같고 각 폴더에 model.pkl·meta.json, model/HISTORY.md 가 있다
    (목록 밖 폴더가 있거나 필수 파일이 없으면 새 venv 실행 전에 실패)
 결과: reports/eval/package_verify.log(실행 기록), reports/eval/package_verify.json(체크리스트용 요약)
@@ -149,6 +151,11 @@ def main(argv: list[str] | None = None) -> int:
         [py, "-m", "venv", ".venv"],
         [vpy, "-m", "pip", "install", "-q", "-r", "requirements.txt"],
         [vpy, "-m", "pip", "install", "-q", "-e", ".", "--no-deps"],
+        # README 4-1절 심사 재현(추론만) — 노트북보다 먼저, 깨끗한 사본에서
+        [vpy, "scripts/verify_frozen.py"],
+        [vpy, "-m", "algaecast.align.run", "--strategy", "S1"],
+        [vpy, "-m", "algaecast.features.run", "--strategy", "S1"],
+        [vpy, "-m", "algaecast.models.predict", "--out", "submission_reproduced.csv"],
         [vpy, "-m", "jupytext", "--to", "notebook", "--execute", "notebooks/01_train_eval.py"],
     ]
     rc = 0
@@ -185,6 +192,10 @@ def main(argv: list[str] | None = None) -> int:
         b = ref.read_bytes()
         res["submission_identical"] = a == b
         res["submission_sha256"] = hashlib.sha256(a).hexdigest()
+        inf = pkg / "submission_reproduced.csv"
+        ia = inf.read_bytes() if inf.exists() else b""
+        res["inference_identical"] = inf.exists() and ia == b
+        res["inference_sha256"] = hashlib.sha256(ia).hexdigest()
         errs, warns = notebook_errors(pkg / "notebooks" / "01_train_eval.ipynb")
         res["notebook_errors"] = errs
         res["notebook_stderr_warnings"] = warns
@@ -195,6 +206,7 @@ def main(argv: list[str] | None = None) -> int:
     res["minutes"] = round((time.time() - t0) / 60, 1)
     msg = (
         f"submission.csv diff: {'0 (바이트 동일)' if res.get('submission_identical') else '불일치/미실행'} · "
+        f"추론 4줄 submission_reproduced.csv diff: {'0 (바이트 동일)' if res.get('inference_identical') else '불일치/미실행'} · "
         f"노트북 오류 {res.get('notebook_errors', '미실행')}건(경고 줄 {res.get('notebook_stderr_warnings', '-')}, 절대경로 {res.get('notebook_abs_paths', '-')}) · "
         f"데모 sha256 {str(res['demo_sha256'])[:16]}… {'일치' if res['demo_sha_ok'] else '불일치'} · "
         f"DataON 원값 {'있음' if dataon_raw else '없음'}(수위 피처 {res['level_cont_mode']}) · "
@@ -209,6 +221,7 @@ def main(argv: list[str] | None = None) -> int:
         rc == 0
         and not model_problems
         and res.get("submission_identical")
+        and res.get("inference_identical")
         and res.get("notebook_errors") == 0
         and res.get("notebook_abs_paths") == 0
         and res["demo_sha_ok"]
