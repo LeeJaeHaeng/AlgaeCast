@@ -13,4 +13,4 @@
 | 2026 사후(test 124, 블라인드 아님) | T24(제출·운영) | 124 | 0.731 | 0.566 | 0.106 | 0.002 | 0.818* |
 | 2026 사후(test 124, 블라인드 아님) | B0 지속성 | 124 | 0.902 | 0.633 | 0.120 | -0.302 | 0.841* |
 
-생성: `python -m algaecast.eval.headline`(reports/eval/headline_metrics.json 의 `official`·`posthoc2026` 와 같은 값).
+생성: `python -m algaecast.eval.headline`(reports/eval/headline_metrics.json 의 `official`·`posthoc2026` 와 같은 값). 이 모듈과 2026 사후 예측 parquet 은 사후 분석 자료라 공지 ⑧에 따라 제출 패키지에 넣지 않았다(비공개 저장소 보관, 요청 시 제공 — 재현 실행에는 필요 없음).

@@ -99,4 +99,4 @@ def test_handoff_reports_not_packaged() -> None:
     src = (Path(__file__).resolve().parents[1] / "scripts" / "build_submission_package.py").read_text(
         encoding="utf-8"
     )
-    assert 'copy(ROOT / "docs", out / "src" / "docs", extra_ignore=("handoff",))' in src
+    assert 'copy(ROOT / "docs", out / "src" / "docs", extra_ignore=("handoff", "SUBMISSION_FINAL.md"))' in src

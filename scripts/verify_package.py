@@ -137,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
         pkg = next(p for p in tmp.iterdir() if p.is_dir())
     else:
         pkg = tmp / "pkg"
-        shutil.copytree(args.dir, pkg)
+        shutil.copytree(args.dir, pkg, ignore=shutil.ignore_patterns(".venv", "__pycache__"))
     dataon_raw = (pkg / "data" / "raw" / "dataon" / "level_continuous_long.parquet").exists()
     level_file = (pkg / "data" / "processed" / "level_cont_features_S1.parquet").exists()
     wamis_raw = (pkg / "data" / "raw" / "wamis_dam" / "wamis_dam_daily.parquet").exists()
@@ -146,7 +146,8 @@ def main(argv: list[str] | None = None) -> int:
     # 복사본의 제출 파일을 지워, 노트북이 실제로 다시 만든 파일만 비교한다.
     (pkg / "submission.csv").unlink(missing_ok=True)
     py = sys.executable  # 같은 인터프리터(3.11)로 새 venv
-    vpy = str(pkg / ".venv" / "Scripts" / "python.exe")
+    # Windows = .venv/Scripts/python.exe, Linux·macOS = .venv/bin/python
+    vpy = str(pkg / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python"))
     steps = [
         [py, "-m", "venv", ".venv"],
         [vpy, "-m", "pip", "install", "-q", "-r", "requirements.txt"],

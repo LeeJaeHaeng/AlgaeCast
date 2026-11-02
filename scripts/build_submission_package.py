@@ -82,7 +82,9 @@ MANIFEST_PACKAGE_NOTE = (
     "`nier_algae_all/`) 파일은 이 패키지에 없다. 패키지 재현은 예측 대상 5지점 조류(상류 피처의 바로 위 지점도 이 5지점 안)를 "
     "대회 번들 `data/raw/competition/` 의 `algae_measure.csv` 에서 읽는다. API 조류는 대시보드 일일 운영에만 쓴다. "
     "WAMIS 원값(`wamis_dam/`·`hydro_daily_long` 의 WAMIS 행)과 DataON 원값(연속 수위 시계열·원 배포 xlsx)은 "
-    "패키지에 없다 — DataON 은 운영사무국 공식 Q&A(2026-10-30) ⑥에 따라 가공 계수만 동봉(README §1·§2·§6).\n"
+    "패키지에 없다 — DataON 은 운영사무국 공식 Q&A(2026-10-30) ⑥에 따라 가공 계수만 동봉(README §1·§2·§6). "
+    "표의 WQ-02·WQ-02b·WQ-06·MT-01b·MT-01c·MT-05c 원자료도 실험 전용이라 패키지에 없다(제출 모델 미사용). "
+    "`hydro_daily_long.parquet` 패키지 사본은 WAMIS 출처 행을 뺀 1,288,393행이다(아래 HY 통합 행 수는 저장소 전체 기준).\n"
 )
 
 
@@ -173,6 +175,7 @@ SCAN_SKIP_SUFFIX = {
 RAW_NOTE = "원본 녹화(노트북 전체 실행 약 20분·운영 화면 장면별)는 용량 때문에 제출 패키지에서는 제외했으며, 요청 시 제공한다."
 # 오프라인 재현(네트워크 차단 새 venv, 노트북 + predict CLI) 확인 시각 — README 3절. 다시 확인하면 고친다.
 OFFLINE_VERIFIED = "2026-11-02"
+LINUX_VERIFIED = "2026-11-02"  # Debian 13 컨테이너(python:3.11-slim + libgomp1) --network none — 추론 4줄·노트북 바이트 동일
 SUB_SHA_SHORT = "057afeee"  # submission.csv(T24) sha256 앞 8자 — README·읽어보기
 
 
@@ -334,7 +337,7 @@ def checklist(out: Path, verify: dict | None) -> str:
             "2. 노트북 실행",
             "깨끗한 환경에서 위→아래 한 번에 실행, 실행 결과(출력) 포함 저장",
             nb_ok and repro_ok,
-            f"새 venv 재실행 오류 {v.get('notebook_errors', '미실행')}건, submission.csv 가 패키지 제출 파일과 바이트 동일={v.get('submission_identical', '미실행')}, 소요 {v.get('minutes', '-')}분 ({v.get('when', '-')})",
+            f"새 venv 재실행 오류 {v.get('notebook_errors', '미실행')}건, submission.csv 가 패키지 제출 파일과 바이트 동일={v.get('submission_identical', '미실행')}, 소요 {v.get('minutes', '-')}분 — 설치·추론 4줄·노트북 포함, 검증 PC 에서 다른 검증과 동시 실행일 수 있음, 노트북 단독은 4-2절 약 20분 ({v.get('when', '-')})",
         ),
         (
             "3. submission.csv",
@@ -370,7 +373,7 @@ def checklist(out: Path, verify: dict | None) -> str:
             "8. 재현 기준(공식 Q&A 2026-10-30 ④)",
             "제출된 학습 완료 모델로 추론만 다시 실행, README 에 실행 명령·난수 시드, 추론 중 외부 네트워크 불필요",
             infer_ok,
-            f"4-1절 추론 4줄 새 venv 실행: submission_reproduced.csv 바이트 동일={v.get('inference_identical', '미실행')} ({v.get('when', '-') if 'inference_identical' in v else '-'}), 오프라인 {OFFLINE_VERIFIED}",
+            f"4-1절 추론 4줄 새 venv 실행: submission_reproduced.csv 바이트 동일={v.get('inference_identical', '미실행')} ({v.get('when', '-') if 'inference_identical' in v else '-'}), 오프라인 {OFFLINE_VERIFIED}, Linux 컨테이너(--network none) 바이트 동일 {LINUX_VERIFIED}",
         ),
         (
             "9. 외부 자료 원값(공식 Q&A 2026-10-30 ⑥)",
@@ -388,7 +391,13 @@ def checklist(out: Path, verify: dict | None) -> str:
             "11. 사후 분석 코드(공식 Q&A 2026-10-30 ⑧)",
             "평가 실측치를 튜닝·제출 수정에 쓰지 않음, 사후 분석 코드는 재현과 분리",
             posthoc_ok,
-            "패키지 src/ 에 2026 사후 분석 코드(eval/posthoc*·eval/headline.py·eval/live.py·exp/confirm_2026.py) 없음, 5절 '공지 ⑧ 대응'",
+            "2026 지표를 쓴 직접 선택·튜닝·제출 수정 없음. 간접 경로 1건 공개 — v1~v2 지점별 수온 임계 상수에 2026 조류 측정(수온·세포수, 평가 구간 포함) 39~54행/지점, FIX-v2.1 에서 학습기간 자료로 다시 계산(T24 ≤2024), 결정은 사전등록대로 고정(5절 '공지 ⑧ 대응'). 패키지 src/ 에 2026 사후 분석 코드(eval/posthoc*·eval/headline.py·eval/live.py·exp/confirm_2026.py) 없음",
+        ),
+        (
+            "12. 댐·외부 자료 보충(공식 Q&A 2026-10-30 ⑦)",
+            "기준일 이후 관측값 미사용, 보충 자료의 출처·수집·가공 방법 명시",
+            (out / "data" / "raw" / "MANIFEST.md").exists(),
+            "번들 dam_daily(2026-09-11까지) 뒤는 K-water delist(#15099110)·다목적댐 운영 정보(#15099049)로 보강, 모든 외부 자료는 기준일까지의 값만(공통 as-of 절단, 누수 감사 `scripts/leakage_audit.py` 불일치 0), 출처·수집일시·라이선스 `data/raw/MANIFEST.md`(HY-02·HY-01 보조), 제출 124행 기준일(2026-05-04~09-03)은 번들 기간 안",
         ),
     ]
     lines = [
@@ -405,7 +414,7 @@ def checklist(out: Path, verify: dict | None) -> str:
     lines += [
         "",
         f"- 자체 점검(추가): {sec} (텍스트 파일 전체 대상, 영상·자막·이진 파일 제외, `scripts/security_scan.txt`).",
-        "- 점검 기준: 1~7번은 공지 #564 '제출 전 확인사항'(참가자 정리 문서 '제출요건_공지정리'의 요건 문구), 8~11번은 운영사무국 공식 Q&A(2026-10-30) ④⑤⑥⑧.",
+        "- 점검 기준: 1~7번은 공지 #564 '제출 전 확인사항'(참가자 정리 문서 '제출요건_공지정리'의 요건 문구), 8~12번은 운영사무국 공식 Q&A(2026-10-30) ④⑤⑥⑧⑦. ①②③(공식 4지표·R² 정의·목표)은 0절과 `figures/reports/eval/tbl_official_metrics.md`.",
     ]
     return "\n".join(lines)
 
@@ -424,7 +433,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 - **2026년 경계 사건 8건 중 7건을 중앙 21일 앞서 감시 단계로 포착**(지속성 2건)
 - **2020~2026년 경계 사건 28건 중 24건(86%) 포착**(중앙 14일, 지속성 3건)
 - 대회 공식 지표(운영사무국 공식 Q&A 2026-10-30 ①②, 지점 구분 없이 통합): 2025 홀드아웃(252행) RMSE(log) 0.712 · MAE(log) 0.537 · R² 0.204 · NSE 0.175 / 2026(124조합, 사후) 0.731 · 0.566 · 0.106 · 0.002(지속성 RMSE(log) 2025 0.896·2026 0.902). 표 `figures/reports/eval/tbl_official_metrics.md`. R² 는 원단위 피어슨 상관계수 제곱이다(1−SSE/SST 는 NSE).
-- 2024년까지 자료로만 학습했다(대회 공식 학습 분할 split=train 2,310행 — 목표일 2025-01-06 인 5행 포함, 운영사무국이 학습 사용을 허용). 2025 홀드아웃은 제출 모델 자신의 홀드아웃이다. 2026년 값은 동결 뒤 1회 계산한 사후 결과다(블라인드 아님).
+- 기준일 2024년까지인 대회 공식 학습 분할 split=train 2,310행으로만 학습했다(그중 5행의 목표 측정일은 2025-01-06 — 출제기관이 split=train 으로 지정한 조합이고 운영사무국이 이메일로 학습 사용을 허용, 2절 '학습 범위'). 2025 홀드아웃은 제출 모델 자신의 홀드아웃이다. 2026년 값은 동결 뒤 1회 계산한 사후 결과다(블라인드 아님).
 
 > **목표 R² 0.6·NSE 0.5에 대해**(공지 ③: 2026 평가 구간 124건 기준, 순위 미반영)
 > 1. T24 의 R² 는 2026 사후 0.106(2025 검증 0.204), NSE 는 0.002(0.175)로 목표에 못 미쳤다.
@@ -453,7 +462,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 | `model/` | 동결 모델: **T24**(제출·운영, v2.1 구성을 2024년까지 자료로만 학습 — 회귀·경보 분류기·분위 회귀 {' · '.join(f'`{d}`' for d in PACKAGE_MODEL_DIRS)}, 재현에 불러오는 모델은 이 3개뿐) + `registry.json`(current = T24) + `FROZEN_T24.md`(T24 sha256, 동결 커밋 `{frozen['T24']}`). 이력 모델 파일(v2.1 회귀·분류기·분위, 수정 전 v1 회귀·분류기·분위, v2 회귀, 민감도용 v1-fix 회귀 — 8개 폴더)은 재현에 쓰지 않아 넣지 않았다: 폴더별 sha256·동결 커밋·재학습 명령·제공 방법(요청 시 제공)은 `HISTORY.md`. 동결 문서 `FROZEN_v2.1.md`(v2.1, 동결 커밋 `{frozen['v2.1']}`)·`FROZEN.md`(v1, 동결 커밋 `{frozen['v1']}`)·`FROZEN_v2.md`(v2, 동결 커밋 `{frozen['v2']}`)는 기록으로 남김 | {sizes.get('model', '-')} |
 | `src/` | 파이썬 패키지 `algaecast`(정렬·피처·모델·평가 재현 코드. `exp/` 는 실험 코드로 재현에 쓰지 않는다. 2026 사후 분석 코드 `eval/posthoc*`·`eval/headline.py`·`eval/live.py`·`exp/confirm_2026.py` 는 공지 ⑧(사후 분석 코드는 재현 실행과 분리)에 맞춰 재현 패키지에서 뺐다 — 비공개 저장소 보관, 요청 시 제공) + `src/config/`(지점·피처·모델·시드 설정, `seed.yaml` = 난수 시드 42, `derived_constants.json` — 데이터 유래 상수와 계산 자료 메타데이터) + `src/docs/`(설계 문서) | {sizes.get('src', '-')} |
 | `notebooks/01_train_eval.ipynb` · `01_train_eval.py` | (.py = jupytext 짝, 4-2절 실행 원본) 동결 모델 검증(`FROZEN.md`·`FROZEN_v2.md`·`FROZEN_v2.1.md`·`FROZEN_T24.md` — 제출 모델은 파일 해시, 패키지에 없는 이력 모델은 `model/HISTORY.md` 해시 대조) → 데이터 로드·전처리 → 피처(+ 상류 피처, 수온 임계 ≤2024) → 학습(동결 파라미터, T24·비교용 v1-fix, 학습 행 = 대회 split=train 2,310행 확인) → 2025 검증 지표(T24·v1-fix 나란히, 재학습 ≈ 동결 T24 확인 — 허용 오차 비교, 넘으면 경고만) → `submission.csv`(T24, 동결 모델로만) 생성 → 그림. 실행 결과(출력) 포함 | |
-| `scripts/` | `verify_frozen.py`(네 동결 문서 해시 검증 — 제출 모델 3개는 파일이 있어야 하고, 이력 모델은 '패키지 미포함(이력, model/HISTORY.md)'으로 표시), `leakage_audit.py`(누수 감사, 원자료부터 재계산 포함), `verify_package.py`(새 venv 재현 검증, `model/` 허용 폴더 점검), `security_scan.txt` | |
+| `scripts/` | `verify_frozen.py`(네 동결 문서 해시 검증 — 제출 모델 3개는 파일이 있어야 하고, 이력 모델은 '패키지 미포함(이력, model/HISTORY.md)'으로 표시), `leakage_audit.py`(누수 감사, 원자료부터 재계산 포함), `verify_package.py`(개발 PC 용 새 venv 재현 검증 기록 도구 — 설치 3줄·4-1절 4줄·노트북을 차례로 실행, Windows·Linux, `model/` 허용 폴더 점검. 심사 재현은 4-1절 4줄), `security_scan.txt`. 통계분석 노트북 `notebooks/02_stats.*` 와 테스트 `tests/` 는 저장소 전용(비공개 저장소, 요청 시 제공) — 누수 감사는 `scripts/leakage_audit.py` 로 패키지에서 실행할 수 있다 | |
 | `demo/` | 데모 영상 `AlgaeCast_demo.mp4`(2분 28초, 1080p H.264, 한국어 자막. 2026-10-28 제출 모델 T24 기준 녹화 — 노트북 실행·운영 화면·다시 보기 장면 ①, 방법설명서 9.4절) · `AlgaeCast_demo.srt` · `script.md`(콘티) · `README_DEMO.md`(구성·편집 내역. 자막 18번 '결정계수 0.18·0.00' 은 NSE 값이며 공식 R² 는 0.20·0.11 — 2026-11-02 정정 절) · `captures/`(장면 캡처 7장). {RAW_NOTE} | {sizes.get('demo', '-')} |
 | `figures/` | 방법설명서·발표용 핵심 그림, 대시보드 스크린샷(`dashboard_*.png`), `figures/reports/`(평가·통계 표 원본 — 방법설명서 각주의 출처) | {sizes.get('figures', '-')} |
 
@@ -462,6 +471,7 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 - 조류 원천: 예측 대상 지점 조류 = 대회 번들(`algae_measure.csv`). 상류 지점 조류도 대회 번들이다(상류 피처의 바로 위 지점 해평·강정고령·칠서가 모두 예측 대상 5지점 안이라 같은 파일, 기준일 이전 값만). 공공데이터포털 조류경보 API 는 대시보드 일일 운영에만 쓰고 패키지에 넣지 않았다(겹치는 기간 값은 번들과 같음, 방법설명서 2장·9.1절).
 - 입력: 조류경보제 측정(국립환경과학원), 댐·보 운영(K-water delist·WAMIS — WAMIS 원값은 제출 패키지에 넣지 않고 수문 피처 33열 가공 파일만 포함, 받는 법 `data/raw/hydro/README_GET_WAMIS.md`), 댐유역 하천 일평균수위(**DataON** 국가참조표준 DOI 10.20925/KSRD.74670854.v5, CC BY-NC-SA — 원값은 넣지 않고 수위 피처 2열 가공 계수만 포함(운영사무국 공식 Q&A 2026-10-30 ⑥), `LICENSE_DataON.txt` 첨부), ASOS 기상(기상청). 기상청 단기·중기예보는 2026-10-20 발표분부터 누적하지만 과거 발표분이 없어 제출 모델 T24 는 쓰지 않는다(방법설명서 2.5절). AIDA 정규격자 자료는 계획했으나 미사용(기상 입력은 ASOS 관측소로 대체).
 - 모델: **제출·운영 모델 T24**(2026-10-26 동결, 커밋 `{frozen['T24']}`, 2026-10-28 운영사무국 답변 '학습은 24년까지'에 따라 사전등록 규칙대로 v2.1에서 전환) = v2.1(데이터 유래 상수 누수 수정판) 구성 그대로, 학습은 대회 번들 `eval_pairs.csv` 의 split=train 정의 그대로(2,310행, 기준일 ≤2024-12-30, 이 중 5행은 기준일 2024-12-30·목표일 2025-01-06). 구성: LightGBM 변형 3종(log 가중 회귀 C1 · hurdle C3 · tweedie C2, v1 하이퍼파라미터)에 속별 구성원 cg(Microcystis + 나머지 3속)를 더한 log10 공간 NNLS 앙상블(제출용 세포수, 가중치 c1 0.055 · c3 0.280 · c2 0.267 · cg 0.398) + 경계(+4~+10일 ≥10,000) 분류기(경보 확률, 운영점 p ≥ 0.46 = 놓침:헛경보 비용비 r=3) + 분위 회귀 q10/50/90(CQR 보정 q̂ 0.165, 감시 규칙 q90 ≥ 10,000). 회귀 피처 35개 = 선별 30개(VIF·Boruta) + 상류 지점 피처 5열(바로 위 지점의 최근 측정, 해평·회남 결측). 분류기·분위·CQR·운영점도 수정 피처로 다시 적합했다. 데이터로 계산한 상수는 기준일까지(as-of) 또는 학습기간 자료로만 쓴다: 수위 편차 = 관측소별 직전 365일 평균 대비, 지점별 수온 임계 = 학습기간 측정만(폴드마다, T24 ≤2024, `src/config/derived_constants.json`). 이력: v2.1(2026-10-23 동결, 커밋 `{frozen['v2.1']}`, 같은 구성·최종 적합 ≤2025, 2026-10-23~28 제출 후보), 수정 전 v1(2026-10-21 봉인, 커밋 `{frozen['v1']}`, 같은 3종 NNLS 앙상블·피처 30개)·v2(2026-10-22 동결, 커밋 `{frozen['v2']}`, v2.1 과 같은 구성), v1-fix(v1 구성 + 수정 피처, 민감도용) — 이력 모델 파일은 재현에 쓰지 않아 패키지에 넣지 않았다(`model/HISTORY.md`: sha256·재학습 명령, 요청 시 제공).
+- 학습 범위(공지 ⑤): 최종 모델 T24 의 학습 행은 대회 `eval_pairs.csv` split=train 2,310행과 (지점, 기준일, 목표일) 단위로 같다(노트북 3~4단계에서 확인). 이 가운데 5행(기준일 2024-12-30)은 목표 측정일이 2025-01-06 이다. 이 5행은 출제기관이 split=train 으로 지정한 조합이라 ⑤ 첫 문장('split=train 으로 지정된 조합만')의 범위 안이고, 운영사무국 이메일 답변('해당 5행은 학습에 사용해도 괜찮습니다')이 이 5행을 특정해 허용했다. ⑤ 둘째 문장('2025년 자료는 모델 선택과 하이퍼파라미터 결정에만')은 2025 검증 분할(split=valid, 기준일 2025)을 가리키는 것으로 보고 이 5행과 충돌하지 않는다고 판단했다. 2025 검증 분할은 모델 선택·규칙 확인에만 썼다.
 - 검증: 연도 expanding-window CV(2020~2024) → 2025 홀드아웃(목표일 ≤2025-12-31 인 252행) → v1 동결(2026-10-21) → v2 사전등록 확인 실험(EXP-confirm)으로 채택·동결(2026-10-22) → 2026-10-23 데이터 유래 상수 전수 점검에서 누수 발견 → 사전등록(FIX-v2.1) 규칙대로 고친 v2.1 을 결과와 무관하게 채택·동결 → 2026-10-28 운영사무국 답변(학습은 2024년까지)에 따라 답변 전에 등록한 규칙(사전등록 960d76f, T24 동결 a961caf)대로 T24 로 교체 → 2026 사후 계산(T24 동결 뒤 1회. 팀은 v2.1 의 2026 결과를 본 뒤 T24 를 사전등록·동결했으므로 블라인드 아님). 누수 감사: 기준일까지 잘라낸 달력 재계산 표본 300·원자료부터 재계산 표본 60 불일치 0, 예전 방식 음성 대조 5/5 검출, 데이터 유래 상수 테스트 15개.
 - 핵심 결과: 2025 홀드아웃(같은 252행 — 제출 모델 T24 자신의 홀드아웃, v2.1 Final 폴드와 같은 값) T24 RMSE(log) 0.712 · MAE(log) 0.537 · R²(공식) 0.204 · NSE 0.175 · 로그 공간 설명력 r2_log 0.778(순위 미반영) · 경계 F1 0.705(지속성 F1 0.727, 봉우리 1건이 분산의 43%). **2024년까지 자료로만 학습한 모델(T24, 대회 공식 학습 분할)로 2026년 경계 사건 8건 중 7건을 중앙 21일 앞서 감시 단계로 포착(지속성 2건)**, **2020~2026년 합계 28건 중 24건(86%)을 첫 경계 초과 측정 기준 중앙 14일 앞서 포착(지속성 3건)**. 2026 test 124조합: T24 RMSE(log) 0.731 · MAE(log) 0.566 · R²(공식) 0.106 · NSE 0.002 · r2_log 0.502(순위 미반영) · F1@10k 0.818('이상' 기준 보고값 — 공식 '초과' 기준과 같을 것으로 봄; 지속성 F1 0.841; v2.1 이력 R² 0.100 · NSE 0.001 · F1 0.826). 누수 수정: 이전 모델 v1·v2 가 일부 데이터 유래 상수(수위 편차 관측소 평균·지점별 수온 임계·ASOS 관측소 선정)를 2026 자료까지 포함해 계산했음을 2026-10-23 사후 발견해 사전등록 규칙대로 고쳤다(경위와 수정 전후 비교는 방법설명서 5.11절). v1 봉인본의 2026 7/8 은 이력으로만 남긴다. 2026 사후 성능 저하와 한계는 방법설명서 5.11절·6.11절·10장.
 
@@ -490,9 +500,9 @@ def readme(info: dict, frozen: dict[str, str], sizes: dict[str, str], check_md: 
 - **오프라인 재현**: 패키지 설치 후 인터넷 없이 재현 가능, 결과 sha256 동일({OFFLINE_VERIFIED} 확인 — 새 venv 설치 뒤 네트워크를 막은 상태에서 노트북 전체 실행(동결 모델 검증·정렬·피처는 4-1절 명령과 같은 함수)과 추론 CLI `algaecast.models.predict`, 둘 다 sha256 `{SUB_SHA_SHORT}…`, 외부 접속 시도 0건, 이 제출본(DataON 원값 없음) 기준).
 
 ## 4. 설치·실행
-모든 명령은 압축을 푼 패키지 루트(이 README.md 가 있는 폴더)에서 실행한다. 설치(아래 3줄)에만 네트워크가 필요하고, 그다음 명령은 모두 네트워크 없이 실행된다. Windows 는 PowerShell 이나 Git Bash 에서 그대로 실행한다(cmd.exe 에서는 `.venv\Scripts\python` 처럼 역슬래시로 쓴다). Linux·macOS 는 `.venv/Scripts/` 를 `.venv/bin/` 으로 바꾼다(Windows 전용 `pywinpty` 는 requirements.txt 의 환경 표시 `; sys_platform == "win32"` 로 자동 제외, 재현에는 쓰지 않음). Python 3.11 이 필요하다(3.12 이상 미검증). Windows 에서는 경로 260자 제한 때문에 짧은 경로(예: `C:\ac\`)에 압축을 풀기를 권한다.
+모든 명령은 압축을 푼 패키지 루트(이 README.md 가 있는 폴더)에서 실행한다. 설치(아래 3줄)에만 네트워크가 필요하고, 그다음 명령은 모두 네트워크 없이 실행된다. Windows 는 PowerShell 또는 Git Bash 에서 아래 줄을 그대로 실행한다(cmd.exe 는 경로 구분자를 바꿔야 해서 권하지 않는다). Linux·macOS 는 첫 줄을 `python3.11 -m venv .venv` 로, `.venv/Scripts/python` 을 `.venv/bin/python` 으로 바꾼다(Windows 전용 `pywinpty` 는 requirements.txt 의 환경 표시 `; sys_platform == "win32"` 로 자동 제외, 재현에는 쓰지 않음). 최소 구성 Linux(예: Docker `python:3.11-slim`)에는 LightGBM 이 쓰는 OpenMP 런타임이 없으므로 먼저 `apt-get install -y libgomp1`(Debian·Ubuntu)을 설치한다. Python 3.11 이 필요하다(3.12 이상 미검증). Windows 에서는 경로 260자 제한 때문에 짧은 경로(예: `C:\\ac\\`)에 압축을 풀기를 권한다.
 ```bash
-py -3.11 -m venv .venv                                  # Linux·macOS: python3.11 -m venv .venv
+py -3.11 -m venv .venv
 .venv/Scripts/python -m pip install -r requirements.txt
 .venv/Scripts/python -m pip install -e . --no-deps
 ```
@@ -500,23 +510,25 @@ py -3.11 -m venv .venv                                  # Linux·macOS: python3.
 
 ### 4-1. 심사 재현(추론만) — 제출된 학습 완료 모델(`model/` 의 T24 3개)로 submission 다시 만들기, 재학습 없음
 ```bash
-.venv/Scripts/python scripts/verify_frozen.py                                     # 동결 모델 sha256 확인
-.venv/Scripts/python -m algaecast.align.run --strategy S1                         # 지점별 일 달력 정렬(결측 전략 S1)
-.venv/Scripts/python -m algaecast.features.run --strategy S1                      # 피처 생성(기준일까지 자료만)
-.venv/Scripts/python -m algaecast.models.predict --out submission_reproduced.csv  # T24 추론 → 124행
+.venv/Scripts/python scripts/verify_frozen.py
+.venv/Scripts/python -m algaecast.align.run --strategy S1
+.venv/Scripts/python -m algaecast.features.run --strategy S1
+.venv/Scripts/python -m algaecast.models.predict --out submission_reproduced.csv
 ```
+- 순서: 동결 모델 sha256 확인 → 지점별 일 달력 정렬(결측 전략 S1) → 피처 생성(기준일까지 자료만) → T24 추론(124행).
 - **난수 시드: 42** — `src/config/seed.yaml`(seed: 42). LightGBM `random_state` 는 `models.train.SEED` 가, 부트스트랩 등 numpy 난수는 `algaecast.config.load_seed()` 가 이 파일에서 읽는다. 추론은 저장된 모델과 고정 가중치만 쓰므로 난수를 쓰지 않는다.
 - `submission_reproduced.csv` 는 루트 `submission.csv` 와 바이트가 같다(새 가상환경 `scripts/verify_package.py` — 7절 8번).
 - 확인: PowerShell `Get-FileHash submission_reproduced.csv` / Linux `sha256sum submission_reproduced.csv` → `057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73`(루트 `submission.csv` 와 같음).
-- 공식 Q&A(2026-10-30) ④ 재현 기준(124건 행 단위 log10(x+1) 차 ≤0.05 또는 절대 차 ≤100 cells/mL 면 일치, 불일치 ≤6행이고 그중 2배 넘게 차이 나는 행이 없으면 통과) 대비: 개발 환경(Windows 11·Python 3.11.9) 새 venv 에서 바이트 동일했다(7절 2·8번, 오프라인 {OFFLINE_VERIFIED}). 추론은 저장된 LightGBM 트리의 결정론적 계산이라 다른 환경이어도 차이는 부동소수 끝자리(정수 반올림 ±1 cells) 수준으로 예상하며, 공지 허용 오차보다 훨씬 작다.
+- 공식 Q&A(2026-10-30) ④ 재현 기준(124건 행 단위 log10(x+1) 차 ≤0.05 또는 절대 차 ≤100 cells/mL 면 일치, 불일치 ≤6행이고 그중 2배 넘게 차이 나는 행이 없으면 통과) 대비: 개발 환경(Windows 11·Python 3.11.9) 새 venv 에서 바이트 동일했다(7절 2·8번, 오프라인 {OFFLINE_VERIFIED}). 추론은 저장된 LightGBM 트리의 결정론적 계산이라 다른 환경이어도 차이는 부동소수 끝자리(정수 반올림 ±1 cells) 수준으로 예상하며, 공지 허용 오차보다 훨씬 작다. Linux 에서도 확인했다 — Debian 13 컨테이너(Docker `python:3.11-slim` + `libgomp1`, Python 3.11.18, 같은 고정 버전 설치 뒤 `--network none`)에서 추론 4줄 `submission_reproduced.csv`(11분)와 노트북 전체 `submission.csv`(17분)가 모두 제출본과 바이트 동일했고(124행 일치, 공지 ④ 기준 불일치 0), 노트북 오류 0건(2026-11-02).
 - 소요 시간: 약 10분(대부분 정렬·피처 생성, 8코어 CPU 기준).
 
 ### 4-2. 노트북 전체 실행(검증·재학습 포함)
 ```bash
-.venv/Scripts/python -m jupytext --to notebook --execute notebooks/01_train_eval.py   # → 루트 submission.csv 를 다시 씀, figures/
+.venv/Scripts/python -m jupytext --to notebook --execute notebooks/01_train_eval.py
 ```
+- 결과: 루트 `submission.csv` 를 다시 쓰고 `figures/` 그림을 만든다.
 - 순서: 동결 모델 검증 → 정렬 → 피처 → 학습(T24·v1-fix 재학습, 2025 검증 지표용) → 2025 지표 → 동결 모델로 `submission.csv` 생성 → 그림. `submission.csv` 는 재학습 결과가 아니라 동결 모델로만 만든다.
-- 4단계의 '재학습 ≈ 동결 T24' 대조는 허용 오차(상대·절대 1e-6) 비교이며, 넘으면 멈추지 않고 경고 줄만 출력한다(개발 환경에서는 최대 절대차 0.0). OS·CPU 명령어 집합이 다르면 재학습 결과가 부동소수 끝자리에서 달라질 수 있기 때문이다.
+- 4단계의 '재학습 ≈ 동결 T24' 대조는 허용 오차(상대·절대 1e-6) 비교이며, 넘으면 멈추지 않고 경고 줄만 출력한다. 개발 환경(Windows)에서는 최대 절대차 0.0, Linux 컨테이너에서는 1.0×10⁻¹⁰ 이었다(허용 오차 안, 경고 없음) — OS·CPU 명령어 집합에 따라 재학습 결과가 부동소수 끝자리에서 달라지기 때문이며, 제출 예측(동결 모델)은 두 환경 모두 바이트 동일했다.
 - 화면에서 셀 단위로 실행해 보려면: `.venv/Scripts/jupyter lab notebooks/01_train_eval.ipynb` (위 3줄 설치 후).
 - 재현 소요 시간: 약 20분(대부분 피처 생성, 8코어 CPU 기준). 노트북은 루트 `submission.csv` 를 다시 쓴다. 비교하려면 실행 전에 사본을 두거나, 실행 뒤 sha256 이 `057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73` 인지 확인한다(새 가상환경 `scripts/verify_package.py` 에서는 바이트 동일).
 - 대시보드(운영 데모): https://algaecast-7.vercel.app · 코드 저장소: 비공개 저장소 — 요청 시 열람 권한 제공
@@ -524,7 +536,7 @@ py -3.11 -m venv .venv                                  # Linux·macOS: python3.
 ## 5. AI 활용범위 및 주요 검토 과정
 - **활용 도구**
   - 기획·설계 검토와 웹 자료 조사 — Claude(claude.ai). 2026-10-20~10-21 오전은 Claude Fable 5.1, 2026-10-21 T4-c(경보 분류) 검토부터 Claude Opus 5.5.
-  - 구현·실험·문서 작성 — Claude Code(CLI). 2026-10-20~10-21 13시는 Claude Fable 5.1(수집·통계분석·피처·튜닝·평가 등), 2026-10-21 16시부터 Claude Opus 5.5(대시보드·일일 운영·동결 뒤 실험·v2 이식·데이터 유래 상수 누수 점검과 수정(FIX-v2.1)·T24 사전등록 전환·패키징·데모 영상). 구분은 커밋의 공동 작성자 표기 기준이다.
+  - 구현·실험·문서 작성 — Claude Code(CLI). 2026-10-20~10-21 13시는 Claude Fable 5.1(수집·통계분석·피처·튜닝·평가 등), 2026-10-21 16시부터 Claude Opus 5.5(대시보드·일일 운영·동결 뒤 실험·v2 이식·데이터 유래 상수 누수 점검과 수정(FIX-v2.1)·T24 사전등록 전환·패키징·데모 영상). 구분은 커밋의 공동 작성자 표기 기준이며, 예외로 2026-10-27 대시보드 문구 수정·다시 보기 근거 백필 2건(4db74cf·c0b714c)은 Claude Fable 5.1 이다.
 - **참가자 기여**: 문제 정의와 평가 원칙(연도 단위 검증, 2026 정답 격리, 원단위 지표를 숨기지 않기), 입력 데이터 선택, 아래 표의 모든 채택·기각 결정, 사전등록 조건 검토·승인과 판정 승인, 대시보드 표현 원칙(공식 발령과 AI 예상 병기, 예상값 하나), 데이터 유래 상수 전수 점검 지시 → 누수 발견 → 사전등록 수정(v2.1), 학습 기간을 운영사무국에 문의하고 답변('학습은 24년까지')에 따라 사전등록 규칙대로 T24 전환을 결정(5행 문제는 엄격판 T24S를 비상안으로 동결해 두고 운영사무국에 문의했고, 운영사무국 이메일 답변('해당 5행은 학습에 사용해도 괜찮습니다')으로 규칙대로 T24를 유지하고 T24S는 비상안에서 종료했다 — 2026 미채점), 운영사무국 공식 Q&A(2026-10-30) 기준 점검과 재제출 결정(DataON 원값 제외·지표 표기 정정·README 재현 명령).
 - **참가자 검증**
   - 배포 대시보드를 직접 확인해 구버전 화면과 빌드 실패를 발견, 수정 지시
@@ -568,7 +580,7 @@ py -3.11 -m venv .venv                                  # Linux·macOS: python3.
 | 결합 가중치·분류기 임계·운영점·CQR | 2026-10-23(v2.1 재적합) | CV OOF 2020~2024(가중치·CQR 에는 목표일 2025-01-06 5행 포함) | 수정 상수 | 이 재적합 자체 |
 
 - **모델 적합 표본에는 2025·2026 측정이 들어가지 않는다.** 예외는 대회 split=train 정의 그대로인 5행의 목표값(2025-01-06 측정)이며, 이 5행까지 뺀 엄격판 T24S를 비상안으로 동결했으나, 운영사무국 이메일 답변('해당 5행은 학습에 사용해도 괜찮습니다')으로 규칙대로 T24를 유지하고 T24S는 비상안에서 종료했다(2026 미채점).
-- **공지 ⑧ 대응.** (1) 2026 지표를 쓴 선택·튜닝은 없다 — 선택 규칙은 CV 2020~2024 와 2025 검증만 썼고, 2026 은 각 동결 뒤 1회만 계산했다. (2) 간접 경로: v1~v2 단계 지점별 수온 임계에 2026 측정이 지점마다 39~54행 섞여 임계가 0.3~0.7℃ 낮았고, 그 피처로 선별·Optuna·구성원을 정했다. (3) FIX-v2.1 에서 상수와 적합 모수를 학습기간 자료로 다시 계산했고, 결정은 사전등록대로 고정했다(재선별·재튜닝은 2026 을 본 뒤의 새 선택이 되므로 하지 않음). (4) 영향 범위: 선별 재실행 시 30개 중 2개 교체, Optuna 미재실행(방법설명서 5.11절 표 5-15·'공지 ⑧ 대응').
+- **공지 ⑧ 대응.** (1) 2026 지표를 쓴 선택·튜닝은 없다 — 선택 규칙은 CV 2020~2024 와 2025 검증만 썼고, 2026 은 각 동결 뒤 1회만 계산했다. (2) 간접 경로: v1~v2 단계 지점별 수온 임계(세포수–수온 LOESS)에 2026 조류 측정(수온·세포수, 평가 구간 포함)이 지점마다 39~54행 섞여 임계가 0.3~0.7℃ 낮았고, 그 피처로 선별·Optuna·구성원을 정했다. (3) FIX-v2.1 에서 상수와 적합 모수를 학습기간 자료로 다시 계산했고, 결정은 사전등록대로 고정했다(재선별·재튜닝은 2026 을 본 뒤의 새 선택이 되므로 하지 않음). (4) 영향 범위: 선별 재실행 시 30개 중 2개 교체, Optuna 미재실행(방법설명서 5.11절 표 5-15·'공지 ⑧ 대응').
 
 **검토한 대안·실패 사례** (세부 수치는 방법설명서 5.11절·10장)
 
@@ -861,7 +873,7 @@ def build(out: Path) -> int:
         (out / d).mkdir(parents=True, exist_ok=True)
         shutil.copy2(lic, out / d / "LICENSE_DataON.txt")
     # docs/handoff/(작업 보고서·화면 캡처, 내부 전달용)는 재현·설계와 무관해 넣지 않는다
-    copy(ROOT / "docs", out / "src" / "docs", extra_ignore=("handoff",))
+    copy(ROOT / "docs", out / "src" / "docs", extra_ignore=("handoff", "SUBMISSION_FINAL.md"))
     copy(ROOT / "pyproject.toml", out / "pyproject.toml")
     for s in SCRIPTS:
         copy(ROOT / "scripts" / s, out / "scripts" / s)
@@ -906,6 +918,9 @@ def build(out: Path) -> int:
     security(out)
     write_readme(out)  # 검사 결과를 README 에 반영한 뒤, README 를 포함해 다시 검사
     hits = security(out)
+    ctrl = control_char_files(out)
+    if ctrl:
+        raise SystemExit(f"빌드 중단: 텍스트 파일에 제어문자가 있다(이스케이프 실수 가능): {ctrl}")
     leaked = dataon_raw_files(out)
     if leaked:
         raise SystemExit(f"빌드 중단: 패키지에 DataON 원값 파일이 있다(공식 Q&A 2026-10-30 ⑥): {leaked}")
@@ -918,6 +933,24 @@ def build(out: Path) -> int:
     print(f"패키지 {out} 총 {dir_size(out)}")
     print("루트:", sorted(p.name for p in out.iterdir()))
     return 1 if hits else 0
+
+
+TEXT_SUFFIXES = (".md", ".txt", ".csv", ".json", ".yaml", ".yml", ".toml", ".py", ".srt")
+
+
+def control_char_files(out: Path) -> list[str]:
+    """텍스트 파일 안의 제어문자(탭·줄바꿈 외 0x00~0x1F, 0x7F) — 이스케이프 실수로 생긴 글자를 막는다."""
+    bad = []
+    for p in out.rglob("*"):
+        if not p.is_file() or p.suffix.lower() not in TEXT_SUFFIXES or ".venv" in p.parts:
+            continue
+        try:
+            t = p.read_text(encoding="utf-8-sig")
+        except UnicodeDecodeError:
+            continue
+        if any((ord(c) < 32 and c not in "\t\n\r") or ord(c) == 127 for c in t):
+            bad.append(p.relative_to(out).as_posix())
+    return sorted(bad)
 
 
 def dataon_raw_files(out: Path) -> list[str]:
@@ -954,6 +987,8 @@ def make_zips(out: Path) -> int:
     dist = ROOT / "dist"
     dist.mkdir(exist_ok=True)
     files = sorted(p for p in out.rglob("*") if p.is_file())
+    if control_char_files(out):
+        raise SystemExit(f"zip 중단: 텍스트 파일에 제어문자가 있다: {control_char_files(out)}")
     if dataon_raw_files(out):
         raise SystemExit(
             "zip 중단: 패키지에 DataON 원값 파일이 있다(공식 Q&A 2026-10-30 ⑥) — 1단계 빌드를 다시 한다."
@@ -1009,7 +1044,7 @@ def doc_readme(pdf: Path, pair_zip: str, pair_sha: str, mp4: Path | None) -> str
         "[짝이 되는 모델자료]",
         f"- {pair_zip}",
         f"  sha256 {pair_sha}",
-        f"- 모델자료 zip 의 폴더 {PKG_NAME}/ 에 코드·데이터·동결 모델(T24 — 2024년까지 자료로만 학습: 대회 공식 학습 분할 split=train, 목표일 2025-01-06 인 5행 포함, 운영사무국 허용)·submission.csv·실행 결과를 담은 노트북이 있다.",
+        f"- 모델자료 zip 의 폴더 {PKG_NAME}/ 에 코드·데이터·동결 모델(T24 — 기준일 2024년까지인 대회 split=train 2,310행으로만 학습, 그중 5행의 목표 측정일은 2025-01-06·운영사무국 허용)·submission.csv·실행 결과를 담은 노트북이 있다.",
         "- data/ 에는 대회 제공 데이터(심사용 — 운영사무국 답변 2026-10-28 '별도의 컴퓨터에서 재현이 원활하도록 구성', 공개 시 제외·대회 종료 후 폐기)와"
         " 외부 공공 자료 스냅샷이 있다. DataON 수위는 원값을 넣지 않고 가공 계수만 담았고(운영사무국 공식 Q&A 2026-10-30 ⑥),"
         " WAMIS 도 원값 없이 가공 수문 피처만 담았다.",
@@ -1027,7 +1062,7 @@ def doc_readme(pdf: Path, pair_zip: str, pair_sha: str, mp4: Path | None) -> str
         " 심사 재현(제출된 학습 완료 모델로 추론만, 재학습 없음)은 4-1절의 4줄이며 난수 시드는 42다.",
         "- 4-1절로 다시 만든 submission_reproduced.csv(4-2절 노트북은 루트 submission.csv)는 제출본과 바이트가 같다"
         "(sha256 057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73).",
-        "- 제출 모델 T24 는 2024년까지 자료로만 학습했다(대회 공식 학습 분할 split=train — 목표일 2025-01-06 인 5행 포함)."
+        "- 제출 모델 T24 는 기준일 2024년까지인 대회 공식 학습 분할 split=train 2,310행으로만 학습했다(그중 5행의 목표 측정일은 2025-01-06)."
         " 학습 범위는 운영사무국 답변(2026-10-28, '학습은 24년까지'), 5행은 운영사무국 이메일 답변(10-28 문의에 대한 회신,"
         " '해당 5행은 학습에 사용해도 괜찮습니다')을 따랐다. 데모 영상도 T24 기준으로 다시 녹화했다(2026-10-28, 방법설명서 9.4절).",
         "- 대회 공식 지표(공식 Q&A 2026-10-30 ①②, R² = 원단위 피어슨 상관계수 제곱): 2025 검증 RMSE(log) 0.712 · MAE(log) 0.537 ·"

@@ -26,7 +26,7 @@
 - [ ] DataON 원값 미포함(10-30 공지 ⑥ — 「댐유역 하천 일평균수위」 재배포 금지, 원자료 대신 가공한 계수만 동봉): 모델자료 zip 에 `data/raw/dataon/level_continuous_long.parquet`·원 배포 xlsx 가 없음(verify_package `dataon_raw_present false`), 노트북이 가공 파일(`data/processed/level_cont_features_S1.parquet`, `level_cont_mode = derived`)로 수위 피처 2열을 채워 submission.csv diff 0(sha256 057afeee…). 가공 계수 정의·기준면 오프셋·출처는 `LICENSE_DataON.txt`·`data/raw/dataon/README_GET_DATAON.md`·MANIFEST 에 기재, README_GET_WAMIS 의 예외 문구(연속 시계열의 WAMIS 연장분) 삭제. 2026-10-28 업로드본(`submission-final-T24`·`submission-final-T24v`)은 이메일 답변(2026-10-28 '결과물 data/ 포함 가능')으로 원값을 넣었으나, 10-28 답변과 10-30 공지가 달라 나중에 나온 출제기관 확인 공지를 따랐다
 - [ ] WAMIS 원값도 모델자료 zip 에 넣지 않음: 수문 피처 33열 가공 파일(`data/processed/wamis_hydro_features_S1.parquet`)로 원자료 없이 submission.csv diff 0, 받는 법은 `data/raw/hydro/README_GET_WAMIS.md`(#3068550·#3040409)
 - [ ] 대회 제공 데이터는 저장소에 커밋하지 않음(참가신청서 규정 3항: 승인 목적 외 이용 금지, 제3자 열람·제공·대여·판매 금지, 대회 완료 후 폐기, 성과물 출처 명시). 패키지에는 심사용으로만(`data/raw/competition/README_심사용_공개시제외.txt`) — 운영사무국 답변(2026-10-28): 결과물 data/ 에 포함 가능, 별도 컴퓨터에서 재현이 원활하도록 구성
-- [ ] 10-30 공지 ⑧ — 사후 분석 코드(`eval/posthoc*.py`·`eval/live.py`·`exp/confirm_2026.py`)가 패키지 `src/` 에 없음(빌더 `SRC_SKIP_FILES`, 남은 `exp/` 는 재현(노트북·추론 4줄)에 쓰지 않는 실험 코드), 2026 사후 수치는 '블라인드 아님' 표기 유지, 2026 실측을 모델 튜닝·제출 결과 수정에 쓰지 않음
+- [ ] 10-30 공지 ⑧ — 사후 분석 코드(`eval/posthoc*.py`·`eval/headline.py`·`eval/live.py`·`exp/confirm_2026.py`)가 패키지 `src/` 에 없음(빌더 `SRC_SKIP_FILES`, 남은 `exp/` 는 재현(노트북·추론 4줄)에 쓰지 않는 실험 코드), 2026 사후 수치는 '블라인드 아님' 표기 유지, 2026 실측을 모델 튜닝·제출 결과 수정에 쓰지 않음
 
 ## C. 우수성 증빙 (방법 설명서에 포함)
 - [ ] 베이스라인 B0~B4 비교표
