@@ -1,12 +1,10 @@
 # WAMIS 원값 받기 — 국가수자원관리종합정보시스템 댐·보 일자료·수위 (선택)
 
 이 제출 패키지(모델자료 zip 2종)에는 **WAMIS 원값을 넣지 않았다.** 빠진 파일은 다음과 같다.
-(예외: DataON 연속 수위 시계열 `data/raw/dataon/level_continuous_long.parquet` 의 2025년 이후 구간은 같은 관측소 WAMIS 일수위를
-기준면 오프셋으로 이어 붙인 값이다. 같은 값은 공공데이터포털 #3068550·#3040409(이용허락범위 제한 없음)에서도 받을 수 있다.)
 - `data/raw/wamis_dam/wamis_dam_daily.parquet`
 - `data/raw/hydro/hydro_daily_long.parquet` 의 `wamis_mn_dtdata`·`wamis_wl_dtdata` 행
 
-노트북과 `make reproduce` 는 WAMIS 원자료 없이 수문 피처 33열을 `data/processed/wamis_hydro_features_S1.parquet`(가공물)로 채운다. 그래서 제출본과 같은 `submission.csv` 를 만든다.
+노트북과 심사 재현(추론만) 4줄(패키지 README 4절)은 WAMIS 원자료 없이 수문 피처 33열을 `data/processed/wamis_hydro_features_S1.parquet`(가공물)로 채운다. 그래서 제출본과 같은 `submission.csv` 를 만든다.
 
 ## 1. 원값을 빼는 이유
 
@@ -24,12 +22,12 @@
 |---|---|---|
 | 공공데이터포털 #3068550 「기후에너지환경부 한강홍수통제소_수자원 정보」 | 이용허락범위 제한 없음 | WAMIS 수위·댐 일자료 등록분(제공 URL wamis.go.kr/wkw/wl_dubwlobs.do) |
 | 공공데이터포털 #3040409 「한강홍수통제소_표준수문DB」 | 이용허락범위 제한 없음. 오픈 API 이용약관 제10조 "저작자 및 출처 표시 조건으로 자유이용" | 한강홍수통제소 OpenAPI(api.hrfco.go.kr). 인증키가 필요하다 |
-| 공공데이터포털 #15099110 「K-water 수문 운영 정보」 | 이용허락범위 제한 없음 | 보·댐 유입·방류·수위(이미 기본 패키지에 포함) |
+| 공공데이터포털 #15099110 「K-water 수문 운영 정보」 | 이용허락범위 제한 없음 | 보·댐 유입·방류·수위(이미 제출 패키지에 포함) |
 
 - 표본 대조 결과(2026-10-23): 유입·방류는 일치했고, 수위는 반올림 차 0.005 m 이하였다.
 - 출처 표시: 한강홍수통제소 국가수자원관리종합정보시스템(WAMIS).
 
-## 3. 기본 패키지에 남긴 수문 자료
+## 3. 제출 패키지에 남긴 수문 자료
 
 - K-water delist(#15099110, 이용허락범위 제한 없음)
 - K-water 다목적댐 운영 정보(#15099049, 이용허락범위 제한 없음)
@@ -55,5 +53,5 @@ python -m algaecast.models.predict --out submission_from_wamis.csv
   | `wamis_dam_daily.parquet` | `1044c8256afe7de8e191ae1d4e0fd3a8fbf4e98ae0c2dee6e244599aef5fd2a2` |
   | `hydro_daily_long.parquet`(전체) | `9f6edb82b14d2f00fde259232127da569100e4fa5618c97c21ee7a1e07caf085` |
 
-- 다시 받으면 최근 값(잠정값)이 바뀌어 결과가 조금 달라질 수 있다. 제출본과 같은 결과가 필요하면 기본 패키지의 가공 피처 파일을 쓴다.
+- 다시 받으면 최근 값(잠정값)이 바뀌어 결과가 조금 달라질 수 있다. 제출본과 같은 결과가 필요하면 제출 패키지의 가공 피처 파일을 쓴다.
 - 가공 파일은 원자료가 있는 환경에서 다시 만들 수 있다: `python -m algaecast.features.run --strategy S1 --export-wamis`

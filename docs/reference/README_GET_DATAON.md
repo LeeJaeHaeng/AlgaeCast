@@ -1,9 +1,14 @@
 # DataON 원자료 받기 — 댐유역 하천 일평균수위 (선택)
 
-이 제출 패키지(모델자료 zip 2종)에는 **DataON 연속 수위 원값 `data/raw/dataon/level_continuous_long.parquet` 이 들어 있다**
-(운영사무국 답변(2026-10-28): 결과물 data/ 폴더에 포함해 제출 가능). 노트북과 `make reproduce` 는 이 원자료로 수위 피처를 계산한다. 원자료 파일을 치우면
-`data/processed/level_cont_features_S1.parquet`(수위 피처 2열, DataON 가공물)로 두 열을 채우며, 어느 쪽이든 `features_S1` 은
-완전히 같고 `submission.csv` 는 바이트까지 같다(2026-10-23·10-28 확인).
+이 제출 패키지에는 **DataON 원값(일평균수위)과 원 배포 xlsx 를 넣지 않았다.** 운영사무국 공식 Q&A(2026-10-30) ⑥이
+「댐유역 하천 일평균수위」는 재배포 금지이므로 원자료 대신 가공한 계수만 동봉하라고 했기 때문이다.
+2026-10-28 업로드본(`submission-final-T24`·`submission-final-T24v`)의 모델자료 zip 2종에는 운영사무국 이메일 답변(2026-10-28, '결과물 data/ 폴더에 원자료 포함 가능')에 따라
+연속 수위 원값 `data/raw/dataon/level_continuous_long.parquet` 을 넣었다. 10-28 답변과 10-30 공지가 달라, 나중에 나온 출제기관 확인 공지를 따랐다(새 제출본에서 원값을 뺐다).
+
+노트북과 심사 재현(추론만) 4줄(패키지 README 4절)은 원자료 파일이 없으면 가공 파일 모드(`level_cont_mode = derived`)로 자동 전환해,
+수위 피처 2열(`level_cont_t0`·`level_cont_diff7`)을 가공 파일 `data/processed/level_cont_features_S1.parquet`(2,979행×4열)로 채운다.
+이 2열은 원자료로 계산한 T24 피처와 비트 단위로 같아 `features_S1` 의 두 열이 같고 `submission.csv` 는 바이트까지 같다
+(빌더 동등성 검사·2026-11-02 대조. 패키지 재현은 2026-10-23 확인, 원값 없는 가공 파일 모드 — v2.1 패키지. 2026-10-28 은 원값 모드 검증).
 원 배포 xlsx 부터 다시 만들고 싶을 때만 아래를 따른다.
 
 ## 1. 자료
@@ -13,7 +18,7 @@
 | 자료명 | 댐유역 하천 일평균수위 (국가참조표준) |
 | DOI | 10.20925/KSRD.74670854.v5 (https://doi.org/10.20925/KSRD.74670854.v5), 제·개정 2025-12-16 |
 | 저작자 | 생산 한국수자원공사 오재우·이영창·이재용 / 발행 국가참조표준센터 / DataON(KISTI) 등재 |
-| 라이선스 | **CC BY-NC-SA**(저작자표시-비영리-동일조건변경허락). DataON 유래 데이터와 그 가공물은 같은 조건으로만 재배포할 수 있다(`LICENSE_DataON.txt`) |
+| 라이선스 | **CC BY-NC-SA**(저작자표시-비영리-동일조건변경허락). 원자료(일평균수위 원값)는 재배포 금지(운영사무국 공식 Q&A 2026-10-30 ⑥). 이 패키지의 DataON 유래 가공물은 같은 조건으로만 재배포할 수 있다(`LICENSE_DataON.txt`) |
 | 받는 곳 | DataON 상세 페이지 https://dataon.kisti.re.kr/search/view.do?mode=view&svcId=683386b621f469db2f44fb1ff25fe4ca 의 첨부파일 '전체' 내려받기 |
 
 ## 2. 기대 파일 (2026-10-20 내려받은 파일 기준)
@@ -56,20 +61,25 @@ python -m algaecast.models.predict --out submission_from_dataon.csv
     2026-10-23 그 규칙(v2)으로 다시 받은 시계열을 돌린 결과: `level_cont_t0` 2,979행 모두 조금씩 달라졌다(최대 차 1.21).
     `level_cont_diff7` 는 117행(대부분 칠서), `submission.csv` 는 124행 중 26행(최대 상대차 14.7%)이 달라졌다.
   - 제출본(T24, 수위 피처 정의는 v2.1 과 같음)은 관측소별 직전 365일 평균(기준일 미포함)을 쓴다. 그래서 2026-10-20 잠정값 차이는 표본 행(기준일 ≤2026-10-15)의
-    피처에 들어가지 않고, 보현산댐 2025년~ 값은 코드가 뺀다. 다만 WAMIS 가 과거 값을 고치면 달라질 수 있으므로 제출본 재현에는 아래 파일을 쓴다.
-- **제출본과 같은 결과가 필요하면** 패키지에 든 연속 시계열 스냅샷을 쓴다(다시 받지 않는다).
-  - 파일: `data/raw/dataon/level_continuous_long.parquet`, 144,068행
+    피처에 들어가지 않고, 보현산댐 2025년~ 값은 코드가 뺀다. 다만 WAMIS 가 과거 값을 고치면 달라질 수 있으므로 제출본 재현에는 아래 가공 파일을 쓴다.
+- **제출본과 같은 결과가 필요하면** 패키지에 든 가공 파일 `data/processed/level_cont_features_S1.parquet` 를 쓴다(원자료를 다시 받지 않는다).
+  원자료 파일이 없으면 노트북과 심사 재현 4줄이 자동으로 이 파일을 쓴다(`level_cont_mode = derived`). `submission.csv` 는 바이트까지 같다.
+- 참고 — 제출본을 만든 연속 시계열 스냅샷(원값 포함, 패키지에 없음):
+  - 파일: `data/raw/dataon/level_continuous_long.parquet`, 144,068행(DataON 2010~2024 128,279행 + 같은 관측소 WAMIS 일수위 2025~ 15,789행)
   - sha256: `c37195353178e9d30fc0d6873a57a27379dd16558ae8a4f7016ccd8eaf981830`
-  - 이 스냅샷으로 수위 피처를 계산해도 `submission.csv` 는 바이트까지 같다(2026-10-26·10-27 대체 zip, 2026-10-28 모델자료 zip 재현 검증).
+  - 이 스냅샷으로 수위 피처를 계산해도 `submission.csv` 는 바이트까지 같았다(2026-10-26·10-27 대체 zip, 2026-10-28 모델자료 zip 재현 검증 — 원값 모드).
+  - DataON 원값이 들어 있어 10-30 공지 ⑥에 따라 새 제출본에는 넣지 않았다. 가공 파일은 이 스냅샷으로 계산한 값과 같다.
 
-## 5. 패키지에 든 DataON 유래 파일 (CC BY-NC-SA, 같은 폴더에 `LICENSE_DataON.txt`)
+## 5. 패키지에 든 DataON 유래 파일 (가공 계수만, CC BY-NC-SA, 같은 폴더에 `LICENSE_DataON.txt`)
 
-- `data/raw/dataon/level_continuous_long.parquet`: 연속 수위 원값(DataON 2010~2024 + 같은 관측소 WAMIS 2025~, 기준면 오프셋 보정), 144,068행.
+DataON 원값·원 배포 xlsx·원값이 든 연속 시계열(`data/raw/dataon/level_continuous_long.parquet`)은 넣지 않았다(10-30 공지 ⑥).
 
 - `data/processed/level_cont_features_S1.parquet`
   - 2,979행 × 4열(`station_id`, `base_date`, `level_cont_t0`, `level_cont_diff7`)
-  - 학습·검증·평가 샘플마다 수위 편차와 7일 변화를 담았다(원값이 아니라 관측소별 직전 365일 평균을 뺀 가공값).
-  - sha256 `86243a68758a473a2ca6fc9cd3915b30f05ccdf916df12b33fe3c3ab4bed89f0`(v2.1 피처, 2026-10-23 12:10 생성).
+  - 가공 계수 정의: 지점마다 상류 관측소 3~9곳 각각의 '기준일 수위 − 직전 365일 평균(기준일 제외, 유효 ≥180일)'을 평균한 값(`level_cont_t0`)과
+    그 7일 변화(`level_cont_diff7`). 관측소별 일평균수위는 이 값에서 복원할 수 없다.
+  - 학습·검증·평가 샘플마다 이 두 값을 담았다. 원자료로 계산한 T24 피처와 비트 단위로 같다(빌더 동등성 검사·2026-11-02 대조).
+  - sha256 `86243a68758a473a2ca6fc9cd3915b30f05ccdf916df12b33fe3c3ab4bed89f0`(v2.1 피처, 2026-10-23 12:10 생성. 수위 피처 정의는 T24 와 같다).
   - 원자료가 있는 환경에서 `python -m algaecast.features.run --strategy S1 --export-level-cont` 로 다시 만들 수 있다.
-- `src/config/level_cont_stats.json`: 관측소별 기준면 오프셋(2020~2024 겹침 구간 DataON − WAMIS 중앙값)·관측소 목록·본댐 대체 표.
+- `src/config/level_cont_stats.json`: 관측소별 기준면 오프셋(2020~2024 겹침 구간 DataON − WAMIS 중앙값, 관측소 24곳)·관측소 목록·본댐 대체 표.
   대시보드 일일 운영 전용이고 재현에는 쓰지 않는다(전 기간 평균 값은 v2.1 에서 폐기, T24 도 같음).
