@@ -53,10 +53,10 @@ N_2025 = 252
 N_2026 = 124
 # (키, 표 이름, 정의) — 주 지표 4개 + 참고 1개
 DEFS: tuple[tuple[str, str, str], ...] = (
-    ("nse_raw", "원단위 결정계수(=NSE)", "1 − SSE/SST, 원단위(cells/mL), SST 는 그 집계의 관측 평균 기준"),
-    ("r2_pearson_raw", "원단위 상관계수 제곱(r²)", "Pearson r², 원단위 — 편향·척도 오차를 벌점하지 않음"),
-    ("rmse_log", "로그 RMSE", "√mean((log10(o+1) − log10(p+1))²) — 대회 1차 지표"),
-    ("mae_log", "로그 MAE", "mean(|log10(o+1) − log10(p+1)|)"),
+    ("nse_raw", "원단위 NSE(1−SSE/SST)", "1 − SSE/SST, 원단위(cells/mL), SST 는 그 집계의 관측 평균 기준"),
+    ("r2_pearson_raw", "원단위 R²(공식, 피어슨 r²)", "Pearson r², 원단위 — 편향·척도 오차를 벌점하지 않음"),
+    ("rmse_log", "로그 RMSE", "√mean((log10(o+1) − log10(p+1))²) — 대회 공식 순위 지표"),
+    ("mae_log", "로그 MAE", "mean(|log10(o+1) − log10(p+1)|) — 대회 공식 순위 지표"),
     ("r2_log", "(참고) 로그 결정계수", "1 − SSE/SST, log10(x+1) 공간"),
 )
 METRIC_KEYS: tuple[str, ...] = tuple(k for k, _, _ in DEFS)
@@ -304,7 +304,7 @@ def render_md(res: Mapping[str, Mapping[str, Any]], checks: list[dict[str, Any]]
         "블라인드 아님(팀은 수정 전 v1·v2 의 2026 결과를 이미 봤다).\n\n"
         "- 2025: ≤2024 학습 v2.1 의 연도 확장 OOF(eval.holdout_v21 과 같은 252행). 2026: v2.1(≤2025 학습) 사후 예측.\n"
         "- B0 지속성 = 가장 최근 측정을 7일 뒤 값으로. 통합 = 5지점 행을 모아 한 번 계산, "
-        "지점 평균 = 지점별 값 5개의 단순 평균(가중 없음). 지점별 결정계수는 그 지점 관측 평균을 기준으로 하므로 "
+        "지점 평균 = 지점별 값 5개의 단순 평균(가중 없음). 지점별 NSE 는 그 지점 관측 평균을 기준으로 하므로 "
         "지점 간 수준 차이로 얻는 설명력이 빠진다.\n\n"
         "## 정의(eval.metrics.compute_all 과 같은 함수)\n\n"
         f"{defs}\n\n"

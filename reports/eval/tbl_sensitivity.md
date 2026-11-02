@@ -1,6 +1,6 @@
 # 2025 원단위 지표 민감도 — 최대 관측 1건 제외 / 지점별 최대 1건씩 제외
 
-- 폴드 F1~F5(train ≤2019~2023 → valid 2020~2024) 평균 = cv_*, Final(train ≤2024 → 2025) = final_*. test(2026) 미접근. 지표 정의: docs/04 6.1 (r2_raw=sklearn 결정계수, r2_pearson_raw=상관²).
+- 폴드 F1~F5(train ≤2019~2023 → valid 2020~2024) 평균 = cv_*, Final(train ≤2024 → 2025) = final_*. test(2026) 미접근. 지표 정의: docs/04 6.1 (r2_raw=sklearn 결정계수 = NSE(대회 공식 R² 아님), r2_pearson_raw=상관² = 대회 공식 R²(공식 Q&A 2026-10-30 ②)).
 - B0 지속성 2025: rmse_log 0.896, r2_raw -0.283, r2_pearson_raw 0.148, nse_raw -0.283, F1@10k 0.727
 
 | study | 변형 | 목적 | bias | max_obs | max_obs_site | pred_at_max | full_r2_raw | full_r2_pearson_raw | full_nse_raw | full_rmse_log | drop1_r2_raw | drop1_r2_pearson_raw | drop1_nse_raw | drop1_rmse_log | drop_site_max_r2_raw | drop_site_max_r2_pearson_raw | drop_site_max_nse_raw | drop_site_max_rmse_log |

@@ -190,3 +190,28 @@ def test_bootstrap_ci_cluster_keys():
     # 재표본에서 NaN 이 나오는 지표(상수 관측)는 n_failed 로 집계된다
     const = m.bootstrap_ci([5.0, 5.0, 5.0], [5.0, 6.0, 7.0], m.nse_raw, n=20, seed=3)
     assert const["n_failed"] == 20 and math.isnan(const["lo"])
+
+
+def test_r2_official_is_pearson_squared_with_zero_rules():
+    """공식 R²(운영사무국 공식 Q&A 2026-10-30 ②) = 원단위 피어슨 r², 예측 상수·상관 음수면 0. r2_raw(= NSE)와 다르다."""
+    o = np.array([0.0, 10.0, 100.0, 1_000.0, 20_000.0])
+    p = np.array([5.0, 50.0, 80.0, 3_000.0, 9_000.0])
+    r = np.corrcoef(o, p)[0, 1]
+    assert r > 0
+    assert m.r2_official(o, p) == pytest.approx(r**2, abs=1e-12)
+    assert m.r2_official(o, p) == pytest.approx(m.r2_pearson_raw(o, p), abs=1e-12)
+    assert m.r2_official(o, p) != pytest.approx(m.r2_raw(o, p), abs=1e-3)  # 1 − SSE/SST 와 구분
+    assert m.r2_official(o, 2.0 * p + 7.0) == pytest.approx(r**2, abs=1e-12)  # 척도·편향 불변
+    assert m.r2_official(o, o[::-1]) == 0.0  # 상관 음수 → 0
+    assert m.r2_pearson_raw(o, o[::-1]) > 0  # (0 규칙 없는 r² 는 양수)
+    assert m.r2_official(o, np.full(5, 123.0)) == 0.0  # 예측 상수 → 0
+
+
+def test_f1_official_uses_strict_threshold():
+    """공식 참고지표 F1 은 10,000 '초과', f1_at 은 '이상'(조류경보제). 경계값이 없으면 같다."""
+    o = np.array([10_000.0, 20_000.0, 500.0, 15_000.0])
+    p = np.array([10_000.0, 30_000.0, 100.0, 9_000.0])
+    assert m.f1_at(o, p)["f1"] == pytest.approx(0.8)  # ≥: TP 2(10k·20k)·FN 1(15k) → 4/5
+    assert m.f1_official(o, p) == pytest.approx(2 / 3)  # >: TP 1(20k)·FN 1(15k) → 2·1/(2·1+0+1)
+    o2, p2 = np.array([12_000.0, 500.0, 30_000.0]), np.array([11_000.0, 20_000.0, 5.0])
+    assert m.f1_official(o2, p2) == pytest.approx(m.f1_at(o2, p2)["f1"])

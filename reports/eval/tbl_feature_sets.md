@@ -1,6 +1,6 @@
 # 피처 세트 비교 (채택 변형·파라미터, S1)
 
-- 폴드 F1~F5(train ≤2019~2023 → valid 2020~2024) 평균 = cv_*, Final(train ≤2024 → 2025) = final_*. test(2026) 미접근. 지표 정의: docs/04 6.1 (r2_raw=sklearn 결정계수, r2_pearson_raw=상관²).
+- 폴드 F1~F5(train ≤2019~2023 → valid 2020~2024) 평균 = cv_*, Final(train ≤2024 → 2025) = final_*. test(2026) 미접근. 지표 정의: docs/04 6.1 (r2_raw=sklearn 결정계수 = NSE(대회 공식 R² 아님), r2_pearson_raw=상관² = 대회 공식 R²(공식 Q&A 2026-10-30 ②)).
 - B0 지속성 2025: rmse_log 0.896, r2_raw -0.283, r2_pearson_raw 0.148, nse_raw -0.283, F1@10k 0.727
 
 | 피처 세트 | 피처 수 | cv_rmse_log | cv_mae_log | cv_r2_log | cv_r2_raw | cv_r2_pearson_raw | cv_nse_raw | cv_f1_10k | final_rmse_log | final_mae_log | final_r2_log | final_r2_raw | final_r2_pearson_raw | final_nse_raw | final_f1_10k |

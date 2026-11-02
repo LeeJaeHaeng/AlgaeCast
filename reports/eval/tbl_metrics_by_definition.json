@@ -2,16 +2,16 @@
  "_about": "회귀 지표 정의별 값(집계만). 2025 = 같은 252행(≤2024 학습 v2.1 OOF), 2026 = test 124 조합(저장된 v2.1 사후 예측, 블라인드 아님). python -m algaecast.eval.posthoc_metrics_by_definition",
  "definitions": {
   "nse_raw": {
-   "name": "원단위 결정계수(=NSE)",
+   "name": "원단위 NSE(1−SSE/SST)",
    "definition": "1 − SSE/SST, 원단위(cells/mL), SST 는 그 집계의 관측 평균 기준"
   },
   "r2_pearson_raw": {
-   "name": "원단위 상관계수 제곱(r²)",
+   "name": "원단위 R²(공식, 피어슨 r²)",
    "definition": "Pearson r², 원단위 — 편향·척도 오차를 벌점하지 않음"
   },
   "rmse_log": {
    "name": "로그 RMSE",
-   "definition": "√mean((log10(o+1) − log10(p+1))²) — 대회 1차 지표"
+   "definition": "√mean((log10(o+1) − log10(p+1))²) — 대회 공식 순위 지표"
   },
   "mae_log": {
    "name": "로그 MAE",

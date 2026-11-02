@@ -227,7 +227,8 @@ def main(argv: list[str] | None = None) -> int:
     # ---- 저장
     hdr_note = (
         f"- 폴드 F1~F5(train ≤2019~2023 → valid 2020~2024) 평균 = cv_*, Final(train ≤2024 → 2025) = final_*. "
-        f"test(2026) 미접근. 지표 정의: docs/04 6.1 (r2_raw=sklearn 결정계수, r2_pearson_raw=상관²).\n"
+        "test(2026) 미접근. 지표 정의: docs/04 6.1 (r2_raw=sklearn 결정계수 = NSE(대회 공식 R² 아님), "
+        "r2_pearson_raw=상관² = 대회 공식 R²(공식 Q&A 2026-10-30 ②)).\n"
         f"- B0 지속성 2025: rmse_log {b0['rmse_log']:.3f}, r2_raw {b0['r2_raw']:.3f}, "
         f"r2_pearson_raw {b0['r2_pearson_raw']:.3f}, "
         f"nse_raw {b0['nse_raw']:.3f}, F1@10k {b0['f1_10k']:.3f}\n"

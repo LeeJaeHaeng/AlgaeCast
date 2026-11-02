@@ -1,12 +1,16 @@
+# ruff: noqa: E501  (지표 정의 표의 긴 한국어 줄)
 """평가 지표 (docs/04_MODELING_SPEC.md 6.1절) — T0-c.
 
 | 지표 | 공간 | 정의 |
 |---|---|---|
-| rmse_log, mae_log | log10(x+1) | 대회 1차 지표 |
-| r2_raw | 원단위 | sklearn r2_score (= 1 − SS_res/SS_tot, 검증 관측 평균 기준) |
-| nse_raw | 원단위 | Nash–Sutcliffe = 1 − Σ(o−p)²/Σ(o−ō)². 수식상 r2_raw 와 동일하지만 보고 관례상 별도 제공 |
-| r2_log, kge | log10(x+1) | 보완 (KGE: Gupta et al. 2009, r·α·β 분해) |
-| f1_at(threshold) | 분류 | obs ≥ t vs pred ≥ t 의 precision/recall/f1 (경계 10,000·관심 1,000, 경계값 포함) |
+| rmse_log, mae_log | log10(x+1) | 대회 공식 순위 지표 4개(가중치 동일) 중 둘 |
+| r2_official | 원단위 | **대회 공식 R²**(운영사무국 공식 Q&A 2026-10-30 ②): 피어슨 상관계수 제곱, 예측(또는 관측)이 상수이거나 상관이 음수면 0 |
+| nse_raw | 원단위 | Nash–Sutcliffe = 1 − Σ(o−p)²/Σ(o−ō)². 대회 공식 순위 지표 |
+| r2_raw | 원단위 | sklearn r2_score (= 1 − SS_res/SS_tot). **NSE 와 같은 값이며 대회 공식 R² 가 아니다**(공지 ②). 예전 표·보고와의 호환을 위해 이름을 남긴다 |
+| r2_pearson_raw | 원단위 | 피어슨 r² (0 규칙 없음 — 상관이 양수면 r2_official 과 같다) |
+| r2_log, kge | log10(x+1) | 보완 (KGE: Gupta et al. 2009, r·α·β 분해), 순위 미반영 |
+| f1_at(threshold) | 분류 | obs ≥ t vs pred ≥ t 의 precision/recall/f1 (경계 10,000·관심 1,000, 경계값 포함 — 조류경보제 '이상') |
+| f1_official | 분류 | 공식 참고지표 F1(공지 ①): obs > 10,000 vs pred > 10,000(초과), 순위 미반영 |
 | picp, mpiw | 구간 | 80% 예측구간(q10~q90) 포함률과 평균 폭(기본 log 공간). 교차 구간은 정렬 후 계산 |
 | brier | 확률 | 경계 초과 확률의 Brier score |
 
@@ -67,7 +71,7 @@ def _is_constant(x: np.ndarray) -> bool:
 
 
 def log10p(x: ArrayLike) -> np.ndarray:
-    """log10(x + 1). 대회 1차 지표 공간."""
+    """log10(x + 1). 대회 공식 순위 지표 RMSE(log)·MAE(log)의 공간."""
     return np.log10(np.asarray(x, dtype="float64") + LOG_OFFSET)
 
 
@@ -95,7 +99,7 @@ def _r2(o: np.ndarray, p: np.ndarray) -> float:
 
 
 def r2_raw(obs: ArrayLike, pred: ArrayLike) -> float:
-    """sklearn r2_score (원단위). 관측이 상수이면 NaN."""
+    """sklearn r2_score (원단위) = 1 − SSE/SST = NSE. 대회 공식 R² 가 아니다(r2_official). 관측이 상수이면 NaN."""
     o, p = _pair(obs, pred)
     return _r2(o, p)
 
@@ -109,6 +113,19 @@ def r2_pearson_raw(obs: ArrayLike, pred: ArrayLike) -> float:
     if _is_constant(o) or _is_constant(p):
         return float("nan")
     return float(np.corrcoef(o, p)[0, 1] ** 2)
+
+
+def r2_official(obs: ArrayLike, pred: ArrayLike) -> float:
+    """대회 공식 R²(운영사무국 공식 Q&A 2026-10-30 ②, 원단위): 관측·예측의 피어슨 상관계수 제곱.
+
+    1 − SSE/SST(sklearn r2_score, = NSE)는 쓰지 않는다. 예측값이 모두 같거나 상관계수가 음수이면 0
+    (관측이 상수여도 상관을 정의할 수 없으므로 0).
+    """
+    o, p = _pair(obs, pred)
+    if _is_constant(o) or _is_constant(p):
+        return 0.0
+    r = float(np.corrcoef(o, p)[0, 1])
+    return r * r if r > 0 else 0.0
 
 
 def nse_raw(obs: ArrayLike, pred: ArrayLike) -> float:
@@ -154,6 +171,19 @@ def f1_at(obs: ArrayLike, pred: ArrayLike, threshold: float = THRESHOLD_WARNING)
         "n_pos_obs": int(y_true.sum()),
         "n_pos_pred": int(y_pred.sum()),
     }
+
+
+def f1_official(obs: ArrayLike, pred: ArrayLike, threshold: float = THRESHOLD_WARNING) -> float:
+    """공식 참고지표 F1(공지 ①, 순위 미반영): 정답·예측이 각각 threshold 를 '넘는지'(초과)로 계산한다.
+
+    f1_at 은 조류경보제 기준('이상', 경계값 포함)이라 정확히 threshold 인 값이 있을 때만 둘이 달라진다.
+    """
+    o, p = _pair(obs, pred)
+    y_true, y_pred = (o > threshold).astype(int), (p > threshold).astype(int)
+    _, _, f1, _ = precision_recall_fscore_support(
+        y_true, y_pred, average="binary", pos_label=1, zero_division=0
+    )
+    return float(f1)
 
 
 # ---------------------------------------------------------------- 구간·확률
