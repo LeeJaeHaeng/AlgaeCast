@@ -1,5 +1,5 @@
 {
- "when": "2026-10-28 14:53",
+ "when": "2026-11-02 16:54",
  "returncode": 0,
  "source": "dist\\AlgaeCast_모델자료_이재행.zip",
  "model_dirs": [
@@ -8,17 +8,19 @@
   "quantile/20261026_131722"
  ],
  "model_dir_problems": [],
- "dataon_raw_present": true,
- "level_cont_mode": "raw",
+ "dataon_raw_present": false,
+ "level_cont_mode": "derived",
  "wamis_raw_present": false,
  "wamis_mode": "derived",
  "submission_regenerated": true,
  "submission_identical": true,
  "submission_sha256": "057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73",
+ "inference_identical": true,
+ "inference_sha256": "057afeee93c7a4213bf9176d8696fd9255617641f5c0b0aa35427a8fc1cf3f73",
  "notebook_errors": 0,
  "notebook_stderr_warnings": 0,
  "notebook_abs_paths": 0,
  "demo_sha256": "5c648ac0b38021a12a5c4cbd1b4db97becc6e750babf9e42249f6899cd4d56a1",
  "demo_sha_ok": true,
- "minutes": 17.5
+ "minutes": 23.5
 }

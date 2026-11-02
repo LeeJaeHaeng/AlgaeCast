@@ -1,23 +1,69 @@
-# 2026-10-28 데모 영상 v7 반영 패키지 재검증 3건(아래 순서): 패키지 폴더(--update-package) 13:43, 모델자료 영상제외 zip 14:20, 모델자료 zip 14:36.
-# 모델자료 zip 은 14:08 에도 검증했다(diff 0·노트북 오류 0·데모 sha256 일치·11.3분). 그 실행 기록은 다음 검증이 덮어써서, 기록 보존을 위해 14:36 에 다시 실행했다.
-
-# 패키지 재현 검증 2026-10-28 13:43
+# 패키지 재현 검증 2026-11-02 15:43
 원본: C:\Users\user\OneDrive\Desktop\경진대회\algaecast\submission_package
 
 $ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
-C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe scripts/verify_frozen.py
+[FROZEN.md]
+regression/20261021_091108: 패키지 미포함(이력, model/HISTORY.md)
+classifier/20261021_091109: 패키지 미포함(이력, model/HISTORY.md)
+quantile/20261021_091110: 패키지 미포함(이력, model/HISTORY.md)
+[FROZEN_v2.md]
+regression/20261022_162747: 패키지 미포함(이력, model/HISTORY.md)
+classifier/20261021_091109: 패키지 미포함(이력, model/HISTORY.md)
+quantile/20261021_091110: 패키지 미포함(이력, model/HISTORY.md)
+[FROZEN_v2.1.md]
+regression/20261023_120818: 패키지 미포함(이력, model/HISTORY.md)
+classifier/20261023_120255: 패키지 미포함(이력, model/HISTORY.md)
+quantile/20261023_120257: 패키지 미포함(이력, model/HISTORY.md)
+regression/20261023_120255: 패키지 미포함(이력, model/HISTORY.md)
+[FROZEN_T24.md]
+regression/20261026_131722: OK
+classifier/20261026_131722: OK
+quantile/20261026_131722: OK
+current regression: 20261026_131722 (OK)
+current classifier: 20261026_131722 (OK)
+current quantile: 20261026_131722 (OK)
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m algaecast.align.run --strategy S1
+INFO HP S1 → daily_HP_S1.parquet (5420행)
+INFO GJGR S1 → daily_GJGR_S1.parquet (5420행)
+INFO CS S1 → daily_CS_S1.parquet (5420행)
+INFO MGMR S1 → daily_MGMR_S1.parquet (5420행)
+INFO DCHN S1 → daily_DCHN_S1.parquet (5420행)
+  지점 전략   일수  측정일  fac_inflow 결측%  dam_inflow 결측%  ta 결측%  si 결측%  예보 보유일  wtemp 채움후 결측%
+  HP S1 5420  566             0.2             0.2     0.3     0.4      14           28.7
+GJGR S1 5420  600             0.2             0.2     0.3     0.4      14           28.7
+  CS S1 5420  624             0.2             0.2     0.3    25.9      14           28.7
+MGMR S1 5420  366             0.7             0.2     0.3     0.7      14           56.3
+DCHN S1 5420  783             0.2             0.2     0.3     0.7      14           28.7
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m algaecast.features.run --strategy S1
+INFO S1 HP: 샘플 566 (타깃 509)
+INFO S1 GJGR: 샘플 600 (타깃 547)
+INFO S1 CS: 샘플 624 (타깃 592)
+INFO S1 MGMR: 샘플 366 (타깃 339)
+INFO S1 DCHN: 샘플 783 (타깃 767)
+INFO DataON 원자료 없음 → 가공 수위 피처 level_cont_features_S1.parquet 로 ('level_cont_t0', 'level_cont_diff7') 채움(키 없음 0행)
+INFO WAMIS 원자료 없음 → 가공 수문 피처 wamis_hydro_features_S1.parquet 로 33열 채움
+전략   샘플  train  valid  test  피처
+S1 2939   2310    256   124 101
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m algaecast.models.predict --out submission_reproduced.csv
+{'rows': 124, 'columns': True, 'order_same_as_sample': True, 'nan': 0, 'negative': 0, 'bom': True, 'sha256': '057afeee93c7a421', 'min': 5, 'max': 56709, 'median': 11111.0}
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
+C:\Users\user\AppData\Local\Temp\algaecast_verify_fgr17_p6\pkg\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
   self._get_loop()
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
 [jupytext] Reading notebooks/01_train_eval.py in format py
@@ -25,51 +71,74 @@ C:\Users\user\AppData\Local\Temp\algaecast_verify__hktzslf\pkg\.venv\Lib\site-pa
 [jupytext] Warning: Notebook is not trusted
 [jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
 [jupytext] Updating the timestamp of notebooks/01_train_eval.py
-submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 5c648ac0b38021a1… 일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 11.5 분
+submission.csv diff: 0 (바이트 동일) · 추론 4줄 submission_reproduced.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 5c648ac0b38021a1… 일치 · DataON 원값 없음(수위 피처 derived) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 40.7 분
 
-# 패키지 재현 검증 2026-10-28 14:20
-원본: dist\AlgaeCast_모델자료_영상제외_이재행.zip
-
-$ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
-
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
-
-[notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
-
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
-
-[notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
-
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
-C:\Users\user\AppData\Local\Temp\algaecast_verify_ls51jmtp\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
-  self._get_loop()
-[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
-[jupytext] Reading notebooks/01_train_eval.py in format py
-[jupytext] Executing notebook with kernel python3
-[jupytext] Warning: Notebook is not trusted
-[jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
-[jupytext] Updating the timestamp of notebooks/01_train_eval.py
-submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 None… 불일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 14.7 분
-
-# 패키지 재현 검증 2026-10-28 14:36
+# 패키지 재현 검증 2026-11-02 16:30
 원본: dist\AlgaeCast_모델자료_이재행.zip
 
 $ C:\Users\user\OneDrive\Desktop\경진대회\algaecast\.venv\Scripts\python.exe -m venv .venv
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -r requirements.txt
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install -q -e . --no-deps
 
 [notice] A new release of pip is available: 24.0 -> 26.2.2
-[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
+[notice] To update, run: C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m pip install --upgrade pip
 
-$ C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
-C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe scripts/verify_frozen.py
+[FROZEN.md]
+regression/20261021_091108: 패키지 미포함(이력, model/HISTORY.md)
+classifier/20261021_091109: 패키지 미포함(이력, model/HISTORY.md)
+quantile/20261021_091110: 패키지 미포함(이력, model/HISTORY.md)
+[FROZEN_v2.md]
+regression/20261022_162747: 패키지 미포함(이력, model/HISTORY.md)
+classifier/20261021_091109: 패키지 미포함(이력, model/HISTORY.md)
+quantile/20261021_091110: 패키지 미포함(이력, model/HISTORY.md)
+[FROZEN_v2.1.md]
+regression/20261023_120818: 패키지 미포함(이력, model/HISTORY.md)
+classifier/20261023_120255: 패키지 미포함(이력, model/HISTORY.md)
+quantile/20261023_120257: 패키지 미포함(이력, model/HISTORY.md)
+regression/20261023_120255: 패키지 미포함(이력, model/HISTORY.md)
+[FROZEN_T24.md]
+regression/20261026_131722: OK
+classifier/20261026_131722: OK
+quantile/20261026_131722: OK
+current regression: 20261026_131722 (OK)
+current classifier: 20261026_131722 (OK)
+current quantile: 20261026_131722 (OK)
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m algaecast.align.run --strategy S1
+INFO HP S1 → daily_HP_S1.parquet (5420행)
+INFO GJGR S1 → daily_GJGR_S1.parquet (5420행)
+INFO CS S1 → daily_CS_S1.parquet (5420행)
+INFO MGMR S1 → daily_MGMR_S1.parquet (5420행)
+INFO DCHN S1 → daily_DCHN_S1.parquet (5420행)
+  지점 전략   일수  측정일  fac_inflow 결측%  dam_inflow 결측%  ta 결측%  si 결측%  예보 보유일  wtemp 채움후 결측%
+  HP S1 5420  566             0.2             0.2     0.3     0.4      14           28.7
+GJGR S1 5420  600             0.2             0.2     0.3     0.4      14           28.7
+  CS S1 5420  624             0.2             0.2     0.3    25.9      14           28.7
+MGMR S1 5420  366             0.7             0.2     0.3     0.7      14           56.3
+DCHN S1 5420  783             0.2             0.2     0.3     0.7      14           28.7
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m algaecast.features.run --strategy S1
+INFO S1 HP: 샘플 566 (타깃 509)
+INFO S1 GJGR: 샘플 600 (타깃 547)
+INFO S1 CS: 샘플 624 (타깃 592)
+INFO S1 MGMR: 샘플 366 (타깃 339)
+INFO S1 DCHN: 샘플 783 (타깃 767)
+INFO DataON 원자료 없음 → 가공 수위 피처 level_cont_features_S1.parquet 로 ('level_cont_t0', 'level_cont_diff7') 채움(키 없음 0행)
+INFO WAMIS 원자료 없음 → 가공 수문 피처 wamis_hydro_features_S1.parquet 로 33열 채움
+전략   샘플  train  valid  test  피처
+S1 2939   2310    256   124 101
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m algaecast.models.predict --out submission_reproduced.csv
+{'rows': 124, 'columns': True, 'order_same_as_sample': True, 'nan': 0, 'negative': 0, 'bom': True, 'sha256': '057afeee93c7a421', 'min': 5, 'max': 56709, 'median': 11111.0}
+
+$ C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Scripts\python.exe -m jupytext --to notebook --execute notebooks/01_train_eval.py
+C:\Users\user\AppData\Local\Temp\algaecast_verify_se74l6si\AlgaeCast_녹조7일예측_이재행\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
   self._get_loop()
 [IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
 [jupytext] Reading notebooks/01_train_eval.py in format py
@@ -77,4 +146,4 @@ C:\Users\user\AppData\Local\Temp\algaecast_verify_iz4l5amo\AlgaeCast_녹조7일�
 [jupytext] Warning: Notebook is not trusted
 [jupytext] Writing notebooks/01_train_eval.ipynb (destination file replaced [use --update to preserve cell outputs and ids])
 [jupytext] Updating the timestamp of notebooks/01_train_eval.py
-submission.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 5c648ac0b38021a1… 일치 · DataON 원값 있음(수위 피처 raw) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 17.5 분
+submission.csv diff: 0 (바이트 동일) · 추론 4줄 submission_reproduced.csv diff: 0 (바이트 동일) · 노트북 오류 0건(경고 줄 0, 절대경로 0) · 데모 sha256 5c648ac0b38021a1… 일치 · DataON 원값 없음(수위 피처 derived) · WAMIS 원값 없음(수문 피처 derived) · model/ 허용 폴더 3개만 · 소요 23.5 분
