@@ -19,7 +19,7 @@
 - [ ] 시드 고정, requirements 버전 고정, Python 버전 명시
 - [ ] 10-30 공지 ④ — 패키지 README 4절에 실행 명령 기재: 심사 재현(추론만, 재학습 없음) 4줄을 첫 경로로(`.venv/Scripts/python scripts/verify_frozen.py` → `-m algaecast.align.run --strategy S1` → `-m algaecast.features.run --strategy S1` → `-m algaecast.models.predict --out submission_reproduced.csv`, Linux/macOS 는 `.venv/bin/python`), 노트북 전체 실행은 둘째 경로. 패키지에는 `Makefile` 이 없으므로 패키지 문서는 `make reproduce` 대신 이 4줄을 가리킴
 - [ ] 공지 ④ — 추론만 4줄의 결과 `submission_reproduced.csv` 가 루트 `submission.csv` 와 바이트 동일(sha256 057afeee…), 새 venv 에서 확인
-- [ ] 공지 ④ — README 에 난수 시드 42 명시: `src/config/seed.yaml` → `algaecast.config.load_seed` → `models.train.SEED`(LightGBM `random_state`). 추론은 저장 모델·고정 가중치만 써서 난수를 쓰지 않음
+- [ ] 공지 ④ — README 에 난수 시드 42 명시: `src/config/seed.yaml`(seed: 42 — LightGBM `random_state` 는 `models.train.SEED`, 부트스트랩 등은 `algaecast.config.load_seed()`). 추론은 저장 모델·고정 가중치만 써서 난수를 쓰지 않음
 - [ ] 공지 ④ — 오프라인: 설치 명령(첫 2줄)만 네트워크 사용, 추론 4줄은 네트워크 없이 실행해 바이트 동일
 - [ ] 공지 ④ — 허용 오차(124행 행 단위, log10(세포수+1) 차 ≤0.05 또는 절대 차 ≤100 cells/mL, 불일치 ≤6행·2배 초과 0행) 대비: 노트북 4단계 '재학습 = 동결' 대조는 허용 오차 비교(상대·절대 1e-6, 넘으면 경고 줄만 출력), `requirements.txt` 의 `pywinpty` 에 `; sys_platform == "win32"` 표시(Linux/macOS 설치 자동 제외)
 - [ ] 외부 데이터 전부 MANIFEST에 출처·라이선스·수집일시 기재(공공데이터포털 자료는 공공누리/이용허락범위 제한 없음, WAMIS 는 같은 값의 포털 #3068550·#3040409 등록분 기준(수집은 키 없는 개방 API, 회원약관 제15조④ 비회원 적용 불분명), DataON 수위 자료는 CC BY-NC-SA — 패키지의 DataON 유래 파일에 LICENSE_DataON.txt)

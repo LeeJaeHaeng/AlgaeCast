@@ -117,7 +117,7 @@ AI 예상은 세 단계입니다. 두 조건(p_alert ≥ 0.46, 보정 q90 ≥ 10
 <table>
   <tr>
     <td width="50%" valign="top"><img src="docs/images/site_detail.png" alt="지점 상세 화면 — 강정·고령" width="100%"><br><b>지점 상세</b> <code>/sites/2011G56</code><br><sub>강정·고령, 2026-10-28 16:51 KST 캡처(기준일·측정일 10월 19일). 예상값 2.2만 개/mL, 예상 범위 1,500~3.8만, 다음 주 1만 넘을 가능성 94%. 근거 세 가지, 지난 경계 사건 기록, 권고 조치, 물·날씨 6개월 그래프.</sub></td>
-    <td width="50%" valign="top"><img src="docs/images/performance.png" alt="얼마나 잘 맞혔나 화면" width="100%"><br><b>얼마나 잘 맞혔나</b> <code>/performance</code><br><sub>2026-10-28 16:51 KST 캡처(상단 1080px). 큰 숫자 4개와 T24·이전 모델·지속성 비교표. 2026 열은 '사후 계산·블라인드 아님'으로 표시하고, 약한 점(2026 '원단위 결정계수' 0.00)을 빨간 글로 밝힙니다. 이 캡처의 '원단위 결정계수' 0.18 · 0.00 은 NSE 이고 공식 R² 는 0.20 · 0.11 입니다(대시보드 라벨은 2026-11-02 수정, 배포 전. 캡처는 그 전 화면).</sub></td>
+    <td width="50%" valign="top"><img src="docs/images/performance.png" alt="얼마나 잘 맞혔나 화면" width="100%"><br><b>얼마나 잘 맞혔나</b> <code>/performance</code><br><sub>2026-11-02 15:40 KST 캡처(상단 1080px). 큰 숫자 4개와 T24·이전 모델·지속성 비교표 — 대회 공식 순위 지표 4개(로그 기준 오차·평균 오차·원단위 상관계수 제곱(R²)·원단위 효율계수(NSE))와 참고 지표. 2026 열은 '사후 계산·블라인드 아님'으로 표시하고, 약한 점(2026 상관계수 제곱 0.11·효율계수 0.00)을 빨간 글로 밝힙니다. 대시보드 라벨은 2026-11-02 공식 Q&A ② 기준으로 고쳤습니다(그 전 화면의 '원단위 결정계수' 0.18·0.00 은 NSE 였습니다).</sub></td>
   </tr>
   <tr>
     <td width="50%" valign="top"><img src="docs/images/replay_0727.png" alt="다시 보기 화면 — 2026-07-27 기준" width="100%"><br><b>다시 보기</b> <code>/?asof=2026-07-27</code><br><sub>2026-10-28 16:51 KST 캡처, 기준일 7월 27일. 동결 모델(T24)로 그날까지의 자료만 써서 사후 계산한 화면이며, 당시 실시간 운영 화면이 아닙니다. 고정 run 이라 값이 바뀌지 않습니다.</sub></td>
@@ -333,7 +333,7 @@ flowchart LR
 | 10-28 | 제출본 태그 `submission-final-T24v`(데모 영상 v7 반영) | [SUBMISSION_FINAL](docs/SUBMISSION_FINAL.md) |
 | 수신일 확인 중 | **운영사무국 5행 허용 답변**(이메일, 10-28 문의에 대한 회신): "해당 5행은 학습에 사용해도 괜찮습니다." 8절 규칙('5행도 학습 불가'일 때만 T24S 로 교체)대로 **T24 유지 확정**, 엄격판 T24S 는 비상안 종료(2026 미채점, 앞으로도 채점하지 않음) | PREREG_contingency 덧붙임(2026-11-02) |
 | 10-30 | **운영사무국 공식 Q&A**('평가 방식 및 데이터 활용 관련 Q&A 안내', 출제기관 확인 답변 ①~⑧). PREREG_contingency 1절의 미답 질문 3개(기준일 당일 측정 → ⑤, 번들 밖 조류경보 API → ⑥, 동결 뒤 2026 사후 → ⑧)가 모두 '허용'이라 S 모델 전환·2026 수치 대체 없음. 항목별 대응은 [아래 표](#운영사무국-공식-qa2026-10-30-대응) | [공지 원문](docs/organizer_answers/2026-10-30.md) |
-| 11-02 | 10-30 공지 대응: 지표 표기 정정(공식 R²·NSE), 재현 명령·시드 기재, DataON 원값을 뺀 새 제출본 준비(태그 `submission-final-qa1030` 예정). T24·`model/`·`submission.csv` 는 바꾸지 않음 | 이 문서 |
+| 11-02 | 10-30 공지 대응: 지표 표기 정정(공식 R²·NSE), 재현 명령·시드 기재, DataON 원값을 뺀 새 제출본(태그 `submission-final-qa1030`, 새 가상환경·오프라인 재현 통과). T24·`model/`·`submission.csv` 는 바꾸지 않음 | 이 문서 |
 
 - v1·v2·v2.1 은 **이력**입니다. v1 의 2026 '8건 중 7건'은 누수가 있던 때의 결과라 이력으로만 남깁니다.
 - 피처 선별·하이퍼파라미터·상류·cg 채택은 누수 수정 전에 정했습니다. 당시 피처 상수에 2026년 자료가 섞여 있었으므로 간접 영향은 남아 있습니다(방법설명서 5.11 표 5-15).
@@ -384,9 +384,9 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt
 .venv/Scripts/python -m algaecast.models.predict --out submission_reproduced.csv
 ```
 
-- 결과 `submission_reproduced.csv` 는 루트 `submission.csv` 와 바이트 단위로 같습니다(새 제출본의 재빌드 검증에서 확인 예정).
-- **난수 시드: 42**(`src/config/seed.yaml` → `algaecast.config.load_seed` → `models.train.SEED`, LightGBM `random_state`). 저장소 경로는 `config/seed.yaml` 입니다. 추론은 저장된 모델과 고정 가중치만 써서 난수를 쓰지 않습니다.
-- 공지 ④ 재현 기준(124건 행 단위, log10(세포수+1) 차 ≤0.05 또는 절대 차 ≤100 cells/mL) 대비: 2026-10-28 업로드본(노트북 경로, DataON 원값 raw 모드)은 개발 환경(Windows 11·Python 3.11.9) 새 venv 에서 온라인·오프라인 모두 바이트 동일했습니다. 새 제출본과 위 4줄 단독 실행은 재빌드 검증에서 확인합니다. 추론은 저장된 LightGBM 트리의 결정론적 계산이라, 다른 환경이어도 차이는 부동소수 끝자리(정수 반올림 ±1 cells) 수준으로 예상합니다(공지 허용 오차보다 훨씬 작음).
+- 결과 `submission_reproduced.csv` 는 루트 `submission.csv` 와 바이트 단위로 같습니다(새 제출본, 2026-11-02 새 가상환경 단독 실행으로 확인).
+- **난수 시드: 42**(`src/config/seed.yaml` 의 seed: 42 — LightGBM `random_state` 는 `models.train.SEED`, 부트스트랩 등은 `algaecast.config.load_seed()` 가 읽음). 저장소 경로는 `config/seed.yaml` 입니다. 추론은 저장된 모델과 고정 가중치만 써서 난수를 쓰지 않습니다.
+- 공지 ④ 재현 기준(124건 행 단위, log10(세포수+1) 차 ≤0.05 또는 절대 차 ≤100 cells/mL 면 일치, 불일치 ≤6행이고 그중 2배 넘게 차이 나는 행이 없으면 통과) 대비: 2026-10-28 업로드본(노트북 경로, DataON 원값 raw 모드)은 개발 환경(Windows 11·Python 3.11.9) 새 venv 에서 온라인·오프라인 모두 바이트 동일했습니다. 새 제출본(DataON 원값 제외)도 2026-11-02 새 가상환경에서 4줄 단독 실행·노트북 모두 바이트 동일했고, 네트워크를 막은 오프라인 재현도 통과했습니다. 추론은 저장된 LightGBM 트리의 결정론적 계산이라, 다른 환경이어도 차이는 부동소수 끝자리(정수 반올림 ±1 cells) 수준으로 예상합니다(공지 허용 오차보다 훨씬 작음).
 - 패키지 `requirements.txt` 의 Windows 전용 `pywinpty` 에는 환경 표시(`; sys_platform == "win32"`)를 붙여 Linux/macOS 설치에서 자동으로 빠집니다.
 - 패키지에는 `Makefile` 이 없으므로 `make reproduce` 대신 위 4줄을 씁니다.
 
@@ -401,7 +401,7 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt
 - 4단계 재학습은 2025 검증 지표 확인용이고, `submission.csv` 는 6단계에서 동결 모델로만 만듭니다. 4단계의 '재학습 = 동결' 대조는 새 제출본에서 허용 오차(상대·절대 1e-6) 비교이며, 넘으면 멈추지 않고 경고 줄만 출력합니다(개발 PC 출력은 최대 절대차 0.0 그대로). 예전 판(10-28 업로드본)은 정확히 0.0 이 아니면 멈췄습니다.
 - 셀 단위로 보려면 `.venv/Scripts/jupyter lab notebooks/01_train_eval.ipynb` 를 씁니다. jupyterlab 은 패키지 `requirements.txt` 에 들어 있습니다.
 - 2026-10-28 검증(10-28 업로드본, DataON 원값으로 수위 피처를 계산하는 raw 모드): 새 venv 에서 diff 0·노트북 오류 0(11.5분). 오프라인(PIP_NO_INDEX·가짜 프록시)에서도 PASS(11.8분).
-- 새 제출본은 DataON 원값이 없어 수위 피처 2열을 가공 파일로 채웁니다(`level_cont_mode = derived`, 원자료 파일이 없으면 자동 전환). 이 2열은 원자료로 계산한 T24 피처와 비트 단위로 같아 `submission.csv` 도 같습니다(빌더 동등성 검사·2026-11-02 대조).
+- 새 제출본은 DataON 원값이 없어 수위 피처 2열을 가공 파일로 채웁니다(`level_cont_mode = derived`, 원자료 파일이 없으면 자동 전환). 이 2열은 원자료로 계산한 T24 피처와 비트 단위로 같아 `submission.csv` 도 같습니다(빌더 동등성 검사·2026-11-02 대조, 새 가상환경 재현으로 확인).
 - 사후 분석 코드(`eval/posthoc*.py`·`eval/live.py`·`exp/confirm_2026.py`)는 새 제출본에 넣지 않았습니다(공지 ⑧). 패키지 `src/algaecast/exp/` 의 나머지는 실험 코드이며 재현(노트북·추론 4줄)에 쓰지 않습니다.
 
 ### (나) 저장소에서 `make reproduce`
@@ -424,7 +424,7 @@ python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt
 2026-10-27 공지에 따라 제출란은 두 칸(① 문서자료 ② 모델자료)이고, 둘 다 zip 하나에 폴더 하나입니다. 10-28 업로드본 기록은 [`docs/SUBMISSION_FINAL.md`](docs/SUBMISSION_FINAL.md)(태그 `submission-final-T24v`)에 있습니다.
 
 > [!NOTE]
-> **10-30 공지 ⑥ 대응 — DataON 원값 제외.** 10-28 이메일 답변('결과물 data/ 에 원자료 포함 가능')에 따라 업로드본 `submission-final-T24`·`submission-final-T24v`(2026-10-28)의 모델자료 zip 2종에 연속 수위 원값 `data/raw/dataon/level_continuous_long.parquet`(DataON 2010~2024 128,279행 + 같은 관측소 WAMIS 일수위 2025~ 15,789행)을 넣었습니다. 10-30 공지 ⑥('재배포 금지 — 원자료 대신 가공한 계수만 동봉')에 따라 **새 제출본에서는 원값을 뺐습니다**(태그 이름은 `submission-final-qa1030` 예정). 10-28 답변과 10-30 공지가 달라, 나중에 나온 출제기관 확인 공지를 따랐습니다. 새 제출본에는 DataON 원값·원 배포 xlsx 가 없고, 수위 피처 2열은 가공 파일 `data/processed/level_cont_features_S1.parquet`(2,979행×4열)로 채웁니다. 제출 모델 T24·`model/`·`submission.csv` 는 그대로입니다.
+> **10-30 공지 ⑥ 대응 — DataON 원값 제외.** 10-28 이메일 답변('결과물 data/ 에 원자료 포함 가능')에 따라 업로드본 `submission-final-T24`·`submission-final-T24v`(2026-10-28)의 모델자료 zip 2종에 연속 수위 원값 `data/raw/dataon/level_continuous_long.parquet`(DataON 2010~2024 128,279행 + 같은 관측소 WAMIS 일수위 2025~ 15,789행)을 넣었습니다. 10-30 공지 ⑥('재배포 금지 — 원자료 대신 가공한 계수만 동봉')에 따라 **새 제출본에서는 원값을 뺐습니다**(태그 이름은 `submission-final-qa1030`). 10-28 답변과 10-30 공지가 달라, 나중에 나온 출제기관 확인 공지를 따랐습니다. 새 제출본에는 DataON 원값·원 배포 xlsx 가 없고, 수위 피처 2열은 가공 파일 `data/processed/level_cont_features_S1.parquet`(2,979행×4열)로 채웁니다. 제출 모델 T24·`model/`·`submission.csv` 는 그대로입니다.
 
 아래 크기는 10-28 업로드본 기준입니다.
 
