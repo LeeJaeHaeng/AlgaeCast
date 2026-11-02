@@ -52,10 +52,12 @@ const checks = [
 ];
 // 비교표의 모든 값(2자리)이 성능 페이지에 있는지
 for (const b of ["h25t24", "h25v2", "h25v1", "h25b0", "p26t24", "p26v2", "p26v1", "p26b0"]) {
-  for (const k of ["rmselog", "r2log", "r2raw", "nseraw", "f1_10k"]) checks.push(["/performance", f2(val(b, k))]);
+  for (const k of ["rmselog", "maelog", "r2off", "nseraw", "r2log", "f1_10k"]) checks.push(["/performance", f2(val(b, k))]);
 }
 for (const k of ["t24", "v2", "v1", "b0"]) checks.push(["/performance", f2(val("cvR2raw", k))]);
-for (const k of ["r2raw", "f1_10k"]) checks.push(["/performance", f2(val("p26v1fix", k))]);
+for (const k of ["r2off", "f1_10k"]) checks.push(["/performance", f2(val("p26v1fix", k))]);
+// 공식 지표 라벨(운영사무국 공식 Q&A 2026-10-30 ②) — 예전 라벨 '원단위 결정계수'가 화면에 남지 않았는지는 check_copy 금지어로 본다
+checks.push(["/performance", "원단위 상관계수 제곱 (대회 공식 지표 · 목표 0.6)"], ["/performance", "원단위 효율계수 (대회 공식 지표 · 목표 0.5)"]);
 for (const k of ["r2log", "f1_10k"]) checks.push(["/performance", f2(val("p26v21", k))]);
 
 let bad = 0;

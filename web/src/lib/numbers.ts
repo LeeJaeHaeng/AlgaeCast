@@ -7,6 +7,8 @@
  * 2026 = reports/experiments/contingency_T24/tbl_holdout_2026_posthoc_T24.md(T24, 감시 q90_cqr≥임계).
  * 지표 값은 reports/eval/headline_metrics.json 의 전체 정밀도 값에서 한 번만 반올림한 값이다(이중 반올림 금지).
  * 2025 = 같은 252행(T24 의 홀드아웃 = v2.1 Final 폴드, tbl_holdout_2025_v21.json), 2026 = test 124조합(T24 동결 뒤 1회 사후 계산, 블라인드 아님).
+ * 대회 공식 지표(운영사무국 공식 Q&A 2026-10-30 ①②): RMSE(log)·MAE(log)·R²(원단위 피어슨 r², r2off = headline r2_official)·NSE(nseraw).
+ * r2raw 는 sklearn r2_score = NSE 와 같은 값이라 공식 R² 가 아니다(예전 키, 원천 대조용으로만 남김 — 화면에는 쓰지 않는다).
  */
 export const NUMBERS = {
   events: { total: 28, detected: 24, medianLeadDays: 14, persistenceDetected: 3 },
@@ -16,6 +18,8 @@ export const NUMBERS = {
   f1_10k: { y2025: 0.7, y2026: 0.82, persistence2025: 0.73, persistence2026: 0.84 },
   r2raw: { y2025: 0.18, y2026: 0 },
   nseraw: { y2025: 0.18, y2026: 0 },
+  r2off: { y2025: 0.2, y2026: 0.11 },
+  maelog: { y2025: 0.54, y2026: 0.57 },
   picp80: { y2025: 0.85, y2026: 0.72 },
 } as const;
 
@@ -38,19 +42,19 @@ export const MODELS = {
  * v2·v1 값은 수정 전 계산 그대로). 2026 = contingency_T24/tbl_holdout_2026_posthoc_T24.md(T24·v2.1)·tbl_holdout_2026_posthoc_v21.md(v2·v1·v1-fix).
  */
 export const CMP = {
-  h25t24: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.7 },
-  h25v21: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.7 },
-  h25v2: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.7 },
-  h25v1: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.16, nseraw: 0.16, f1_10k: 0.68 },
-  h25v1fix: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.17, nseraw: 0.17, f1_10k: 0.67 },
-  h25b0: { n: 252, rmselog: 0.9, r2log: 0.65, r2raw: -0.28, nseraw: -0.28, f1_10k: 0.73 },
+  h25t24: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.7, r2off: 0.2, maelog: 0.54 },
+  h25v21: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.7, r2off: 0.2, maelog: 0.54 },
+  h25v2: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.18, nseraw: 0.18, f1_10k: 0.7, r2off: 0.21, maelog: 0.53 },
+  h25v1: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.16, nseraw: 0.16, f1_10k: 0.68, r2off: 0.19, maelog: 0.53 },
+  h25v1fix: { n: 252, rmselog: 0.71, r2log: 0.78, r2raw: 0.17, nseraw: 0.17, f1_10k: 0.67, r2off: 0.2, maelog: 0.53 },
+  h25b0: { n: 252, rmselog: 0.9, r2log: 0.65, r2raw: -0.28, nseraw: -0.28, f1_10k: 0.73, r2off: 0.15, maelog: 0.59 },
   cvR2raw: { t24: 0.29, v21: 0.29, v2: 0.29, v1: 0.17, v1fix: 0.19, b0: 0 },
-  p26t24: { n: 124, rmselog: 0.73, r2log: 0.5, r2raw: 0, nseraw: 0, f1_10k: 0.82 },
-  p26v21: { n: 124, rmselog: 0.72, r2log: 0.52, r2raw: 0, nseraw: 0, f1_10k: 0.83 },
-  p26v2: { n: 124, rmselog: 0.72, r2log: 0.52, r2raw: -0.01, nseraw: -0.01, f1_10k: 0.82 },
-  p26v1: { n: 124, rmselog: 0.74, r2log: 0.49, r2raw: -0.05, nseraw: -0.05, f1_10k: 0.7 },
-  p26v1fix: { n: 124, rmselog: 0.73, r2log: 0.5, r2raw: -0.03, nseraw: -0.03, f1_10k: 0.76 },
-  p26b0: { n: 124, rmselog: 0.9, r2log: 0.24, r2raw: -0.3, nseraw: -0.3, f1_10k: 0.84 },
+  p26t24: { n: 124, rmselog: 0.73, r2log: 0.5, r2raw: 0, nseraw: 0, f1_10k: 0.82, r2off: 0.11, maelog: 0.57 },
+  p26v21: { n: 124, rmselog: 0.72, r2log: 0.52, r2raw: 0, nseraw: 0, f1_10k: 0.83, r2off: 0.1, maelog: 0.55 },
+  p26v2: { n: 124, rmselog: 0.72, r2log: 0.52, r2raw: -0.01, nseraw: -0.01, f1_10k: 0.82, r2off: 0.11, maelog: 0.55 },
+  p26v1: { n: 124, rmselog: 0.74, r2log: 0.49, r2raw: -0.05, nseraw: -0.05, f1_10k: 0.7, r2off: 0.08, maelog: 0.57 },
+  p26v1fix: { n: 124, rmselog: 0.73, r2log: 0.5, r2raw: -0.03, nseraw: -0.03, f1_10k: 0.76, r2off: 0.09, maelog: 0.56 },
+  p26b0: { n: 124, rmselog: 0.9, r2log: 0.24, r2raw: -0.3, nseraw: -0.3, f1_10k: 0.84, r2off: 0.12, maelog: 0.63 },
   /** 2026 경계 사건 8건 — 점예측이 1만 이상을 미리 낸 사건 수, 감시 단계 선행 탐지 */
   p26point: { total: 8, t24: 4, v21: 5, v2: 5, v1: 2, v1fix: 2, persistence: 2 },
   p26watch: { total: 8, t24: 7, v21: 7, v2: 7, v1: 7, medianLeadT24: 21, medianLeadV21: 21, medianLeadV2: 21, medianLeadV1: 21 },

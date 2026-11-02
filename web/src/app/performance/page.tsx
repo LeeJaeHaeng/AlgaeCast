@@ -103,14 +103,14 @@ export default async function PerformancePage({ searchParams }: { searchParams: 
           <h2 className="text-lg font-semibold">{PERF.target.title}</h2>
           <ul className="mt-2 space-y-1 text-base">
             {PERF.target
-              .rows({ r25: n2(NUMBERS.r2raw.y2025), r26: n2(NUMBERS.r2raw.y2026), n25: n2(NUMBERS.nseraw.y2025), n26: n2(NUMBERS.nseraw.y2026) })
+              .rows({ r25: n2(NUMBERS.r2off.y2025), r26: n2(NUMBERS.r2off.y2026), n25: n2(NUMBERS.nseraw.y2025), n26: n2(NUMBERS.nseraw.y2026) })
               .map((r) => (
               <li key={r} className="font-semibold" style={{ color: "var(--severe)" }}>
                 {r}
               </li>
             ))}
           </ul>
-          <p className="mt-1 text-xs text-dim">{PERF.target.rowsNote(n2(CMP.h25v1.r2raw), n2(CMP.h25v2.r2raw))}</p>
+          <p className="mt-1 text-xs text-dim">{PERF.target.rowsNote(n2(CMP.h25v1.r2off), n2(CMP.h25v2.r2off))}</p>
           <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm leading-relaxed">
             {PERF.target.why.map((w) => (
               <li key={w}>{w}</li>
@@ -201,9 +201,9 @@ function CompareTable({ title, rows, expert, notice }: { title: string; rows: Me
 function CompareModels({ expert }: { expert: boolean }) {
   const C = PERF.compare;
   const { h25t24, h25v2, h25v1, h25v1fix, h25b0, p26t24, p26v21, p26v2, p26v1, p26v1fix, p26b0, p26point, p26watch, cvR2raw, priorWatch } = CMP;
-  type M = { rmselog: number; r2log: number; r2raw: number; nseraw: number; f1_10k: number };
+  type M = { rmselog: number; maelog: number; r2off: number; nseraw: number; r2log: number; f1_10k: number };
   const metricRows = (a: M, b: M, c: M, d: M): MetricRow[] => [
-    ...(["r2log", "rmselog", "r2raw", "nseraw"] as const).map((k): MetricRow => ({ key: k, t24: n2(a[k]), v2: n2(b[k]), v1: n2(c[k]), b0: n2(d[k]) })),
+    ...(["rmselog", "maelog", "r2off", "nseraw", "r2log"] as const).map((k): MetricRow => ({ key: k, t24: n2(a[k]), v2: n2(b[k]), v1: n2(c[k]), b0: n2(d[k]) })),
     { key: "f1", t24: n2(a.f1_10k), v2: n2(b.f1_10k), v1: n2(c.f1_10k), b0: n2(d.f1_10k) },
   ];
   const rows26: MetricRow[] = [
@@ -224,8 +224,8 @@ function CompareModels({ expert }: { expert: boolean }) {
       <ul className="space-y-1 text-sm leading-relaxed">
         <li style={{ color: "var(--safe)" }}>{C.prior(priorWatch.t24, priorWatch.total)}</li>
         <li>{C.v21(n2(p26v21.r2log), n2(p26v21.f1_10k), p26point.v21, p26point.total)}</li>
-        <li>{C.v1fix(n2(h25v1fix.r2raw), n2(p26v1fix.r2raw), n2(p26v1fix.f1_10k), p26point.v1fix, p26point.total)}</li>
-        <li style={{ color: "var(--severe)" }}>{C.weak(n2(p26t24.r2raw), n2(h25t24.f1_10k), n2(h25b0.f1_10k), n2(p26t24.f1_10k), n2(p26b0.f1_10k))}</li>
+        <li>{C.v1fix(n2(h25v1fix.r2off), n2(p26v1fix.r2off), n2(p26v1fix.f1_10k), p26point.v1fix, p26point.total)}</li>
+        <li style={{ color: "var(--severe)" }}>{C.weak(n2(p26t24.r2off), n2(p26t24.nseraw), n2(h25t24.f1_10k), n2(h25b0.f1_10k), n2(p26t24.f1_10k), n2(p26b0.f1_10k))}</li>
         <li className="text-dim">{C.cv(n2(cvR2raw.t24), n2(cvR2raw.v2), n2(cvR2raw.v1), n2(cvR2raw.b0))}</li>
       </ul>
       <p className="text-[11px] text-dim">{C.source}</p>

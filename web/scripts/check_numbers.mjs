@@ -100,23 +100,27 @@ checks.push(["2020~25 사건 수(priorWatch)", pick("priorWatch", "total"), S.pr
 // ── 헤드라인 지표(T24: 2025 같은 252행 = v2.1 Final 폴드 · 2026 test 124) ───────────
 const h21 = H.same252_2025.t24;
 const p21 = H.posthoc2026.t24;
-for (const k of ["rmse_log", "r2_log", "r2_raw", "nse_raw", "f1_10k", "f1_1k"]) checks.push([`2025 T24 = v2.1 Final 폴드 ${k}`, 0, H.same252_2025.t24[k] === H.same252_2025.v21[k] ? 0 : 1]);
+for (const k of ["rmse_log", "mae_log", "r2_log", "r2_raw", "r2_pearson_raw", "r2_official", "nse_raw", "f1_10k", "f1_1k"]) checks.push([`2025 T24 = v2.1 Final 폴드 ${k}`, 0, H.same252_2025.t24[k] === H.same252_2025.v21[k] ? 0 : 1]);
 checks.push(["r2_log 2025", pick("r2log", "y2025"), r2(h21.r2_log)], ["r2_log 2026", pick("r2log", "y2026"), r2(p21.r2_log)]);
 checks.push(["F1@10k 2025", pick("f1_10k", "y2025"), r2(h21.f1_10k)], ["F1@10k 2026", pick("f1_10k", "y2026"), r2(p21.f1_10k)]);
 checks.push(["F1@10k 지속성 2025", pick("f1_10k", "persistence2025"), r2(H.same252_2025.b0.f1_10k)], ["F1@10k 지속성 2026", pick("f1_10k", "persistence2026"), r2(H.posthoc2026.b0.f1_10k)]);
 checks.push(["r2_raw 2025", pick("r2raw", "y2025"), r2(h21.r2_raw)], ["r2_raw 2026", pick("r2raw", "y2026"), r2(p21.r2_raw)]);
 checks.push(["nse_raw 2025", pick("nseraw", "y2025"), r2(h21.nse_raw)], ["nse_raw 2026", pick("nseraw", "y2026"), r2(p21.nse_raw)]);
+// 공식 R²(운영사무국 공식 Q&A 2026-10-30 ②: 원단위 피어슨 r², 상관 음수·예측 상수면 0)·MAE(log)
+checks.push(["R²(공식) 2025", pick("r2off", "y2025"), r2(h21.r2_official)], ["R²(공식) 2026", pick("r2off", "y2026"), r2(p21.r2_official)]);
+checks.push(["mae_log 2025", pick("maelog", "y2025"), r2(h21.mae_log)], ["mae_log 2026", pick("maelog", "y2026"), r2(p21.mae_log)]);
+checks.push(["R²(공식) 2025 = 공식 지표 표(OOF)", 0, H.official.same252_2025.t24.r2_official === h21.r2_official ? 0 : 1]);
 checks.push(["PICP80(CQR) 2025", pick("picp80", "y2025"), r2(H.picp80_2025_same252)], ["PICP80(CQR) 2026", pick("picp80", "y2026"), r2(p21.picp80)]);
 
 // ── 비교표(CMP) ──────────────────────────────────────────────────
-const metricBlock = (b) => ({ n: pick(b, "n"), rmse: pick(b, "rmselog"), r2log: pick(b, "r2log"), r2raw: pick(b, "r2raw"), nse: pick(b, "nseraw"), f1: pick(b, "f1_10k") });
-const jsonMetrics = (o) => ({ n: o.n, rmse: r2(o.rmse_log), r2log: r2(o.r2_log), r2raw: r2(o.r2_raw), nse: r2(o.nse_raw), f1: r2(o.f1_10k) });
-const KMAP = { n: "n", rmse: "rmse_log", r2log: "r2_log", r2raw: "r2_raw", nse: "nse_raw", f1: "f1_10k" };
+const metricBlock = (b) => ({ n: pick(b, "n"), rmse: pick(b, "rmselog"), mae: pick(b, "maelog"), r2log: pick(b, "r2log"), r2raw: pick(b, "r2raw"), r2off: pick(b, "r2off"), nse: pick(b, "nseraw"), f1: pick(b, "f1_10k") });
+const jsonMetrics = (o) => ({ n: o.n, rmse: r2(o.rmse_log), mae: r2(o.mae_log), r2log: r2(o.r2_log), r2raw: r2(o.r2_raw), r2off: r2(o.r2_official), nse: r2(o.nse_raw), f1: r2(o.f1_10k) });
+const KMAP = { n: "n", rmse: "rmse_log", mae: "mae_log", r2log: "r2_log", r2raw: "r2_raw", r2off: "r2_official", nse: "nse_raw", f1: "f1_10k" };
 const pushMetrics = (label, ours, theirs) => {
   for (const k of Object.keys(KMAP)) checks.push([`${label} ${KMAP[k]}`, ours[k], theirs[k]]);
 };
 const srcEq = (t, row, o, label) => {
-  for (const k of ["rmse_log", "r2_log", "r2_raw", "nse_raw", "f1_10k"]) checks.push([`원천 정합 ${label} ${k}: JSON→셋째 자리 = md 표`, 0, Math.abs(r3x(o[k]) - num(row[col(t, k)])) < 1e-9 ? 0 : 1]);
+  for (const k of ["rmse_log", "mae_log", "r2_log", "r2_raw", "r2_pearson_raw", "nse_raw", "f1_10k"]) checks.push([`원천 정합 ${label} ${k}: JSON→셋째 자리 = md 표`, 0, Math.abs(r3x(o[k]) - num(row[col(t, k)])) < 1e-9 ? 0 : 1]);
   checks.push([`원천 정합 ${label} n`, num(row[col(t, "n")]), o.n]);
 };
 // 2025 같은 252행
